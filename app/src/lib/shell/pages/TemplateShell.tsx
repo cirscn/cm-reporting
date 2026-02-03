@@ -73,13 +73,39 @@ function TemplateScaffold({
 
   /** 工作流页面集合（用于 stepper 与上下页）。 */
   const workflowPages = useCreation(() => getWorkflowPages(versionDef), [versionDef])
+
+  /** 获取每个页面的进度（合并多个 section 的进度）。 */
+  const getPageProgress = (pageKey: string) => {
+    const { sections } = checkerSummary
+    switch (pageKey) {
+      case 'declaration':
+        return {
+          total:
+            sections.companyInfo.total +
+            sections.questionMatrix.total +
+            sections.companyQuestions.total,
+          completed:
+            sections.companyInfo.completed +
+            sections.questionMatrix.completed +
+            sections.companyQuestions.completed,
+        }
+      case 'smelterList':
+        return sections.smelterList
+      case 'productList':
+        return sections.productList
+      default:
+        return undefined
+    }
+  }
+
   const workflowSteps = useCreation(
     () =>
       workflowPages.map((page) => ({
         key: page.key,
         label: t(page.labelKey),
+        progress: getPageProgress(page.key),
       })),
-    [workflowPages, t, locale, i18n.isInitialized]
+    [workflowPages, t, locale, i18n.isInitialized, checkerSummary]
   )
   const workflowPageKeys = useCreation(
     () => workflowPages.map((page) => page.key),

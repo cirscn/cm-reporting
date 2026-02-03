@@ -27,12 +27,28 @@ import { calculateRequiredFields, getActiveMineralKeys } from './required'
 export type Translate = (key: I18nKey, options?: Record<string, unknown>) => string
 
 /**
+ * 导出接口类型：SectionProgress。
+ */
+export interface SectionProgress {
+  total: number
+  completed: number
+}
+
+/**
  * 导出接口类型：CheckerSummary。
  */
 export interface CheckerSummary {
   completion: number
   totalRequired: number
   completedRequired: number
+  /** 分区进度（用于 GlobalErrorBar 显示） */
+  sections: {
+    companyInfo: SectionProgress
+    questionMatrix: SectionProgress
+    companyQuestions: SectionProgress
+    smelterList: SectionProgress
+    productList: SectionProgress
+  }
 }
 
 /**
@@ -294,9 +310,9 @@ export function buildCheckerSummary(
   }
 
   // Product list required for scope B
+  let productRequired = 0
+  let productCompleted = 0
   if (formState.scopeType === 'B') {
-    let productRequired = 0
-    let productCompleted = 0
     totalRequired += 1
     productRequired += 1
     if (productList.length > 0) {
@@ -344,6 +360,13 @@ export function buildCheckerSummary(
       completion,
       totalRequired,
       completedRequired,
+      sections: {
+        companyInfo: { total: companyRequired, completed: companyCompleted },
+        questionMatrix: { total: questionsRequired, completed: questionsCompleted },
+        companyQuestions: { total: companyQuestionsRequired, completed: companyQuestionsCompleted },
+        smelterList: { total: smelterRequired, completed: smelterCompleted },
+        productList: { total: productRequired, completed: productCompleted },
+      },
     },
     passedItems,
   }

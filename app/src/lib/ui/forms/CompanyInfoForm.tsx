@@ -200,10 +200,6 @@ export function CompanyInfoForm({
   )
 
   const sectionHeaderStyle = { marginBottom: 0 }
-  const combinedFields = useCreation(
-    () => [...companyFields, ...contactFields, ...authorizerFields],
-    [companyFields, contactFields, authorizerFields]
-  )
 
   return (
     <Card
@@ -221,9 +217,38 @@ export function CompanyInfoForm({
       }
     >
       <Flex vertical gap={24}>
+        {/* 公司基本信息 */}
         <Row gutter={[24, 0]}>
-          {combinedFields.map((field) => renderField(field, 12))}
+          {companyFields.map((field) => renderField(field, 12))}
         </Row>
+
+        {/* 联系人信息 */}
+        {contactFields.length > 0 && (
+          <>
+            <div className="border-t border-gray-200 pt-4">
+              <Typography.Text strong className="text-gray-600 text-sm">
+                {t('sections.contact')}
+              </Typography.Text>
+            </div>
+            <Row gutter={[24, 0]}>
+              {contactFields.map((field) => renderField(field, 12))}
+            </Row>
+          </>
+        )}
+
+        {/* 授权人信息 */}
+        {authorizerFields.length > 0 && (
+          <>
+            <div className="border-t border-gray-200 pt-4">
+              <Typography.Text strong className="text-gray-600 text-sm">
+                {t('sections.authorizer')}
+              </Typography.Text>
+            </div>
+            <Row gutter={[24, 0]}>
+              {authorizerFields.map((field) => renderField(field, 12))}
+            </Row>
+          </>
+        )}
       </Flex>
     </Card>
   )

@@ -205,6 +205,19 @@ export function ProductListTable({
     return base
   }, [config, t, handleCellChange, handleRemoveRow])
 
+  const emptyLocale = {
+    emptyText: (
+      <Flex vertical align="center" gap={16} style={{ padding: '32px 0' }}>
+        <Typography.Text type="secondary" style={{ fontSize: 14 }}>
+          {t('tables.noData')}
+        </Typography.Text>
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
+          {t('actions.addRow')}
+        </Button>
+      </Flex>
+    ),
+  }
+
   return (
     <Card
       title={
@@ -228,6 +241,7 @@ export function ProductListTable({
         pagination={false}
         scroll={{ x: 'max-content' }}
         bordered
+        locale={emptyLocale}
       />
     </Card>
   )

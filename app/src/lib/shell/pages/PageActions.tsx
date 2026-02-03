@@ -3,7 +3,7 @@
  * @description 页面组件。
  */
 
-// 说明：页面组件
+import { CheckCircleOutlined, ExclamationCircleOutlined, WarningOutlined } from '@ant-design/icons'
 import type { PageDef, PageKey } from '@core/registry/types'
 import type { CheckerError } from '@core/rules/checker'
 import { getPageKeyForFieldPath } from '@core/rules/fieldPath'
@@ -14,7 +14,7 @@ import { buildTemplatePath } from '@shell/routing/resolveTemplateRoute'
 import { useTemplateState } from '@shell/store'
 import { useT } from '@ui/i18n/useT'
 import { useCreation, useMemoizedFn } from 'ahooks'
-import { Alert, Button, Descriptions, Flex, List, Modal, Typography } from 'antd'
+import { Button, Flex, List, Modal, Progress, Result, Typography } from 'antd'
 import { useState } from 'react'
 
 const { Text } = Typography
@@ -110,29 +110,75 @@ export function PageActions({
             onCancel={closeSubmit}
             footer={null}
             title={t('checker.submitTitle')}
+            width={480}
           >
-            <Flex vertical gap="middle">
-              <Descriptions column={1}>
-                <Descriptions.Item label={t('checker.submitCompletion')}>
-                  <Text strong type="success">{completion}%</Text>
-                </Descriptions.Item>
-                <Descriptions.Item label={t('checker.submitErrors')}>
-                  <Text strong type="danger">{checkerErrors.length}</Text>
-                </Descriptions.Item>
-              </Descriptions>
-              {checkerErrors.length === 0 ? (
-                <Alert type="success" message={t('checker.submitAllPass')} showIcon />
-              ) : (
-                <>
-                  <Text type="secondary" style={{ fontSize: 12 }}>
-                    {t('checker.submitFixTop')}
-                  </Text>
+            {checkerErrors.length === 0 ? (
+              // 成功状态 - 使用 Result 组件
+              <Result
+                status="success"
+                icon={<CheckCircleOutlined />}
+                title={t('checker.submitAllPass')}
+                subTitle={t('checker.progressDetail', { done: completedRequired, total: totalRequired })}
+                extra={
+                  <Button type="primary" onClick={closeSubmit}>
+                    {t('actions.close')}
+                  </Button>
+                }
+              />
+            ) : (
+              // 有错误状态 - 改进的信息层次
+              <Flex vertical gap={20}>
+                {/* 进度环 */}
+                <Flex align="center" gap={24}>
+                  <Progress
+                    type="circle"
+                    percent={completion}
+                    size={80}
+                    status={completion === 100 ? 'success' : 'exception'}
+                    strokeColor={
+                      completion === 100
+                        ? undefined
+                        : { '0%': 'var(--ant-color-warning)', '100%': 'var(--ant-color-error)' }
+                    }
+                  />
+                  <Flex vertical gap={4}>
+                    <Text style={{ fontSize: 16 }}>
+                      {t('checker.progressDetail', { done: completedRequired, total: totalRequired })}
+                    </Text>
+                    <Flex align="center" gap={6}>
+                      <ExclamationCircleOutlined style={{ color: 'var(--ant-color-error)' }} />
+                      <Text type="danger" strong>
+                        {t('checker.submitErrors')}: {checkerErrors.length}
+                      </Text>
+                    </Flex>
+                  </Flex>
+                </Flex>
+
+                {/* 错误列表 */}
+                <div
+                  style={{
+                    background: 'var(--ant-color-error-bg)',
+                    borderRadius: 6,
+                    padding: '12px 16px',
+                    border: '1px solid var(--ant-color-error-border)',
+                  }}
+                >
+                  <Flex align="center" gap={6} style={{ marginBottom: 8 }}>
+                    <WarningOutlined style={{ color: 'var(--ant-color-warning)' }} />
+                    <Text strong style={{ fontSize: 13 }}>
+                      {t('checker.submitFixTop')}
+                    </Text>
+                  </Flex>
                   <List
+                    size="small"
                     dataSource={checkerErrors.slice(0, 5)}
                     renderItem={(error) => (
-                      <List.Item key={`${error.code}-${error.fieldPath}`} style={{ padding: '4px 0' }}>
-                        <Text type="secondary" style={{ fontSize: 14 }}>
-                          {translateError(error.messageKey, {
+                      <List.Item
+                        key={`${error.code}-${error.fieldPath}`}
+                        style={{ padding: '6px 0', borderBottom: 'none' }}
+                      >
+                        <Text style={{ fontSize: 13 }}>
+                          • {translateError(error.messageKey, {
                             field: error.fieldLabelKey ? t(error.fieldLabelKey) : undefined,
                             ...(error.messageValues ?? {}),
                           })}
@@ -140,22 +186,22 @@ export function PageActions({
                       </List.Item>
                     )}
                   />
-                </>
-              )}
-              <Text type="secondary" style={{ fontSize: 12 }}>
-                {t('checker.progressDetail', { done: completedRequired, total: totalRequired })}
-              </Text>
-              <Flex justify="flex-end" gap={8}>
-                <Button onClick={closeSubmit}>{t('checker.submitContinue')}</Button>
-                <Button
-                  type="primary"
-                  onClick={handleFixErrors}
-                  disabled={checkerErrors.length === 0}
-                >
-                  {t('checker.submitFix')}
-                </Button>
+                  {checkerErrors.length > 5 && (
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      ... {t('checker.andMoreErrors', { count: checkerErrors.length - 5 })}
+                    </Text>
+                  )}
+                </div>
+
+                {/* 按钮 */}
+                <Flex justify="flex-end" gap={12}>
+                  <Button onClick={closeSubmit}>{t('actions.close')}</Button>
+                  <Button type="primary" onClick={handleFixErrors}>
+                    {t('checker.submitFix')}
+                  </Button>
+                </Flex>
               </Flex>
-            </Flex>
+            )}
           </Modal>
         </>
       ) : (

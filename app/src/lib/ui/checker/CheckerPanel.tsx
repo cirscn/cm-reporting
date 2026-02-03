@@ -4,6 +4,7 @@
  */
 
 // 说明：模块实现
+import type { I18nKey } from '@core/i18n'
 import type { TemplateVersionDef } from '@core/registry/types'
 import type { CheckerError } from '@core/rules/checker'
 import { groupCheckerErrors } from '@core/rules/errorGroups'
@@ -16,6 +17,43 @@ import { useState } from 'react'
 import type { CheckerSummary, PassedItem } from './types'
 
 const { Text, Title } = Typography
+
+/**
+ * 从 fieldPath 中提取金属 key（用于问题矩阵和公司层面问题）。
+ * 例如：questions.Q1.tantalum -> tantalum
+ *       companyQuestions.A.tantalum -> tantalum
+ */
+function extractMineralKeyFromPath(fieldPath: string): string | null {
+  const parts = fieldPath.split('.')
+  // 问题矩阵: questions.Q1.tantalum
+  if (parts[0] === 'questions' && parts.length === 3) {
+    return parts[2]
+  }
+  // 公司层面问题: companyQuestions.A.tantalum 或 companyQuestions.A_comment.tantalum
+  if (parts[0] === 'companyQuestions' && parts.length === 3) {
+    return parts[2]
+  }
+  return null
+}
+
+/**
+ * 根据金属 key 获取对应的翻译 key。
+ */
+function getMineralLabelKey(mineralKey: string): I18nKey | null {
+  const mineralLabelKeys: Record<string, I18nKey> = {
+    tantalum: 'minerals.tantalum',
+    tin: 'minerals.tin',
+    gold: 'minerals.gold',
+    tungsten: 'minerals.tungsten',
+    cobalt: 'minerals.cobalt',
+    mica: 'minerals.mica',
+    copper: 'minerals.copper',
+    graphite: 'minerals.graphite',
+    lithium: 'minerals.lithium',
+    nickel: 'minerals.nickel',
+  }
+  return mineralLabelKeys[mineralKey] ?? null
+}
 
 interface CheckerPanelProps {
   versionDef: TemplateVersionDef
@@ -108,16 +146,24 @@ export function CheckerPanel({
                 <Flex vertical gap={8}>
                   {group.items.map((error) => {
                     const errorKey = `${error.code}-${error.fieldPath}`
+                    const mineralKey = extractMineralKeyFromPath(error.fieldPath)
+                    const mineralLabelKey = mineralKey ? getMineralLabelKey(mineralKey) : null
+                    const mineralLabel = mineralLabelKey ? t(mineralLabelKey) : null
                     return (
                       <Flex key={errorKey} align="flex-start" justify="space-between" gap={12}>
-                        <Text>
-                          {translateError(error.messageKey, {
-                            field: error.fieldLabelKey ? t(error.fieldLabelKey) : undefined,
-                            ...(error.messageValues ?? {}),
-                          })}
-                        </Text>
+                        <Flex align="baseline" gap={8} wrap>
+                          {mineralLabel && (
+                            <Tag color="blue" className="shrink-0">{mineralLabel}</Tag>
+                          )}
+                          <Text>
+                            {translateError(error.messageKey, {
+                              field: error.fieldLabelKey ? t(error.fieldLabelKey) : undefined,
+                              ...(error.messageValues ?? {}),
+                            })}
+                          </Text>
+                        </Flex>
                         {onGoToField && (
-                          <Button type="link" onClick={getGoToFieldHandler(error)}>
+                          <Button type="link" onClick={getGoToFieldHandler(error)} className="shrink-0">
                             {t('checker.goToField')}
                           </Button>
                         )}

@@ -66,6 +66,25 @@ function App() {
 | `--cm-field-required-border` | `#fbc02d` | 必填字段空值边框色 |
 | `--cm-field-focus-shadow-color` | `rgba(21, 101, 192, 0.4)` | 字段聚焦高亮阴影色 |
 
+> **注意**：`--cm-field-focus-shadow-color` 的默认值基于默认主色 `#1565c0`（40% 透明度）。
+> 如果您自定义了 Ant Design 的 `colorPrimary`，建议同步更新此变量以保持视觉一致性：
+>
+> ```css
+> :root {
+>   /* 假设您的主色是 #1890ff */
+>   --cm-field-focus-shadow-color: rgba(24, 144, 255, 0.4);
+> }
+> ```
+>
+> 或通过 Props 配置：
+>
+> ```tsx
+> <CMReportingProvider
+>   theme={{ token: { colorPrimary: '#1890ff' } }}
+>   cssVariables={{ fieldFocus: { shadowColor: 'rgba(24, 144, 255, 0.4)' } }}
+> >
+> ```
+
 ### 动画配置
 
 | CSS 变量 | 默认值 | 说明 |

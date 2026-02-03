@@ -246,9 +246,9 @@ export const defaultAntdTheme: ThemeConfig = {
     colorFillTertiary: '#f5f5f5',
     colorFillQuaternary: '#fafafa',
 
-    // 圆角
-    borderRadius: 8,
-    borderRadiusLG: 12,
+    // 圆角 - 更保守的值，避免过度圆润
+    borderRadius: 6,
+    borderRadiusLG: 8,
     borderRadiusSM: 4,
     borderRadiusXS: 2,
 

@@ -170,7 +170,8 @@
     "addRow": "新增一行",
     "prev": "上一页",
     "next": "下一页",
-    "submit": "提交"
+    "submit": "提交",
+    "close": "关闭"
   },
   "options": {
     "yes": "是",
@@ -408,9 +409,12 @@
     "submitFixTop": "待修复（前 5 条）",
     "submitContinue": "继续填写",
     "submitFix": "去修复",
+    "andMoreErrors": "还有 {{count}} 条错误...",
     "globalErrorBar": "⚠️ 还有 {{count}} 个必填项未完成，点击查看。",
     "globalSuccessBar": "✅ 所有必填项已完成。",
     "globalErrorAction": "前往 Checker",
+    "sessionSaved": "数据已保存到会话",
+    "sessionSavedHint": "您的数据已临时保存在浏览器会话中。关闭页面前请导出文件以永久保存。",
     "groups": {
       "declaration": "申报信息",
       "companyInfo": "公司信息",

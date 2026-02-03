@@ -100,8 +100,8 @@ export function AppLayout({
         )}
 
         {/* 内容区域 */}
-        <Layout style={{ padding: LAYOUT.pagePadding }}>
-          <Content>
+        <Layout style={{ padding: LAYOUT.pagePadding, display: 'flex', flexDirection: 'column' }}>
+          <Content style={{ flex: 1, overflow: 'auto' }}>
             <Flex
               vertical
               gap={LAYOUT.sectionGap}
@@ -109,13 +109,26 @@ export function AppLayout({
               style={maxContentWidth ? { maxWidth: maxContentWidth, margin: '0 auto' } : undefined}
             >
               {children}
-              {bottomSlot && (
-                <Card>
-                  {bottomSlot}
-                </Card>
-              )}
             </Flex>
           </Content>
+          {/* 底部导航栏 - 粘性定位，始终可见 */}
+          {bottomSlot && (
+            <div
+              className="sticky-bottom-nav"
+              style={{
+                position: 'sticky',
+                bottom: 0,
+                zIndex: 10,
+                marginTop: LAYOUT.sectionGap,
+                maxWidth: maxContentWidth,
+                marginLeft: maxContentWidth ? 'auto' : undefined,
+                marginRight: maxContentWidth ? 'auto' : undefined,
+                width: '100%',
+              }}
+            >
+              <Card>{bottomSlot}</Card>
+            </div>
+          )}
         </Layout>
       </Layout>
     </Layout>

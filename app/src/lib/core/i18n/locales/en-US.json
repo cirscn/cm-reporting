@@ -170,7 +170,8 @@
     "addRow": "Add Row",
     "prev": "Previous",
     "next": "Next",
-    "submit": "Submit"
+    "submit": "Submit",
+    "close": "Close"
   },
   "options": {
     "yes": "Yes",
@@ -408,9 +409,12 @@
     "submitFixTop": "To fix (top 5)",
     "submitContinue": "Continue",
     "submitFix": "Fix now",
+    "andMoreErrors": "and {{count}} more errors...",
     "globalErrorBar": "⚠️ {{count}} required items remain incomplete. Click to review.",
     "globalSuccessBar": "✅ All required items are completed.",
     "globalErrorAction": "Go to Checker",
+    "sessionSaved": "Saved in session",
+    "sessionSavedHint": "Your data is temporarily saved in the browser session. Please export the file before closing the page to save permanently.",
     "groups": {
       "declaration": "Declaration",
       "companyInfo": "Company Information",
