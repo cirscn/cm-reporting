@@ -10,7 +10,7 @@ import type { TemplateType } from '@core/registry/types'
  * 常量：SMELTER_LOOKUP_META。
  */
 export const SMELTER_LOOKUP_META = {
-  placeholder: 'Select from list...',
+  placeholder: 'Select from list…',
   notListed: 'Smelter not listed',
   notYetIdentified: 'Smelter not yet identified',
   separator: '---',

@@ -25,6 +25,10 @@ interface TextFieldProps {
   fieldPath?: string
   className?: string
   style?: React.CSSProperties
+  /** HTML autocomplete 属性，用于浏览器自动填充 */
+  autoComplete?: string
+  /** 是否启用拼写检查，邮箱等字段应设为 false */
+  spellCheck?: boolean
 }
 
 /**
@@ -44,6 +48,8 @@ export function TextField({
   fieldPath,
   className,
   style,
+  autoComplete,
+  spellCheck,
 }: TextFieldProps) {
   const { t } = useT()
 
@@ -81,6 +87,8 @@ export function TextField({
           disabled={disabled}
           rows={rows}
           className={inputClassName}
+          autoComplete={autoComplete}
+          spellCheck={spellCheck}
         />
       ) : (
         <Input
@@ -89,6 +97,8 @@ export function TextField({
           placeholder={resolvedPlaceholder}
           disabled={disabled}
           className={inputClassName}
+          autoComplete={autoComplete}
+          spellCheck={spellCheck}
         />
       )}
     </Form.Item>

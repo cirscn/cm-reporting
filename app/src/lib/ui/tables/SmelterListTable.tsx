@@ -315,6 +315,7 @@ export function SmelterListTable({
       dataIndex: 'metal',
       key: 'metal',
       width: 140,
+      fixed: 'left',
       render: (value: string, record: SmelterRow) =>
         wrapRequired(
           true,
@@ -617,6 +618,7 @@ export function SmelterListTable({
       title: '',
       key: 'actions',
       width: 60,
+      fixed: 'right',
       render: (_: unknown, record: SmelterRow) => (
         <Button
           type="text"
@@ -677,7 +679,8 @@ export function SmelterListTable({
         dataSource={rows}
         rowKey="id"
         pagination={false}
-        scroll={{ x: 'max-content' }}
+        scroll={{ x: 'max-content', y: rows.length > 20 ? 600 : undefined }}
+        virtual={rows.length > 50}
         bordered
         locale={emptyLocale}
       />

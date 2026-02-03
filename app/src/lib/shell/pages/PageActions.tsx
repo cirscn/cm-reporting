@@ -188,7 +188,7 @@ export function PageActions({
                   />
                   {checkerErrors.length > 5 && (
                     <Text type="secondary" style={{ fontSize: 12 }}>
-                      ... {t('checker.andMoreErrors', { count: checkerErrors.length - 5 })}
+                      … {t('checker.andMoreErrors', { count: checkerErrors.length - 5 })}
                     </Text>
                   )}
                 </div>

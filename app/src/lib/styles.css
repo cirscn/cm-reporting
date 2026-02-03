@@ -21,6 +21,7 @@
   justify-content: center;
   background: var(--ant-color-bg-container);
   border-bottom: 1px solid var(--ant-color-border-secondary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .step-nav-inner {
@@ -34,11 +35,18 @@
   width: 100%;
 }
 
+/* 步骤标题样式 */
 .step-nav-steps .ant-steps-item-title {
   font-size: 13px !important;
   font-weight: 500 !important;
   letter-spacing: 0.02em;
   line-height: 1.4 !important;
+  transition: color 0.2s ease;
+}
+
+/* 当前步骤标题高亮 */
+.step-nav-steps .ant-steps-item-process .ant-steps-item-title {
+  font-weight: 600 !important;
 }
 
 .step-nav-steps .ant-steps-item-icon {
@@ -46,6 +54,13 @@
   align-items: center;
   justify-content: center;
   vertical-align: middle;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* 当前步骤图标增强 */
+.step-nav-steps .ant-steps-item-process .ant-steps-item-icon {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(22, 119, 255, 0.25);
 }
 
 .step-nav-steps .ant-steps-item-title {
@@ -58,6 +73,21 @@
   line-height: 1.5;
   padding: 0 6px;
   border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 连接线增强 */
+.step-nav-steps .ant-steps-item-tail::after {
+  height: 2px !important;
+}
+
+/* 完成步骤的动画效果 */
+.step-nav-steps .ant-steps-item-finish .ant-steps-item-icon {
+  transition: transform 0.3s ease;
+}
+
+.step-nav-steps .ant-steps-item-finish .ant-steps-item-icon:hover {
+  transform: scale(1.1);
 }
 
 /* --------------------------------------------------------------------------
@@ -229,72 +259,81 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 16px;
+  padding: 10px 20px;
   font-size: 13px;
   border-radius: 0;
+  min-height: 44px;
 }
 
 .global-status-bar--success {
-  background: var(--ant-color-success-bg);
+  background: linear-gradient(90deg, var(--ant-color-success-bg) 0%, rgba(246, 255, 237, 0.8) 100%);
   color: var(--ant-color-success);
+  border-bottom: 1px solid var(--ant-color-success-border);
 }
 
 .global-status-bar--error {
-  background: var(--ant-color-error-bg);
+  background: linear-gradient(90deg, var(--ant-color-error-bg) 0%, rgba(255, 241, 240, 0.9) 100%);
   color: var(--ant-color-error);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid var(--ant-color-error-border);
 }
 
 .global-status-bar--error:hover {
-  background: var(--ant-color-error-bg-hover, #ffdbdb);
+  background: linear-gradient(90deg, var(--ant-color-error-bg-hover, #ffdbdb) 0%, rgba(255, 220, 220, 0.95) 100%);
 }
 
 .global-status-bar__content {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .global-status-bar__icon {
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .global-status-bar__message {
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 .global-status-bar__sections {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-left: 8px;
+  gap: 8px;
+  margin-left: 12px;
   flex-wrap: wrap;
 }
 
 .global-status-bar__section-tag {
-  font-size: 11px;
+  font-size: 12px;
   margin: 0;
+  font-variant-numeric: tabular-nums;
+  padding: 2px 8px;
 }
 
 .global-status-bar__action {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   background: none;
   border: none;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   color: inherit;
-  opacity: 0.8;
-  transition: opacity 0.2s;
+  opacity: 0.85;
+  transition: all 0.2s ease;
   white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 4px;
 }
 
 .global-status-bar__action:hover {
   opacity: 1;
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .global-status-bar__actions {
@@ -304,8 +343,9 @@
 }
 
 .global-status-bar__session-tag {
-  font-size: 11px;
+  font-size: 12px;
   cursor: help;
+  opacity: 0.9;
 }
 
 /* --------------------------------------------------------------------------
@@ -318,4 +358,26 @@
 .sticky-bottom-nav .ant-card {
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
   border-top: 1px solid var(--ant-color-border-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   Typography - 数字等宽对齐
+   -------------------------------------------------------------------------- */
+.ant-tag,
+.ant-statistic-content-value,
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   Touch Optimization - 移动端触摸优化
+   -------------------------------------------------------------------------- */
+button,
+a,
+[role="button"],
+.ant-btn,
+.ant-select,
+.ant-input,
+.ant-picker {
+  touch-action: manipulation;
 }

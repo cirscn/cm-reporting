@@ -58,6 +58,29 @@ const PLACEHOLDER_KEYS: Record<string, I18nKey> = {
   authorizationDate: 'placeholders.authorizationDate',
 }
 
+/** 字段的 HTML autocomplete 属性映射 */
+const AUTOCOMPLETE_KEYS: Record<string, string> = {
+  companyName: 'organization',
+  address: 'street-address',
+  contactName: 'name',
+  contactEmail: 'email',
+  contactPhone: 'tel',
+  authorizerName: 'name',
+  authorizerTitle: 'organization-title',
+  authorizerEmail: 'email',
+  authorizerPhone: 'tel',
+}
+
+/** 需要禁用拼写检查的字段（邮箱、电话、ID 等） */
+const SPELLCHECK_DISABLED_KEYS = new Set([
+  'contactEmail',
+  'authorizerEmail',
+  'contactPhone',
+  'authorizerPhone',
+  'companyId',
+  'companyAuthId',
+])
+
 /**
  * CompanyInfoForm：公司信息表单组件。
  */
@@ -151,6 +174,8 @@ export function CompanyInfoForm({
           rows={field.key === 'scopeDescription' ? 3 : undefined}
           placeholder={placeholder}
           fieldPath={`companyInfo.${field.key}`}
+          autoComplete={AUTOCOMPLETE_KEYS[field.key]}
+          spellCheck={SPELLCHECK_DISABLED_KEYS.has(field.key) ? false : undefined}
         />
       )
     })()

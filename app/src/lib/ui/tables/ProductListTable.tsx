@@ -117,6 +117,7 @@ export function ProductListTable({
         dataIndex: 'productNumber',
         key: 'productNumber',
         width: 180,
+        fixed: 'left',
         render: (value: string, record: ProductRow) => (
           wrapRequired(
             required,
@@ -192,6 +193,7 @@ export function ProductListTable({
       title: '',
       key: 'actions',
       width: 60,
+      fixed: 'right',
       render: (_: unknown, record: ProductRow) => (
         <Button
           type="text"
@@ -239,7 +241,8 @@ export function ProductListTable({
         dataSource={rows}
         rowKey="id"
         pagination={false}
-        scroll={{ x: 'max-content' }}
+        scroll={{ x: 'max-content', y: rows.length > 20 ? 600 : undefined }}
+        virtual={rows.length > 50}
         bordered
         locale={emptyLocale}
       />
