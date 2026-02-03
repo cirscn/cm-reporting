@@ -1,0 +1,37 @@
+flowchart TD
+    Start([开始]) --> SelectMinerals[选择申报矿种]
+    SelectMinerals --> FillCompany[填写公司信息]
+    FillCompany --> SelectScope[选择申报范围]
+    
+    SelectScope --> |A. Company| FillQ
+    SelectScope --> |B. Product| FillProduct[填写 Product List]
+    SelectScope --> |C. User defined| FillDesc[填写范围描述]
+    
+    FillProduct --> FillQ
+    FillDesc --> FillQ
+    
+    FillQ[填写问题矩阵] --> Q1Check{Q1有Yes?}
+    
+    Q1Check --> |是| FillQ2Q8[填写 Q2-Q8]
+    Q1Check --> |否| SkipQ2Q8[跳过 Q2-Q8]
+    
+    FillQ2Q8 --> FillAG[填写公司问题 A-G]
+    SkipQ2Q8 --> CheckV2{是否EMRT 2.0+?}
+    
+    FillAG --> FillSmelter[填写 Smelter List]
+    
+    CheckV2 --> |是| FillMine[填写 Mine List]
+    CheckV2 --> |否| Review
+    
+    FillSmelter --> CheckV2
+    FillMine --> Review[查看 Checker]
+    
+    Review --> Fix{有错误?}
+    Fix --> |是| FixError[修正错误]
+    FixError --> Review
+    Fix --> |否| Export[导出/提交]
+    
+    Export --> End([结束])
+    
+    style SelectMinerals fill:#e8f5e9,stroke:#388e3c
+    style FillMine fill:#fff3e0,stroke:#f57c00

@@ -1,0 +1,47 @@
+graph TB
+    subgraph Header["页面头部"]
+        Title["EMRT 2.1 - Smelter List"]
+    end
+    
+    subgraph TableHeader["表头"]
+        H1["金属"]
+        H2["冶炼厂查找"]
+        H3["冶炼厂名称"]
+        H4["国家/地区"]
+        H5["状态"]
+    end
+    
+    subgraph Row1["数据行 1"]
+        R1C1["Cobalt<br/>标签"]
+        R1C2["Freeport Cobalt Oy"]
+        R1C3["自动填充"]
+        R1C4["Finland"]
+        R1C5["Conformant<br/>绿色标签"]
+    end
+    
+    subgraph Row2["数据行 2"]
+        R2C1["Mica<br/>标签"]
+        R2C2["Smelter not listed<br/>橙色提示"]
+        R2C3["ABC Mica Processing"]
+        R2C4["India"]
+        R2C5["Not Listed<br/>橙色标签"]
+    end
+    
+    subgraph Row3["数据行 3"]
+        R3C1["Lithium<br/>标签"]
+        R3C2["Not yet identified<br/>灰色"]
+        R3C3["Unknown"]
+        R3C4["-"]
+        R3C5["Unknown<br/>灰色标签"]
+    end
+    
+    Header --> TableHeader
+    TableHeader --> Row1
+    Row1 --> Row2
+    Row2 --> Row3
+    
+    style Header fill:#388e3c,color:#fff
+    style TableHeader fill:#e8f5e9
+    style Row1 fill:#fff
+    style Row2 fill:#fff
+    style Row3 fill:#fff

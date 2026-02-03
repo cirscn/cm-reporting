@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>冲突矿产模板系统 - 图表</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #f5f5f5;
+        }
+        .diagram-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a1a2e;
+            border-bottom: 3px solid #1976d2;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+        .export-btn {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .export-btn:hover {
+            background: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <h1>冲突矿产模板系统 PRD 图表</h1>
+    <p>以下图表可通过右键保存或截图方式导出为PNG</p>
+
+    <div class="diagram-container" id="arch">
+        <h2>1. 系统架构图 - 模板关系概览</h2>
+        <div class="mermaid">
+graph TB
+    subgraph RMI[RMI 标准模板体系]
+        CMRT[CMRT<br/>冲突矿产报告模板<br/>3TG: 钽/锡/金/钨]
+        EMRT[EMRT<br/>扩展矿产报告模板<br/>钴/铜/石墨/锂/云母/镍]
+        CRT[CRT<br/>钴报告模板<br/>钴专用]
+        AMRT[AMRT<br/>其他矿产报告模板<br/>排除上述矿种]
+    end
+    
+    CMRT --> Supply[供应链披露]
+    EMRT --> Supply
+    CRT --> Supply
+    AMRT --> Supply
+        </div>
+    </div>
+
+    <div class="diagram-container" id="flow">
+        <h2>2. 用户填写流程图</h2>
+        <div class="mermaid">
+flowchart LR
+    A[选择模板] --> B[填写公司信息]
+    B --> C[选择申报范围]
+    C --> D[填写问题矩阵]
+    D --> E[填写清单]
+    E --> F[校验检查]
+    F --> G[导出提交]
+    
+    style A fill:#e3f2fd,stroke:#1976d2
+    style B fill:#e8f5e9,stroke:#388e3c
+    style C fill:#fff3e0,stroke:#f57c00
+    style D fill:#fce4ec,stroke:#c2185b
+    style E fill:#e1f5fe,stroke:#0288d1
+    style F fill:#f3e5f5,stroke:#7b1fa2
+    style G fill:#c8e6c9,stroke:#2e7d32
+        </div>
+    </div>
+
+    <div class="diagram-container" id="cmrt-flow">
+        <h2>3. CMRT 填写流程详图</h2>
+        <div class="mermaid">
+flowchart TD
+    Start([开始]) --> SelectLang[选择语言]
+    SelectLang --> FillCompany[填写公司信息]
+    FillCompany --> SelectScope[选择申报范围]
+    
+    SelectScope --> |A. Company| FillQ
+    SelectScope --> |B. Product| FillProduct[填写 Product List]
+    SelectScope --> |C. User defined| FillDesc[填写范围描述]
+    
+    FillProduct --> FillQ
+    FillDesc --> FillQ
+    
+    FillQ[填写问题矩阵 Q1-Q8] --> CheckQ1Q2{Q1或Q2有Yes?}
+    
+    CheckQ1Q2 --> |是| FillQ3Q8[填写 Q3-Q8]
+    CheckQ1Q2 --> |否| SkipQ3Q8[跳过 Q3-Q8]
+    
+    FillQ3Q8 --> FillAH[填写公司层面问题 A-H]
+    SkipQ3Q8 --> Review
+    
+    FillAH --> FillSmelter[填写 Smelter List]
+    FillSmelter --> Review[查看 Checker 校验结果]
+    
+    Review --> Fix{有错误?}
+    Fix --> |是| FixError[修正错误]
+    FixError --> Review
+    Fix --> |否| Export[导出/提交]
+    
+    Export --> End([结束])
+        </div>
+    </div>
+
+    <div class="diagram-container" id="smelter-flow">
+        <h2>4. Smelter List 填写流程</h2>
+        <div class="mermaid">
+flowchart TD
+    Start([开始填写冶炼厂]) --> KnowID{已知冶炼厂识别号码?}
+    
+    KnowID --> |是| EnterID[输入识别号码]
+    EnterID --> AutoFill[自动填充其他字段]
+    AutoFill --> Done([完成])
+    
+    KnowID --> |否| SelectMetal[选择金属]
+    SelectMetal --> KnowSmelter{冶炼厂在目录中?}
+    
+    KnowSmelter --> |是| SelectLookup[从下拉选择冶炼厂]
+    SelectLookup --> AutoFill2[自动填充]
+    AutoFill2 --> Done
+    
+    KnowSmelter --> |否| SelectNotListed[选择 Smelter not listed]
+    SelectNotListed --> ManualFill[手填名称 + 选择国家]
+    ManualFill --> FillOther[补充其他信息]
+    FillOther --> Done
+    
+    KnowSmelter --> |尚未识别| SelectNotIdentified[选择 not yet identified]
+    SelectNotIdentified --> FillName[手填冶炼厂名称]
+    FillName --> Done
+        </div>
+    </div>
+
+    <div class="diagram-container" id="validation">
+        <h2>5. 校验规则优先级</h2>
+        <div class="mermaid">
+graph TD
+    A[模板文字要求<br/>Instructions/表内说明] --> B{冲突?}
+    B -->|否| C[Excel 校验标记<br/>Checker/条件格式/数据验证]
+    B -->|是| A
+    C --> D[产品实现约束]
+    
+    style A fill:#ffcdd2,stroke:#c62828
+    style C fill:#fff9c4,stroke:#f9a825
+    style D fill:#c8e6c9,stroke:#2e7d32
+        </div>
+    </div>
+
+    <div class="diagram-container" id="er">
+        <h2>6. CMRT 数据模型 (ER图)</h2>
+        <div class="mermaid">
+erDiagram
+    Declaration ||--o{ QuestionMatrix : contains
+    Declaration ||--o{ CompanyQuestion : contains
+    Declaration ||--o| SmelterList : references
+    Declaration ||--o| ProductList : conditional
+    
+    Declaration {
+        string company_name
+        enum scope
+        string scope_description
+        date effective_date
+    }
+    
+    QuestionMatrix {
+        enum metal
+        enum q1_answer
+        enum q2_answer
+        string comments
+    }
+    
+    SmelterList {
+        enum metal
+        string smelter_lookup
+        string smelter_name
+        string country
+    }
+    
+    ProductList {
+        string product_number
+        string product_name
+        string comments
+    }
+        </div>
+    </div>
+
+    <div class="diagram-container" id="timeline">
+        <h2>7. 版本演进时间线</h2>
+        <div class="mermaid">
+timeline
+    title 模板版本演进
+    section CMRT
+        2021-04 : 6.01 / 6.1
+        2022-05 : 6.22
+        2023-05 : 6.31
+        2024-04 : 6.4
+        2025-04 : 6.5
+    section EMRT
+        2022-11 : 1.11
+        2023-05 : 1.2
+        2024-04 : 1.3
+        2025-04 : 2.0
+        2025-10 : 2.1
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose'
+        });
+    </script>
+</body>
+</html>

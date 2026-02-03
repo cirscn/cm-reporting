@@ -1,0 +1,2 @@
+rule_dirs:
+  - .ast-grep/rules

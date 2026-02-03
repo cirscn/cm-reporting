@@ -1,0 +1,23 @@
+case_id,template,version,section,rule
+CMRT-6.5-001,CMRT,6.5,1. Declaration（公司信息必填）,公司名称、申报范围或种类、联系人姓名、电子邮件-联系人、电话-联系人、授权人、电子邮件-授权人、生效日期。
+CMRT-6.5-002,CMRT,6.5,1. Declaration（公司信息必填）,申报范围=User defined → 范围描述必填。
+CMRT-6.5-003,CMRT,6.5,2. 申报问题（Q1–Q8）,Q1/Q2：钽/锡/金/钨均必须回答。
+CMRT-6.5-004,CMRT,6.5,2. 申报问题（Q1–Q8）,Q3–Q8：仅当该金属在 Q1/Q2 中回答为 Yes 时才要求填写。
+CMRT-6.5-005,CMRT,6.5,3. 公司层面问题（A–H）,仅当任一金属在 Q1/Q2 中回答为 Yes 时才要求填写。
+CMRT-6.5-006,CMRT,6.5,4. Product List,申报范围=Product → “回复方的产品编号 (*)”必填。
+CMRT-6.5-007,CMRT,6.5,5. Smelter List 校验条款（条件格式）,金属为空 → 触发提示。
+CMRT-6.5-008,CMRT,6.5,5. Smelter List 校验条款（条件格式）,金属已填但冶炼厂查找为空 → 触发提示。
+CMRT-6.5-009,CMRT,6.5,5. Smelter List 校验条款（条件格式）,金属 + 冶炼厂查找 组合不在目录 → 触发提示。
+CMRT-6.5-010,CMRT,6.5,5. Smelter List 校验条款（条件格式）,选择金属为钽/锡/金/钨，但 Declaration 对应问题为空 → 金属/冶炼厂查找触发提示。
+CMRT-6.5-011,CMRT,6.5,5. Smelter List 校验条款（条件格式）,冶炼厂查找已选且不为 Smelter Not Listed，但冶炼厂名称为空 → 触发提示。
+CMRT-6.5-012,CMRT,6.5,5. Smelter List 校验条款（条件格式）,冶炼厂查找=Smelter Not Listed 且冶炼厂名称为空 → 触发提示。
+CMRT-6.5-013,CMRT,6.5,5. Smelter List 校验条款（条件格式）,冶炼厂查找=Smelter Not Listed 且冶炼厂所在国家或地区为空 → 触发提示。
+CMRT-6.5-014,CMRT,6.5,5. Smelter List 校验条款（条件格式）,冶炼厂名称或国家/地区包含 “!” → 触发提示。
+CMRT-6.5-015,CMRT,6.5,5. Smelter List 校验条款（条件格式）,冶炼厂识别号码输入列不为空且与自动填充的冶炼厂识别不一致 → 触发提示。
+CMRT-6.5-016,CMRT,6.5,5. Smelter List 校验条款（条件格式）,冶炼厂出处识别号出现 “Enter smelter details” → 触发提示。
+CMRT-6.5-017,CMRT,6.5,6. Smelter not yet identified 取值核对,标准冶炼厂名称=Unknown；国家多数为 Unknown，Tungsten 行为空。
+CMRT-6.5-18,CMRT,6.5,3. 公司层面问题（A–H）,"E 题若回答 “Yes, using other format (describe)” → 注释必填。"
+CMRT-6.5-019,CMRT,6.5,1. Declaration（公司信息必填）,生效日期格式 DD-MMM-YYYY；DV 下限 >31-Dec-2006（超出仅提示不阻断；Excel 可自动格式化 YYYY-MM-DD → DD-MMM-YYYY）。
+CMRT-6.5-020,CMRT,6.5,1. Declaration（公司信息必填）,申报范围下拉错误提示 Required Field / "Select from dropdown options to declare survey scope"。
+CMRT-6.5-021,CMRT,6.5,1. Declaration（公司信息必填）,联系人姓名为空错误提示 Blank Field / "Please enter your contact name."。
+CMRT-6.5-022,CMRT,6.5,1. Declaration（公司信息必填）,公司/联系人/授权人字段存在输入提示 prompt 文案（Company Name / Contact Name / Contact Email / Contact Phone / Authorizer Name / Authorizer Email）。

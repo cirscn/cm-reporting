@@ -1,0 +1,6 @@
+case_id,template,version,section,rule
+COMMON-001,COMMON,ALL,A.1 Smelter Look-up（三种填写路径）,选项 A：已知冶炼厂识别号码 → 输入号码后其余列自动填充，名称列变灰。
+COMMON-002,COMMON,ALL,A.1 Smelter Look-up（三种填写路径）,选项 B：已知金属 + 冶炼厂查找名称 → 先选金属，再选冶炼厂查找。
+COMMON-003,COMMON,ALL,A.1 Smelter Look-up（三种填写路径）,选项 C：已知金属 + 冶炼厂名称 → 冶炼厂查找选择 “Smelter not listed”，再手工填写名称与国家。
+COMMON-004,COMMON,ALL,A.1 Smelter Look-up（特殊选项）,Smelter not listed / Smelter not yet identified 为下拉选项，不是独立输入字段。
+COMMON-005,COMMON,ALL,A.1 Smelter Look-up（自动填充字段）,Look-up 自动填充列默认只读。

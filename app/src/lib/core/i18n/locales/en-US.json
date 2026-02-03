@@ -1,0 +1,1180 @@
+{
+  "common": {
+    "appTitle": "Conflict Minerals Reporting",
+    "selectTemplate": "Select Template",
+    "selectVersion": "Version",
+    "export": "Export",
+    "lookupSeparator": "----------",
+    "comingSoon": "{{title}} - Coming Soon",
+    "homeTitle": "Conflict Minerals Reporting Templates",
+    "homeSubtitle": "Select a template from the header to get started",
+    "language": "Language"
+  },
+  "templates": {
+    "cmrt": "CMRT",
+    "emrt": "EMRT",
+    "crt": "CRT",
+    "amrt": "AMRT",
+    "cmrt_full": "Conflict Minerals Reporting Template",
+    "emrt_full": "Extended Minerals Reporting Template",
+    "crt_full": "Cobalt Reporting Template",
+    "amrt_full": "Additional Minerals Reporting Template"
+  },
+  "tabs": {
+    "revision": "Revision",
+    "declaration": "Declaration",
+    "smelterList": "Smelter List",
+    "checker": "Checker",
+    "productList": "Product List",
+    "smelterLookup": "Smelter Look-up",
+    "definitions": "Definitions",
+    "instructions": "Instructions",
+    "mineList": "Mine List",
+    "mineralsScope": "Minerals Scope"
+  },
+  "sections": {
+    "companyInfo": "Company Information",
+    "contact": "Contact",
+    "authorizer": "Authorizer",
+    "questionMatrix": "Question Matrix",
+    "questionMatrixHint": "Based on the reporting scope above, answer questions 1 to 8.",
+    "companyQuestions": "Company-level Questions",
+    "mineralsScope": "Minerals in Scope",
+    "mineralsOther": "Other minerals"
+  },
+  "notices": {
+    "requiredHintTitle": "Filling tip:",
+    "requiredHintBody": "Fields highlighted in yellow are required. Please complete them before submitting."
+  },
+  "badges": {
+    "requiredCompleted": "{{done}}/{{total}} required completed",
+    "questionRange": "Q{{from}}-Q{{to}}",
+    "companyQuestionsRequired": "Required when any metal {{condition}}",
+    "recordCount": "{{count}} records"
+  },
+  "conditions": {
+    "always": "always",
+    "q1NotNo": "Q1 ≠ {{no}}",
+    "q1Yes": "Q1 = {{yes}}",
+    "q1q2NotNo": "Q1 ≠ {{no}} and Q2 ≠ {{noQ2}}",
+    "q1q2Yes": "Q1 = {{yes}} and Q2 = {{yesQ2}}",
+    "q1NotNegatives": "Q1 not in {{negatives}}",
+    "q1NotNegativesAndQ2NotNegatives": "Q1 not in {{q1Negatives}} and Q2 not in {{q2Negatives}}"
+  },
+  "placeholders": {
+    "select": "Select",
+    "input": "Enter value",
+    "number": "Enter number",
+    "date": "Select date",
+    "companyName": "Enter the company’s legal registered name",
+    "declarationScope": "Select...",
+    "scopeDescription": "Describe the custom reporting scope",
+    "customMineral": "Mineral {{index}}",
+    "companyId": "DUNS, VAT, organization ID, etc.",
+    "companyAuthId": "Authorization identifier",
+    "address": "Company address",
+    "contactName": "Enter contact name",
+    "contactEmail": "example@company.com",
+    "contactPhone": "+86 xxx xxxx xxxx",
+    "authorizerName": "Enter authorizer name",
+    "authorizerTitle": "Title",
+    "authorizerEmail": "example@company.com",
+    "authorizerPhone": "+86 xxx xxxx xxxx",
+    "authorizationDate": "DD-MMM-YYYY",
+    "smelterIdInput": "Enter identification number...",
+    "smelterLookup": "Search smelter...",
+    "smelterName": "Smelter name",
+    "smelterNameRequired": "Required: Smelter name",
+    "smelterNameOptional": "Smelter name (optional)",
+    "smelterCountry": "Select country",
+    "smelterCountryRequired": "Required: Country",
+    "smelterIdentification": "CID...",
+    "smelterSourceId": "Source ID",
+    "smelterStreet": "Street",
+    "smelterCity": "City",
+    "smelterState": "State / Province",
+    "smelterContactName": "Contact name",
+    "smelterContactEmail": "email@...",
+    "smelterNextSteps": "Next steps",
+    "smelterMineName": "Mine name",
+    "smelterMineCountry": "Mine country",
+    "mineralsScopeReason": "Reason for inclusion",
+    "smelterComments": "Comments",
+    "comments": "Comments",
+    "smelterCombinedMetal": "Select",
+    "smelterCombinedSmelter": "Combined smelter",
+    "mineSmelterSelect": "Select smelter",
+    "mineSmelterInput": "Smelter name",
+    "mineName": "Mine name",
+    "mineId": "CID...",
+    "mineSourceId": "Source ID",
+    "mineCountry": "Select country",
+    "mineStreet": "Street",
+    "mineCity": "City",
+    "mineState": "State / Province",
+    "mineContactName": "Contact name",
+    "mineContactEmail": "email@...",
+    "mineNextSteps": "Next steps",
+    "mineComments": "Comments"
+  },
+  "productPlaceholders": {
+    "productNumber": "PRD-xxxx-xxx",
+    "productName": "Product name",
+    "requesterNumber": "Requester number",
+    "requesterName": "Requester name",
+    "comments": "Comments"
+  },
+  "hints": {
+    "companyName": "Use the formal registered name; no abbreviations.",
+    "declarationScope": "A=Company-wide | B=Product (requires Product List) | C=User defined",
+    "contactEmail": "If no email, enter \"not available\".",
+    "authorizerName": "Do not enter placeholders like \"same\".",
+    "authorizationDate": "Format: DD-MMM-YYYY (e.g., 01-Jan-2026)",
+    "smelterNotYetIdentifiedCountry": "Not yet identified: leave country blank.",
+    "mineralsMaxCount": "Select up to {{max}} minerals",
+    "mineralsMaxCountReached": "Maximum minerals selected"
+  },
+  "tables": {
+    "metal": "Metal",
+    "smelterLookup": "Smelter Look-up",
+    "smelterName": "Smelter Name",
+    "smelterId": "Smelter Identification Number Input Column",
+    "smelterIdentification": "Smelter Identification",
+    "sourceId": "Source ID",
+    "country": "Country",
+    "street": "Street",
+    "city": "City",
+    "stateProvince": "State / Province",
+    "contactName": "Contact Name",
+    "contactEmail": "Contact Email",
+    "proposedNextSteps": "Proposed Next Steps",
+    "mineCountry": "Mine Country",
+    "mineSmelterName": "Smelter name sourced from this mine",
+    "mineSourceId": "Smelter Source ID",
+    "mineId": "Mine Identification",
+    "mineIdSource": "Mine ID Source",
+    "recycledScrap": "100% Recycled or Scrap?",
+    "combinedMetal": "Combined Metal",
+    "combinedSmelter": "Combined Smelter",
+    "mineName": "Mine Name",
+    "province": "Province",
+    "mineralsScopeReason": "Reasons for inclusion",
+    "mineralsScopeReasonPrt": "Reasons for inclusion on the PRT",
+    "mineralsScopeReasonAmrt": "Reasons for inclusion on the AMRT",
+    "comments": "Comments",
+    "requesterNumber": "Requester Number",
+    "requesterName": "Requester Name",
+    "noData": "No data"
+  },
+  "actions": {
+    "addRow": "Add Row",
+    "prev": "Previous",
+    "next": "Next",
+    "submit": "Submit"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No",
+    "unknown": "Unknown",
+    "notApplicable": "Not applicable",
+    "notApplicableForDeclaration": "Not applicable for this declaration",
+    "notDeclaring": "Not declaring",
+    "none": "None",
+    "didNotSurvey": "Did not survey",
+    "drcOnly": "DRC only",
+    "drcOrAdjoiningOnly": "DRC or adjoining countries only",
+    "indiaMadagascarOnly": "India and/or Madagascar only",
+    "percentage100": "100%",
+    "percentageOne": "1",
+    "percentageAbove90": "Greater than 90%",
+    "percentageAbove75": "Greater than 75%",
+    "percentageAbove50": "Greater than 50%",
+    "percentage50OrLess": "50% or less",
+    "percentageLess25": "Less than 25%",
+    "yesCrtTemplate": "Yes, CRT",
+    "yesOtherFormat": "Yes, using other format (describe)",
+    "yesOtherFormatTitle": "Yes, Using Other Format (Describe)",
+    "yesIpc1755": "Yes, in conformance with IPC1755 (e.g., CMRT)",
+    "yesIpc1755Emrt": "Yes, in conformance with IPC1755 (e.g. EMRT)",
+    "yesWhenMoreValidated": "Yes, when more processors are validated",
+    "yesWithSec": "Yes, with the SEC",
+    "yesWithEu": "Yes, with the EU",
+    "yesWithSecAndEu": "Yes, with the SEC and the EU"
+  },
+  "minerals": {
+    "tantalum": "Tantalum",
+    "tin": "Tin",
+    "gold": "Gold",
+    "tungsten": "Tungsten",
+    "cobalt": "Cobalt",
+    "mica": "Mica",
+    "copper": "Copper",
+    "graphite": "Graphite",
+    "lithium": "Lithium",
+    "nickel": "Nickel",
+    "silver": "Silver",
+    "aluminum": "Aluminum",
+    "antimony": "Antimony",
+    "chromium": "Chromium",
+    "germanium": "Germanium",
+    "iridium": "Iridium",
+    "lime": "Lime",
+    "magnesium": "Magnesium",
+    "manganese": "Manganese",
+    "palladium": "Palladium",
+    "phosphorus": "Phosphorus",
+    "platinum": "Platinum",
+    "rareEarthElements": "Rare Earth Elements",
+    "rhodium": "Rhodium",
+    "ruthenium": "Ruthenium",
+    "silicon": "Silicon",
+    "sodaAsh": "Soda Ash",
+    "titanium": "Titanium",
+    "vanadium": "Vanadium",
+    "zinc": "Zinc",
+    "zirconium": "Zirconium",
+    "other": "Other"
+  },
+  "questions": {
+    "cmrt": {
+      "q1": "1) Is any 3TG intentionally added or used in the product(s) or in the production process?",
+      "q2": "2) Does any 3TG remain in the product(s)?",
+      "q3": "3) Do any of the smelters in your supply chain source the 3TG from the covered countries? (SEC term, see definitions tab)",
+      "q4": "4) Do any of the smelters in your supply chain source the 3TG from conflict-affected and high-risk areas?",
+      "q5": "5) Does 100 percent of the 3TG (necessary to the functionality or production of your products) originate from recycled or scrap sources?",
+      "q6": "6) What percentage of relevant suppliers have provided a response to your supply chain survey?",
+      "q7": "7) Have you identified all of the smelters supplying the 3TG to your supply chain?",
+      "q8": "8) Has all applicable smelter information received by your company been reported in this declaration?"
+    },
+    "emrt": {
+      "q1": "1) Is any of the specified mineral/metal intentionally added or used in the product(s) or in the production process?",
+      "q2": "2) Does any of the specified mineral/metal remain in the product(s)?",
+      "q3": "3) Do any of the smelters or processors in your supply chain source the specified mineral/metal from conflict-affected and high-risk areas? (OECD Due Diligence Guidance, see definitions tab)",
+      "q4": "4) Does 100 percent of the specified mineral/metal originate from recycled or scrap sources?",
+      "q5": "5) What percentage of relevant suppliers have provided a response to your supply chain survey?",
+      "q6": "6) Have you identified all of the smelters or processors supplying the specified minerals/metal to your supply chain?",
+      "q7": "7) Has all applicable smelter or processor information received by your company been reported in this declaration?",
+      "v1": {
+        "q1": "1) Is any cobalt or mica intentionally added or used in the product(s) or in the production process?",
+        "q2": "2) Does any cobalt or mica remain in the product(s)?",
+        "q3": "3) Do any of the smelters or processors in your supply chain source cobalt or mica from conflict-affected and high-risk areas? (OECD Due Diligence Guidance, see definitions tab)",
+        "q4": "4) Does 100 percent of the cobalt originate from recycled or scrap sources?",
+        "q5": "5) What percentage of relevant suppliers have provided a response to your supply chain survey?",
+        "q6": "6) Have you identified all of the smelters or processors supplying cobalt or mica to your supply chain?",
+        "q7": "7) Has all applicable smelter or processor information received by your company been reported in this declaration?"
+      }
+    },
+    "crt": {
+      "q1": "1) Is any of the cobalt intentionally added or used in the product(s) or in the production process?",
+      "q2": "2) Do any of the smelters in your supply chain source the cobalt from a Conflict-Affected and High-Risk area? (OECD Due Diligence Guidance, see definitions tab)",
+      "q3": "3) Does 100 percent of the cobalt originate from recycled or scrap sources?",
+      "q4": "4) What percentage of relevant suppliers have provided a response to your supply chain survey?",
+      "q5": "5) Have you identified all of the smelters supplying the cobalt to your supply chain?",
+      "q6": "6) Has all applicable smelter information received by your company been reported in this declaration?"
+    },
+    "amrt": {
+      "q1": "1) Is any of the following minerals or metals intentionally added or used in the product(s) or in the production process?",
+      "q2": "2) What percentage of relevant suppliers have provided a response to your supply chain survey?"
+    }
+  },
+  "companyQuestions": {
+    "cmrt": {
+      "a": "A. Have you established a responsible minerals sourcing policy?",
+      "b": "B. Is your responsible minerals sourcing policy publicly available on your website? (Note – If yes, the user shall specify the URL in the comment field.)",
+      "b_comment": "Please specify the URL",
+      "c": "C. Do you require your direct suppliers to source the 3TG from smelters whose due diligence practices have been validated by an independent third party audit program?",
+      "d": "D. Have you implemented due diligence measures for responsible sourcing?",
+      "e": "E. Does your company conduct Conflict Minerals survey(s) of your relevant supplier(s)?",
+      "e_comment": "Describe other format",
+      "f": "F. Do you review due diligence information received from your suppliers against your company’s expectations?",
+      "g": "G. Does your review process include corrective action management?",
+      "h": "H. Is your company required to file an annual conflict minerals disclosure?"
+    },
+    "emrt": {
+      "a": "A. Have you established a responsible minerals sourcing policy?",
+      "b": "B. Is your responsible minerals sourcing policy publicly available on your website? (Note – If yes, the user shall specify the URL in the comment field.)",
+      "b_comment": "Please specify the URL",
+      "c": "C. Do you require your direct suppliers to source the specified minerals/metals from smelters whose due diligence practices have been validated by an independent third-party audit program?",
+      "d": "D. Have you implemented due diligence measures for responsible sourcing?",
+      "e": "E. Does your company conduct supply chain survey(s) of your relevant supplier(s) on the specified minerals/metals?",
+      "e_comment": "Describe other format",
+      "f": "F. Do you review due diligence information received from your suppliers against your company’s expectations?",
+      "g": "G. Does your review process include corrective action management?",
+      "v1": {
+        "c": "C. Do you require your direct suppliers to source cobalt from smelters whose due diligence practices have been validated by an independent third-party audit program, or mica from processors with equivalent qualifications?",
+        "e": "E. Does your company conduct cobalt and/or mica supply chain survey(s) of your relevant supplier(s)?"
+      },
+      "v11": {
+        "a": "A. Have you established a publicly available cobalt sourcing policy?",
+        "b": "B. Does your policy cover, at a minimum, all risks in the OECD Due Diligence Guidance Annex II Model Policy, as well as the worst forms of child labor?",
+        "c": "C. Do you require your direct suppliers to source cobalt from smelters whose due diligence practices have been validated by an independent third-party audit program, or mica from processors with equivalent qualifications?",
+        "d": "D. Do you require suppliers' due diligence practices to cover, at a minimum, all risks in the OECD Due Diligence Guidance Annex II Model Policy, as well as the worst forms of child labor?",
+        "e": "E. Does your company conduct cobalt and/or mica supply chain survey(s) of your relevant supplier(s)?",
+        "f": "F. Do you review due diligence information received from your suppliers against your company’s expectations?",
+        "g": "G. Does your review process include corrective action management?"
+      }
+    },
+    "crt": {
+      "a": "A. Have you established a publicly available cobalt sourcing policy?",
+      "a_comment": "Please specify the URL",
+      "b": "B. Does your policy cover, at a minimum, all risks in the OECD Due Diligence Guidance Annex II Model Policy, as well as the worst forms of child labor?",
+      "c": "C. Have you implemented due diligence measures for cobalt in the declaration scope indicated above?",
+      "d": "D. Do you require suppliers to exercise due diligence over the cobalt supply chain in accordance with the OECD Due Diligence Guidance?",
+      "e": "E. Do you require your direct suppliers to source cobalt from smelters whose due diligence practices have been validated by an independent third party audit program?",
+      "f": "F. Do you require suppliers' due diligence practices to cover, at a minimum, all risks in the OECD Due Diligence Guidance Annex II Model Policy, as well as the worst forms of child labor?",
+      "g": "G. Does your company conduct cobalt supply chain survey(s) of your relevant supplier(s)?",
+      "g_comment": "Describe other format",
+      "h": "H. Do you review due diligence information received from your suppliers against your company’s expectations?",
+      "i": "I. Does your review process include corrective action management?"
+    }
+  },
+  "productList": {
+    "cmrt": {
+      "respondentNumber": "Responder’s Product Number",
+      "respondentName": "Responder’s Product Name",
+      "manufacturerNumber": "Manufacturer’s Product Number",
+      "manufacturerName": "Manufacturer’s Product Name",
+      "comment": "Comments"
+    },
+    "emrt": {
+      "respondentNumber": "Responder Product Number",
+      "respondentName": "Responder Product Name",
+      "comment": "Comments"
+    },
+    "crt": {
+      "manufacturerNumber": "Manufacturer’s Product Number",
+      "manufacturerName": "Manufacturer’s Product Name",
+      "comment": "Comments"
+    },
+    "amrt": {
+      "manufacturerNumber": "Manufacturer’s Product Number",
+      "manufacturerName": "Manufacturer’s Product Name",
+      "comment": "Comments"
+    }
+  },
+  "fields": {
+    "companyName": "Company Name",
+    "reportingScope": "Scope of Reporting",
+    "scopeDescription": "Description of Scope",
+    "companyId": "Company Unique Identification",
+    "companyAuthId": "Company Unique Authority ID",
+    "address": "Address",
+    "contactName": "Contact Name",
+    "contactEmail": "Contact Email",
+    "contactPhone": "Contact Phone",
+    "authorizerName": "Authorizer Name",
+    "authorizerTitle": "Authorizer Title",
+    "authorizerEmail": "Authorizer Email",
+    "authorizerPhone": "Authorizer Phone",
+    "authorizationDate": "Date of Completion"
+  },
+  "docStatus": {
+    "productListRequired": "Current scope: Product List is required.",
+    "productListNotRequired": "Current scope: Product List is not required.",
+    "productListUnknown": "Select Declaration Scope to determine if Product List is required.",
+    "smelterListRequired": "Current answers require the Smelter List.",
+    "smelterListRequiredWithMetals": "Smelter List required for: {{metals}}.",
+    "smelterListPending": "Complete {{questions}} for: {{metals}} to determine Smelter List requirement.",
+    "smelterListNotRequired": "Current answers do not require the Smelter List.",
+    "smelterListUnknown": "Complete the mineral scope and Q1/Q2 to determine Smelter List requirement.",
+    "mineListAvailable": "Mine List is available for this version.",
+    "mineListNotAvailable": "Mine List is not available for this version."
+  },
+  "checker": {
+    "subtitle": "System automatically checks completeness and compliance.",
+    "progressTitle": "Overall completion",
+    "progressDetail": "{{done}}/{{total}} required completed",
+    "errorsTitle": "Errors (must fix)",
+    "errorBadge": "{{count}} items",
+    "groupCount": "{{count}} items",
+    "groupToggleShow": "Expand",
+    "groupToggleHide": "Collapse",
+    "passedTitle": "Passed",
+    "passedBadge": "{{count}} items",
+    "passedSummary": "Passed {{count}} required checks",
+    "passedToggleShow": "Show details",
+    "passedToggleHide": "Hide details",
+    "passedEmpty": "No passed items yet",
+    "passedProductList": "Product List provided",
+    "passedProductRow": "Product List row {{index}} has product number",
+    "passedSmelterForMineral": "{{mineral}} smelter record provided",
+    "sectionComplete": "{{section}} required items completed",
+    "validEmail": "Valid email: {{field}}",
+    "submit": "Submit",
+    "submitTitle": "Pre-submission check",
+    "submitCompletion": "Completion",
+    "submitErrors": "Errors",
+    "submitAllPass": "All passed",
+    "submitFixTop": "To fix (top 5)",
+    "submitContinue": "Continue",
+    "submitFix": "Fix now",
+    "globalErrorBar": "⚠️ {{count}} required items remain incomplete. Click to review.",
+    "globalSuccessBar": "✅ All required items are completed.",
+    "globalErrorAction": "Go to Checker",
+    "groups": {
+      "declaration": "Declaration",
+      "companyInfo": "Company Information",
+      "mineralsScope": "Minerals Scope",
+      "questionMatrix": "Based on the reporting scope above, answer questions 1 to 8.",
+      "companyQuestions": "From a company-level, answer the following questions.",
+      "smelter": "Smelter List",
+      "mine": "Mine List",
+      "product": "Product List",
+      "other": "Other"
+    },
+    "error": "Error",
+    "pass": "Pass",
+    "noErrors": "No errors found",
+    "totalErrors": "{{count}} error(s) found",
+    "goToField": "Go to field",
+    "requiredField": "{{field}} is required.",
+    "requiredCompanyQuestionComment": "Comment is required: {{field}}.",
+    "requiredProductList": "Product List is required for scope B.",
+    "requiredSmelterList": "Smelter List entry required for {{field}}.",
+    "invalidEmail": "Invalid email format: {{field}}."
+  },
+  "revision": {
+    "subtitle": "Template version overview based on registry metadata.",
+    "templateName": "Template name",
+    "currentVersion": "Current version",
+    "defaultVersion": "Default version",
+    "totalVersions": "Total versions",
+    "availableVersions": "Available versions",
+    "currentTag": "Current",
+    "defaultTag": "Default"
+  },
+  "docs": {
+    "cmrt": {
+      "6.5": {
+        "instructions": [
+          "RMI website: (www.responsiblemineralsinitiative.org)\nTraining and guidance, template, Responsible Minerals Assurance Process conformant smelter list.",
+          "Introduction",
+          "This Conflict Minerals Reporting Template (Template) is a free, standardized reporting template created by the Responsible Minerals Initiative (RMI). The Template facilitates the transfer of information through the supply chain regarding mineral country of origin and smelters and refiners being utilized and supports compliance to legislation*. The template also facilitates the identification of new smelters and refiners to potentially undergo an audit via the Responsible Minerals Assurance Process**.\n\nThe CMRT was designed for downstream companies to disclose information about their supply chains up to but not including the smelter.  If you are a 3TG smelter or refiner, in accordance with the RMAP protocols, we recommend you enter your own name in the smelter list tab.\n\nWhen filling out the form, none of the cell entries should start will \"=\" or \"#.\"",
+          "* In 2010, the U.S. Dodd-Frank Wall Street Reform and Consumer Protection Act was passed concerning “conflict minerals” originating from the Democratic Republic of the Congo (DRC) or adjoining countries. The SEC published final rules associated with the disclosure of the source of conflict minerals by U.S. publicly traded companies (see the rules at http://www.sec.gov/rules/final/2012/34-67716.pdf). The rules reference the OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected and High-Risk Areas, (http://www.oecd.org/daf/inv/mne/GuidanceEdition2.pdf), which guides suppliers to establish policies, due diligence frameworks and management systems.\nIn 2017, Regulation (EU) 2017/821 of the European Parliament and of the European Council of 17 May 2017 was passed concerning supply chain due diligence obligations for Union importers of tin, tantalum and tungsten, their ores, and gold originating from conflict-affected and high-risk areas (see regulation at https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L:2017:130:FULL&from=EN)\n** See information on the Responsible Minerals Initiative (www.responsiblemineralsinitiative.org).",
+          "Instructions for completing Company Information questions (rows 8 - 22).\nProvide comments in ENGLISH only",
+          "Note:  Entries with (*) are mandatory fields.",
+          "1. Insert your company's Legal Name.  Please do not use abbreviations. In this field you have the option to add other commercial names, DBAs, etc.",
+          "2. Select your company's Declaration Scope.  The options for scope are:\n\nA.  Company-wide\nB.  Product (or List of Products)\nC.  User-Defined \n\nFor \"Company-wide\", the declaration encompasses the entirety of a company's products or product substances produced by the parent company. Therefore if the user is reporting 3TG data at the company level, they will be reporting conflict minerals data on all products they manufacture. \n\nFor Scope selection of Product (or List of Products), a link to the worksheet tab for Product List will be displayed.  If this scope is chosen, it is mandatory to list the Responder's Product Number of the products covered under the Scope of this Declaration in Column B of the Product List worksheet. It is optional to list the Responder's Product Name in Column C of the Product List worksheet.\n\nFor Scope selection of \"User Defined\", it is mandatory that the user describes the scope to which the 3TG disclosure is applicable. The scope of this class shall be defined in a text field by the supplier and should be easily understood by customers or the receivers of the document. As an example, companies may provide a link to clarifying information.\n\nThis field is mandatory.",
+          "3. Insert your company’s unique identifier number or code (DUNS number, VAT number, customer-specific identifier, etc.)",
+          "4. Insert the source for the unique identifier number or code (\"DUNS\", \"VAT\", \"Customer\", etc).",
+          "5. Insert your full company address (street, city, state, country, postal code).  This field is optional.",
+          "6. Insert the name of the person to contact regarding the contents of the declaration information. This field is mandatory.",
+          "7. Insert the email address of the contact person.  If an email address is not available, state ‘‘not available’’ or ‘‘n/a.’’ A blank field may cause an error in form implementation.  This field is mandatory.",
+          "8. Insert the telephone number for the contact. This field is mandatory.",
+          "9. Insert the name of the person who  is responsible for the contents of the declaration information. The authorizer may be a different individual than the contact person. It is not correct to use the words ‘‘same’’ or similar identification to provide the name of the authorizer.  This field is mandatory.",
+          "10. Insert the title for the Authorizing person. This field is optional.",
+          "11. Insert the email address of the Authorizing person.  If an email address is not available, state ‘‘not available’’ or ‘‘n/a.’’ A blank field may cause an error in form implementation.  This field is mandatory.",
+          "12. Insert the telephone number for the Authorizing person. This field is optional.",
+          "13. Please enter the Date of Completion for this form using the format DD-MMM-YYYY.  This field is mandatory.",
+          "14. As an example, the user may save the file name as:  companyname-date.xls (date as YYYY-MM-DD).",
+          "Instructions for completing the eight Due Diligence Questions (rows 24 - 71).\nProvide answers in ENGLISH only",
+          "These eight questions define the usage, origination and sourcing identification for each of the metals. The questions are designed to collect information about the use of 3TG in the company’s product(s) to allow for the determination of regulatory applicability. Responses to these questions shall represent the ‘Declaration Scope’ selected in the company information section.The responses to the questions in this section can be used to determine applicability and completeness of 3TG reporting.",
+          "For each of the eight required questions, provide an answer for each metal using the pull down menu selections.The questions in this section must be completed for all 3TG. If the response for a given metal to questions 1 and 2 is positive, then the subsequent questions shall be completed for that metal and the following due diligence questions (A to H) shall be completed about the company’s overall due diligence program.",
+          "1. This is the first of two questions for which the response is used to determine whether the 3TG is within the scope of conflict minerals reporting requirements.  This question relies upon the guidance provided by the SEC in the final rules regarding the determination if a 3TG is “necessary to the functionality or production” of a product.   The SEC guidance is based upon the presumption that a company in the supply chain for a product would not intentionally add a 3TG to that product or any of a product’s sub-components if that 3TG was not necessary to the product’s generally expected function, use, or purpose.  Similarly, the guidance presumes that a 3TG would not be necessary to the production of a product unless it was intentionally included in the production process of that product. The response to this question serves to exclude any trace-level contaminants or naturally-occurring by-products such as tin in steel.  This question shall  be answered for each 3TG.\n\nThis question asks if any conflict minerals are used as raw material, component or additive in a product that you manufacture or contract to manufacture (including raw material and components). Impurities from raw materials, components, additives, abrasives, and cutting tools are outside the scope of the survey.\n\nThis question shall be answered for each 3TG. Valid responses to this question are either \"yes\" or \"no\". This question is mandatory.",
+          "Some companies may require substantiation for a \"No\" answer that should be entered into the Comment Field.",
+          "2. This question shall be answered for each 3TG for each the answer to question 1 is \"yes.\" This is the second of two questions for which the response is used to determine whether the 3TG is within the scope of conflict minerals reporting requirements as described in the SECs final rules regarding the determination if a 3TG is necessary to the functionality or production of a product.  This question is dependent upon the question and response to Question 1.  This question is intended to identify 3TGs which are intentionally added or included in the manufacturing process of a product where some amount of the 3TG remains in the finished product.  This includes 3TGs which may not have been intended to become part of the final product and may not be necessary to the functionality of the product but are only present as residuals of the manufacturing process.  In many cases, the manufacturer may have attempted to remove or facilitate consumption of the 3TG during the manufacturing process, however, some amount of the 3TG remains.  Should the 3TG, which is added or included during the manufacturing process, be completely removed such that none of the 3TG remains upon the completion of that process, the response to this question would be no.\n\nThis question shall be answered for each 3TG. Valid answers to this question are either \"yes\" or \"no\". This question is mandatory.",
+          "3. This is a declaration that any portion of the 3TGs contained in a product or multiple products originates from the DRC or an adjoining country (covered countries). The answer to this question should be \"yes\" if any smelter in the supply chain sources from the covered countries, even if those smelters are on the RMI conformant smelter and refiner list.  For more information, see RMI's due diligence guidance on conflict minerals here: http://www.responsiblemineralsinitiative.org/training-and-resources/publications-and-guidance/.\n\nThe answer to this question shall be \"yes\", \"no\", or \"unknown\". It is recommended to substantiate a \"Yes\" answer in the comments section.\n\nThis question is mandatory for a specific metal if the response to Question 1 and 2 is “Yes” for that metal.",
+          "4. This is a declaration that any portion of the 3TGs contained in a product or multiple products originates from conflict-affected and high-risk areas (CAHRAs).\n\nThe answer to this question should be “yes” if any smelter in the supply chain sources from covered countries or CAHRAs, even if those smelters are on the RMI conformant smelter and refiner list. For more information, see RMI's due diligence guidance on conflict minerals here: http://www.responsiblemineralsinitiative.org/training-and-resources/publications-and-guidance/. \n\nThe answer to this question shall be yes, no or unknown. It is recommended to substantiate a “yes” answer in the comments section. This question is mandatory for a specific metal if the response to Question 1 and 2 is “yes” for that metal.",
+          "5. This is a declaration that identifies whether 3TGs contained in the product(s) necessary to the functionality of that product(s) originate from recycled or scrap sources. \n\nThe answer to this question shall be \"yes\", \"no\", or \"unknown\". This question is mandatory for a specific metal if the response to Question 1 and 2 is “Yes” for that metal. \n\nA \"Yes\" answer means that 100% of the 3TG comes from recycled or scrap sources.  A \"No\" answer means that some of the 3TG does not come from recycled or scrap sources. An \"Unknown\" answer means that the user does not know whether or not 100% of the 3TG comes from recycled or scrap sources.",
+          "6. This is a question to determine whether a company has received conflict minerals disclosures from all direct suppliers reasonably believed to be providing 3TGs contained in the products covered by the scope of this declaration. Permissible responses to this question are:\n\n­ 100%\n­ Greater than 90%\n­ Greater than 75%\n- Greater than 50%\n- 50% or less\n- None\n\nThis question is mandatory for a specific metal if the response to Question 1 and 2 is “Yes” for that metal.",
+          "7. This question verifies if the supplier has reason to believe they have identified all of the smelters providing 3TGs in the products covered by this declaration. The answer to this question shall be \"Yes\" or \"No\", along with a comment in certain cases, e.g. list of smelters. \n\nThis question is mandatory for a specific metal if the response to Question 1 and 2 is “Yes” for that metal.",
+          "8. This question verifies that all of the smelters identified to be providing any of the 3TGs contained in the products covered by the scope of this declaration have been reported in this declaration. The answer to this question shall be \"yes\" or \"no\" along with a comment in certain cases, e.g. list of smelters. This question is mandatory for a specific metal if the response to Question 1 and 2 is “Yes” for that metal.",
+          "Provide comments in the Comment sections as required to clarify your responses.",
+          "Instructions for completing Questions A. – H. (rows 75 - 89).  Questions A. through H. are mandatory if the both of responses to Question 1 and 2 are “Yes” for any metal.\nProvide answers in ENGLISH only",
+          "The OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-affected and High-risk Areas (OECD Guidance) defines “Due Diligence” as “an on-going, proactive and reactive process through which companies can ensure that they respect human rights and do not contribute to conflict”.   Due diligence should be an integral part of your company’s overall conflict free sourcing strategy.   Questions A. thru H. are designed to assess your company’s conflict-free minerals sourcing due diligence activities. Responses to these questions shall represent the full scope of your company’s activities and shall not be limited to the ‘Declaration Scope’ selected in the company information section.",
+          "A. This is a declaration to disclose whether a company has a responsible minerals sourcing policy. The answer to this question shall be \"yes\" or \"no.\" Comments shall be captured in a question comment field. \n\nThis question is mandatory.",
+          "B. This is a declaration to disclose whether a company’s responsible minerals sourcing policy is available on the company website. The answer to this question shall be \"yes\" or \"no.\" If \"Yes\" the user shall specify the URL in a question comment field. \n\nThis question is mandatory.",
+          "C. This is a declaration to determine whether a company requires their direct suppliers to source 3TG from validated smelters. The answer to this question shall be \"yes\" or \"no.\" Comments should be captured in a question comment field.\n\nThis question is mandatory.",
+          "D. Please answer  \"yes\" or \"no\" to disclose whether your company has implemented responsible sourcing due diligence measures. This declaration is not intended to provide the details of a company’s due diligence measures - just that a company has implemented due diligence measures. The aspects of acceptable due diligence measures shall be determined by the requestor and supplier.\n\nExamples of due diligence measures may include: communicating and incorporating into contracts (where possible) your expectations to suppliers on responsible mineral supply chain; identifying and assessing risks in the supply chain; designing and implementing a strategy to respond to identified risks; verifying your direct supplier’s compliance to its responsible minerals sourcing policy, etc.  These due diligence measure examples are consistent with the guidelines included in the internationally recognized OECD Guidance.\n\nThis question is mandatory.",
+          "E. This is a question to disclose whether a company requests their supplier to fill out a conflict minerals declaration. Acceptable answers are listed below, in certain cases further explanation may be required, i.e., to provide the format used for collecting information. If the answer is \"Yes,\" using other format the user shall provide a comment in a question comment field.  Permissible responses to this question are:\n\n- Yes, in conformance with IPC-1755 [e.g., CMRT]\n- Yes, using other format (describe)\n- No\n\nThis question is mandatory.",
+          "F. Please answer “Yes” or “No”.  In the comments section, you can provide additional information on your approach. Examples could be:\n\n “3rd party audit” - on-site audits of your suppliers conducted by independent third parties.  \n “Documentation review only” - a reviewof supplier submitted records and documentation conducted by independent third parties and, or your company personnel.   \n “Internal audit” - on-site audits of your suppliers conducted by your company personnel.\n\nThis question is mandatory.",
+          "G. This is a question to disclose whether a company’s review process includes corrective action management. The answer to this question shall be \"yes\" or \"no.\" Comments shall be captured in a question comment field. \n\nThis question is mandatory.",
+          "H. This is a question to disclose whether a company is subject to the SEC rule, the EU regulation, or both. The answer to this question shall be \"yes, with the SEC\", \"yes, with the EU\", \"yes with the SEC and the EU\" or \"no.\" Comments shall be captured in a question comment field. This question is mandatory. For more information on the SEC rule, please refer to www.sec.gov. For more information on the EU regulation, please refer to https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32017R0821&from=EN.",
+          "Instructions for completing the Smelter List Tab.\nProvide answers in ENGLISH only",
+          "Note:  Columns with (*) are mandatory fields",
+          "This template allows for smelter identification using the Smelter Look-up.  Columns B, and C must be completed in order from left to right to utilize the Smelter Look-up feature.\nUse a separate line for each metal/smelter/country combination.",
+          "1. Smelter Identification Input Column - If you know the Smelter Identification Number, input the number in Column A (columns B, C, E, F, G, I, and J will auto-populate).  Column A does not autopopulate.",
+          "2. Metal (*)   -   Use the pull down menu to select the metal for which you are entering smelter information.  This field is mandatory.",
+          "3. Smelter Look-up (*) - Select from dropdown.  This is the list of known smelters as of template release date.  If smelter is not listed select 'Smelter Not Listed'.  This will allow you to enter the name of the smelter in Column D.  If you do not know the name or location of the smelter, select 'Smelter Not Yet Identified.'  For this option,  columns D and E will autopopulate to say, 'unknown.'  This field is mandatory.",
+          "4. Smelter Name (1)- Fill in smelter name if you selected \"Smelter Not Listed\" in column C.  This field will auto-populate when a smelter name in selected in Column C.  This field is mandatory.",
+          "5. Smelter Country (*) – This field will auto-populate when a smelter name is selected in column C. If you selected \"Smelter Not Listed\" in column C, use the pull down menu to select the country location of the smelter.  This field is mandatory.",
+          "6. Smelter Identification - This is a unique identifier assigned to a smelter or refiner according to an established smelter and refinery identification system. It is expected that multiple names or aliases could be used to describe a single smelter or refiner and therefore multiple names or aliases could be associated to a single ‘Smelter ID’.",
+          "7. Source of Smelter Identification Number - This is the source of the Smelter Identification Number entered in Column F.  If a smelter name was selected in Column C using the dropdown box, this field will auto-populate.",
+          "8. Smelter Street -  Provide the street name on which the smelter is located. This field is optional.",
+          "9. Smelter City – Provide the city name of where the smelter is located. This field is optional.",
+          "10. Smelter Location: State/Province, if applicable – Provide the state or province where the smelter is located. This field is optional.",
+          "11. Smelter Contact Name – The Conflict Minerals Reporting Template (CMRT) is circulated among companies in the requesting company's supply chain to ensure compliance with the OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected and High-Risk Areas and the U.S. Securities and Exchange Commission Final Rule on conflict minerals.\n\nIf the template is circulated in a country where laws protecting personal information exist, sharing personal contact information in the CMRT may violate related regulations. Therefore, it is recommended that the requesting company take precautions such as obtaining the contact person's permission to share the information with other companies in the supply chain when completing \"Smelter Contact Name\" and the \"Smelter Contact Email\" columns.\n\nIf you have permission to share this information, please fill in the name of the Smelter Facility Contact person who you worked with.",
+          "12. Smelter Contact Email – Fill in the email address of the Smelter Facility contact person who was identified as the Smelter Contact Name.  Example: John.Smith@SmelterXXX.com.  Please review the instructions for Smelter Contact Name before completing this field.",
+          "13. Name of Mine(s) - This field allows a company to define the actual mines being used by the smelter.  Please enter the actual mine names if known.  If 100% of the smelter’s feedstock originates from recycled or scrap sources, enter \"Recycled\" or \"Scrap\" in place of the name of the mine and answer \"Yes\" in Column P.\n\n\"RCOI confirmed as per RMI\" may be an acceptable answer to this question.",
+          "14. Location (Country) of Mine(s) - This is a free form text field that allows a company to define the location of the mines being used by the smelter.   Please enter the country of the mine(s).  If the country of origin is not known, enter \"Unknown\".   If 100% of the smelter’s feedstock originates from recycled or scrap sources, enter \"Recycled\" or \"Scrap\" in place of the country of origin.  This field is optional.\n\n\"RCOI confirmed as per RMI\" may be an acceptable answer to this question.",
+          "15. Indicates whether the smelter solely obtains inputs for its smelting process(es) from recycled or scrap sources. This question is optional.  Permissible responses to this question are:\n\n- Yes\n- No\n- Unknown",
+          "16. Comments – free form text field to enter any comments concerning the smelter.  Example: smelter is being acquired by Company YYY",
+          "The Checker worksheet is used to verify if all the required information in the Template has been completed. It is updated real-time and can be reviewed at any time while using the Template. It is used to verify completion.\n\nTo use this sheet, verify if all required fields have been completed (completed fields will be highlighted in green). If not, look for the red field(s) and review the \"Notes\" in Column C for required actions. You may use the URL in Column D to directly access the field for completion.",
+          "TERMS AND CONDITIONS",
+          "The Responsible Minerals Assurance Process (“Process”) Conformant Smelter List (the \"List\") and Process templates and tools, including, without limitation, the Conflict Minerals Reporting Template  (collectively “Tools”), including, without limitation, all information provided therein, are provided for informational purposes only and are current as of the date set forth therein. Any inaccuracy or omission in the List or any Tool is not the responsibility of the Responsible Business Alliance, a Delaware non-stock corporation (\"RBA\"). Determination of whether and/or how to use all or any portion of the List or any Tool is to be made in the User’s sole and absolute discretion. Prior to using the List or any Tool, you should review it with your own legal counsel.  No part of the List or any Tool constitutes legal advice. Use of the List or any Tool is voluntary.",
+          "RBA makes no representations or warranties with respect to the List or any Tool. The List and Tools are provided on an \"AS IS\" and on an \"AS AVAILABLE\" basis. RBA hereby disclaims all warranties of any nature, express, implied or otherwise, or arising from trade or custom, including, without limitation, any implied warranties of merchantability, non-infringement, quality, title, fitness for a particular purpose, completeness or accuracy.",
+          "To the fullest extent permitted by applicable laws, RBA renounces any liability for any losses, expenses or damages of any nature, including, without limitation, special, incidental, punitive, direct, indirect or consequential damages or lost income or profits, resulting from or arising out of the User’s use of the List or any Tool, whether arising in tort, contract, statute, or otherwise, even if shown that they were advised of the possibility of such damages.",
+          "In consideration for access and use of the List and/or any Tool, THE USER hereby agrees to and does (a) release and forever discharge RBA, as well as their respective officers, directors, agents, employees, volunteers, representatives, contractors, successors, and assigns, from any and all claims, actions, losses, suits, damages, judgments, levies, and executions, which the User has ever had, has, or ever can, shall, or may have or claim to have against RBA, as well as their respective officers, directors, agents, employees, volunteers, representatives, contractors, successors, and assigns, resulting from or arising out of the List or any Tool or use thereof, and agrees to (b) indemnify, defend and hold harmless RBA, as well as their respective officers, directors, agents, employees, volunteers, representatives, contractors, successors, and assigns, from any and all claims,  actions, losses, suits, damages, judgments, levies, and executions resulting from or arising out of the USER'S use of the List or any Tool.",
+          "If any part of any provision of these Terms and Conditions shall be invalid or unenforceable under applicable law, said part shall be deemed ineffective to the extent of such invalidity or unenforceability only, without in any way affecting the remaining parts of said provision or the remaining provisions of these Terms and Conditions.",
+          "By accessing and using the List or any Tool, and in consideration thereof, the User agrees to the foregoing."
+        ],
+        "smelterList": [],
+        "productList": [],
+        "definitions": [
+          {
+            "term": "3TG",
+            "definition": "Tantalum, tin, tungsten, gold"
+          },
+          {
+            "term": "Authorizer",
+            "definition": "This field identifies the person responsible for the content of the declaration. The authorizer may be a different individual from the contact person. It is not correct to use the words ‘‘same’’ or similar identification to provide the name of the authorizer."
+          },
+          {
+            "term": "Conflict-Affected and High-Risk Area (CAHRA)",
+            "definition": "Conflict-affected and high-risk areas are areas in a state of armed conflict, fragile post-conflict areas, as well as areas witnessing weak or non-existing governance and security, such as failed states, and widespread and systematic violations of international law, including human rights abuses."
+          },
+          {
+            "term": "Conflict Mineral",
+            "definition": "As defined in  2010 United States legislation, Dodd-Frank Wall Street Reform and Consumer Protection Act, Section 1502(e)(4):\nCONFLICT MINERAL.—The term ‘‘conflict mineral’’ means—\n(A) columbite-tantalite (coltan), cassiterite, gold, wolframite, or their derivatives; or\n(B) any other mineral or its derivatives determined by the Secretary of State to be financing conflict in the Democratic Republic of the Congo or an adjoining country.  (available at http://www.sec.gov/about/laws/wallstreetreform-cpa.pdf)"
+          },
+          {
+            "term": "Covered Country(ies)",
+            "definition": "Covered Country(ies) as defined by the United States Dodd-Frank Wall Street Reform and Consumer Protection Act of 2010. These countries include the Democratic Republic of the Congo and the nine countries with which it shares an internationally recognized border: Angola, Burundi, Central African Republic, Republic of the Congo, Rwanda, South Sudan, Tanzania, Uganda, Zambia."
+          },
+          {
+            "term": "Declaration Scope or Class",
+            "definition": "For the purposes of this template, “scope” describes the applicability of the information provided by the reporting company.  The scope may encompass the entirety of a company’s services and/or products, or at a company’s discretion, the template may be used to report on a specific product (or products), or, be ‘User defined’.  The ‘User defined’ scope selection or class may be used to describe any subset of a company’s operation or product portfolio."
+          },
+          {
+            "term": "Dodd-Frank",
+            "definition": "2010 United States legislation, Dodd-Frank Wall Street Reform and Consumer Protection Act, Section 1502 (“Dodd-Frank”) (http://www.sec.gov/about/laws/wallstreetreform-cpa.pdf)"
+          },
+          {
+            "term": "DRC",
+            "definition": "Democratic Republic of Congo"
+          },
+          {
+            "term": "DRC conflict-free",
+            "definition": "Products that do not contain minerals that directly or indirectly finance or benefit armed groups in the Democratic Republic of the Congo or an adjoining country.  Source: 2010 United States legislation, Dodd-Frank Wall Street Reform and Consumer Protection Act, Section 1502 (http://www.sec.gov/about/laws/wallstreetreform-cpa.pdf)"
+          },
+          {
+            "term": "Gold (Au) refiner (smelter)",
+            "definition": "A gold refiner is a metallurgical operation that produces fine gold with a concentration of 99.5% or higher from gold and gold-bearing materials with lower concentrations.  Refer to the RMAP assessment standard for this metal for a complete description at: https://www.responsiblemineralsinitiative.org/minerals-due-diligence/standards/."
+          },
+          {
+            "term": "Independent Third-Party Assessment Firm",
+            "definition": "With respect to smelter assessments, an “Independent Third-Party Assessment Firm” is a private sector organization competent in evaluating the smelter or refiner’s materials traceability against the standards of the RMAP or equivalent assessment standards.  To maintain neutrality and impartiality, such organization and its team members must have no conflicts of interest with the assessment participant."
+          },
+          {
+            "term": "Intentionally added",
+            "definition": "Intentionally added refers to a substance used in one or more product life cycle stage(s) intended to give a particular property, reaction or quality.\n\nWhile the SEC does not define the phrase “intentionally added” in the final rule*, the rule’s preamble states:\n“[W]e agree that being intentionally added, rather than being a naturally-occurring by-product, is a significant factor in determining whether a conflict mineral is ‘‘necessary to the functionality or production’’ of a product. This is true regardless of who intentionally added the conflict mineral to the product so long as it is contained in the product. [D]etermining whether a conflict mineral is considered ‘‘necessary’’ to a product should not depend on whether the conflict mineral is added directly to the product by the issuer or whether it is added to a component of the product that the issuer receives from a third party. Instead, the issuer should ‘report on the totality of the product and work with suppliers to comply with the requirements.’ Therefore, in determining whether a conflict mineral is ‘‘necessary’’ to a product, an issuer must consider any conflict mineral contained in its product, even if that conflict mineral is only in the product because it was included as part of a component of the product that was manufactured originally by a third party.”\n*(56296 Federal Register / Vol. 77, No. 177 / Wednesday, September 12, 2012 / Rules and Regulations)"
+          },
+          {
+            "term": "IPC",
+            "definition": "IPC (www.IPC.org) is a global industry association based in Bannockburn, Ill., dedicated to the competitive excellence and financial success of its 3,400 member companies which represent all facets of the electronics industry, including design, printed board manufacturing, electronics assembly and test. As a member-driven organization and leading source for industry standards, training, market research and public policy advocacy, IPC supports programs to meet the needs of an estimated $2.0 trillion global electronics industry. IPC maintains additional offices in Taos, N.M.; Washington, D.C.; Stockholm, Sweden; Moscow, Russia; Bangalore, India; Bangkok, Thailand; and Shanghai, Shenzhen, Chengdu, Suzhou and Beijing, China."
+          },
+          {
+            "term": "IPC-1755 Responsible Sourcing of Minerals Data Exchange Standard",
+            "definition": "This IPC standard establishes the requirements for exchanging conflict minerals data between suppliers and their customers. To meet the needs of a broad range of users, this standard provides flexibility in the scope of the products covered within a single declaration. This standard is not a compliance guide."
+          },
+          {
+            "term": "Necessary for the Functionality of a Product",
+            "definition": "The SEC does not provide a formal definition of this phrase in the final rule*, however it provides some guidance: A conflict mineral will be considered to be necessary to its functionality of a product if it meets the following: 1) is intentionally added to the product or any component of the product and is not a naturally-occurring byproduct; 2) is necessary to the product’s generally expected function, use or purpose; and 3) is incorporated for the purpose of ornamentation, decoration, or embellishment, whether the primary purpose of the product is ornamentation or decoration.\n\nNOTE: The conflict mineral must be contained in the product to be applicable.\n\n*(56296 Federal Register / Vol. 77, No. 177 / Wednesday, September 12, 2012 / Rules and Regulations)"
+          },
+          {
+            "term": "Necessary for the Production of a Product",
+            "definition": "The SEC does not provide a formal definition of this phrase in the final rule*; however, it provides some guidance: A conflict mineral will be considered to be necessary to the production of a product when: 1) it is intentionally included in the product’s production process, other than if it is included in a tool, machine, or equipment used to produce the product (such as computers or power lines); 2) it is included in the product (MUST be contained in the product to be applicable); and 3) it is necessary to the product.\n\n*(56296 Federal Register / Vol. 77, No. 177 / Wednesday, September 12, 2012 / Rules and Regulations)"
+          },
+          {
+            "term": "OECD",
+            "definition": "Organisation for Economic Co-operation and Development"
+          },
+          {
+            "term": "Product",
+            "definition": "A company’s Product or Finished good is a material or item which has completed the final stage of manufacturing and/or processing and is available for distribution or sale to customers."
+          },
+          {
+            "term": "RBA",
+            "definition": "Responsible Business Alliance (www.responsiblebusiness.org)"
+          },
+          {
+            "term": "Recycled or Scrap Sources",
+            "definition": "Recycled or scrap sources are recycled metals, that are reclaimed end-user or post-consumer products, or scrap processed metals created during product manufacturing. Recycled metal includes excess, obsolete, defective, and scrap metal materials that contain refined or processed metals that are appropriate to recycle in the production of tin, tantalum, tungsten and/or gold. Minerals partially processed, unprocessed or byproducts from other ores are not included in the definition of recycled metal."
+          },
+          {
+            "term": "Responsible Minerals Assurance Process (RMAP)",
+            "definition": "The Responsible Minerals Assurance Process (RMAP) is a process developed by the RBA to enhance company capability to verify the responsible sourcing of metals. Further details of the RMAP can be found here: http://www.responsiblemineralsinitiative.org/responsible-minerals-assurance-process/."
+          },
+          {
+            "term": "Responsible Minerals Initiative",
+            "definition": "Founded in 2008 by members of the Responsible Business Alliance, the Responsible Minerals Initiative has grown into one of the most utilized and respected resources for companies addressing conflict minerals issues in their supply chains. Over 360 companies from ten different industries participate in the RMI today, contributing to a range of tools and resources including the Responsible Minerals Assurance Process, the Conflict Minerals Reporting Template, Reasonable Country of Origin Inquiry data and a range of guidance documents on conflict minerals sourcing. The RMI also runs regular workshops on conflict minerals issues and contributes to policy development and debates with leading civil society organizations and governments. Additional information is available at http://www.responsiblemineralsinitiative.org."
+          },
+          {
+            "term": "RMAP Conformant Smelter List",
+            "definition": "The Responsible Minerals Assurance Process (RMAP) Conformant Smelter List is a published list of smelters and refiners that have undergone assessment through the RMAP, a program of the Responsible Minerals Initiative (RMI) or industry equivalent program (such as Responsible Jewellery Council or London Bullion Market Association) and have been validated to be in conformance with the standards. If a smelter or refiner is not on the list, it has either not completed a RMAP assessment or is not in conformance with the RMAP standard. \n\nA list of smelters and refiners which have been validated to be conformant to the RMAP can be found at https://www.responsiblemineralsinitiative.org/facilities-lists/active-conformant-facilities-list/."
+          },
+          {
+            "term": "SEC",
+            "definition": "U.S. Securities and Exchange Commission (www.sec.gov)"
+          },
+          {
+            "term": "Smelter",
+            "definition": "A smelter or refiner is a company that procures and processes mineral ore, slag and/or materials from recycled or scrap sources into refined metal or metal containing intermediate products.  The output can be pure (99.5% or greater) metals, powders, ingots, bars, grains, oxides or salts. The terms “smelter” and “refiner” are used interchangeably throughout various publications."
+          },
+          {
+            "term": "Smelter Identification Number",
+            "definition": "A unique identification number the RMI assigns to companies that have been reported by members of the supply chain as smelters or refiners, whether or not they have been verified to meet the characteristics of smelters or refiners as defined in the RMAP assessment standards."
+          },
+          {
+            "term": "Tantalum (Ta) smelter",
+            "definition": "A tantalum smelter (also known as a processor) is defined as a company that converts Ta-containing ores, concentrates, slags or secondary materials into tantalum intermediate products or other tantalum containing products for direct sales or further processing into Ta-containing products, such as Ta powders, Ta components, Ta oxides, alloys, wires, sintered bars, etc.  Refer to the RMAP assessment standard for this metal for a complete description at: https://www.responsiblemineralsinitiative.org/minerals-due-diligence/standards/."
+          },
+          {
+            "term": "Tin (Sn) smelter",
+            "definition": "Primary [tin] smelters are companies with one or more facilities treating tin containing ore concentrates in order to produce tin metal.  Secondary [tin] smelters are companies with one or more facilities that treat secondary materials by reduction for the production of crude or higher grade tin or tin product such as solder.  A smelter as referred to within this audit protocol may operate as either one or both types of business operation. Refer to the RMAP assessment standard for this metal for a complete description at: https://www.responsiblemineralsinitiative.org/minerals-due-diligence/standards/."
+          },
+          {
+            "term": "Tungsten (W) smelter",
+            "definition": "A company with one or more facilities that converts W-containing ores (such as wolframite and scheelite), W concentrates, or W-bearing scrap (secondary material) into tungsten containing intermediates such as Ammonium Para-Tungstate (APT), Ammonium Meta-Tungstate (AMT), ferrotungsten, and tungsten oxides for direct sales or further processed into W-containing products (such as W powder or W-carbide powder). Refer to the RMAP assessment standard for this metal for a complete description at: https://www.responsiblemineralsinitiative.org/minerals-due-diligence/standards/."
+          }
+        ],
+        "smelterLookup": [
+          "The following list represents the RMI's latest smelter name/alias information as of this templates release.  This list is updated frequently, and the most up-to-date version can be found on the RMI website http://www.responsiblemineralsinitiative.org/responsible-minerals-assurance-process/exports/cmrt-export/.  The presence of a smelter here is NOT a guarantee that it is currently Active or Conformant within the Responsible Minerals Assurance Process.\n\nPlease refer to the RMI web site www.responsiblemineralsinitiative.org for the most current and accurate list of standard smelter names that are Active or Conformant. \n\nNames included in column B represent company names that are commonly recognized and reported by the supply chain for a particular smelter. These names may include former company names, alternate names, abbreviations, or other variations. Although the names may not be the RMI Standard Smelter Name, the reference names are helpful to identify the smelter, which is listed under column C in the Smelter Look-up.\n\nColumn C is the list of the official standard smelter names, in the ASCII character set. The majority of smelters will have the same entry for both columns, however if the common name varies from the standard name, the variation is noted in Column B."
+        ]
+      }
+    },
+    "emrt": {
+      "2.1": {
+        "instructions": [
+          "RMI:www.responsiblemineralsinitiative.org/",
+          "Introduction",
+          "This Extended Mineral Reporting Template (EMRT) is a free, standardized reporting template created by the Responsible Minerals Initiative® (RMI®). The Template facilitates the transfer of information through the supply chain regarding mineral country of origin and smelters, refiners and processors being utilized and supports the exercise of due diligence in accordance with the OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected and High-Risk Areas. The template also facilitates the identification of new smelters and refiners to potentially undergo an audit via the Responsible Minerals Assurance Process.\n\nThe EMRT was designed for downstream companies to disclose information about their supply chains up to but not including the smelter.  If you are a smelter or refiner, we recommend you enter your own name in the smelter list tab.\n\nWhen filling out the form, none of the cell entries should start with \"=\" or \"#.\"",
+          "Instructions for completing Company Information questions (rows 7 - 26).\nProvide comments in ENGLISH only",
+          "Note:  Entries with (*) are mandatory fields.",
+          "1. Insert your company's Legal Name.  Please do not use abbreviations. In this field you have the option to add other commercial names, DBAs, etc. This field is mandatory.",
+          "2. Select your company's Declaration Scope.  The options for scope are:\n\nA.  Company-wide\nB.  Product (or List of Products)\nC.  User-Defined \n\nFor \"Company-wide\", the declaration encompasses the entirety of a company's products or product substances produced by the parent company. Therefore if the user is reporting specified mineral data at the company level, they will be reporting data on all products they manufacture. \n\nFor Scope selection of Product (or List of Products), a link to the worksheet tab for Product List will be displayed.  If this scope is chosen, it is mandatory to list the Responder's Product Number of the products covered under the Scope of this Declaration in Column B of the Product List worksheet. It is optional to list the Responder's Product Name in Column C of the Product List worksheet.\n\nFor Scope selection of \"User Defined\", it is mandatory that the user describes the scope to which the specified minerals disclosure is applicable. The scope of this class shall be defined in a text field by the supplier and should be easily understood by customers or the receivers of the document. As an example, companies may provide a link to clarifying information.\n\nThis field is mandatory.",
+          "3. The requesting company is required to select all minerals that are in scope of the declaration. These fields are pre-populated with the six EMRT minerals. To remove a mineral from the declaration, the user selects \"Delete [Mineral]\". Minerals are automatically populated in alphabetical order for Questions 1-7 and C.\n\nThis field is mandatory.",
+          "4. Insert your company’s unique identifier number or code (DUNS number, VAT number, customer-specific identifier, etc.)",
+          "5. Insert the source for the unique identifier number or code (\"DUNS\", \"VAT\", \"Customer\", etc).",
+          "6. Insert your full company address (street, city, state, country, postal code). This field is optional.",
+          "7. Insert the name of the person to contact regarding the contents of the declaration information. This field is mandatory.",
+          "8. Insert the email address of the contact person.  If an email address is not available, state \"not available\" or \"n/a\". A blank field may cause an error in form implementation. This field is mandatory.",
+          "9. Insert the telephone number for the contact. This field is mandatory.",
+          "10. Insert the name of the person who  is responsible for the contents of the declaration information. The authorizer may be a different individual than the contact person. It is not correct to use the words ‘‘same’’ or similar identification to provide the name of the authorizer. This field is mandatory.",
+          "11. Insert the title for the Authorizing person. This field is optional.",
+          "12. Insert the email address of the Authorizing person.  If an email address is not available, state ‘‘not available’’ or ‘‘n/a.’’ A blank field may cause an error in form implementation. This field is mandatory.",
+          "13. Insert the telephone number for the Authorizing person. This field is optional.",
+          "14. Please enter the Date of Completion for this form using the format DD-MMM-YYYY.  This field is mandatory.",
+          "15. As an example, the user may save the file name as:  companyname-date.xlsx (date as YYYY-MM-DD).",
+          "Instructions for completing the seven Declaration of Scope Questions (rows 28 - 107).\nProvide answers in ENGLISH only",
+          "These seven questions define the usage, origination and sourcing identification for each of the specified minerals. The questions are designed to collect information about the use of the specified mineral in the company’s product(s) and the completeness of reporting. Responses to these questions shall represent the ‘Declaration Scope’ selected in the company information section.",
+          "Provide comments in the Comment sections as required to clarify your responses.",
+          "Provide an answer using the pull down menu selections. If the response for the specified mineral to question 1 and 2 is positive, then all questions shall be completed for that mineral and the following due diligence questions (A to G) shall be completed about the company’s overall due diligence program.",
+          "1. This question is used to determine whether the specified mineral is within the scope of the reporting requirement.  The response to this question serves to exclude any trace-level contaminants or naturally-occurring by-products.\n\nThis question asks if any of the specified mineral is used as raw material, component or additive in a product that you manufacture, including compounds. Impurities from raw materials, components, additives, abrasives, and cutting tools are outside the scope of the survey.\n\nThe answer to this question shall be either \"yes\" \"no\" \"unknown\" or \"not declaring\". This question is mandatory.",
+          "Some companies may require substantiation for a \"No\" answer that should be entered into the Comment Field.",
+          "2. This question shall be answered for the specified minerals for which the answer to question 1 is \"yes.\" This is the second of two questions for which the response is used to determine whether the specified mineral is within the scope of this reporting template.  This question is dependent upon the question and response to Question 1.  This question is intended to identify the specified mineral which is intentionally added or included in the manufacturing process of a product where some amount of the specified mineral remains in the finished product.  This includes any specified mineral which may not have been intended to become part of the final product and may not be necessary to the functionality of the product but are only present as residuals of the manufacturing process.  In many cases, the manufacturer may have attempted to remove or facilitate consumption of the specified mineral during the manufacturing process, however, some amount of the specified mineral remains.  Should the specified mineral, which is added or included during the manufacturing process, be completely removed such that none of the specified mineral remains upon the completion of that process, the response to this question would be no.\n\nThis question shall be answered for the specified minerals. Valid answers to this question are either \"yes\", \"no\", or \"unknown\". This question is mandatory.",
+          "3. This is a declaration that any portion of the specified mineral contained in a product or multiple products originates from a conflict-affected and high-risk area (CAHRA). The answer to this question should be \"yes\" if any smelter in the supply chain sources from CAHRAs, regardless of whether such a smelter has been independently audited or not.\n\nThe answers to this question for the specified mineral shall be \"yes,\" \"no,\" or \"unknown,\". Substantiate a \"Yes\" answer in the comments section.  An answer of \"unknown\" is an acceptable response. This question is mandatory for the specified mineral if the response to Question 1 and 2 is \"Yes.\"",
+          "4. This is a declaration that identifies whether the specified mineral contained in the product(s) originate exclusively from recycled or scrap sources. \n\nThe answer to this question shall be \"yes\", \"no\", or \"unknown\".\n\nA \"Yes\" answer means that 100% of the specified mineral comes from recycled or scrap sources.  A \"No\" answer means that some of the raw material does not come from recycled or scrap sources. An \"Unknown\" answer means that the user does not know whether or not 100% of the raw material comes from recycled or scrap sources.  This question is mandatory for the specified mineral if the response to Question 1 and 2 is \"Yes.\"",
+          "5. This is a question to determine whether a company has received disclosures from all direct suppliers reasonably believed to be providing the specified mineral contained in the products covered by the scope of this declaration. Permissible responses to this question are:\n\n­ 100%\n­ Greater than 90%\n­ Greater than 75%\n- Greater than 50%\n- 50% or less\n- None\n- Did not survey\n\nThis question is mandatory for the specified mineral if the response to Question 1 and 2 is \"Yes.\"",
+          "6. This question verifies if the supplier has reason to believe they have identified all of the smelters providing the specified mineral in the products covered by this declaration. The answer to this question shall be \"Yes\" \"No\" or \"unknown\", along with a comment in certain cases, e.g. list of smelters. This question is mandatory for the specified mineral if the response to Question 1 and 2 is \"Yes.\"",
+          "7. This question verifies that all of the smelters or processors identified to be providing any of the raw materials contained in the products covered by the scope of this declaration have been reported in this declaration. The answer to this question shall be \"yes,\" \"no,\" or \"unknown\" along with a comment in certain cases e.g. list of smelters. This question is mandatory for the specified mineral if the response to Question 1 and 2 is \"Yes.\"",
+          "Instructions for completing Questions A. – G. (rows 113 - 137). Questions A through G are mandatory if the response to Question 1 and Question 2 is \"Yes\" for the specified mineral.\nProvide answers in ENGLISH only.",
+          "The OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-affected and High-risk Areas (OECD Guidance) defines “Due Diligence” as “an on-going, proactive and reactive process through which companies can ensure that they respect human rights and do not contribute to conflict”. More information is available at http://www.responsiblemineralsinitiative.org/training-and-resources/conflict-affected-and-high-risk-areas/.\n\nQuestions A. through G are designed to assess your company’s responsible minerals sourcing due diligence activities. Responses to these questions shall represent the full scope of your company’s activities and shall not be limited to the ‘Declaration Scope’ selected in the company information section.",
+          "A. This is a declaration to disclose whether a company has a responsible minerals sourcing policy. The answer to this question shall be \"yes\" or \"no\". This field is mandatory.",
+          "B. This is a declaration to disclose whether a company's responsible minerals sourcing policy is available on the company website. The answer to this question shall be \"yes\" or \"no.\" If \"yes,\" add the URL in the comments field. This field is mandatory.",
+          "C. This is a declaration to determine whether a company requires their direct suppliers to source the specified minerals from independently validated smelters and processors. The answer to this question shall be \"yes,\" \"yes, when more processors are validated,\" or \"no.\" Comments should be captured in a question comment field. This field is mandatory.",
+          "D. This is a question to disclose whether a company has implemented responsible minerals sourcing due diligence measures. This question is not intended to provide details of a company's due diligence measures. The aspects of acceptable due diligence measures shall be determined by the requestor and supplier.\n\nThe answer to this question shall be \"yes\" or \"no.\" If \"yes,\" the user shall describe the due diligence measures implemented in the question comment field (e.g. OECD Due Diligence Framework).",
+          "E. This is a question to disclose whether a company requests their supplier to fill out an extended mineral reporting template. Acceptable answers are listed below, in certain cases further explanation may be required, i.e., to provide the format used for collecting information. If the answer is \"Yes, using other format\" the user shall provide a comment in a question comment field.  Permissible responses to this question are:\n\n- Yes, in conformance with IPC-1755 (e.g. EMRT)\n- Yes, using other format (describe)\n- No\n\nThis field is mandatory.",
+          "F. Please answer “Yes” or “No”.  In the comments section, you can provide additional information on your approach. Examples could be:\n\n “3rd party audit” - on-site audits of your suppliers conducted by independent third parties.  \n “Documentation review only” - a review of supplier submitted records and documentation conducted by independent third parties and, or your company personnel.   \n “Internal audit” - on-site audits of your suppliers conducted by your company personnel.\n\nThis field is mandatory.",
+          "G. This is a question to disclose whether a company’s review process includes corrective action management. The answer to this question shall be \"yes\" or \"no.\" Comments shall be captured in a question comment field. This field is mandatory.",
+          "Instructions for completing the Smelter List Tab.\nProvide answers in ENGLISH only\n\nNote:  Columns with (*) are mandatory fields",
+          "This template allows for the identification of smelters, refiners, or processors using the Smelter Look-up.  Columns B, and C must be completed in order from left to right to utilize the Smelter Look-up feature.\nUse a separate line for each metal/smelter/country combination.",
+          "1. Smelter Identification Input Column - If you know the Smelter Identification Number, input the number in Column A (columns B, C, D, E, F, G, I, and J will auto-populate).  Column A does not autopopulate",
+          "2. Metal (*) - Use the pull down menu to select the metal for which you are entering smelter information. Metals appear only if Declaration Questions 1 and 2 are answered \"Yes\" for those metals. This field is mandatory.",
+          "3. Smelter Look-up (*) - Select from dropdown.  This is the list of known smelters as of template release date.  If smelter is not listed select 'Smelter Not Listed'.  This will allow you to enter the name of the smelter in Column D.  If you do not know the name or location of the smelter, select 'Smelter Not Yet Identified.'  For this option,  columns D and E will autopopulate to say, 'unknown.' This field is mandatory.",
+          "4. Smelter Name (1) - Fill in smelter name if you selected \"Smelter Not Listed\" in column C.  This field will auto-populate when a smelter name in selected in Column C. This field is mandatory.",
+          "5. Smelter Country (*) – This field will auto-populate when a smelter name is selected in column C. If you selected \"Smelter Not Listed\" in column C, use the pull down menu to select the country location of the smelter. This field is mandatory.",
+          "6. Smelter Identification - This is a unique identifier assigned to a smelter or refiner according to an established smelter and refinery identification system. It is expected that multiple names or aliases could be used to describe a single smelter or refiner and therefore multiple names or aliases could be associated to a single ‘Smelter ID’.",
+          "7. Source of Smelter Identification Number - This is the source of the Smelter Identification Number entered in Column F.  If a smelter name was selected in Column C using the dropdown box, this field will auto-populate.",
+          "8. Smelter Street -  Provide the street name on which the smelter is located. This field is optional.",
+          "9. Smelter City – Provide the city name of where the smelter is located. This field is optional.",
+          "10. Smelter Location: State/Province, if applicable – Provide the state or province where the smelter is located. This field is optional.",
+          "11. Smelter Contact Name – The Extended Mineral Reporting Template (EMRT) is circulated among companies in the requesting company's supply chain to exercise due diligence in accordance with the OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected and High-Risk.\n\nIf the template is circulated in a country where laws protecting personal information exist, sharing personal contact information in the EMRT may violate related regulations. Therefore, it is recommended that the requesting company take precautions such as obtaining the contact person's permission to share the information with other companies in the supply chain when completing \"Smelter Contact Name\" and the \"Smelter Contact Email\" columns.\n\nIf you have permission to share this information, please fill in the name of the Smelter Facility Contact person who you worked with.",
+          "12. Smelter Contact Email – Fill in the email address of the Smelter Facility contact person who was identified as the Smelter Contact Name.  Example: John.Smith@SmelterXXX.com.  Please review the instructions for Smelter Contact Name before completing this field.",
+          "13. Name of Mine(s) - This field allows a company to define the actual mines being used by the smelter.  Please enter the actual mine names if known.  If 100% of the smelter’s feedstock originates from recycled or scrap sources, enter \"Recycled\" or \"Scrap\" in place of the name of the mine and answer \"Yes\" in Column P.",
+          "14. Location (Country) of Mine(s) - This is a free form text field that allows a company to define the location of the mines being used by the smelter.   Please enter the country of the mine(s).  If the country of origin is not known, enter \"Unknown\".   If 100% of the smelter’s feedstock originates from recycled or scrap sources, enter \"Recycled\" or \"Scrap\" in place of the country of origin.  This field is optional.",
+          "15. Indicates whether the smelter solely obtains inputs for its smelting process(es) from recycled or scrap sources. This question is optional.  Permissible responses to this question are:\n\n- Yes\n- No\n- Unknown",
+          "16. Comments – free form text field to enter any comments concerning the smelter.  Example: smelter is being acquired by Company YYY",
+          "Instructions for completing the Mine List Tab.\nProvide answers in ENGLISH only",
+          "1. Metal  -   Use the pull down menu to select the metal for which you are entering mine facility information. Metals appear only if Declaration Questions 1 and 2 are answered \"Yes\" for those metals.",
+          "2. Name of Smelter(s) sourcing from this Mine Facility - When possible, fill in the name of the smelter(s) that is sourcing from the listed mine facility.",
+          "3. Mine Facility (Site) Name - Fill in the mine facility name as you know it.",
+          "4. Mine Identification - This is a unique identifier assigned to a mine facility according to an established mine facility identification system. It is expected that multiple names or aliases could be used to describe a single mine facility and therefore multiple names or aliases could be associated to a single ‘Facility ID’.",
+          "5. Source of Mine Identification Number - This is the source of the Mine Identification Number entered in Column D.",
+          "6. Mine Facility (Site) Country - Select from dropdown, the country where the mine facility is located.",
+          "7. Mine Facility Street -  Provide the street name on which the mine is located. This field is optional.",
+          "8. Mine Facility City – Provide the city name of where the mine facility is located.",
+          "9. Mine Facility Location: State/Province, if applicable – Provide the state or province where the mine facility is located.",
+          "10. Mine Facility Contact Name – If the template is circulated in a country where laws protecting personal information exist, sharing personal contact information in the AMRT may violate related regulations. Therefore, it is recommended that the requesting company take precautions such as obtaining the contact person's permission to share the information with other companies in the supply chain when completing \"Mine Facility Contact Name\" and the \"Mine Facility Contact Email\" columns.\n\nIf you have permission to share this information, please fill in the name of the Mine Facility Contact person who you worked with.",
+          "11. Mine Facility Contact Email – Fill in the email address of the Mine Facility contact person who was identified as the Mine Facility Contact Name.  Example: John.Smith@MineXXX.com.  Please review the instructions for Mine Facility Contact Name before completing this field.",
+          "12. Proposed next steps - This is a comments area, which allows the company to specify the next steps to manage mine facilities. These are the actions you may take with the mine if the facility is not listed on the Responsible Minerals Initiative (RMI) Conformant Facility List. Example: request mine facility to undergo an RMI assessment, remove from preferred supplier list, etc.",
+          "13. Comments – free form text field to enter any comments concerning the mine facility.  Example: mine is being acquired by Company YYY",
+          "The Checker worksheet is used to verify if all the required information in the Template has been completed. It is updated real-time and can be reviewed at any time while using the Template. It is used to verify completion.\n\nTo use this sheet, verify if all required fields have been completed (completed fields will be highlighted in green). If not, look for the red field(s) and review the \"Notes\" in Column C for required actions. You may use the URL in Column D to directly access the field for completion.",
+          "TERMS AND CONDITIONS",
+          "The Responsible Minerals Initiative Smelter List (the \"List\") and Program templates and tools, including, without limitation, the Extended Mineral Reporting Template  (collectively “Tools”), including, without limitation, all information provided therein, are provided for informational purposes only and are current as of the date set forth therein. Any inaccuracy or omission in the List or any Tool is not the responsibility of the Responsible Business Alliance, Incorporated, a Delaware non-stock corporation (\"RBA\"). Determination of whether and/or how to use all or any portion of the List or any Tool is to be made in the User’s sole and absolute discretion. Prior to using the List or any Tool, you should review it with your own legal counsel.  No part of the List or any Tool constitutes legal advice. Use of the List or any Tool is voluntary.",
+          "RBA does not make any representations or warranties with respect to the List or any Tool. The List and Tools are provided on an \"AS IS\" and on an \"AS AVAILABLE\" basis. RBA hereby disclaim all warranties of any nature, express, implied or otherwise, or arising from trade or custom, including, without limitation, any implied warranties of merchantability, non-infringement, quality, title, fitness for a particular purpose, completeness or accuracy.",
+          "To the fullest extent permitted by applicable laws, RBA renounces any liability for any losses, expenses or damages of any nature, including, without limitation, special, incidental, punitive, direct, indirect or consequential damages or lost income or profits, resulting from or arising out of the User’s use of the List or any Tool, whether arising in tort, contract, statute, or otherwise, even if shown that they were advised of the possibility of such damages.",
+          "In consideration for access and use of the List and/or any Tool, THE USER hereby agrees to and does (a) release and forever discharge RBA as well as its officers, directors, agents, employees, volunteers, representatives, contractors, successors, and assigns, from any and all claims, actions, losses, suits, damages, judgments, levies, and executions, which the User has ever had, has, or ever can, shall, or may have or claim to have against RBA , as well as its officers, directors, agents, employees, volunteers, representatives, contractors, successors, and assigns, resulting from or arising out of the List or any Tool or use thereof, and agrees to (b) indemnify, defend and hold harmless RBA, as well as its officers, directors, agents, employees, volunteers, representatives, contractors, successors, and assigns, from any and all claims,  actions, losses, suits, damages, judgments, levies, and executions resulting from or arising out of the USER'S use of the List or any Tool.",
+          "If any part of any provision of these Terms and Conditions shall be invalid or unenforceable under applicable law, said part shall be deemed ineffective to the extent of such invalidity or unenforceability only, without in any way affecting the remaining parts of said provision or the remaining provisions of these Terms and Conditions.",
+          "By accessing and using the List or any Tool, and in consideration thereof, the User agrees to the foregoing."
+        ],
+        "smelterList": [],
+        "productList": [],
+        "definitions": [
+          {
+            "term": "Authorizer",
+            "definition": "This field identifies the person responsible for the content of the declaration. The authorizer may be a different individual from the contact person. It is not correct to use the words ‘‘same’’ or similar identification to provide the name of the authorizer."
+          },
+          {
+            "term": "Cobalt Refiner",
+            "definition": "An entity that processes cobalt concentrates, intermediates or recycled feed and produces a cobalt product for direct use in a downstream manufacturing process."
+          },
+          {
+            "term": "Conflict-Affected and High-Risk Areas (CAHRA)",
+            "definition": "Conflict-Affected and High-Risk Areas (CAHRA) are defined by the OECD Due Diligence Guidance as \"areas identified by the presence of armed conflict, widespread violence or other risks of harm to people. Armed conflict may take a variety of forms, such as a conflict of international or non-international character, which may involve two or more states, or may consist of wars of liberation, or insurgencies, civil wars, etc. High-risk areas may include areas of political instability or repression, institutional weakness, insecurity, collapse of civil infrastructure and widespread violence. Such areas are often characterised by widespread human right abuses and violations of national or international law.\""
+          },
+          {
+            "term": "Copper Processor*",
+            "definition": "A copper processor is a facility engaged in the transformation of copper-bearing materials into intermediate or final copper products through metallurgical, chemical, or electrochemical processes. Copper processors may operate integrated facilities or specialize in one or more stages of the copper value chain, including alloying, casting, or further fabrication."
+          },
+          {
+            "term": "Declaration of Scope or Class",
+            "definition": "For the purposes of this template, “scope” describes the applicability of the information provided by the reporting company.  The scope may encompass the entirety of a company’s services and/or products, or at a company’s discretion, the template may be used to report on a specific product (or products), or, be ‘User defined’.  The ‘User defined’ scope selection or class may be used to describe any subset of a company’s operation or product portfolio"
+          },
+          {
+            "term": "Due Diligence",
+            "definition": "The OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-affected and High-risk Areas (OECD Guidance) defines “Due Diligence” as “an on-going, proactive and reactive process through which companies can ensure that they respect human rights and do not contribute to conflict”. More information is available at http://www.responsiblemineralsinitiative.org/training-and-resources/conflict-affected-and-high-risk-areas/."
+          },
+          {
+            "term": "Graphite (Natural)*",
+            "definition": "Natural Graphite is a naturally occurring form of crystalline carbon, found in graphite-bearing ores: flake graphite; amorphous and vein graphite. A natural graphite project or operations (Upstream actor) refers to an active industrial undertaking focused on the extraction of graphite ore and its subsequent beneficiation into graphite concentrate."
+          },
+          {
+            "term": "Graphite Processor*",
+            "definition": "A spherical graphite producer (Pinch Point) is a facility that manufactures high-purity, fine-particle graphite products—either coated or uncoated—by processing natural or synthetic graphite concentrate into spherical graphite (also known as spheroidized graphite), primarily for use in lithium-ion battery anodes."
+          },
+          {
+            "term": "Independent Third-Party Audit Firm",
+            "definition": "With respect to smelter audits, an “Independent Third-Party Audit Firm” is a private sector organization competent in evaluating the smelter or refiner’s due diligence system against a defined standard.  To maintain neutrality and impartiality, such organization and its audit team members must have no conflicts of interest with the auditee."
+          },
+          {
+            "term": "Intentionally added",
+            "definition": "Intentionally added refers to a substance used in one or more product life cycle stage(s) intended to give a particular property, reaction or quality."
+          },
+          {
+            "term": "Lithium Processor*",
+            "definition": "A lithium processor is a facility that converts lithium-bearing materials into lithium compounds, lithium metal, or intermediates through chemical, thermal, or electrochemical processes. Processed outputs may include lithium carbonate, lithium hydroxide, lithium chloride, lithium sulfate, lithium oxide, lithium metal, or other lithium-containing intermediates used in downstream applications such as batteries, ceramics, glass, lubricants, and pharmaceuticals."
+          },
+          {
+            "term": "OECD",
+            "definition": "Organisation for Economic Co-operation and Development.  The OECD has developed the OECD Due Diligence Guidance for Responsible Supply Chains.  The OECD Due Diligence Guidance provides detailed recommendations to help companies respect human rights and avoid contributing to conflict through their mineral purchasing decisions and practices and uses a reasonableness approach. This Guidance is for use by any company potentially sourcing minerals or metals from conflict-affected and high-risk areas. The OECD Guidance is global in scope, and applies to all mineral supply chains. (http://mneguidelines.oecd.org/mining.htm)"
+          },
+          {
+            "term": "Mica (Natural)",
+            "definition": "Natural mica is a mineral that is mined or naturally occurring, such as muscovite and phlogopite."
+          },
+          {
+            "term": "Mica (Synthetic)",
+            "definition": "Synthetic mica (fluorophlogopite) is a man-made material composed of such materials as magnesium, aluminum and silicon."
+          },
+          {
+            "term": "Mica Processor",
+            "definition": "A mica processor is an entity that takes raw mined minerals such as pegmatites (schist), feldspar, kaolin, muscovite or phlogopite and subjects them to various physical or mechanical methods to separate non-mica components from mica components, then produce grades of mica products for use in downstream manufacturing processes. Raw mineral processing can include sorting, separation, milling, grinding, cutting, stamping and binding."
+          },
+          {
+            "term": "Nickel Processor*",
+            "definition": "A nickel processor is a facility that transforms nickel-bearing materials into nickel metal, nickel alloys, or intermediates through pyrometallurgical, hydrometallurgical, or electrochemical processes. Processed products may include ferronickel, nickel pig iron (NPI), nickel matte, mixed hydroxide precipitate (MHP), mixed sulfide precipitate (MSP), nickel sulfate, or refined nickel metal."
+          },
+          {
+            "term": "Processor",
+            "definition": "A facility that performs process or processes to remove all undesirable and separate the desired elements of primary materials by concentration or purification. This includes, but is not limited to: cleaning, separation, concentrating (e.g. separate valuable minerals from unwanted gangue by mechanical, thermal or chemical means), roasting (e.g. smelting, roasting, or other means to drive off impurities), cathode and anode production and other refining processes. The terms \"smelter\", \"refiner\", and \"processor\" are used interchangeably throughout various publications."
+          },
+          {
+            "term": "Product",
+            "definition": "A company’s Product or Finished good is a material or item which has completed the final stage of manufacturing and/or processing and is available for distribution or sale to customers."
+          },
+          {
+            "term": "Recycled or Scrap Sources",
+            "definition": "Recycled metals are reclaimed end-user or post-consumer products, or scrap processed metals created during product manufacturing. Recycled metal includes excess, obsolete, defective, and scrap metal materials which contain refined or processed metals that are appropriate to recycle in the production of the in scope metals. Minerals partially processed, unprocessed or a bi-product from another ore are not recycled metals.\n\nNote: As of the date of this publication, there is no significant post-consumer recycling of mica."
+          },
+          {
+            "term": "Responsible Business Alliance (RBA)",
+            "definition": "Founded in 2004 the Responsible Business Alliance is the world’s largest industry coalition dedicated to electronics supply chain responsibility. (http://www.responsiblebusiness.org)"
+          },
+          {
+            "term": "Responsible Minerals Assurance Process (RMAP)",
+            "definition": "The Responsible Minerals Assurance Process (RMAP) is a process developed by the RBA to enhance company capability to verify the responsible sourcing of metals. Further details of the RMAP can be found here: http://www.responsiblemineralsinitiative.org/responsible-minerals-assurance-process/."
+          },
+          {
+            "term": "Responsible Minerals Initiative (RMI)",
+            "definition": "Founded in 2008 by members of the Responsible Business Alliance and the Global e-Sustainability Initiative, the Responsible Minerals Initiative has grown into one of the most utilized and respected resources for companies addressing conflict minerals issues in their supply chains. Over 150 companies from seven different industries participate in the RMI today, contributing to a range of tools and resources including the Responsible Minerals Assurance Process, the Conflict Minerals Reporting Template, Reasonable Country of Origin Inquiry data and a range of guidance documents on conflict minerals sourcing. The RMI also runs regular workshops on conflict minerals issues and contributes to policy development and debates with leading civil society organizations and governments. Additional information is available at http://www.responsiblemineralsinitiative.org/."
+          },
+          {
+            "term": "RMAP Conformant Smelter List",
+            "definition": "The Responsible Minerals Assurance Process (RMAP) Conformant Smelter List is a published list of smelters and refiners that have undergone assessment through the RMAP, a program of the Responsible Minerals Initiative (RMI) or industry equivalent program (such as Responsible Jewellery Council or London Bullion Market Association) and have been validated to be in conformance with the protocols. If a smelter or refiner is not on the list, it has either not completed a RMAP assessment or is not in conformance with the RMAP protocol. \n\nA list of smelters and refiners which have been validated to be conformant to the RMAP can be found at www.responsiblemineralsinitiative.org"
+          },
+          {
+            "term": "Smelter",
+            "definition": "A smelter or refiner is a company that procures and processes mineral ore, slag and/or materials from recycled or scrap sources into refined metal or metal containing intermediate products.  The output can be pure (99.5% or greater) metals, powders, ingots, bars, grains, oxides or salts. The terms \"smelter\", \"refiner\", and \"processor\" are used interchangeably throughout various publications."
+          },
+          {
+            "term": "Smelter Identification Number",
+            "definition": "A unique identification number the RMI assigns to companies that have been reported by members of the supply chain as smelters or refiners, whether or not they have been verified to meet the characteristics of smelters or refiners as defined in the RMAP audit protocols or other applicable audit programs."
+          }
+        ],
+        "mineList": [],
+        "smelterLookup": [
+          "The following list represents the RMI's latest smelter name/alias information as of this templates release.  This list is updated frequently,  and the most up-to-date version can be found on the RMI website http://www.responsiblemineralsinitiative.org/responsible-minerals-assurance-process/exports/cmt-export/.  The presence of a smelter here is NOT a guarantee that it is currently Active or Conformant within an independent third party audit program.\n\nPlease refer to the RMI web site www.responsiblemineralsinitiative.org for the most current and accurate list of standard smelter names that are Active or Conformant. \n\nNames included in column B represent company names that are commonly recognized and reported by the supply chain for a particular smelter. These names may include former company names, alternate names, abbreviations, or other variations. Although the names may not be the Standard Smelter Name, the reference names are helpful to identify the smelter, which is listed under column C in the Smelter Look-up.\n\nColumn C is the list of the official standard smelter names, in the ASCII character set. The majority of smelters will have the same entry for both columns, however if the common name varies from the standard name, the variation is noted in Column B."
+        ]
+      }
+    },
+    "crt": {
+      "2.21": {
+        "instructions": [
+          "RMI:www.responsiblemineralsinitiative.org/",
+          "Introduction",
+          "This Cobalt Reporting Template (CRT) is a free, standardized reporting template created by the Responsible Minerals Initiative® (RMI®). The Template facilitates the transfer of information through the supply chain regarding mineral country of origin and smelters and refiners being utilized and supports the exercise of due diligence in accordance with the OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected and High-Risk Areas. The template also facilitates the identification of new smelters and refiners to potentially undergo an audit via the Responsible Minerals Assurance Process.\n\nThe CRT was designed for downstream companies to disclose information about their supply chains up to but not including the smelter.  If you are a smelter or refiner, we recommend you enter your own name in the smelter list tab.\n\nWhen filling out the form, none of the cell entries should start with \"=\" or \"#.\"",
+          "Instructions for completing Company Information questions (rows 8 - 22).\nProvide comments in ENGLISH only",
+          "Note:  Entries with (*) are mandatory fields.",
+          "1. Insert your company's Legal Name.  Please do not use abbreviations. In this field you have the option to add other commercial names, DBAs, etc. This field is mandatory.",
+          "2. Select your company's Declaration Scope.  The options for scope are:\n\nA.  Company-wide\nB.  Product (or List of Products)\nC.  User-Defined \n\nFor \"Company-wide\", the declaration encompasses the entirety of a company's products or product substances produced by the parent company. Therefore if the user is reporting cobalt data at the company level, they will be reporting data on all products they manufacture. \n\nFor Scope selection of Product (or List of Products), a link to the worksheet tab for Product List will be displayed.  If this scope is chosen, it is mandatory to list the Manufacturer's Product Number of the products covered under the Scope of this Declaration in Column B of the Product List worksheet. It is optional to list the Manufacturer's Product Name in Column C of the Product List worksheet.\n\nFor Scope selection of \"User Defined\", it is mandatory that the user describes the scope to which the cobalt disclosure is applicable. The scope of this class shall be defined in a text field by the supplier and should be easily understood by customers or the receivers of the document. As an example, companies may provide a link to clarifying information.\n\nThis field is mandatory.",
+          "3. Insert your company’s unique identifier number or code (DUNS number, VAT number, customer-specific identifier, etc.)",
+          "4. Insert the source for the unique identifier number or code (\"DUNS\", \"VAT\", \"Customer\", etc).",
+          "5. Insert your full company address (street, city, state, country, postal code). This field is optional.",
+          "6. Insert the name of the person to contact regarding the contents of the declaration information. This field is mandatory.",
+          "7. Insert the email address of the contact person.  If an email address is not available, state \"not available\" or \"n/A\". A blank field may cause an error in form implementation. This field is mandatory.",
+          "8. Insert the telephone number for the contact. This field is mandatory.",
+          "9. Insert the name of the person who  is responsible for the contents of the declaration information. The authorizer may be a different individual than the contact person. It is not correct to use the words ‘‘same’’ or similar identification to provide the name of the authorizer. This field is mandatory.",
+          "10. Insert the title for the Authorizing person. This field is optional.",
+          "11. Insert the email address of the Authorizing person.  If an email address is not available, state ‘‘not available’’ or ‘‘n/a.’’ A blank field may cause an error in form implementation. This field is mandatory.",
+          "12. Insert the telephone number for the Authorizing person. This field is optional.",
+          "13. Please enter the Date of Completion for this form using the format DD-MMM-YYYY.  This field is mandatory.",
+          "14. As an example, the user may save the file name as:  companyname-date.xlsx (date as YYYY-MM-DD).",
+          "Instructions for completing the six Declaration of Scope Questions (rows 24 - 56).\nProvide answers in ENGLISH only",
+          "These six questions define the usage, origination and sourcing identification for cobalt. The questions are designed to collect information about the use of cobalt in the company’s product(s) and the completeness of reporting. Responses to these questions shall represent the ‘Declaration Scope’ selected in the company information section.",
+          "Provide comments in the Comment sections as required to clarify your responses.",
+          "Provide an answer using the pull down menu selections. If the response for cobalt to question 1 is positive, then all questions shall be completed for cobalt and the following due diligence questions (A to I) shall be completed about the company’s overall due diligence program.",
+          "1. This question is used to determine whether cobalt is within the scope of the reporting requirement.  The response to this question serves to exclude any trace-level contaminants or naturally-occurring by-products.\n\nThis question asks if any cobalt is used as raw material, component or additive in a product that you manufacture, including compounds. Impurities from raw materials, components, additives, abrasives, and cutting tools are outside the scope of the survey.\n\nThe answer to this question shall be either \"yes\" \"no\" or \"unknown.\"",
+          "Some companies may require substantiation for a \"No\" answer that should be entered into the Comment Field.",
+          "2. This is a declaration that any portion of the cobalt contained in a product or multiple products originates from a conflict-affected and high-risk area (CAHRA). The answer to this question should be \"yes\" if any smelter in the supply chain sources from a CAHRA, regardless of whether such a smelter has been independently audited or not.\n\nThe answers to this question shall be \"yes,\" \"no,\" \"unknown,\" or \"DRC or adjoining countries only.\" Substantiate a \"Yes\" answer in the comments section.  An answer of \"unknown\" is an acceptable response. This question is mandatory for cobalt if the response to Question 1 is \"Yes.\"",
+          "3. This is a declaration that identifies whether cobalt contained in the product(s) originate exclusively from recycled or scrap sources. \n\nThe answer to this question shall be \"yes\", \"no\", or \"unknown\".\n\nA \"Yes\" answer means that 100% of the cobalt comes from recycled or scrap sources.  A \"No\" answer means that some of the raw material does not come from recycled or scrap sources. An \"Unknown\" answer means that the user does not know whether or not 100% of the raw material comes from recycled or scrap sources.  This field is mandatory.",
+          "4. This is a question to determine whether a company has received disclosures from all direct suppliers reasonably believed to be providing cobalt contained in the products covered by the scope of this declaration. Permissible responses to this question are:\n\n­ 100%\n­ Greater than 90%\n­ Greater than 75%\n- Greater than 50%\n- 50% or less\n- None\n\nThis field is mandatory.",
+          "5. This question verifies if the supplier has reason to believe they have identified all of the smelters providing cobalt in the products covered by this declaration. The answer to this question shall be \"Yes\" \"No\" or \"unknown\", along with a comment in certain cases, e.g. list of smelters. This field is mandatory.",
+          "6. This question verifies that all of the smelters identified to be providing any of the cobalt contained in the products covered by the scope of this declaration have been reported in this declaration. The answer to this question shall be \"yes\" \"no\" or \"unknown\" along with a comment in certain cases, e.g. list of smelters. This question is mandatory for cobalt if the response to Question 1 is “Yes” for cobalt.",
+          "Instructions for completing Questions A. – I. (rows 63 - 79).  Questions A. through I. are mandatory if the response to Question 1 is “Yes” for cobalt.\nProvide answers in ENGLISH only.",
+          "The OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-affected and High-risk Areas (OECD Guidance) defines “Due Diligence” as “an on-going, proactive and reactive process through which companies can ensure that they respect human rights and do not contribute to conflict”. More information is available at http://www.responsiblemineralsinitiative.org/training-and-resources/conflict-affected-and-high-risk-areas/.\n\nQuestions A. thru I. are designed to assess your company’s cobalt sourcing due diligence activities. Responses to these questions shall represent the full scope of your company’s activities and shall not be limited to the ‘Declaration Scope’ selected in the company information section.",
+          "A. This is a declaration to disclose whether a company has a publicly available cobalt sourcing policy. The answer to this question shall be \"yes\" or \"no.\" If \"Yes\" the user shall specify the URL in a question comment field. This field is mandatory.",
+          "B. This is a declaration whether the company's cobalt sourcing policy addresses all risks in the OECD Due Diligence Guidance Annex II Model Policy as well as all the worst forms of child labor.  The answer to this question shall be \"yes\" or \"no\". \n\nThis field is mandatory.\n\n\"Annex II Risks\" can be found at http://www.oecd.org/daf/inv/mne/OECD-Due-Diligence-Guidance-Minerals-Edition3.pdf.",
+          "C. Please answer  \"yes\" or \"no\" to disclose whether your company has implemented cobalt sourcing due diligence measures. This declaration is not intended to provide the details of a company’s due diligence measures - just that a company has implemented due diligence measures. The aspects of acceptable due diligence measures shall be determined by the requestor and supplier. \n\nExamples of due diligence measures may include: communicating and incorporating into contracts (where possible) your expectations to suppliers on responsible cobalt supply chain; identifying and assessing risks in the supply chain; designing and implementing a strategy to respond to identified risks, etc.  These due diligence measure examples are consistent with the guidelines included in the internationally recognized OECD Guidance.  \n\nThis field is mandatory.",
+          "D. This is a declaration to determine whether a company requires their direct suppliers to exercise due diligence over the cobalt supply chain in accordance with the OECD Due Diligence Guidance. The answer to this question shall be \"yes\" or \"no.\" Comments should be captured in a question comment field. This field is mandatory.",
+          "E. This is a declaration to determine whether a company requires their direct suppliers to source cobalt from independently validated smelters. The answer to this question shall be \"yes\" or \"no.\"  Comments should be captured in a question comment field. This field is mandatory.",
+          "F. This is a declaration to determine whether a company requires smelters in their supply chain to exercise due diligence over the cobalt supply chain in accordance with the OECD Due Diligence Guidance. The answer to this question shall be \"yes\" or \"no.\" Comments should be captured in a question comment field. This field is mandatory.\n\n\"Annex II Risks\" can be found at http://www.oecd.org/daf/inv/mne/OECD-Due-Diligence-Guidance-Minerals-Edition3.pdf.",
+          "G. This is a question to disclose whether a company requests their supplier to fill out a cobalt reporting template. Acceptable answers are listed below, in certain cases further explanation may be required, i.e., to provide the format used for collecting information. If the answer is \"Yes, using other format\" the user shall provide a comment in a question comment field.  Permissible responses to this question are:\n\n- Yes, Cobalt Reporting Template\n- Yes, using other format (describe)\n- No\n\nThis field is mandatory.",
+          "H. Please answer “Yes” or “No”.  In the comments section, you can provide additional information on your approach. Examples could be:\n\n “3rd party audit” - on-site audits of your suppliers conducted by independent third parties.  \n “Documentation review only” - a review of supplier submitted records and documentation conducted by independent third parties and, or your company personnel.   \n “Internal audit” - on-site audits of your suppliers conducted by your company personnel.\n\nThis field is mandatory.",
+          "I. This is a question to disclose whether a company’s review process includes corrective action management. The answer to this question shall be \"yes\" or \"no.\" Comments shall be captured in a question comment field. This field is mandatory.",
+          "Instructions for completing the Smelter List Tab.\nProvide answers in ENGLISH only\n\nNote:  Columns with (*) are mandatory fields",
+          "This template allows for smelter identification using the Smelter Look-up.  Columns B, and C must be completed in order from left to right to utilize the Smelter Look-up feature.\nUse a separate line for each metal/smelter/country combination.",
+          "1. Smelter Identification Input Column - If you know the Smelter Identification Number, input the number in Column A (columns B, C, D, E, F, G, I, and J will auto-populate).  Column A does not autopopulate",
+          "2. Metal (*)   -   Use the pull down menu to select the metal for which you are entering smelter information. This field is mandatory.",
+          "3. Smelter Look-up (*) - Select from dropdown.  This is the list of known smelters as of template release date.  If smelter is not listed select 'Smelter Not Listed'.  This will allow you to enter the name of the smelter in Column D.  If you do not know the name or location of the smelter, select 'Smelter Not Yet Identified.'  For this option,  columns D and E will autopopulate to say, 'unknown.' This field is mandatory.",
+          "4. Smelter Name (1)- Fill in smelter name if you selected \"Smelter Not Listed\" in column C.  This field will auto-populate when a smelter name in selected in Column C. This field is mandatory.",
+          "5. Smelter Country (*) – This field will auto-populate when a smelter name is selected in column C. If you selected \"Smelter Not Listed\" in column C, use the pull down menu to select the country location of the smelter. This field is mandatory.",
+          "6. Smelter Identification - This is a unique identifier assigned to a smelter or refiner according to an established smelter and refinery identification system. It is expected that multiple names or aliases could be used to describe a single smelter or refiner and therefore multiple names or aliases could be associated to a single ‘Smelter ID’.",
+          "7. Source of Smelter Identification Number - This is the source of the Smelter Identification Number entered in Column F.  If a smelter name was selected in Column C using the dropdown box, this field will auto-populate.",
+          "8. Smelter Street -  Provide the street name on which the smelter is located. This field is optional.",
+          "9. Smelter City – Provide the city name of where the smelter is located. This field is optional.",
+          "10.. Smelter Location: State/Province, if applicable – Provide the state or province where the smelter is located. This field is optional.",
+          "11. Smelter Contact Name – The Cobalt Reporting Template (CRT) is circulated among companies in the requesting company's supply chain to exercise due diligence in accordance with the OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected and High-Risk.\n\nIf the template is circulated in a country where laws protecting personal information exist, sharing personal contact information in the CRT may violate related regulations. Therefore, it is recommended that the requesting company take precautions such as obtaining the contact person's permission to share the information with other companies in the supply chain when completing \"Smelter Contact Name\" and the \"Smelter Contact Email\" columns.\n\nIf you have permission to share this information, please fill in the name of the Smelter Facility Contact person who you worked with.",
+          "12. Smelter Contact Email – Fill in the email address of the Smelter Facility contact person who was identified as the Smelter Contact Name.  Example: John.Smith@SmelterXXX.com.  Please review the instructions for Smelter Contact Name before completing this field.",
+          "13. Name of Mine(s) - This field allows a company to define the actual mines being used by the smelter.  Please enter the actual mine names if known.  If 100% of the smelter’s feedstock originates from recycled or scrap sources, enter \"Recycled\" or \"Scrap\" in place of the name of the mine and answer \"Yes\" in Column P.",
+          "14. Location (Country) of Mine(s) - This is a free form text field that allows a company to define the location of the mines being used by the smelter.   Please enter the country of the mine(s).  If the country of origin is not known, enter \"Unknown\".   If 100% of the smelter’s feedstock originates from recycled or scrap sources, enter \"Recycled\" or \"Scrap\" in place of the country of origin.  This field is optional.",
+          "15. Indicates whether the smelter solely obtains inputs for its smelting process(es) from recycled or scrap sources. This question is optional.  Permissible responses to this question are:\n\n- Yes\n- No\n- Unknown",
+          "16. Comments – free form text field to enter any comments concerning the smelter.  Example: smelter is being acquired by Company YYY",
+          "The Checker worksheet is used to verify if all the required information in the Template has been completed. It is updated real-time and can be reviewed at any time while using the Template. It is used to verify completion.\n\nTo use this sheet, verify if all required fields have been completed (completed fields will be highlighted in green). If not, look for the red field(s) and review the \"Notes\" in Column C for required actions. You may use the URL in Column D to directly access the field for completion.",
+          "TERMS AND CONDITIONS",
+          "The Responsible Minerals Initiative Smelter List (the \"List\") and Program templates and tools, including, without limitation, the Cobalt Reporting Template  (collectively “Tools”), including, without limitation, all information provided therein, are provided for informational purposes only and are current as of the date set forth therein. Any inaccuracy or omission in the List or any Tool is not the responsibility of the Responsible Business Alliance, Incorporated, a Delaware non-stock corporation (\"RBA\"). Determination of whether and/or how to use all or any portion of the List or any Tool is to be made in the User’s sole and absolute discretion. Prior to using the List or any Tool, you should review it with your own legal counsel.  No part of the List or any Tool constitutes legal advice. Use of the List or any Tool is voluntary.",
+          "RBA does not make any representations or warranties with respect to the List or any Tool. The List and Tools are provided on an \"AS IS\" and on an \"AS AVAILABLE\" basis. RBA hereby disclaim all warranties of any nature, express, implied or otherwise, or arising from trade or custom, including, without limitation, any implied warranties of merchantability, non-infringement, quality, title, fitness for a particular purpose, completeness or accuracy.",
+          "To the fullest extent permitted by applicable laws, RBA renounces any liability for any losses, expenses or damages of any nature, including, without limitation, special, incidental, punitive, direct, indirect or consequential damages or lost income or profits, resulting from or arising out of the User’s use of the List or any Tool, whether arising in tort, contract, statute, or otherwise, even if shown that they were advised of the possibility of such damages.",
+          "In consideration for access and use of the List and/or any Tool, THE USER hereby agrees to and does (a) release and forever discharge RBA as well as its officers, directors, agents, employees, volunteers, representatives, contractors, successors, and assigns, from any and all claims, actions, losses, suits, damages, judgments, levies, and executions, which the User has ever had, has, or ever can, shall, or may have or claim to have against RBA , as well as its officers, directors, agents, employees, volunteers, representatives, contractors, successors, and assigns, resulting from or arising out of the List or any Tool or use thereof, and agrees to (b) indemnify, defend and hold harmless RBA, as well as its officers, directors, agents, employees, volunteers, representatives, contractors, successors, and assigns, from any and all claims,  actions, losses, suits, damages, judgments, levies, and executions resulting from or arising out of the USER'S use of the List or any Tool.",
+          "If any part of any provision of these Terms and Conditions shall be invalid or unenforceable under applicable law, said part shall be deemed ineffective to the extent of such invalidity or unenforceability only, without in any way affecting the remaining parts of said provision or the remaining provisions of these Terms and Conditions.",
+          "By accessing and using the List or any Tool, and in consideration thereof, the User agrees to the foregoing."
+        ],
+        "smelterList": [],
+        "productList": [],
+        "definitions": [
+          {
+            "term": "Authorizer",
+            "definition": "This field identifies the person responsible for the content of the declaration. The authorizer may be a different individual from the contact person. It is not correct to use the words ‘‘same’’ or similar identification to provide the name of the authorizer."
+          },
+          {
+            "term": "Cobalt Refiner",
+            "definition": "An entity that processes cobalt concentrates, intermediates or recycled feed and produces a cobalt product for direct use in a downstream manufacturing process."
+          },
+          {
+            "term": "Conflict-Affected and High-Risk Areas (CAHRA)",
+            "definition": "Conflict-Affected and High-Risk Areas (CAHRA) are defined by the OECD Due Diligence Guidance as \"areas identified by the presence of armed conflict, widespread violence or other risks of harm to people. Armed conflict may take a variety of forms, such as a conflict of international or non-international character, which may involve two or more states, or may consist of wars of liberation, or insurgencies, civil wars, etc. High-risk areas may include areas of political instability or repression, institutional weakness, insecurity, collapse of civil infrastructure and widespread violence. Such areas are often characterised by widespread human right abuses and violations of national or international law.\""
+          },
+          {
+            "term": "Declaration of Scope or Class",
+            "definition": "For the purposes of this template, “scope” describes the applicability of the information provided by the reporting company.  The scope may encompass the entirety of a company’s services and/or products, or at a company’s discretion, the template may be used to report on a specific product (or products), or, be ‘User defined’.  The ‘User defined’ scope selection or class may be used to describe any subset of a company’s operation or product portfolio"
+          },
+          {
+            "term": "Due Diligence",
+            "definition": "The OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-affected and High-risk Areas (OECD Guidance) defines “Due Diligence” as “an on-going, proactive and reactive process through which companies can ensure that they respect human rights and do not contribute to conflict”. More information is available at http://www.responsiblemineralsinitiative.org/training-and-resources/conflict-affected-and-high-risk-areas/."
+          },
+          {
+            "term": "DRC or adjoining countries",
+            "definition": "Democratic Republic of Congo and the nine countries with which it shares an internationally recognized border: Angola, Burundi, Central African Republic, Republic of the Congo, Rwanda, South Sudan, Tanzania, Uganda, Zambia."
+          },
+          {
+            "term": "Independent Third-Party Audit Firm",
+            "definition": "With respect to smelter audits, an “Independent Third-Party Audit Firm” is a private sector organization competent in evaluating the smelter or refiner’s due diligence system against a defined standard.  To maintain neutrality and impartiality, such organization and its audit team members must have no conflicts of interest with the auditee."
+          },
+          {
+            "term": "Intentionally added",
+            "definition": "Intentionally added is commonly known as the deliberate use of a substance, or in this case metal, in the formulation of a product where continued presence is desired to provide a specific characteristic, appearance or quality."
+          },
+          {
+            "term": "OECD",
+            "definition": "Organisation for Economic Co-operation and Development.  The OECD has developed the OECD Due Diligence Guidance for Responsible Supply Chains.  The OECD Due Diligence Guidance provides detailed recommendations to help companies respect human rights and avoid contributing to conflict through their mineral purchasing decisions and practices and uses a reasonableness approach. This Guidance is for use by any company potentially sourcing minerals or metals from conflict-affected and high-risk areas. The OECD Guidance is global in scope, and applies to all mineral supply chains. (http://mneguidelines.oecd.org/mining.htm)"
+          },
+          {
+            "term": "Product",
+            "definition": "A company’s Product or Finished good is a material or item which has completed the final stage of manufacturing and/or processing and is available for distribution or sale to customers."
+          },
+          {
+            "term": "Refiner",
+            "definition": "A refiner is a company that procures and processes mineral ore, slag and/or materials from recycled or scrap sources into refined metal or metal containing intermediate products.  The output can be pure (99.5% or greater) metals, powders, ingots, bars, grains, oxides or salts. The terms “smelter” and “refiner” are used interchangeably throughout various publications."
+          },
+          {
+            "term": "Recycled or Scrap Sources",
+            "definition": "Recycled or scrap sources are recycled cobalt that are reclaimed end-user or post-consumer products, or scrap processed cobalt created during product manufacturing. Recycled cobalt includes excess, obsolete, defective, and scrap cobalt materials that contain refined or processed metals that are appropriate to recycle in the production of such metals. Minerals partially processed, unprocessed or byproducts from other ores are not included in the definition of recycled cobalt"
+          },
+          {
+            "term": "Responsible Business Alliance (RBA)",
+            "definition": "Founded in 2004 the Responsible Business Alliance is the world’s largest industry coalition dedicated to electronics supply chain responsibility. (http://www.responsiblebusiness.org)"
+          },
+          {
+            "term": "Responsible Minerals Assurance Process (RMAP)",
+            "definition": "The Responsible Minerals Assurance Process (RMAP) is a program developed by the RBA and GeSI to enhance company capability to verify the responsible sourcing of metals. Further details of the RMAP can be found here: http://www.responsiblemineralsinitiative.org/smelter-introduction/"
+          },
+          {
+            "term": "Responsible Minerals Initiative (RMI)",
+            "definition": "Founded in 2008 by members of the Responsible Business Alliance and the Global e-Sustainability Initiative, the Responsible Minerals Initiative has grown into one of the most utilized and respected resources for companies addressing conflict minerals issues in their supply chains. Over 150 companies from seven different industries participate in the RMI today, contributing to a range of tools and resources including the Responsible Minerals Assurance Process, the Conflict Minerals Reporting Template, Reasonable Country of Origin Inquiry data and a range of guidance documents on conflict minerals sourcing. The RMI also runs regular workshops on conflict minerals issues and contributes to policy development and debates with leading civil society organizations and governments. Additional information is available at http://www.responsiblemineralsinitiative.org/."
+          },
+          {
+            "term": "RMAP Conformant Smelter List",
+            "definition": "The Responsible Minerals Assurance Process (RMAP) Conformant Smelter List is a published list of smelters and refiners that have undergone assessment through the RMAP, a program of the Responsible Minerals Initiative (RMI) or industry equivalent program (such as Responsible Jewellery Council or London Bullion Market Association) and have been validated to be in conformance with the protocols. If a smelter or refiner is not on the list, it has either not completed a RMAP assessment or is not in conformance with the RMAP protocol. \n\nA list of smelters and refiners which have been validated to be conformant to the RMAP can be found at www.responsiblemineralsinitiative.org"
+          },
+          {
+            "term": "Smelter",
+            "definition": "A smelter  is a company that procures and processes mineral ore, slag and/or materials from recycled or scrap sources into refined metal or metal containing intermediate products.  The output can be pure (99.5% or greater) metals, powders, ingots, bars, grains, oxides or salts. The terms “smelter” and “refiner” are used interchangeably throughout various publications."
+          },
+          {
+            "term": "Smelter Identification Number",
+            "definition": "A unique identification number the RMI assigns to companies that have been reported by members of the supply chain as smelters or refiners, whether or not they have been verified to meet the characteristics of smelters or refiners as defined in the RMAP audit protocols or other applicable audit programs."
+          }
+        ],
+        "smelterLookup": [
+          "The following list represents the RMI's latest smelter name/alias information as of this templates release.  This list is updated frequently,  and the most up-to-date version can be found on the RMI website http://www.responsiblemineralsinitiative.org/responsible-minerals-assurance-process/exports/cmt-export/.  The presence of a smelter here is NOT a guarantee that it is currently Active or Conformant within an independent third party audit program.\n\nPlease refer to the RMI web site www.responsiblemineralsinitiative.org for the most current and accurate list of standard smelter names that are Active or Conformant. \n\nNames included in column B represent company names that are commonly recognized and reported by the supply chain for a particular smelter. These names may include former company names, alternate names, abbreviations, or other variations. Although the names may not be the Standard Smelter Name, the reference names are helpful to identify the smelter, which is listed under column C in the Smelter Look-up.\n\nColumn C is the list of the official standard smelter names, in the ASCII character set. The majority of smelters will have the same entry for both columns, however if the common name varies from the standard name, the variation is noted in Column B."
+        ]
+      }
+    },
+    "amrt": {
+      "1.3": {
+        "instructions": [
+          "RMI website: (www.responsiblemineralsinitiative.org)",
+          "Introduction",
+          "This Additional Minerals Reporting Template (Template) is a free, standardized reporting template created by the Responsible Minerals Initiative (RMI). The Template facilitates the transfer of information through the supply chain regarding mineral country of origin and smelters and refiners being utilized and supports compliance to legislation*. The template also facilitates the identification of new smelters and refiners to potentially undergo an audit via the Responsible Minerals Assurance Process**.\n\nThe AMRT was designed for downstream companies to disclose information about their supply chains up to but not including the smelter.  If you are a smelter, refiner, or processor, in accordance with the RMAP protocols, we recommend you enter your own name in the smelter list tab.\n\nWhen filling out the form, none of the cell entries should start will \"=\" or \"#.\"",
+          "* In 2010, the U.S. Dodd-Frank Wall Street Reform and Consumer Protection Act was passed concerning “conflict minerals” originating from the Democratic Republic of the Congo (DRC) or adjoining countries. The SEC published final rules associated with the disclosure of the source of conflict minerals by U.S. publicly traded companies (see the rules at http://www.sec.gov/rules/final/2012/34-67716.pdf). The rules reference the OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-Affected and High-Risk Areas, (http://www.oecd.org/daf/inv/mne/GuidanceEdition2.pdf), which guides suppliers to establish policies, due diligence frameworks and management systems.\nIn 2017, Regulation (EU) 2017/821 of the European Parliament and of the European Council of 17 May 2017 was passed concerning supply chain due diligence obligations for Union importers of tin, tantalum and tungsten, their ores, and gold originating from conflict-affected and high-risk areas (see regulation at https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:L:2017:130:FULL&from=EN)\n** See information on the Responsible Minerals Initiative (www.responsiblemineralsinitiative.org).",
+          "Instructions for completing Company Information questions (rows 8 - 24).\nProvide comments in ENGLISH only",
+          "Note:  Entries with (*) are mandatory fields.",
+          "1. Insert your company's Legal Name.  Please do not use abbreviations. In this field you have the option to add other commercial names, DBAs, etc.",
+          "2. Select your company's Declaration Scope.  The options for scope are:\n\nA.  Company-wide\nB.  Product (or List of Products)\nC.  User-Defined \n\nFor \"Company-wide\", the declaration encompasses the entirety of a company's products or product substances produced by the parent company. Therefore if the user is reporting mineral data at the company level, they will be reporting mineral data on all products they manufacture. \n\nFor Scope selection of Product (or List of Products), a link to the worksheet tab for Product List will be displayed.  If this scope is chosen, it is mandatory to list the Responder Product Number of the products covered under the Scope of this Declaration in Column B of the Product List worksheet. It is optional to list the Responder Product Name in Column C of the Product List worksheet.\n\nFor Scope selection of \"User Defined\", it is mandatory that the user describes the scope to which the mineral disclosure is applicable. The scope of this class shall be defined in a text field by the supplier and should be easily understood by customers or the receivers of the document. As an example, companies may provide a link to clarifying information.\n\nThis field is mandatory.",
+          "3. The requesting company is required to input all minerals that are in scope of the declaration (up to a maximum of 10). You may select a mineral from the drop-down menu or enter another metal manually. Minerals are automatically populated in alphabetical order for Questions 1 and 2.\n\nMinerals should not include 3TG (tin, tantalum, tungsten, and gold), cobalt, copper, graphite, lithium, mica and/or nickel, as they are included in the CMRT & EMRT.\n\nThis field is mandatory.",
+          "4. If your declaration scope of minerals includes “Other”, input the additional minerals here. The requesting company is required to specify which minerals are in scope. Selected minerals are automatically populated for Questions 1 and 2.\n\nThis field is mandatory if “Other” is selected at least 1 time in the Declaration Scope of Minerals/Metals.",
+          "4. Insert your company’s unique identifier number or code (DUNS number, VAT number, customer-specific identifier, etc.)",
+          "5. Insert the source for the unique identifier number or code (\"DUNS\", \"VAT\", \"Customer\", etc).",
+          "6. Insert your full company address (street, city, state, country, postal code).  This field is optional.",
+          "7. Insert the name of the person to contact regarding the contents of the declaration information. This field is mandatory.",
+          "8. Insert the email address of the contact person.  If an email address is not available, state ‘‘not available’’ or ‘‘n/a.’’ A blank field may cause an error in form implementation.  This field is mandatory.",
+          "9. Insert the telephone number for the contact. This field is mandatory.",
+          "10. Insert the name of the person who is responsible for the contents of the declaration information. The authorizer may be a different individual than the contact person. It is not correct to use the words ‘‘same’’ or similar identification to provide the name of the authorizer.  This field is mandatory.",
+          "11. Insert the title for the Authorizing person. This field is optional.",
+          "12. Insert the email address of the Authorizing person.  If an email address is not available, state ‘‘not available’’ or ‘‘n/a.’’ A blank field may cause an error in form implementation.  This field is mandatory.",
+          "13. Insert the telephone number for the Authorizing person. This field is optional.",
+          "14. Please enter the Date of Completion for this form using the format DD-MMM-YYYY.  This field is mandatory.",
+          "15. As an example, the user may save the file name as:  companyname-date.xls (date as YYYY-MM-DD).",
+          "Instructions for completing the two Due Diligence Questions (rows 26 - 49).\nProvide answers in ENGLISH only",
+          "These two questions define the usage and the level of relevant suppliers’ data collection for the declaration scope of minerals. The questions are designed to collect information about the use of all specified minerals in the company’s product(s) to determine the applicability and completeness of reporting. Responses to these questions shall represent the ‘Declaration Scope’ selected in the company information section.",
+          "For each of the two questions, provide an answer for each mineral using the drop-down menu selections. The first question in this section must be completed for all specified minerals in the declaration scope.",
+          "1. The response to this question is used to determine whether any of the specified minerals are within the scope of the reporting requirement.\n\nThis question asks if any specified minerals are used as a raw material, component or additive in a product that you manufacture, including compounds. Impurities from raw materials, components, additives, abrasives and cutting tools are outside the scope of the survey.\n\nThis question shall be answered for each specified mineral. Valid responses to this question are either \"yes\", \"no\", \"unknown\", or \"not declaring\". This question is mandatory.",
+          "Understand that if any mineral from the declaration scope is intentionally added anywhere within your supply chain, they are considered intentionally added to your product.\n\nSome companies may require substantiation for a \"No\" answer that should be entered into the Comment Field.",
+          "2. This is a question to determine whether a company has received relevant mineral disclosures from all direct suppliers reasonably believed to be providing the declared mineral(s) contained in the products covered by the scope of their declaration. Permissible responses to this question are:\n\n- 100%\n- Greater than 90%\n- Greater than 75%\n- Greater than 50%\n- 50% or less\n- None\n- Unknown\n- Did not survey",
+          "If you respond “100%” for any metal in Question 2, you are expected to provide the names of all smelters that were identified to process the metal(s) used in your supply chain in order for this answer to be complete.\n\nSome companies may require substantiation for how you have defined “relevant” suppliers, which should be entered into the Comments Field. If you have not achieved a 100% response rate from your relevant suppliers, please submit your AMRT indicating the appropriate percentage and continue to survey your suppliers. An increase in your company’s percentage of suppliers surveyed may be one indication of year-over-year improvement.\n\nSome companies may require further substantiation for any mineral with the response “Did not survey”, which should be entered in the Comments Field.",
+          "Instructions for completing the Minerals Scope Tab.\nProvide answers in ENGLISH only",
+          "It is strongly recommended that the requestor complete the Minerals Scope tab prior to sharing their AMRT survey.",
+          "1. Select Minerals/Metals in Scope – The metal dropdown will auto-populate with the list of in scope minerals from your Declaration page. Use the drop-down menu to select the metal for which you are providing reasons for inclusion on the AMRT.",
+          "2. Reasons for inclusion on the AMRT - Provide details on why you are requesting data for the specified mineral(s). Examples include mineral risk profiles, such as those found on the Material Insights platform, and/or regulatory requirements.",
+          "Instructions for completing the Smelter List Tab.\nProvide answers in ENGLISH only",
+          "Note:  Columns with (*) are mandatory fields",
+          "1. Smelter Identification Input Column - If you know the Smelter Identification Number, input the number in Column A (columns B, C, D, E, F, G, I, and J will auto-populate).  Column A does not autopopulate",
+          "2. Metal (*)   -   Use the pull down menu to select the metal for which you are entering smelter information. This field is mandatory.",
+          "3. Smelter Name (*) – This field is mandatory.",
+          "4. Smelter Country (*) – Use the pull down menu to select the country location of the smelter. This field is mandatory.",
+          "5. Smelter Identification - This is a unique identifier assigned to a smelter or refiner according to an established smelter and refinery identification system. It is expected that multiple names or aliases could be used to describe a single smelter or refiner and therefore multiple names or aliases could be associated to a single ‘Smelter ID’.",
+          "6. Source of Smelter Identification Number - This is the source of the Smelter Identification Number entered in Column D.",
+          "7. Smelter Street -  Provide the street name on which the smelter is located. This field is optional.",
+          "8. Smelter City – Provide the city name of where the smelter is located. This field is optional.",
+          "9. Smelter Location: State/Province, if applicable – Provide the state or province where the smelter is located. This field is optional.",
+          "10. Smelter Contact Name – If the template is circulated in a country where laws protecting personal information exist, sharing personal contact information in the AMRT may violate related regulations. Therefore, it is recommended that the requesting company take precautions such as obtaining the contact person's permission to share the information with other companies in the supply chain when completing \"Smelter Contact Name\" and the \"Smelter Contact Email\" columns.\n\nIf you have permission to share this information, please fill in the name of the Smelter Facility Contact person who you worked with.",
+          "11. Smelter Contact Email – Fill in the email address of the Smelter Facility contact person who was identified as the Smelter Contact Name.  Example: John.Smith@SmelterXXX.com.  Please review the instructions for Smelter Contact Name before completing this field.",
+          "12. Proposed next steps - This is a comments area, which allows the company to specify the next steps to manage smelters. These are the actions you may take with the smelter if the facility is not listed on the Responsible Minerals Initiative (RMI) Conformant Facility List. Example: request smelter facility to undergo an RMI assessment, remove from preferred supplier list, etc.",
+          "13. Name of Mine(s) - This field allows a company to define the actual mines being used by the smelter.  Please enter the actual mine names if known.  If 100% of the smelter’s feedstock originates from recycled or scrap sources, enter \"Recycled\" or \"Scrap\" in place of the name of the mine and answer \"Yes\" in Column P.\n\n\"RCOI confirmed as per RMI\" may be an acceptable answer to this question.",
+          "14. Location (Country) of Mine(s) - This is a free form text field that allows a company to define the location of the mines being used by the smelter.   Please enter the country of the mine(s).  If the country of origin is not known, enter \"Unknown\".   If 100% of the smelter’s feedstock originates from recycled or scrap sources, enter \"Recycled\" or \"Scrap\" in place of the country of origin.  This field is optional.\n\n\"RCOI confirmed as per RMI\" may be an acceptable answer to this question.",
+          "15. Indicates whether the smelter solely obtains inputs for its smelting process(es) from recycled or scrap sources. This question is optional.  Permissible responses to this question are:\n\n- Yes\n- No\n- Unknown",
+          "16. Comments – free form text field to enter any comments concerning the smelter.  Example: smelter is being acquired by Company YYY",
+          "Instructions for completing the Mine List Tab.\nProvide answers in ENGLISH only",
+          "1. Metal  -   Use the pull down menu to select the metal for which you are entering mine facility information.",
+          "2. Name of Smelter(s) sourcing from this Mine Facility - When possible, fill in the name of the smelter(s) that is sourcing from the listed mine facility.",
+          "3. Mine Facility (Site) Name - Fill in the mine facility name as you know it.",
+          "4. Mine Identification - This is a unique identifier assigned to a mine facility according to an established mine facility identification system. It is expected that multiple names or aliases could be used to describe a single mine facility and therefore multiple names or aliases could be associated to a single ‘Facility ID’.",
+          "5. Source of Mine Identification Number - This is the source of the Mine Identification Number entered in Column D.",
+          "6. Mine Facility (Site) Country - Select from dropdown, the country where the mine facility is located.",
+          "7. Mine Facility Street -  Provide the street name on which the mine is located. This field is optional.",
+          "8. Mine Facility City – Provide the city name of where the mine facility is located.",
+          "9. Mine Facility Location: State/Province, if applicable – Provide the state or province where the mine facility is located.",
+          "10. Mine Facility Contact Name – If the template is circulated in a country where laws protecting personal information exist, sharing personal contact information in the AMRT may violate related regulations. Therefore, it is recommended that the requesting company take precautions such as obtaining the contact person's permission to share the information with other companies in the supply chain when completing \"Mine Facility Contact Name\" and the \"Mine Facility Contact Email\" columns.\n\nIf you have permission to share this information, please fill in the name of the Mine Facility Contact person who you worked with.",
+          "11. Mine Facility Contact Email – Fill in the email address of the Mine Facility contact person who was identified as the Mine Facility Contact Name.  Example: John.Smith@MineXXX.com.  Please review the instructions for Mine Facility Contact Name before completing this field.",
+          "12. Proposed next steps - This is a comments area, which allows the company to specify the next steps to manage mine facilities. These are the actions you may take with the mine if the facility is not listed on the Responsible Minerals Initiative (RMI) Conformant Facility List. Example: request mine facility to undergo an RMI assessment, remove from preferred supplier list, etc.",
+          "13. Comments – free form text field to enter any comments concerning the mine facility.  Example: mine is being acquired by Company YYY",
+          "The Checker worksheet is used to verify if all the required information in the Template has been completed. It is updated real-time and can be reviewed at any time while using the Template. It is used to verify completion.\n\nTo use this sheet, verify if all required fields have been completed (completed fields will be highlighted in green). If not, look for the red field(s) and review the \"Notes\" in Column C for required actions. You may use the URL in Column D to directly access the field for completion.",
+          "TERMS AND CONDITIONS",
+          "The Responsible Minerals Assurance Process (“Process”) Conformant Smelter List (the \"List\") and Process templates and tools, including, without limitation, the Additional Minerals Reporting Template  (collectively “Tools”), including, without limitation, all information provided therein, are provided for informational purposes only and are current as of the date set forth therein. Any inaccuracy or omission in the List or any Tool is not the responsibility of the Responsible Business Alliance, a Delaware non-stock corporation (\"RBA\"). Determination of whether and/or how to use all or any portion of the List or any Tool is to be made in the User’s sole and absolute discretion. Prior to using the List or any Tool, you should review it with your own legal counsel.  No part of the List or any Tool constitutes legal advice. Use of the List or any Tool is voluntary.",
+          "RBA makes no representations or warranties with respect to the List or any Tool. The List and Tools are provided on an \"AS IS\" and on an \"AS AVAILABLE\" basis. RBA hereby disclaims all warranties of any nature, express, implied or otherwise, or arising from trade or custom, including, without limitation, any implied warranties of merchantability, non-infringement, quality, title, fitness for a particular purpose, completeness or accuracy.",
+          "To the fullest extent permitted by applicable laws, RBA renounces any liability for any losses, expenses or damages of any nature, including, without limitation, special, incidental, punitive, direct, indirect or consequential damages or lost income or profits, resulting from or arising out of the User’s use of the List or any Tool, whether arising in tort, contract, statute, or otherwise, even if shown that they were advised of the possibility of such damages.",
+          "In consideration for access and use of the List and/or any Tool, THE USER hereby agrees to and does (a) release and forever discharge RBA, as well as their respective officers, directors, agents, employees, volunteers, representatives, contractors, successors, and assigns, from any and all claims, actions, losses, suits, damages, judgments, levies, and executions, which the User has ever had, has, or ever can, shall, or may have or claim to have against RBA, as well as their respective officers, directors, agents, employees, volunteers, representatives, contractors, successors, and assigns, resulting from or arising out of the List or any Tool or use thereof, and agrees to (b) indemnify, defend and hold harmless RBA, as well as their respective officers, directors, agents, employees, volunteers, representatives, contractors, successors, and assigns, from any and all claims,  actions, losses, suits, damages, judgments, levies, and executions resulting from or arising out of the USER'S use of the List or any Tool.",
+          "If any part of any provision of these Terms and Conditions shall be invalid or unenforceable under applicable law, said part shall be deemed ineffective to the extent of such invalidity or unenforceability only, without in any way affecting the remaining parts of said provision or the remaining provisions of these Terms and Conditions."
+        ],
+        "smelterList": [],
+        "productList": [],
+        "definitions": [
+          {
+            "term": "Aluminum Processor",
+            "definition": "An aluminum processor is a facility that transforms bauxite into alumina or smelts alumina into aluminum. Aluminum processors also include facilities that transform secondary material (recycled material, end of life products) in aluminum metal or aluminum alloys."
+          },
+          {
+            "term": "Authorizer",
+            "definition": "This field identifies the person responsible for the content of the declaration. The authorizer may be a different individual from the contact person. It is not correct to use the words ‘‘same’’ or similar identification to provide the name of the authorizer."
+          },
+          {
+            "term": "Conflict-Affected and High-Risk Area (CAHRA)",
+            "definition": "Conflict-affected and high-risk areas are areas in a state of armed conflict, fragile post-conflict areas, as well as areas witnessing weak or non-existing governance and security, such as failed states, and widespread and systematic violations of international law, including human rights abuses."
+          },
+          {
+            "term": "Declaration Scope or Class",
+            "definition": "For the purposes of this template, “scope” describes the applicability of the information provided by the reporting company.  The scope may encompass the entirety of a company’s services and/or products, or at a company’s discretion, the template may be used to report on a specific product (or products), or, be ‘User defined’.  The ‘User defined’ scope selection or class may be used to describe any subset of a company’s operation or product portfolio."
+          },
+          {
+            "term": "Due Diligence",
+            "definition": "The OECD Due Diligence Guidance for Responsible Supply Chains of Minerals from Conflict-affected and High-risk Areas (OECD Guidance) defines “Due Diligence” as “an on-going, proactive and reactive process through which companies can ensure that they respect human rights and do not contribute to conflict”. More information is available at http://www.responsiblemineralsinitiative.org/training-and-resources/conflict-affected-and-high-risk-areas/."
+          },
+          {
+            "term": "Independent Third-Party Audit Firm",
+            "definition": "With respect to smelter audits, an “Independent Third-Party Audit Firm” is a private sector organization competent in evaluating the smelter or refiner’s materials traceability against the standards of the RMAP or equivalent audit protocols.  To maintain neutrality and impartiality, such organization and its audit team members must have no conflicts of interest with the auditee."
+          },
+          {
+            "term": "Intentionally added",
+            "definition": "Intentionally added is commonly known as the deliberate use of a substance, or in this case metal, in the formulation of a product where continued presence is desired to provide a specific characteristic, appearance or quality.\n\nWhile the SEC does not define the phrase “intentionally added” in the final rule*, the rule’s preamble states:\n“[W]e agree that being intentionally added, rather than being a naturally-occurring by-product, is a significant factor in determining whether a conflict mineral is ‘‘necessary to the functionality or production’’ of a product. This is true regardless of who intentionally added the conflict mineral to the product so long as it is contained in the product. [D]etermining whether a conflict mineral is considered ‘‘necessary’’ to a product should not depend on whether the conflict mineral is added directly to the product by the issuer or whether it is added to a component of the product that the issuer receives from a third party. Instead, the issuer should ‘report on the totality of the product and work with suppliers to comply with the requirements.’ Therefore, in determining whether a conflict mineral is ‘‘necessary’’ to a product, an issuer must consider any conflict mineral contained in its product, even if that conflict mineral is only in the product because it was included as part of a component of the product that was manufactured originally by a third party.”\n*(56296 Federal Register / Vol. 77, No. 177 / Wednesday, September 12, 2012 / Rules and Regulations)"
+          },
+          {
+            "term": "Iron Processor",
+            "definition": "An iron processor is a facility that transforms iron ore or steel scrap into pig iron, crude steel, refined steel, low-alloy or high-alloy steel."
+          },
+          {
+            "term": "Mine Facility (Site)",
+            "definition": "A mine facility or site is the point of extraction of the raw material."
+          },
+          {
+            "term": "OECD",
+            "definition": "Organisation for Economic Co-operation and Development"
+          },
+          {
+            "term": "Processor",
+            "definition": "A facility that performs process or processes to remove all undesirable and separate the desired elements of primary materials by concentration or purification. This includes, but is not limited to: cleaning, separation, concentrating (e.g. separate valuable minerals from unwanted gangue by mechanical, thermal or chemical means), roasting (e.g. smelting, roasting, or other means to drive off impurities), cathode and anode production and other refining processes. The terms \"smelter\", \"refiner\", and \"processor\" are used interchangeably throughout various publications."
+          },
+          {
+            "term": "Product",
+            "definition": "A company’s Product or Finished good is a material or item which has completed the final stage of manufacturing and/or processing and is available for distribution or sale to customers."
+          },
+          {
+            "term": "Rare Earth Element (REE) Processor",
+            "definition": "An REE refiner is a facility that produces rare earth oxides, rare earth element metals or any intermediates derived from the transformation of REE concentrates or REEs-bearing precipitates from leaching of ion-adsorption clays."
+          },
+          {
+            "term": "Responsible Business Alliance (RBA)",
+            "definition": "Responsible Business Alliance (www.responsiblebusiness.org)"
+          },
+          {
+            "term": "Responsible Minerals Assurance Process (RMAP)",
+            "definition": "The Responsible Minerals Assurance Process (RMAP) is a process developed by the RBA to enhance company capability to verify the responsible sourcing of metals. Further details of the RMAP can be found here: http://www.responsiblemineralsinitiative.org/responsible-minerals-assurance-process/."
+          },
+          {
+            "term": "Responsible Minerals Initiative (RMI)",
+            "definition": "Founded in 2008 by members of the Responsible Business Alliance, the Responsible Minerals Initiative has grown into one of the most utilized and respected resources for companies addressing conflict minerals issues in their supply chains. Over 460 companies from a range of industries participate in the RMI today, contributing to a range of tools and resources including the Responsible Minerals Assurance Process, the Conflict Minerals Reporting Template, Reasonable Country of Origin Inquiry data and a range of guidance documents on conflict minerals sourcing. The RMI also runs regular workshops on conflict minerals issues and contributes to policy development and debates with leading civil society organizations and governments. Additional information is available at http://www.responsiblemineralsinitiative.org."
+          },
+          {
+            "term": "RMI Conformant Smelter List",
+            "definition": "The Responsible Minerals Initiative (RMI) Conformant Facility List is a published list of facilities that have undergone assessment through the RMI or industry equivalent program (such as Responsible Jewellery Council or London Bullion Market Association) and have been validated to be in conformance with the protocols. If a facility is not on the list, it has either not completed an RMI assessment or is not in conformance with the RMI assessment standard. \n\nA list of facilities which have been validated to be conformant with an RMI assessment standard can be found at www.responsiblemineralsinitiative.org."
+          },
+          {
+            "term": "Smelter",
+            "definition": "A smelter or refiner is a company that procures and processes mineral ore, slag and/or materials from recycled or scrap sources into refined metal or metal containing intermediate products.  The output can be pure (99.5% or greater) metals, powders, ingots, bars, grains, oxides or salts. The terms \"smelter\", \"refiner\", and \"processor\" are used interchangeably throughout various publications."
+          },
+          {
+            "term": "Smelter Identification Number",
+            "definition": "A unique identification number the RMI assigns to companies that have been reported by members of the supply chain as smelters or refiners, whether or not they have been verified to meet the characteristics of smelters or refiners as defined in the RMAP audit protocols."
+          },
+          {
+            "term": "Zinc Processor",
+            "definition": "A zinc processor is a facility that transforms zinc sulfide concentrate, zinc calcine (derived from roasting) or zinc oxide (derived from recycling) into Special High Grade Zinc (SHG) or any intermediate (e.g. zinc calcine)."
+          }
+        ],
+        "mineList": [],
+        "smelterLookup": [
+          "The following list represents the RMI's latest smelter name/alias information as of this templates release.  This list is updated frequently, and the most up-to-date version can be found on the RMI website http://www.responsiblemineralsinitiative.org/responsible-minerals-assurance-process/exports/cmrt-export/.  The presence of a smelter here is NOT a guarantee that it is currently Active or Conformant within the Responsible Minerals Assurance Process.\n\nPlease refer to the RMI web site www.responsiblemineralsinitiative.org for the most current and accurate list of standard smelter names that are Active or Conformant. \n\nNames included in column B represent company names that are commonly recognized and reported by the supply chain for a particular smelter. These names may include former company names, alternate names, abbreviations, or other variations. Although the names may not be the RMI Standard Smelter Name, the reference names are helpful to identify the smelter, which is listed under column C in the Smelter Look-up.\n\nColumn C is the list of the official standard smelter names, in the ASCII character set. The majority of smelters will have the same entry for both columns, however if the common name varies from the standard name, the variation is noted in Column B."
+        ]
+      }
+    }
+  },
+  "errors": {
+    "minerals": {
+      "tooManySelected": "Too many minerals selected",
+      "selectAtLeastOne": "Select at least one mineral",
+      "enterAtLeastOne": "Enter at least one mineral",
+      "otherRequired": "Enter other minerals when “Other” is selected",
+      "otherNotAllowed": "Clear other minerals when “Other” is not selected",
+      "tooMany": "Too many minerals"
+    },
+    "companyQuestions": {
+      "commentRequired": "Comment is required"
+    },
+    "required": "Required",
+    "date": {
+      "invalid": "Invalid date format (DD-MMM-YYYY)"
+    },
+    "email": {
+      "invalid": "Invalid email address"
+    }
+  }
+}

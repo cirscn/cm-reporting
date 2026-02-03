@@ -1,0 +1,43 @@
+graph LR
+    subgraph CMRT["CMRT 页面结构"]
+        C1[Instructions]
+        C2[Revision]
+        C3[Declaration]
+        C4[Smelter List]
+        C5[Product List]
+        C6[Checker]
+    end
+    
+    subgraph EMRT["EMRT 页面结构"]
+        E1[Instructions]
+        E2[Revision]
+        E3[Declaration]
+        E4[Smelter List]
+        E5[Mine List<br/>v2.0+]
+        E6[Product List]
+        E7[Checker]
+    end
+    
+    subgraph CRT["CRT 页面结构"]
+        R1[Smelter List]
+        R2[Declaration]
+        R3[Product List]
+        R4[Checker]
+        R5[Instructions]
+        R6[Revision]
+    end
+    
+    subgraph AMRT["AMRT 页面结构"]
+        A1[Minerals Scope]
+        A2[Instructions]
+        A3[Revision]
+        A4[Declaration]
+        A5[Smelter List]
+        A6[Mine List]
+        A7[Product List]
+        A8[Checker]
+    end
+    
+    style E5 fill:#fff3e0,stroke:#f57c00
+    style A1 fill:#fce4ec,stroke:#c2185b
+    style A6 fill:#fff3e0,stroke:#f57c00

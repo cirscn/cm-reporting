@@ -1,0 +1,38 @@
+graph TB
+    subgraph Header["页面头部"]
+        Logo[Logo]
+        Title[CMRT 6.5 - Declaration]
+        Tabs["Declaration | Smelter List | Product List | Checker"]
+    end
+    
+    subgraph CompanyInfo["公司信息区域"]
+        F1["公司名称 (*)"]
+        F2["申报范围 (*)<br/>下拉选择"]
+        F3["联系人姓名 (*)"]
+        F4["联系人邮箱 (*)"]
+        F5["生效日期 (*)"]
+        F6["授权人 (*)"]
+    end
+    
+    subgraph QuestionMatrix["问题矩阵"]
+        direction LR
+        QH["问题 | 钽 | 锡 | 金 | 钨"]
+        Q1["Q1 是否有意添加? | Yes/No × 4"]
+        Q2["Q2 是否来自产品? | Yes/No × 4"]
+        Q3["... Q3-Q8 ..."]
+    end
+    
+    subgraph CompanyQ["公司问题"]
+        QA["A. 有无DRC冲突自由政策?"]
+        QB["B. 有无供应商尽职调查?"]
+        QC["... C-H ..."]
+    end
+    
+    Header --> CompanyInfo
+    CompanyInfo --> QuestionMatrix
+    QuestionMatrix --> CompanyQ
+    
+    style Header fill:#1976d2,color:#fff
+    style CompanyInfo fill:#fff,stroke:#e0e0e0
+    style QuestionMatrix fill:#f5f5f5,stroke:#e0e0e0
+    style CompanyQ fill:#fff,stroke:#e0e0e0

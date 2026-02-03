@@ -1,0 +1,42 @@
+# Analysis outputs
+analysis/**/*.csv
+analysis/**/*.json
+analysis/**/*.jsonl
+analysis/**/*.md
+analysis/**/*.tsv
+analysis/**/*.txt
+analysis/legacy-*/
+analysis/scan-*/
+
+# Temporary/work files
+task_plan.md
+findings.md
+progress.md
+*_extract.json
+output/
+tmp/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Claude/AI tools
+.claude/
+.ast-grep/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*

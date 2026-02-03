@@ -1,0 +1,5 @@
+/* Tailwind CSS v4 */
+@import "tailwindcss";
+
+/* 引入旧版 tailwind.config.js 配置 */
+@config "../tailwind.config.js";

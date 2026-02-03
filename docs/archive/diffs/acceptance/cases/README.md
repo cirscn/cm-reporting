@@ -1,0 +1,19 @@
+# 版本化验收用例索引
+
+- `docs/diffs/acceptance/cases/amrt-1.1.csv`
+- `docs/diffs/acceptance/cases/amrt-1.2.csv`
+- `docs/diffs/acceptance/cases/amrt-1.3.csv`
+- `docs/diffs/acceptance/cases/cmrt-6.01.csv`
+- `docs/diffs/acceptance/cases/cmrt-6.1.csv`
+- `docs/diffs/acceptance/cases/cmrt-6.22.csv`
+- `docs/diffs/acceptance/cases/cmrt-6.31.csv`
+- `docs/diffs/acceptance/cases/cmrt-6.4.csv`
+- `docs/diffs/acceptance/cases/cmrt-6.5.csv`
+- `docs/diffs/acceptance/cases/crt-2.2.csv`
+- `docs/diffs/acceptance/cases/crt-2.21.csv`
+- `docs/diffs/acceptance/cases/emrt-1.1.csv`
+- `docs/diffs/acceptance/cases/emrt-1.11.csv`
+- `docs/diffs/acceptance/cases/emrt-1.2.csv`
+- `docs/diffs/acceptance/cases/emrt-1.3.csv`
+- `docs/diffs/acceptance/cases/emrt-2.0.csv`
+- `docs/diffs/acceptance/cases/emrt-2.1.csv`

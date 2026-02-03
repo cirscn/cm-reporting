@@ -1,0 +1,2740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRT 2.21 - 可交互原型</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1565c0;
+            --primary-dark: #0d47a1;
+            --primary-light: #e3f2fd;
+            --success: #2e7d32;
+            --success-light: #e8f5e9;
+            --warning: #f57c00;
+            --warning-light: #fff3e0;
+            --error: #c62828;
+            --error-light: #ffebee;
+            --gray-50: #fafafa;
+            --gray-100: #f5f5f5;
+            --gray-200: #eeeeee;
+            --gray-300: #e0e0e0;
+            --gray-400: #bdbdbd;
+            --gray-500: #9e9e9e;
+            --gray-600: #757575;
+            --gray-700: #616161;
+            --gray-800: #424242;
+            --gray-900: #212121;
+            --font-main: 'IBM Plex Sans', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --yellow-fill: #ffff00;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--gray-100);
+            color: var(--gray-900);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-md);
+            gap: 16px;
+        }
+
+        .top-nav-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.2);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 14px;
+        }
+
+        .logo-text { color: white; font-weight: 600; font-size: 18px; }
+        .logo-version {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .nav-tabs { display: flex; gap: 4px; }
+
+        .nav-tab {
+            padding: 8px 16px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+        }
+
+        .nav-tab:hover { background: rgba(255,255,255,0.1); color: white; }
+        .nav-tab.active { background: rgba(255,255,255,0.2); color: white; }
+
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+
+        .lang-select {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .btn-export {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-export:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+        /* Page Container */
+        .page-container {
+            display: none;
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-container.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Section Card */
+        .section-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+
+        .section-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--gray-50);
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .section-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .section-body { padding: 20px; }
+
+        /* Form */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full-width { grid-column: 1 / -1; }
+
+        .form-label {
+            font-size: 13px;
+            color: var(--gray-700);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .form-label .required { color: var(--error); }
+
+        .form-input, .form-select, .form-textarea {
+            height: 40px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-sm);
+            padding: 0 12px;
+            font-size: 14px;
+            font-family: var(--font-main);
+            transition: all 0.2s;
+            background: white;
+            width: 100%;
+        }
+
+        .form-input.required-field, .form-select.required-field {
+            background: var(--yellow-fill);
+        }
+
+        .form-textarea {
+            height: 80px;
+            padding: 10px 12px;
+            resize: vertical;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .form-input.error, .form-select.error {
+            border-color: var(--error);
+            background: var(--error-light);
+        }
+
+        .form-input.valid {
+            border-color: var(--success);
+            background: var(--success-light);
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23757575' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+            cursor: pointer;
+        }
+
+        .form-hint { font-size: 11px; color: var(--gray-500); }
+        .form-error { font-size: 11px; color: var(--error); display: none; }
+        .form-group.has-error .form-error { display: block; }
+
+        /* Question Matrix */
+        .question-block {
+            border: 1px solid var(--gray-300);
+            margin-bottom: 16px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .question-header {
+            background: var(--primary-dark);
+            color: white;
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .question-header .q-num {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            margin-right: 10px;
+            font-weight: 600;
+        }
+
+        .question-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .question-table th {
+            background: var(--gray-100);
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-700);
+            border-bottom: 1px solid var(--gray-300);
+        }
+
+        .question-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--gray-200);
+            vertical-align: middle;
+        }
+
+        .question-table tr:last-child td { border-bottom: none; }
+        .question-table tr:hover { background: var(--gray-50); }
+
+        .metal-label {
+            font-weight: 500;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .metal-label .required { color: var(--error); font-size: 14px; }
+
+        .metal-co { color: #1565c0; }
+
+        .answer-select {
+            width: 100%;
+            height: 34px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-sm);
+            padding: 0 10px;
+            font-size: 13px;
+            background: var(--yellow-fill);
+            cursor: pointer;
+        }
+
+        .answer-select:focus { outline: none; border-color: var(--primary); }
+        .answer-select.answered { background: white; }
+        .answer-select.disabled { background: var(--gray-100); color: var(--gray-500); }
+
+        .comment-input {
+            width: 100%;
+            height: 34px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-sm);
+            padding: 0 10px;
+            font-size: 13px;
+        }
+
+        .comment-input:focus { outline: none; border-color: var(--primary); }
+        .comment-input.disabled { background: var(--gray-100); color: var(--gray-500); }
+
+        /* Company Questions */
+        .company-question {
+            display: flex;
+            align-items: flex-start;
+            padding: 16px;
+            border-bottom: 1px solid var(--gray-200);
+            gap: 16px;
+        }
+
+        .company-question:last-child { border-bottom: none; }
+
+        .cq-letter {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .cq-content { flex: 1; }
+        .cq-text { font-size: 14px; color: var(--gray-800); margin-bottom: 10px; }
+
+        .cq-options { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+        .cq-select {
+            height: 36px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-sm);
+            padding: 0 12px;
+            font-size: 13px;
+            background: white;
+            min-width: 240px;
+        }
+
+        #companyQuestionsBody.cq-required .cq-select {
+            background: var(--yellow-fill);
+        }
+
+        #companyQuestionsBody.cq-optional .cq-select {
+            background: var(--gray-100);
+        }
+
+        .cq-select.answered { background: white; }
+
+        .cq-comment {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .cq-comment.show { display: block; }
+
+        .cq-comment input {
+            width: 100%;
+            height: 36px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-sm);
+            padding: 0 12px;
+            font-size: 13px;
+        }
+
+        .cq-comment input:focus { outline: none; border-color: var(--primary); }
+
+        .cq-disabled { opacity: 0.5; pointer-events: none; }
+        .cq-comment.show input { background: var(--yellow-fill); }
+
+        /* Data Table */
+        .table-container { overflow-x: auto; }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 900px;
+        }
+
+        .data-table th {
+            background: var(--gray-100);
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-700);
+            border-bottom: 2px solid var(--gray-300);
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--gray-200);
+            vertical-align: middle;
+        }
+
+        .data-table tr:hover { background: var(--gray-50); }
+
+        .data-table input, .data-table select {
+            width: 100%;
+            height: 34px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-sm);
+            padding: 0 8px;
+            font-size: 12px;
+            font-family: var(--font-main);
+        }
+
+        .data-table input:focus, .data-table select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .metal-select { min-width: 120px; }
+
+        .delete-row-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: var(--error-light);
+            color: var(--error);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .delete-row-btn:hover { background: var(--error); color: white; }
+
+        .add-row-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--radius-md);
+            background: transparent;
+            color: var(--gray-500);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 16px;
+        }
+
+        .add-row-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            padding: 10px 18px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: 1px solid var(--primary);
+        }
+
+        .btn-primary:hover { filter: brightness(0.95); }
+
+        .btn-secondary {
+            background: white;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .btn-secondary:hover { background: var(--gray-50); }
+
+        .btn-primary:disabled,
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 24px 0 40px;
+        }
+
+        .page-actions .btn-primary,
+        .page-actions .btn-secondary {
+            min-width: 120px;
+        }
+
+
+        .progress-bar {
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, #42a5f5 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .checker-list { list-style: none; }
+
+        .checker-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--gray-200);
+            gap: 12px;
+            transition: background 0.2s;
+        }
+
+        .checker-item:hover { background: var(--gray-50); }
+        .checker-item:last-child { border-bottom: none; }
+
+        .checker-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .checker-icon.error { background: var(--error-light); color: var(--error); }
+        .checker-icon.warning { background: var(--warning-light); color: var(--warning); }
+        .checker-icon.success { background: var(--success-light); color: var(--success); }
+
+        .checker-content { flex: 1; }
+        .checker-message { font-size: 13px; color: var(--gray-800); }
+        .checker-location { font-size: 11px; color: var(--gray-500); margin-top: 4px; }
+
+        .checker-fix-btn {
+            padding: 4px 10px;
+            border: 1px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checker-fix-btn:hover { background: var(--primary); color: white; }
+
+        /* === UX 优化新增样式 === */
+
+        /* 进度指示器 */
+        .progress-indicator {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .top-nav .progress-indicator {
+            background: transparent;
+            border-bottom: none;
+            padding: 0;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--gray-500);
+            transition: all 0.2s;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .top-nav .progress-step {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 12px;
+        }
+
+        .progress-step.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .progress-step.completed {
+            color: var(--success);
+        }
+
+        .top-nav .progress-step.active {
+            color: #fff;
+        }
+
+        .top-nav .progress-step.completed {
+            color: #c8f7d4;
+        }
+
+        .progress-step-num {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--gray-200);
+            color: var(--gray-600);
+        }
+
+        .top-nav .progress-step-num {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .progress-step.active .progress-step-num {
+            background: var(--primary);
+            color: white;
+        }
+
+        .progress-step.completed .progress-step-num {
+            background: var(--success);
+            color: white;
+        }
+
+        .top-nav .progress-step.active .progress-step-num {
+            background: #fff;
+            color: var(--primary);
+        }
+
+        .top-nav .progress-step.completed .progress-step-num {
+            background: #b7f5c3;
+            color: #1b5e20;
+        }
+
+        .progress-arrow {
+            color: var(--gray-300);
+            font-size: 16px;
+        }
+
+        .top-nav .progress-arrow {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* 全局错误提示条 */
+        .global-error-bar {
+            position: sticky;
+            top: var(--top-nav-height, 56px);
+            z-index: 99;
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .global-error-bar.has-errors {
+            background: var(--error-light);
+            color: var(--error);
+            border-bottom: 1px solid rgba(198, 40, 40, 0.2);
+        }
+
+        .global-error-bar.all-passed {
+            background: var(--success-light);
+            color: var(--success);
+            border-bottom: 1px solid rgba(46, 125, 50, 0.2);
+        }
+
+        .global-error-bar:hover {
+            filter: brightness(0.95);
+        }
+
+        /* 必填项说明提示 */
+        .required-hint {
+            background: linear-gradient(90deg, var(--yellow-fill) 0%, #fff9c4 100%);
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #e6d800;
+        }
+
+        .required-hint-icon {
+            font-size: 16px;
+        }
+
+        /* 禁用状态遮罩 */
+        .disabled-overlay {
+            position: relative;
+        }
+
+        .disabled-overlay::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+            z-index: 5;
+            border-radius: var(--radius-md);
+        }
+
+        .disabled-overlay-hint {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 6;
+            background: white;
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            font-size: 13px;
+            color: var(--gray-600);
+            text-align: center;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* 定位高亮动画 */
+        @keyframes highlight-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(21, 101, 192, 0.6); }
+            50% { box-shadow: 0 0 0 10px rgba(21, 101, 192, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(21, 101, 192, 0); }
+        }
+
+        .highlight-target {
+            animation: highlight-pulse 0.5s ease-out 3;
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        /* Smelter List 固定列 */
+        .sticky-col-1 {
+            position: sticky;
+            left: 0;
+            background: white;
+            z-index: 2;
+        }
+
+        .sticky-col-2 {
+            position: sticky;
+            left: 120px;
+            background: white;
+            z-index: 2;
+        }
+
+        .sticky-col-3 {
+            position: sticky;
+            left: 240px;
+            background: white;
+            z-index: 2;
+            border-right: 2px solid var(--gray-300);
+        }
+
+        .data-table thead th.sticky-col-1,
+        .data-table thead th.sticky-col-2,
+        .data-table thead th.sticky-col-3 {
+            background: var(--gray-100);
+        }
+
+        .data-table tbody tr:hover .sticky-col-1,
+        .data-table tbody tr:hover .sticky-col-2,
+        .data-table tbody tr:hover .sticky-col-3 {
+            background: var(--gray-50);
+        }
+
+        /* Checker 分组样式 */
+        .checker-group {
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .checker-group:last-child {
+            border-bottom: none;
+        }
+
+        .checker-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--gray-50);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .checker-group-header:hover {
+            background: var(--gray-100);
+        }
+
+        .checker-group-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .checker-group-count {
+            background: var(--error-light);
+            color: var(--error);
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .checker-group-toggle {
+            font-size: 12px;
+            color: var(--gray-500);
+            transition: transform 0.2s;
+        }
+
+        .checker-group.collapsed .checker-group-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .checker-group-content {
+            max-height: none;
+            overflow: visible;
+            transition: none;
+        }
+
+        .checker-group.collapsed .checker-group-content {
+            max-height: 0;
+            overflow: hidden;
+        }
+
+        /* 通过项折叠 */
+        .passed-summary {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .passed-summary:hover {
+            background: var(--gray-50);
+        }
+
+        .passed-summary-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .passed-summary-toggle {
+            font-size: 12px;
+            color: var(--gray-500);
+            padding: 4px 12px;
+            background: var(--gray-100);
+            border-radius: var(--radius-sm);
+        }
+
+        .passed-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .passed-details.expanded {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        /* Loading 状态 */
+        .btn-export.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .btn-export.loading::after {
+            content: '...';
+            animation: loading-dots 1s infinite;
+        }
+
+        @keyframes loading-dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* Page Title */
+        .page-title { margin-bottom: 20px; }
+        .page-title h1 { font-size: 24px; font-weight: 700; color: var(--gray-900); margin-bottom: 4px; }
+        .page-title p { font-size: 14px; color: var(--gray-600); }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 20px;
+            background: var(--gray-900);
+            color: white;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--error); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal-card {
+            width: 520px;
+            max-width: 92%;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .modal-title { font-size: 16px; font-weight: 600; color: var(--gray-900); }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            color: var(--gray-500);
+            cursor: pointer;
+        }
+
+        .modal-body { padding: 16px 20px; }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 16px 20px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .submit-summary {
+            display: flex;
+            gap: 16px;
+            font-size: 14px;
+            color: var(--gray-700);
+            margin-bottom: 12px;
+        }
+
+        .submit-errors {
+            border: 1px solid var(--gray-200);
+            background: var(--gray-50);
+            border-radius: var(--radius-md);
+            padding: 12px;
+        }
+
+        .submit-errors-title {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+        }
+
+        .submit-errors ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .submit-error-item {
+            display: flex;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--gray-800);
+            padding: 4px 0;
+        }
+
+        .submit-all-pass {
+            padding: 12px;
+            border-radius: var(--radius-md);
+            background: var(--success-light);
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="logo">
+            <div class="logo-icon">CR</div>
+            <span class="logo-text">CRT</span>
+            <span class="logo-version">v2.21</span>
+        </div>
+
+        <div class="top-nav-center">
+            <!-- 进度指示器 -->
+            <div class="progress-indicator" id="progressIndicator">
+            <div class="progress-step active" data-step="declaration">
+                <span class="progress-step-num">1</span>
+                <span>Declaration</span>
+            </div>
+            <span class="progress-arrow" data-after="declaration">→</span>
+            <div class="progress-step" data-step="smelter">
+                <span class="progress-step-num">2</span>
+                <span>Smelter List</span>
+            </div>
+            <span class="progress-arrow" data-after="smelter">→</span>
+            <div class="progress-step" data-step="product">
+                <span class="progress-step-num">3</span>
+                <span>Product List</span>
+            </div>
+            <span class="progress-arrow" data-after="product">→</span>
+            <div class="progress-step" data-step="checker">
+                <span class="progress-step-num">4</span>
+                <span>Review</span>
+            </div>
+            </div>
+        </div>
+
+        <div class="nav-right">
+            <select class="lang-select" id="langSelect">
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+                <option value="ja">日本語</option>
+                <option value="ko">한국어</option>
+            </select>
+            <select class="lang-select" id="versionSelect"></select>
+            <button class="btn-export" onclick="exportData()">📤 导出数据</button>
+        </div>
+    </nav>
+
+    <!-- 全局错误提示条 -->
+    <div class="global-error-bar has-errors" id="globalErrorBar" onclick="goToChecker()">
+        <span id="globalErrorIcon">⚠️</span>
+        <span id="globalErrorText">还有 0 个必填项未完成</span>
+        <span style="font-size: 12px; opacity: 0.7;">点击查看详情 →</span>
+    </div>
+
+    <!-- Declaration Page -->
+    <div class="page-container active" id="page-declaration">
+        <div class="page-title">
+            <h1>Declaration 申报页</h1>
+            <p>本文件旨在收集产品中使用的特定原材料（特别是钴）的采购信息。</p>
+        </div>
+
+        <!-- 必填项说明提示 -->
+        <div class="required-hint">
+            <span class="required-hint-icon">💡</span>
+            <span><strong>填写提示：</strong>黄色底色字段为必填项，请确保全部填写完整后再提交。</span>
+        </div>
+
+        <!-- Company Information -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-title-icon">🏢</span>
+                    公司信息 Company Information
+                </div>
+                <span class="section-badge" id="companyFieldsCount">0/8 必填已完成</span>
+            </div>
+            <div class="section-body">
+                <div class="form-grid" id="companyForm">
+                    <div class="form-group" data-field="companyName" data-required="true">
+                        <label class="form-label">公司名称（*）：</label>
+                        <input type="text" class="form-input required-field" id="companyName" placeholder="请输入公司正式注册名称">
+                        <span class="form-hint">使用正式注册名称，不得使用缩写</span>
+                        <span class="form-error">此字段为必填项</span>
+                    </div>
+                    <div class="form-group" data-field="declarationScope" data-required="true">
+                        <label class="form-label">申报范围或种类 (*):</label>
+                        <select class="form-select required-field" id="declarationScope">
+                            <option value="">-- 请选择 --</option>
+                            <option value="A">A. Company</option>
+                            <option value="B">B. Product (or List of Products)</option>
+                            <option value="C">C. User defined</option>
+                        </select>
+                        <span class="form-hint">A=公司级 | B=产品级(需填Product List) | C=自定义</span>
+                        <span class="form-error">请选择申报范围</span>
+                    </div>
+                    <div class="form-group" id="scopeDescGroup" style="display: none;" data-field="scopeDescription">
+                        <label class="form-label">范围描述：</label>
+                        <textarea class="form-textarea required-field" id="scopeDescription" placeholder="请描述自定义申报范围"></textarea>
+                        <span class="form-error">选择自定义范围时必须填写描述</span>
+                    </div>
+                    <div class="form-group" data-field="uniqueId">
+                        <label class="form-label">公司唯一识别信息：</label>
+                        <input type="text" class="form-input" id="uniqueId" placeholder="DUNS, VAT, 组织机构代码等">
+                    </div>
+                    <div class="form-group" data-field="authId">
+                        <label class="form-label">公司唯一授权识别信息：</label>
+                        <input type="text" class="form-input" id="authId" placeholder="授权识别信息">
+                    </div>
+                    <div class="form-group" data-field="address">
+                        <label class="form-label">地址：</label>
+                        <input type="text" class="form-input" id="address" placeholder="公司地址">
+                    </div>
+                    <div class="form-group" data-field="contactName" data-required="true">
+                        <label class="form-label">联系人姓名 (*):</label>
+                        <input type="text" class="form-input required-field" id="contactName" placeholder="请输入联系人姓名">
+                        <span class="form-error">此字段为必填项</span>
+                    </div>
+                    <div class="form-group" data-field="contactEmail" data-required="true">
+                        <label class="form-label">联系人电邮地址 (*):</label>
+                        <input type="email" class="form-input required-field" id="contactEmail" placeholder="example@company.com">
+                        <span class="form-hint">无邮箱可填 "not available"</span>
+                        <span class="form-error">请输入有效的邮箱地址</span>
+                    </div>
+                    <div class="form-group" data-field="contactPhone" data-required="true">
+                        <label class="form-label">联系人电话 (*):</label>
+                        <input type="tel" class="form-input required-field" id="contactPhone" placeholder="+86 xxx xxxx xxxx">
+                        <span class="form-error">此字段为必填项</span>
+                    </div>
+                    <div class="form-group" data-field="authorizerName" data-required="true">
+                        <label class="form-label">授权人姓名 (*):</label>
+                        <input type="text" class="form-input required-field" id="authorizerName" placeholder="请输入授权人姓名">
+                        <span class="form-hint">不可填 "same" 等占位</span>
+                        <span class="form-error">此字段为必填项，且不能为 "same"</span>
+                    </div>
+                    <div class="form-group" data-field="authorizerTitle">
+                        <label class="form-label">授权人职务:</label>
+                        <input type="text" class="form-input" id="authorizerTitle" placeholder="职务名称">
+                    </div>
+                    <div class="form-group" data-field="authorizerEmail" data-required="true">
+                        <label class="form-label">授权人电邮地址 (*):</label>
+                        <input type="email" class="form-input required-field" id="authorizerEmail" placeholder="example@company.com">
+                        <span class="form-error">请输入有效的邮箱地址</span>
+                    </div>
+                    <div class="form-group" data-field="authorizerPhone">
+                        <label class="form-label">授权人电话 :</label>
+                        <input type="tel" class="form-input" id="authorizerPhone" placeholder="+86 xxx xxxx xxxx">
+                    </div>
+                    <div class="form-group" data-field="authDate" data-required="true">
+                        <label class="form-label">授权日期 (*):</label>
+                        <input type="date" class="form-input required-field" id="authDate">
+                        <span class="form-hint">格式: DD-MMM-YYYY (如 01-Jan-2026)，范围 31-Dec-2006 ~ 31-Mar-2026</span>
+                        <span class="form-error">请选择有效日期</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mineral Scope (Fixed) -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-title-icon">⛏️</span>
+                    矿产申报范围
+                </div>
+                <span class="section-badge">固定矿种</span>
+            </div>
+            <div class="section-body">
+                <span class="status-tag status-active">Cobalt (钴)</span>
+                <div class="form-hint">CRT 为单一矿种模板，矿种固定为 Cobalt</div>
+            </div>
+        </div>
+
+        <!-- Question Matrix -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-title-icon">❓</span>
+                    根据上述指明的申报范围回答下列问题 1 - 6
+                </div>
+                <span class="section-badge">Q1-Q6</span>
+            </div>
+            <div class="section-body" style="padding: 16px;" id="questionMatrixContainer"></div>
+        </div>
+
+        <!-- Company Level Questions -->
+        <div class="section-card" id="companyQuestionsCard">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-title-icon">📋</span>
+                    从公司层面来回答以下问题
+                </div>
+                <span class="section-badge" id="cqStatus">Q1 选择 No/Unknown 时不要求填写</span>
+            </div>
+            <div class="section-body" style="padding: 0;" id="companyQuestionsBody"></div>
+        </div>
+
+        <div class="page-actions" data-page="declaration">
+            <button class="btn-secondary" data-action="prev" disabled>上一页</button>
+            <button class="btn-primary" data-action="next">下一页</button>
+        </div>
+    </div>
+
+    <!-- Smelter List Page -->
+    <div class="page-container" id="page-smelter">
+        <div class="page-title">
+            <h1>Smelter List 冶炼厂清单</h1>
+            <p>列出供应链中涉及的钴冶炼厂/精炼厂信息</p>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-title-icon">🏭</span>
+                    冶炼厂清单
+                </div>
+                <span class="section-badge" id="smelterCount">0 条记录</span>
+            </div>
+            <div class="section-body" style="padding: 0;">
+                <div class="table-container" style="max-height: 600px; overflow: auto;">
+                    <table class="data-table" id="smelterTable" style="min-width: 2600px;">
+                        <thead>
+                            <tr>
+                                <th class="sticky-col-1" style="width: 120px; position: sticky; top: 0; left: 0; background: var(--gray-100); z-index: 12;">冶炼厂识别号码<br/>输入列</th>
+                                <th class="sticky-col-2" style="width: 120px; position: sticky; top: 0; left: 120px; background: var(--gray-100); z-index: 12;">金属 <span style="color:var(--error);">*</span></th>
+                                <th class="sticky-col-3" style="width: 200px; position: sticky; top: 0; left: 240px; background: var(--gray-100); z-index: 12; border-right: 2px solid var(--gray-300);">冶炼厂查找 <span style="color:var(--error);">*</span></th>
+                                <th style="width: 200px; position: sticky; top: 0; background: var(--gray-100); z-index: 10;">冶炼厂名称</th>
+                                <th style="width: 140px; position: sticky; top: 0; background: var(--gray-100); z-index: 10;">国家/地区 <span style="color:var(--error);">*</span></th>
+                                <th style="width: 120px; position: sticky; top: 0; background: var(--gray-100); z-index: 10;">冶炼厂识别</th>
+                                <th style="width: 120px; position: sticky; top: 0; background: var(--gray-100); z-index: 10;">出处识别号</th>
+                                <th style="width: 150px; position: sticky; top: 0; background: var(--gray-100); z-index: 10;">街道</th>
+                                <th style="width: 120px; position: sticky; top: 0; background: var(--gray-100); z-index: 10;">城市</th>
+                                <th style="width: 100px; position: sticky; top: 0; background: var(--gray-100); z-index: 10;">州/省</th>
+                                <th style="width: 120px; position: sticky; top: 0; background: var(--gray-100); z-index: 10;">冶炼厂联系人</th>
+                                <th style="width: 150px; position: sticky; top: 0; background: var(--gray-100); z-index: 10;">冶炼厂联系人<br/>电子邮件</th>
+                                <th style="width: 180px; position: sticky; top: 0; background: var(--gray-100); z-index: 10;">建议的后续步骤</th>
+                                <th style="width: 220px; position: sticky; top: 0; background: var(--gray-100); z-index: 10; font-size: 10px; line-height: 1.3;">填写矿井名称/回收/报废</th>
+                                <th style="width: 220px; position: sticky; top: 0; background: var(--gray-100); z-index: 10; font-size: 10px; line-height: 1.3;">填写矿井国家/回收/报废</th>
+                                <th style="width: 160px; position: sticky; top: 0; background: var(--gray-100); z-index: 10;">100%回收料？</th>
+                                <th style="width: 150px; position: sticky; top: 0; background: var(--gray-100); z-index: 10;">注释</th>
+                                <th style="width: 50px; position: sticky; top: 0; background: var(--gray-100); z-index: 10;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="smelterTableBody"></tbody>
+                    </table>
+                </div>
+                <button class="add-row-btn" onclick="addSmelterRow()">+ 添加冶炼厂</button>
+            </div>
+        </div>
+
+        <div class="page-actions" data-page="smelter">
+            <button class="btn-secondary" data-action="prev">上一页</button>
+            <button class="btn-primary" data-action="next">下一页</button>
+        </div>
+    </div>
+
+    <!-- Product List Page -->
+    <div class="page-container" id="page-product">
+        <div class="page-title">
+            <h1>Product List 产品清单</h1>
+            <p>当申报范围选择 "B. Product" 时必填</p>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-title-icon">📦</span>
+                    产品清单
+                </div>
+                <span class="section-badge" id="productCount">0 条记录</span>
+            </div>
+            <div class="section-body" style="padding: 0;">
+                <div class="table-container">
+                    <table class="data-table" id="productTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 200px;">制造商产品编号 *</th>
+                                <th>制造商产品名称</th>
+                                <th>备注</th>
+                                <th style="width: 50px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTableBody"></tbody>
+                    </table>
+                </div>
+                <button class="add-row-btn" onclick="addProductRow()">+ 添加产品</button>
+            </div>
+        </div>
+
+        <div class="page-actions" data-page="product">
+            <button class="btn-secondary" data-action="prev">上一页</button>
+            <button class="btn-primary" data-action="next">下一页</button>
+        </div>
+    </div>
+
+    <!-- Checker Page -->
+    <div class="page-container" id="page-checker">
+        <div class="page-title">
+            <h1>Checker 校验结果</h1>
+            <p>系统自动检测填写完整性和合规性</p>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-title-icon">📊</span>
+                    填写进度
+                </div>
+            </div>
+            <div class="section-body">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="font-size: 13px; color: var(--gray-700);">总体完成度</span>
+                    <span style="font-size: 13px; font-weight: 600; color: var(--primary);" id="progressText">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card" id="errorsCard" style="display: none;">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-title-icon" style="background: var(--error-light); color: var(--error);">❌</span>
+                    错误 Errors (必须修正)
+                </div>
+                <span class="section-badge" style="background: var(--error-light); color: var(--error);" id="errorBadge">0 项</span>
+            </div>
+            <div class="section-body" style="padding: 0;">
+                <div id="groupedErrorsList"></div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-title-icon" style="background: var(--success-light); color: var(--success);">✅</span>
+                    通过 Passed
+                </div>
+                <span class="section-badge" style="background: var(--success-light); color: var(--success);" id="passedBadge">0 项</span>
+            </div>
+            <div class="section-body" style="padding: 0;">
+                <div class="passed-summary" id="passedSummary" onclick="togglePassedDetails()">
+                    <span class="passed-summary-text">
+                        <span>✅</span>
+                        <span id="passedSummaryText">已通过 0 项检查</span>
+                    </span>
+                    <span class="passed-summary-toggle" id="passedToggleBtn">展开查看</span>
+                </div>
+                <div class="passed-details" id="passedDetails">
+                    <ul class="checker-list" id="passedList"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-actions" data-page="checker">
+            <button class="btn-secondary" data-action="prev">上一页</button>
+            <button class="btn-primary" id="submitReviewBtn" onclick="openSubmitModal()">提交</button>
+        </div>
+    </div>
+
+    <!-- Submit Modal -->
+    <div class="modal-overlay" id="submitModal" onclick="handleModalBackdrop(event)">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">提交前检查</div>
+                <button class="modal-close" onclick="closeSubmitModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="submit-summary">
+                    <div>完成度：<span id="submitCompletion">0%</span></div>
+                    <div>错误：<span id="submitErrorCount">0</span></div>
+                </div>
+                <div class="submit-all-pass" id="submitAllPass" style="display: none;">全部通过</div>
+                <div class="submit-errors" id="submitErrorsSection">
+                    <div class="submit-errors-title">待修复（前 5 条）</div>
+                    <ul id="submitErrorsList"></ul>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeSubmitModal()">继续填写</button>
+                <button class="btn-primary" id="submitFixBtn" onclick="handleSubmitFix()">去修复</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const appData = {
+            minerals: ['Cobalt'],
+            questionMatrix: {},
+            companyQuestions: {},
+            smelters: [],
+            products: []
+        };
+
+        const questionOptionsByVersion = {
+            '2.21': ['Yes', 'No', 'Unknown', 'DRC or adjoining countries only'],
+            '2.2': ['Yes', 'No', 'Unknown', 'DRC or adjoining countries only']
+        };
+
+        function buildQuestions(version) {
+            const q2Options = questionOptionsByVersion[version] || questionOptionsByVersion['2.21'];
+            return [
+                { id: 'Q1', text: '是否在产品或生产流程中有意添加或使用 cobalt？', options: ['Yes', 'No', 'Unknown'], dependency: null },
+                { id: 'Q2', text: '是否从 CAHRA 采购 cobalt？', options: q2Options, dependency: 'Q1' },
+                { id: 'Q3', text: '是否 100% 来自回收/报废料？', options: ['Yes', 'No', 'Unknown'], dependency: 'Q1' },
+                { id: 'Q4', text: '相关供应商响应率是多少？', options: ['100%', 'Greater than 90%', 'Greater than 75%', 'Greater than 50%', '50% or less', 'None'], dependency: 'Q1' },
+                { id: 'Q5', text: '是否识别出全部冶炼厂？', options: ['Yes', 'No', 'Unknown'], dependency: 'Q1' },
+                { id: 'Q6', text: '是否已在声明中报告全部冶炼厂？', options: ['Yes', 'No', 'Unknown'], dependency: 'Q1' }
+            ];
+        }
+
+        const versionConfigs = {
+            '2.21': { label: '2.21' },
+            '2.2': { label: '2.2' }
+        };
+
+        const defaultVersion = '2.21';
+        let currentVersion = getVersionFromUrl() || defaultVersion;
+        let questions = buildQuestions(currentVersion);
+        let hasUnsavedChanges = false;
+        let currentPageId = 'declaration';
+        let lastCheckerSummary = { errors: [], passed: [], completion: 0 };
+
+        const companyQuestionsData = [
+            { id: 'A', text: '贵公司是否制定了可公开查阅的钴采购政策？', options: ['Yes', 'No'], commentCondition: 'Yes', commentHint: '如选Yes，请填写URL' },
+            { id: 'B', text: '贵公司的政策是否至少涵盖《经合组织尽职调查指南》附录二《示范政策》中的所有风险以及童工问题的最恶劣形式？', options: ['Yes', 'No'], commentCondition: null },
+            { id: 'C', text: '贵公司是否针对上述指明申报范围中的钴实施了尽职调查措施？', options: ['Yes', 'No'], commentCondition: null },
+            { id: 'D', text: '贵公司是否要求供应商按照《经合组织尽职调查指南》针对钴供应链实施尽职调查？', options: ['Yes', 'No'], commentCondition: null },
+            { id: 'E', text: '贵公司是否要求贵公司的直接供应商从尽职调查实践经独立第三方审计计划验证过的冶炼厂采购钴？', options: ['Yes', 'No'], commentCondition: null },
+            { id: 'F', text: '贵公司是否要求供应商的尽职调查实践至少涵盖《经合组织尽职调查指南》附录二《示范政策》中的所有风险以及童工问题的最恶劣形式？', options: ['Yes', 'No'], commentCondition: null },
+            { id: 'G', text: '贵公司是否针对相关供应商进行钴供应链调查？', options: ['Yes, CRT', 'Yes, Using Other Format (Describe)', 'No'], commentCondition: 'Yes, Using Other Format (Describe)', commentHint: '请描述使用的其他格式' },
+            { id: 'H', text: '贵公司是否会根据预期审核从供应商处收到的尽职调查信息？', options: ['Yes', 'No'], commentCondition: null },
+            { id: 'I', text: '贵公司的审核流程是否包括纠错行动管理？', options: ['Yes', 'No'], commentCondition: null }
+        ];
+
+        const smelterLookupOptions = [
+            'Select from list...',
+            'Smelter not listed',
+            'Smelter not yet identified',
+            '---',
+            'Ningxia Orient Tantalum Industry Co., Ltd.',
+            'Malaysia Smelting Corporation',
+            'Xiamen Tungsten Co., Ltd.',
+            'Metalor Technologies SA'
+        ];
+
+        const countries = ['China', 'Malaysia', 'Indonesia', 'Japan', 'USA', 'Germany', 'Switzerland', 'Vietnam', 'Thailand', 'Philippines', 'Unknown'];
+
+        function getVersionFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const v = params.get('version');
+            return v && versionConfigs[v] ? v : null;
+        }
+
+        function initVersionSelector() {
+            const select = document.getElementById('versionSelect');
+            if (!select) return;
+            select.innerHTML = '';
+            ['2.21', '2.2'].forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v;
+                opt.textContent = `v${v}`;
+                select.appendChild(opt);
+            });
+            select.value = currentVersion;
+            select.addEventListener('change', () => {
+                const params = new URLSearchParams(window.location.search);
+                params.set('version', select.value);
+                window.location.search = params.toString();
+            });
+        }
+
+        function applyVersion(version) {
+            const config = versionConfigs[version] || versionConfigs[defaultVersion];
+            currentVersion = version;
+            questions = buildQuestions(version);
+            document.querySelector('.logo-version').textContent = `v${config.label}`;
+        }
+
+        function getPageOrder() {
+            return ['declaration', 'smelter', 'product', 'checker'];
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initVersionSelector();
+            applyVersion(currentVersion);
+            initQuestionMatrix();
+            initCompanyQuestions();
+            setupFormListeners();
+            updateCompanyFieldsCount();
+            addSmelterRow();
+            addProductRow();
+            updateCompanyQuestionsState();
+            setupUnsavedChangesTracking();
+            setupBeforeUnload();
+            runChecker();
+            setupProgressNavigation();
+            goToPage('declaration');
+            updateStickyOffsets();
+            window.addEventListener('resize', updateStickyOffsets);
+        });
+
+        // 离开确认
+        function setupBeforeUnload() {
+            window.addEventListener('beforeunload', function(e) {
+                if (hasUnsavedChanges) {
+                    e.preventDefault();
+                    e.returnValue = '您有未保存的数据，确定要离开吗？';
+                    return e.returnValue;
+                }
+            });
+        }
+
+        function markAsModified() {
+            hasUnsavedChanges = true;
+        }
+
+        function updateStickyOffsets() {
+            const nav = document.querySelector('.top-nav');
+            if (!nav) return;
+            const height = nav.getBoundingClientRect().height;
+            document.documentElement.style.setProperty('--top-nav-height', `${height}px`);
+        }
+
+        function shouldTrackUnsaved(target) {
+            if (!target) return false;
+            if (target.id === 'versionSelect') return false;
+            return target.matches('input, select, textarea');
+        }
+
+        function setupUnsavedChangesTracking() {
+            document.addEventListener('input', (e) => {
+                if (shouldTrackUnsaved(e.target)) markAsModified();
+            });
+            document.addEventListener('change', (e) => {
+                if (shouldTrackUnsaved(e.target)) markAsModified();
+            });
+        }
+
+        function setupProgressNavigation() {
+            document.querySelectorAll('.progress-step').forEach(step => {
+                step.addEventListener('click', () => {
+                    const target = step.dataset.step;
+                    if (!getPageOrder().includes(target)) return;
+                    goToPage(target);
+                });
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.page-actions button');
+            if (!btn) return;
+            const action = btn.dataset.action;
+            if (action !== 'prev' && action !== 'next') return;
+            const target = btn.dataset.target;
+            if (target) goToPage(target);
+        });
+
+        function updatePageActions() {
+            const pageOrder = getPageOrder();
+            document.querySelectorAll('.page-actions').forEach(actions => {
+                const pageId = actions.dataset.page;
+                const index = pageOrder.indexOf(pageId);
+                const prevBtn = actions.querySelector('[data-action="prev"]');
+                const nextBtn = actions.querySelector('[data-action="next"]');
+                if (prevBtn) {
+                    const prevPage = index > 0 ? pageOrder[index - 1] : '';
+                    prevBtn.disabled = index <= 0;
+                    prevBtn.dataset.target = prevPage;
+                }
+                if (nextBtn) {
+                    const nextPage = index >= 0 && index < pageOrder.length - 1 ? pageOrder[index + 1] : '';
+                    nextBtn.disabled = index === -1 || index >= pageOrder.length - 1;
+                    nextBtn.dataset.target = nextPage;
+                }
+            });
+        }
+
+        function goToPage(pageId) {
+            const page = document.getElementById('page-' + pageId);
+            if (!page) return;
+            currentPageId = pageId;
+            document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active'));
+            page.classList.add('active');
+            updateProgressIndicator(pageId);
+            updatePageActions();
+            if (pageId === 'checker') {
+                runChecker();
+            }
+        }
+
+        function updateProgressIndicator(currentPage) {
+            const pageOrder = getPageOrder();
+            const currentIndex = pageOrder.indexOf(currentPage);
+
+            document.querySelectorAll('.progress-step').forEach(step => {
+                const stepPage = step.dataset.step;
+                const index = pageOrder.indexOf(stepPage);
+                if (index === -1) return;
+                step.classList.remove('active', 'completed');
+                const num = step.querySelector('.progress-step-num');
+                if (index < currentIndex) {
+                    step.classList.add('completed');
+                    if (num) num.textContent = '✓';
+                } else if (index === currentIndex) {
+                    step.classList.add('active');
+                    if (num) num.textContent = index + 1;
+                } else {
+                    if (num) num.textContent = index + 1;
+                }
+            });
+        }
+
+        function goToChecker() {
+            goToPage('checker');
+        }
+
+        function togglePassedDetails() {
+            const details = document.getElementById('passedDetails');
+            const btn = document.getElementById('passedToggleBtn');
+            details.classList.toggle('expanded');
+            btn.textContent = details.classList.contains('expanded') ? '收起' : '展开查看';
+        }
+
+        function toggleErrorGroup(groupId) {
+            const group = document.getElementById(groupId);
+            group.classList.toggle('collapsed');
+        }
+
+        function handleModalBackdrop(event) {
+            if (event.target && event.target.id === 'submitModal') {
+                closeSubmitModal();
+            }
+        }
+
+        function openSubmitModal() {
+            const result = runChecker();
+            const errors = result?.errors || lastCheckerSummary.errors || [];
+            const completion = result?.completion ?? lastCheckerSummary.completion ?? 0;
+            const errorCount = errors.length;
+
+            document.getElementById('submitCompletion').textContent = completion + '%';
+            document.getElementById('submitErrorCount').textContent = errorCount;
+
+            const list = document.getElementById('submitErrorsList');
+            const errorsSection = document.getElementById('submitErrorsSection');
+            const allPass = document.getElementById('submitAllPass');
+            const fixBtn = document.getElementById('submitFixBtn');
+
+            if (errorCount === 0) {
+                errorsSection.style.display = 'none';
+                allPass.style.display = 'block';
+                if (fixBtn) fixBtn.disabled = true;
+                list.innerHTML = '';
+            } else {
+                errorsSection.style.display = 'block';
+                allPass.style.display = 'none';
+                if (fixBtn) fixBtn.disabled = false;
+                list.innerHTML = errors.slice(0, 5).map(item => `
+                    <li class="submit-error-item">
+                        <span>❌</span>
+                        <div>
+                            <div>${formatCheckerLocation(item.location || '')}</div>
+                            <div style="color: var(--gray-500); font-size: 12px;">${item.message}</div>
+                        </div>
+                    </li>
+                `).join('');
+            }
+
+            document.getElementById('submitModal').classList.add('show');
+        }
+
+        function closeSubmitModal() {
+            document.getElementById('submitModal').classList.remove('show');
+        }
+
+        function handleSubmitFix() {
+            closeSubmitModal();
+            goToChecker();
+            const errorsCard = document.getElementById('errorsCard');
+            if (errorsCard) {
+                setTimeout(() => errorsCard.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+            }
+        }
+
+        // Question Matrix
+        function initQuestionMatrix() {
+            const container = document.getElementById('questionMatrixContainer');
+            container.innerHTML = '';
+
+            questions.forEach(q => {
+                appData.questionMatrix[q.id] = {};
+                appData.minerals.forEach(m => {
+                    appData.questionMatrix[q.id][m] = { answer: '', comment: '' };
+                });
+            });
+
+            questions.forEach(q => {
+                const block = document.createElement('div');
+                block.className = 'question-block';
+                block.id = 'question-' + q.id;
+
+                const isDependentQ = q.dependency === 'Q1';
+
+                block.innerHTML = `
+                    <div class="question-header">
+                        <span class="q-num">${q.id.replace('Q', '')}</span>
+                        ${q.text}
+                    </div>
+                    <table class="question-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 160px;"></th>
+                                <th style="width: 240px;">回答</th>
+                                <th>注释</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${appData.minerals.map(m => `
+                                <tr data-mineral="${m}">
+                                    <td>
+                                        <span class="metal-label metal-co">${m} <span class="required">*</span></span>
+                                    </td>
+                                    <td>
+                                        <select class="answer-select" data-question="${q.id}" data-mineral="${m}" ${isDependentQ ? 'disabled' : ''}>
+                                            <option value="">--</option>
+                                            ${q.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="comment-input" data-question="${q.id}" data-mineral="${m}" placeholder="注释 (可选)">
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                `;
+                container.appendChild(block);
+            });
+
+            container.querySelectorAll('.answer-select').forEach(select => {
+                select.addEventListener('change', function() {
+                    const q = this.dataset.question;
+                    const m = this.dataset.mineral;
+                    appData.questionMatrix[q][m].answer = this.value;
+                    this.classList.toggle('answered', this.value !== '');
+
+                    if (q === 'Q1') {
+                        updateQ2Q6Dependency();
+                        updateCompanyQuestionsState();
+                    }
+
+                    runChecker();
+                });
+            });
+
+            container.querySelectorAll('.comment-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    const q = this.dataset.question;
+                    const m = this.dataset.mineral;
+                    appData.questionMatrix[q][m].comment = this.value;
+                    runChecker();
+                });
+            });
+
+            updateQ2Q6Dependency();
+        }
+
+        function updateQ2Q6Dependency() {
+            const q1 = appData.questionMatrix['Q1']?.['Cobalt']?.answer;
+            const required = q1 !== 'No' && q1 !== 'Unknown';
+
+            ['Q2', 'Q3', 'Q4', 'Q5', 'Q6'].forEach(qId => {
+                const select = document.querySelector(`select[data-question="${qId}"][data-mineral="Cobalt"]`);
+                const comment = document.querySelector(`input.comment-input[data-question="${qId}"][data-mineral="Cobalt"]`);
+                const row = select ? select.closest('tr') : null;
+                if (select) {
+                    select.disabled = !required;
+                    select.classList.toggle('disabled', !required);
+                    if (!required) {
+                        select.value = '';
+                        select.classList.remove('answered');
+                        appData.questionMatrix[qId]['Cobalt'].answer = '';
+                    }
+                }
+                if (comment) {
+                    comment.disabled = !required;
+                    comment.classList.toggle('disabled', !required);
+                    if (!required) {
+                        comment.value = '';
+                        appData.questionMatrix[qId]['Cobalt'].comment = '';
+                    }
+                }
+
+                if (row) {
+                    row.style.opacity = required ? '1' : '0.5';
+                }
+            });
+
+            ['Q2', 'Q3', 'Q4', 'Q5', 'Q6'].forEach(qId => {
+                const block = document.getElementById('question-' + qId);
+                if (!block) return;
+                const oldHint = block.querySelector('.disabled-overlay-hint');
+                if (oldHint) oldHint.remove();
+                block.classList.remove('disabled-overlay');
+            });
+        }
+
+        function updateCompanyQuestionsState() {
+            const q1 = appData.questionMatrix['Q1']?.['Cobalt']?.answer;
+            const required = q1 !== 'No' && q1 !== 'Unknown';
+
+            const container = document.getElementById('companyQuestionsBody');
+            const status = document.getElementById('cqStatus');
+
+            container.classList.remove('cq-disabled');
+            container.classList.toggle('cq-required', required);
+            container.classList.toggle('cq-optional', !required);
+            if (required) {
+                status.textContent = '必填';
+                status.style.background = 'var(--error-light)';
+                status.style.color = 'var(--error)';
+            } else {
+                status.textContent = 'Q1 选择 No/Unknown 时可选填写';
+                status.style.background = '';
+                status.style.color = '';
+            }
+        }
+
+        // Company Questions
+        function initCompanyQuestions() {
+            const container = document.getElementById('companyQuestionsBody');
+            container.innerHTML = '';
+
+            companyQuestionsData.forEach(q => {
+                const div = document.createElement('div');
+                div.className = 'company-question';
+                div.innerHTML = `
+                    <div class="cq-letter">${q.id}</div>
+                    <div class="cq-content">
+                        <div class="cq-text">${q.text}</div>
+                        <div class="cq-options">
+                            <select class="cq-select" data-question="${q.id}">
+                                <option value="">-- 请选择 --</option>
+                                ${q.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+                            </select>
+                        </div>
+                        ${q.commentCondition ? `
+                            <div class="cq-comment" id="cq-comment-${q.id}">
+                                <input type="text" placeholder="${q.commentHint || '请填写注释'}" data-question="${q.id}">
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            container.querySelectorAll('.cq-select').forEach(select => {
+                select.addEventListener('change', function() {
+                    const qId = this.dataset.question;
+                    appData.companyQuestions[qId] = this.value;
+                    this.classList.toggle('answered', this.value !== '');
+
+                    const qData = companyQuestionsData.find(q => q.id === qId);
+                    const comment = document.getElementById('cq-comment-' + qId);
+                    if (comment && qData.commentCondition) {
+                        comment.classList.toggle('show', this.value === qData.commentCondition || (qId === 'A' && this.value === 'Yes'));
+                    }
+
+                    runChecker();
+                });
+            });
+
+            container.querySelectorAll('.cq-comment input').forEach(input => {
+                input.addEventListener('input', runChecker);
+            });
+        }
+
+        // Form Listeners
+        function setupFormListeners() {
+            document.getElementById('declarationScope').addEventListener('change', function() {
+                const scopeDescGroup = document.getElementById('scopeDescGroup');
+                scopeDescGroup.style.display = this.value === 'C' ? 'block' : 'none';
+                this.classList.toggle('required-field', !this.value);
+                markAsModified();
+                updateCompanyFieldsCount();
+                runChecker();
+            });
+
+            const handleCompanyFieldInput = (input) => {
+                markAsModified();
+                if (input.classList.contains('required-field') && input.value.trim()) {
+                    input.classList.remove('required-field');
+                    input.classList.add('valid');
+                } else if (!input.value.trim() && input.closest('[data-required="true"]')) {
+                    input.classList.add('required-field');
+                    input.classList.remove('valid');
+                }
+                updateCompanyFieldsCount();
+                runChecker();
+            };
+
+            document.querySelectorAll('#companyForm input, #companyForm select, #companyForm textarea').forEach(input => {
+                input.addEventListener('input', () => handleCompanyFieldInput(input));
+                input.addEventListener('change', () => handleCompanyFieldInput(input));
+            });
+        }
+
+        function updateCompanyFieldsCount() {
+            const requiredFields = document.querySelectorAll('#companyForm [data-required="true"]');
+            let filled = 0;
+            let total = 8; // 基础 8 个必填字段
+            requiredFields.forEach(group => {
+                const input = group.querySelector('input, select, textarea');
+                if (input && input.value.trim()) filled++;
+            });
+
+            const scope = document.getElementById('declarationScope').value;
+            if (scope === 'C') {
+                total += 1;
+                const desc = document.getElementById('scopeDescription').value.trim();
+                if (desc) filled++;
+            }
+
+            document.getElementById('companyFieldsCount').textContent = `${filled}/${total} 必填已完成`;
+        }
+
+        // Smelter List
+        function addSmelterRow() {
+            const tbody = document.getElementById('smelterTableBody');
+            const rowId = 'smelter-' + Date.now();
+            const tr = document.createElement('tr');
+            tr.id = rowId;
+            tr.innerHTML = `
+                <td class="sticky-col-1" style="left: 0; background: white;"><input type="text" data-field="id_input" placeholder="输入识别号..." style="font-family: var(--font-mono); font-size: 11px;"></td>
+                <td class="sticky-col-2" style="left: 120px; background: white;"><select data-field="metal" class="metal-select" style="background: var(--yellow-fill);" disabled></select></td>
+                <td class="sticky-col-3" style="left: 240px; background: white; border-right: 2px solid var(--gray-300);"><select data-field="lookup" style="background: var(--yellow-fill);"></select></td>
+                <td><input type="text" data-field="name" placeholder="冶炼厂名称"></td>
+                <td><select data-field="country"></select></td>
+                <td><input type="text" data-field="smelter_id" placeholder="CID..." style="font-family: var(--font-mono); font-size: 10px; background: var(--gray-100);" readonly></td>
+                <td><input type="text" data-field="source_id" placeholder="Source ID" style="font-size: 10px; background: var(--gray-100);" readonly></td>
+                <td><input type="text" data-field="street" placeholder="街道" style="font-size: 11px; background: var(--gray-100);" readonly></td>
+                <td><input type="text" data-field="city" placeholder="城市" style="font-size: 11px; background: var(--gray-100);" readonly></td>
+                <td><input type="text" data-field="state" placeholder="州/省" style="font-size: 11px; background: var(--gray-100);" readonly></td>
+                <td><input type="text" data-field="contact" placeholder="联系人" style="font-size: 11px;"></td>
+                <td><input type="email" data-field="email" placeholder="email@..." style="font-size: 11px;"></td>
+                <td><input type="text" data-field="next_steps" placeholder="后续步骤" style="font-size: 11px;"></td>
+                <td><input type="text" data-field="mine_name" placeholder="矿井名称" style="font-size: 11px;"></td>
+                <td><input type="text" data-field="mine_country" placeholder="矿井国家" style="font-size: 11px;"></td>
+                <td>
+                    <select data-field="recycled">
+                        <option value="">--</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="Unknown">Unknown</option>
+                    </select>
+                </td>
+                <td><input type="text" data-field="comments" placeholder="注释" style="font-size: 11px;"></td>
+                <td><button class="delete-row-btn" onclick="deleteRow('${rowId}')">×</button></td>
+            `;
+            tbody.appendChild(tr);
+
+            bindSmelterRow(tr);
+            updateSmelterCount();
+            updateSmelterOptions();
+            runChecker();
+        }
+
+        function bindSmelterRow(row) {
+            const idInput = row.querySelector('[data-field="id_input"]');
+            const metalSelect = row.querySelector('[data-field="metal"]');
+            const lookupSelect = row.querySelector('[data-field="lookup"]');
+            const countrySelect = row.querySelector('[data-field="country"]');
+
+            idInput.addEventListener('change', () => {
+                handleSmelterIdInput(row);
+                runChecker();
+            });
+
+            metalSelect.addEventListener('change', () => {
+                metalSelect.style.background = metalSelect.value ? 'white' : 'var(--yellow-fill)';
+                runChecker();
+            });
+
+            lookupSelect.addEventListener('change', () => {
+                lookupSelect.style.background = lookupSelect.value ? 'white' : 'var(--yellow-fill)';
+                handleSmelterLookupChange(row);
+                runChecker();
+            });
+
+            countrySelect.addEventListener('change', runChecker);
+
+            row.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', runChecker);
+            });
+        }
+
+        function updateSmelterOptions() {
+            document.querySelectorAll('#smelterTableBody tr').forEach(row => {
+                const select = row.querySelector('[data-field="metal"]');
+                select.innerHTML = '<option value="Cobalt">Cobalt</option>';
+                select.value = 'Cobalt';
+                select.style.background = 'white';
+
+                const lookup = row.querySelector('[data-field="lookup"]');
+                lookup.innerHTML = smelterLookupOptions.map(opt =>
+                    opt === '---' ? '<option disabled>───────────</option>' : `<option value="${opt}">${opt}</option>`
+                ).join('');
+
+                const country = row.querySelector('[data-field="country"]');
+                country.innerHTML = '<option value="">-- 选择 --</option>' + countries.map(c => `<option value="${c}">${c}</option>`).join('');
+            });
+        }
+
+        function handleSmelterIdInput(row) {
+            const idValue = row.querySelector('[data-field="id_input"]').value.trim();
+            if (!idValue) return;
+
+            if (idValue.startsWith('CID')) {
+                row.querySelector('[data-field="smelter_id"]').value = idValue;
+                row.querySelector('[data-field="source_id"]').value = 'SRC-' + idValue.slice(3);
+                showToast('已通过识别号自动填充部分字段', 'success');
+            }
+        }
+
+        function handleSmelterLookupChange(row) {
+            const lookupValue = row.querySelector('[data-field="lookup"]').value;
+            const nameInput = row.querySelector('[data-field="name"]');
+            const countrySelect = row.querySelector('[data-field="country"]');
+            const smelterId = row.querySelector('[data-field="smelter_id"]');
+            const sourceId = row.querySelector('[data-field="source_id"]');
+            const street = row.querySelector('[data-field="street"]');
+            const city = row.querySelector('[data-field="city"]');
+            const state = row.querySelector('[data-field="state"]');
+
+            countrySelect.disabled = false;
+            countrySelect.style.background = '';
+
+            if (lookupValue === 'Smelter not listed') {
+                nameInput.disabled = false;
+                nameInput.placeholder = '必填：冶炼厂名称';
+                nameInput.style.background = 'var(--yellow-fill)';
+                countrySelect.style.background = 'var(--yellow-fill)';
+                smelterId.value = '';
+                sourceId.value = '';
+                street.value = '';
+                city.value = '';
+                state.value = '';
+            } else if (lookupValue === 'Smelter not yet identified') {
+                nameInput.disabled = true;
+                nameInput.value = 'Unknown';
+                nameInput.style.background = 'var(--gray-100)';
+                smelterId.value = 'Unknown';
+                sourceId.value = 'Unknown';
+                countrySelect.value = 'Unknown';
+            } else if (lookupValue && !lookupValue.includes('Select')) {
+                nameInput.value = lookupValue;
+                nameInput.disabled = true;
+                nameInput.style.background = 'var(--gray-100)';
+
+                const mockData = getSmelterMockData(lookupValue);
+                smelterId.value = mockData.cid;
+                sourceId.value = mockData.sourceId;
+                street.value = mockData.street;
+                city.value = mockData.city;
+                state.value = mockData.state;
+                countrySelect.value = mockData.country;
+                countrySelect.style.background = 'var(--gray-100)';
+                countrySelect.disabled = true;
+            } else {
+                nameInput.disabled = false;
+                nameInput.value = '';
+                nameInput.style.background = '';
+            }
+        }
+
+        function getSmelterMockData(smelterName) {
+            const mockDatabase = {
+                'Ningxia Orient Tantalum Industry Co., Ltd.': {
+                    cid: 'CID001277', sourceId: 'RMI-Co-001', country: 'China',
+                    street: '123 Industrial Road', city: 'Shizuishan', state: 'Ningxia'
+                },
+                'Malaysia Smelting Corporation': {
+                    cid: 'CID001105', sourceId: 'RMI-Co-002', country: 'Malaysia',
+                    street: '88 Smelter Ave', city: 'Butterworth', state: 'Penang'
+                },
+                'Xiamen Tungsten Co., Ltd.': {
+                    cid: 'CID002082', sourceId: 'RMI-Co-003', country: 'China',
+                    street: '56 Tungsten Blvd', city: 'Xiamen', state: 'Fujian'
+                },
+                'Metalor Technologies SA': {
+                    cid: 'CID001149', sourceId: 'RMI-Co-004', country: 'Switzerland',
+                    street: '2 Metalor Strasse', city: 'Marin-Epagnier', state: 'Neuchâtel'
+                }
+            };
+            return mockDatabase[smelterName] || {
+                cid: 'CID' + Math.floor(Math.random() * 900000 + 100000),
+                sourceId: 'SRC-' + Math.floor(Math.random() * 10000),
+                country: '', street: '', city: '', state: ''
+            };
+        }
+
+        function updateSmelterCount() {
+            const count = document.querySelectorAll('#smelterTableBody tr').length;
+            document.getElementById('smelterCount').textContent = `${count} 条记录`;
+        }
+
+        // Product List
+        function addProductRow() {
+            const tbody = document.getElementById('productTableBody');
+            const rowId = 'product-' + Date.now();
+            const tr = document.createElement('tr');
+            tr.id = rowId;
+            tr.innerHTML = `
+                <td><input type="text" data-field="product_id" placeholder="PRD-xxxx-xxx" style="font-family: var(--font-mono);"></td>
+                <td><input type="text" data-field="product_name" placeholder="产品名称"></td>
+                <td><input type="text" data-field="comments" placeholder="备注"></td>
+                <td><button class="delete-row-btn" onclick="deleteRow('${rowId}')">×</button></td>
+            `;
+            tbody.appendChild(tr);
+            updateProductCount();
+            runChecker();
+        }
+
+        function updateProductCount() {
+            const count = document.querySelectorAll('#productTableBody tr').length;
+            document.getElementById('productCount').textContent = `${count} 条记录`;
+        }
+
+        function deleteRow(rowId) {
+            const row = document.getElementById(rowId);
+            if (row) {
+                row.remove();
+                updateSmelterCount();
+                updateProductCount();
+                runChecker();
+            }
+        }
+
+        // Checker
+        function runChecker() {
+            const errors = [];
+            const passed = [];
+            const questionErrors = {
+                Q1: [],
+                Q2: [],
+                Q3: [],
+                Q4: [],
+                Q5: [],
+                Q6: []
+            };
+            const otherErrors = [];
+
+            const requiredFields = [
+                { id: 'companyName', name: '公司名称' },
+                { id: 'declarationScope', name: '申报范围' },
+                { id: 'contactName', name: '联系人姓名' },
+                { id: 'contactEmail', name: '联系人电邮地址' },
+                { id: 'contactPhone', name: '联系人电话' },
+                { id: 'authorizerName', name: '授权人姓名' },
+                { id: 'authorizerEmail', name: '授权人电邮地址' },
+                { id: 'authDate', name: '授权日期' }
+            ];
+
+            requiredFields.forEach(field => {
+                const input = document.getElementById(field.id);
+                if (input && input.value.trim()) {
+                    passed.push({ message: `${field.name} 已填写`, location: 'Declaration → 公司信息' });
+                } else {
+                    otherErrors.push({ id: 'C000', message: `${field.name} 为必填项`, location: 'Declaration → 公司信息', field: field.id });
+                }
+            });
+
+            [
+                { id: 'contactEmail', name: '联系人电邮地址' },
+                { id: 'authorizerEmail', name: '授权人电邮地址' }
+            ].forEach(field => {
+                const input = document.getElementById(field.id);
+                if (input && input.value.trim() && !input.value.includes('@')) {
+                    otherErrors.push({ id: 'C000', message: `${field.name} 格式不正确`, location: 'Declaration → 公司信息', field: field.id });
+                }
+            });
+
+            const authorizer = document.getElementById('authorizerName').value.trim().toLowerCase();
+            if (authorizer === 'same') {
+                otherErrors.push({ id: 'C000', message: '授权人姓名不可为 "same"', location: 'Declaration → 公司信息', field: 'authorizerName' });
+            }
+
+            const scope = document.getElementById('declarationScope').value;
+            if (scope === 'C') {
+                const desc = document.getElementById('scopeDescription').value.trim();
+                if (!desc) {
+                    otherErrors.push({ id: 'C002', message: '选择自定义范围(C)时必须填写范围描述', location: 'Declaration → 公司信息', field: 'scopeDescription' });
+                } else {
+                    passed.push({ message: '范围描述已填写', location: 'Declaration → 公司信息' });
+                }
+            }
+
+            if (scope === 'B') {
+                const products = document.querySelectorAll('#productTableBody tr');
+                let hasValidProduct = false;
+                products.forEach(row => {
+                    const productId = row.querySelector('[data-field="product_id"]').value.trim();
+                    if (productId) hasValidProduct = true;
+                });
+                if (!hasValidProduct) {
+                    otherErrors.push({ id: 'C001', message: '申报范围选择 B.Product 时，Product List 至少需要一条有效记录', location: 'Product List', field: 'productTable' });
+                } else {
+                    passed.push({ message: 'Product List 已填写', location: 'Product List' });
+                }
+            }
+
+            // Question Matrix
+            const q1 = appData.questionMatrix['Q1']?.['Cobalt']?.answer;
+            if (!q1) {
+                questionErrors.Q1.push({ id: 'C003', message: 'Q1 Cobalt 未回答', location: 'Declaration → 问题矩阵', field: 'question-Q1', questionId: 'Q1', mineral: 'Cobalt' });
+            } else {
+                passed.push({ message: `Q1 Cobalt 已回答: ${q1}`, location: 'Declaration → 问题矩阵' });
+            }
+
+            if (q1 !== 'No' && q1 !== 'Unknown') {
+                ['Q2', 'Q3', 'Q4', 'Q5', 'Q6'].forEach(qId => {
+                    const ans = appData.questionMatrix[qId]?.['Cobalt']?.answer;
+                    if (!ans) {
+                        questionErrors[qId].push({ id: 'C003', message: `${qId} Cobalt 未回答 (Q1≠No/Unknown 时必填)`, location: 'Declaration → 问题矩阵', field: `question-${qId}`, questionId: qId, mineral: 'Cobalt' });
+                    } else {
+                        passed.push({ message: `${qId} Cobalt 已回答`, location: 'Declaration → 问题矩阵' });
+                    }
+                });
+            }
+
+            // Company questions A-I
+            if (q1 !== 'No' && q1 !== 'Unknown') {
+                companyQuestionsData.forEach(q => {
+                    if (!appData.companyQuestions[q.id]) {
+                        otherErrors.push({ id: 'C004', message: `公司问题 ${q.id} 未回答`, location: 'Declaration → 公司层面问题', field: 'companyQuestionsCard', questionId: q.id });
+                    } else {
+                        passed.push({ message: `公司问题 ${q.id} 已回答`, location: 'Declaration → 公司层面问题' });
+
+                        if (q.id === 'G' && appData.companyQuestions[q.id] === 'Yes, Using Other Format (Describe)') {
+                            const commentInput = document.querySelector('#cq-comment-G input');
+                            if (!commentInput || !commentInput.value.trim()) {
+                                otherErrors.push({ id: 'C006', message: '问题G 选择 "Using Other Format" 时注释必填', location: 'Declaration → 公司层面问题', field: 'cq-comment-G', questionId: 'G' });
+                            }
+                        }
+
+                        if (q.id === 'A' && appData.companyQuestions[q.id] === 'Yes') {
+                            const commentInput = document.querySelector('#cq-comment-A input');
+                            if (!commentInput || !commentInput.value.trim()) {
+                                otherErrors.push({ id: 'C005', message: 'The URL in the comment field', location: 'Declaration → 公司层面问题', field: 'cq-comment-A', questionId: 'A' });
+                            }
+                        }
+                    }
+                });
+            } else {
+                passed.push({ message: 'A-I 无需填写 (Q1=No/Unknown)', location: 'Declaration → 公司层面问题' });
+            }
+
+            // Smelter List
+            const smelterRows = document.querySelectorAll('#smelterTableBody tr');
+            let hasSmelter = false;
+            smelterRows.forEach((row, index) => {
+                const lookup = row.querySelector('[data-field="lookup"]').value;
+                const name = row.querySelector('[data-field="name"]').value.trim();
+                const country = row.querySelector('[data-field="country"]').value;
+                const idInput = row.querySelector('[data-field="id_input"]').value.trim();
+                const smelterId = row.querySelector('[data-field="smelter_id"]').value.trim();
+
+                if (lookup) hasSmelter = true;
+
+                if (lookup === 'Smelter not listed') {
+                    if (!name) {
+                        otherErrors.push({ id: 'C007', message: `Smelter List 第 ${index + 1} 行: 选择 "Smelter not listed" 时冶炼厂名称必填`, location: 'Smelter List', field: 'smelterTable' });
+                    }
+                    if (!country) {
+                        otherErrors.push({ id: 'C007', message: `Smelter List 第 ${index + 1} 行: 选择 "Smelter not listed" 时国家必填`, location: 'Smelter List', field: 'smelterTable' });
+                    }
+                }
+            });
+
+            if (q1 !== 'No' && q1 !== 'Unknown' && !hasSmelter) {
+                otherErrors.push({ id: 'C008', message: 'Q1≠No/Unknown 时 Smelter List 必填', location: 'Smelter List', field: 'smelterTable' });
+            }
+
+            const otherById = {};
+            otherErrors.forEach(item => {
+                if (!otherById[item.id]) otherById[item.id] = [];
+                otherById[item.id].push(item);
+            });
+            const ruleOrder = ['C000', 'C001', 'C002', 'C003', 'C004', 'C005', 'C006', 'C007', 'C008', 'C010'];
+            ruleOrder.forEach(ruleId => {
+                if (ruleId === 'C003') {
+                    errors.push(
+                        ...questionErrors.Q1,
+                        ...questionErrors.Q2,
+                        ...questionErrors.Q3,
+                        ...questionErrors.Q4,
+                        ...questionErrors.Q5,
+                        ...questionErrors.Q6
+                    );
+                } else if (otherById[ruleId]) {
+                    errors.push(...otherById[ruleId]);
+                }
+            });
+
+            errors.sort(compareCheckerErrors);
+
+            // Completion (approx)
+            let totalRequired = requiredFields.length + 1; // Q1
+            let completedRequired = 0;
+
+            requiredFields.forEach(field => {
+                const input = document.getElementById(field.id);
+                if (input && input.value.trim()) completedRequired++;
+            });
+            if (q1) completedRequired++;
+
+            if (q1 !== 'No' && q1 !== 'Unknown') {
+                totalRequired += 5 + companyQuestionsData.length;
+                ['Q2', 'Q3', 'Q4', 'Q5', 'Q6'].forEach(qId => {
+                    if (appData.questionMatrix[qId]?.['Cobalt']?.answer) completedRequired++;
+                });
+                companyQuestionsData.forEach(q => {
+                    if (appData.companyQuestions[q.id]) completedRequired++;
+                });
+            }
+
+            const completion = totalRequired > 0 ? Math.round((completedRequired / totalRequired) * 100) : 0;
+
+            const errorCountEl = document.getElementById('errorCount');
+            if (errorCountEl) errorCountEl.textContent = errors.length;
+            const passedCountEl = document.getElementById('passedCount');
+            if (passedCountEl) passedCountEl.textContent = passed.length;
+            const completionEl = document.getElementById('completionRate');
+            if (completionEl) completionEl.textContent = completion + '%';
+            document.getElementById('progressText').textContent = completion + '%';
+            document.getElementById('progressFill').style.width = completion + '%';
+
+            document.getElementById('errorBadge').textContent = errors.length + ' 项';
+            document.getElementById('passedBadge').textContent = passed.length + ' 项';
+
+            document.getElementById('errorsCard').style.display = errors.length > 0 ? 'block' : 'none';
+
+            updateGlobalErrorBar(errors.length);
+            document.getElementById('passedSummaryText').textContent = `已通过 ${passed.length} 项检查`;
+            renderGroupedErrors(errors);
+            renderCheckerList('passedList', passed, 'success');
+
+            lastCheckerSummary = { errors, passed, completion };
+            return lastCheckerSummary;
+        }
+
+        function compareCheckerErrors(a, b) {
+            const sectionOrder = {
+                companyInfo: 0,
+                questionMatrix: 1,
+                companyQuestions: 2,
+                productList: 3,
+                smelterList: 4
+            };
+            const aSection = getErrorSectionKey(a, sectionOrder);
+            const bSection = getErrorSectionKey(b, sectionOrder);
+            if (aSection !== bSection) return aSection - bSection;
+
+            if (aSection === sectionOrder.companyInfo) {
+                const fieldOrder = [
+                    'companyName', 'declarationScope', 'scopeDescription', 'uniqueId', 'authId', 'address',
+                    'contactName', 'contactEmail', 'contactPhone', 'authorizerName', 'authorizerTitle',
+                    'authorizerEmail', 'authorizerPhone', 'authDate'
+                ];
+                const aIdx = fieldOrder.indexOf(a.field);
+                const bIdx = fieldOrder.indexOf(b.field);
+                if (aIdx !== bIdx) return (aIdx === -1 ? 999 : aIdx) - (bIdx === -1 ? 999 : bIdx);
+            }
+
+            if (aSection === sectionOrder.questionMatrix) {
+                const questionOrder = {};
+                questions.forEach((q, idx) => { questionOrder[q.id] = idx; });
+                const qa = a.questionId || extractQuestionId(a.message);
+                const qb = b.questionId || extractQuestionId(b.message);
+                if (qa || qb) {
+                    const aIdx = qa ? (questionOrder[qa] ?? 999) : 999;
+                    const bIdx = qb ? (questionOrder[qb] ?? 999) : 999;
+                    if (aIdx !== bIdx) return aIdx - bIdx;
+                }
+            }
+
+            if (aSection === sectionOrder.companyQuestions) {
+                const companyOrder = {};
+                companyQuestionsData.forEach((q, idx) => { companyOrder[q.id] = idx; });
+                const qa = a.questionId || extractCompanyQuestionId(a.message);
+                const qb = b.questionId || extractCompanyQuestionId(b.message);
+                if (qa || qb) {
+                    const aIdx = qa ? (companyOrder[qa] ?? 999) : 999;
+                    const bIdx = qb ? (companyOrder[qb] ?? 999) : 999;
+                    if (aIdx !== bIdx) return aIdx - bIdx;
+                }
+            }
+
+            const aRow = extractRowIndex(a.message);
+            const bRow = extractRowIndex(b.message);
+            if (aRow !== bRow) return aRow - bRow;
+
+            return String(a.message || '').localeCompare(String(b.message || ''));
+        }
+
+        function getErrorSectionKey(error, sectionOrder) {
+            const loc = error.location || '';
+            if (loc.includes('公司信息')) return sectionOrder.companyInfo;
+            if (loc.includes('问题矩阵')) return sectionOrder.questionMatrix;
+            if (loc.includes('公司层面')) return sectionOrder.companyQuestions;
+            if (loc.includes('Product') || loc.includes('产品')) return sectionOrder.productList;
+            if (loc.includes('Smelter') || loc.includes('冶炼厂')) return sectionOrder.smelterList;
+            return 99;
+        }
+
+        function extractQuestionId(message) {
+            const match = message && message.match(/(Q\\d+)/);
+            return match ? match[1] : null;
+        }
+
+        function extractCompanyQuestionId(message) {
+            const match = message && message.match(/公司问题\\s*([A-Z])/);
+            return match ? match[1] : null;
+        }
+
+        function extractRowIndex(message) {
+            const match = message && message.match(/第\\s*(\\d+)\\s*行/);
+            return match ? Number(match[1]) : 999;
+        }
+
+        function updateGlobalErrorBar(errorCount) {
+            const bar = document.getElementById('globalErrorBar');
+            const icon = document.getElementById('globalErrorIcon');
+            const text = document.getElementById('globalErrorText');
+            if (!bar || !icon || !text) return;
+            if (errorCount > 0) {
+                bar.className = 'global-error-bar has-errors';
+                icon.textContent = '⚠️';
+                text.textContent = `还有 ${errorCount} 个必填项未完成`;
+            } else {
+                bar.className = 'global-error-bar all-passed';
+                icon.textContent = '✅';
+                text.textContent = '所有必填项已完成';
+            }
+        }
+
+        function renderGroupedErrors(errors) {
+            const container = document.getElementById('groupedErrorsList');
+            if (!container) return;
+            const groups = {
+                companyInfo: { label: checkerSectionLabels.companyInfo, errors: [] },
+                questionMatrix: { label: checkerSectionLabels.questionMatrix, errors: [] },
+                companyQuestions: { label: checkerSectionLabels.companyQuestions, errors: [] },
+                productList: { label: checkerSectionLabels.productList, errors: [] },
+                smelterList: { label: checkerSectionLabels.smelterList, errors: [] }
+            };
+
+            errors.forEach(error => {
+                const loc = error.location || '';
+                if (loc.includes('公司信息')) {
+                    groups.companyInfo.errors.push(error);
+                } else if (loc.includes('问题矩阵')) {
+                    groups.questionMatrix.errors.push(error);
+                } else if (loc.includes('公司层面')) {
+                    groups.companyQuestions.errors.push(error);
+                } else if (loc.includes('Smelter') || loc.includes('冶炼厂')) {
+                    groups.smelterList.errors.push(error);
+                } else if (loc.includes('Product') || loc.includes('产品')) {
+                    groups.productList.errors.push(error);
+                } else {
+                    groups.companyInfo.errors.push(error);
+                }
+            });
+
+            let html = '';
+            Object.keys(groups).forEach(key => {
+                const group = groups[key];
+                if (group.errors.length > 0 && group.label) {
+                    html += `
+                        <div class="checker-group" id="error-group-${key}">
+                            <div class="checker-group-header" onclick="toggleErrorGroup('error-group-${key}')">
+                                <div class="checker-group-title">
+                                    <span>${group.label}</span>
+                                    <span class="checker-group-count">${group.errors.length}</span>
+                                </div>
+                                <span class="checker-group-toggle">▼</span>
+                            </div>
+                            <div class="checker-group-content">
+                                <ul class="checker-list">
+                                    ${group.errors.map(item => `
+                                        <li class="checker-item">
+                                            <div class="checker-icon error">!</div>
+                                            <div class="checker-content">
+                                                <div class="checker-message">${item.message}</div>
+                                            </div>
+                                            ${item.field ? `<button class="checker-fix-btn" onclick="goToField('${item.field}')">定位</button>` : ''}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            container.innerHTML = html;
+        }
+
+        const checkerSectionLabels = {
+            companyInfo: '公司信息',
+            questionMatrix: '根据上述指明的申报范围回答下列问题 1 - 6',
+            companyQuestions: '从公司层面来回答以下问题',
+            smelterList: '冶炼厂清单',
+            productList: '产品清单',
+            mineList: '矿厂清单',
+            mineralsScope: '矿物范围'
+        };
+
+        function formatCheckerLocation(location) {
+            if (!location) return '';
+            if (location.includes('公司信息')) return checkerSectionLabels.companyInfo;
+            if (location.includes('问题矩阵')) return checkerSectionLabels.questionMatrix;
+            if (location.includes('公司层面')) return checkerSectionLabels.companyQuestions;
+            if (location.includes('Smelter') || location.includes('冶炼厂')) return checkerSectionLabels.smelterList;
+            if (location.includes('Mine') || location.includes('矿厂')) return checkerSectionLabels.mineList;
+            if (location.includes('Product') || location.includes('产品')) return checkerSectionLabels.productList;
+            if (location.includes('Scope') || location.includes('矿物范围') || location.includes('Minerals')) return checkerSectionLabels.mineralsScope;
+            return location.replace('Declaration → ', '');
+        }
+
+        function renderCheckerList(containerId, items, type) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = items.map(item => `
+                <li class="checker-item">
+                    <div class="checker-icon ${type}">${type === 'error' ? '!' : type === 'warning' ? '!' : '✓'}</div>
+                    <div class="checker-content">
+                        <div class="checker-location">${formatCheckerLocation(item.location)}</div>
+                        <div class="checker-message">${item.message}</div>
+                    </div>
+                    ${item.field ? `<button class="checker-fix-btn" onclick="goToField('${item.field}')">定位</button>` : ''}
+                </li>
+            `).join('');
+        }
+
+        function goToField(fieldId) {
+            const field = document.getElementById(fieldId);
+            const page = field ? field.closest('.page-container') : document.getElementById('page-declaration');
+            const pageId = page ? page.id.replace('page-', '') : 'declaration';
+            goToPage(pageId);
+            if (field) {
+                field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                field.focus();
+                field.classList.add('highlight-target');
+                setTimeout(() => field.classList.remove('highlight-target'), 1500);
+            }
+        }
+
+        function exportData() {
+            const exportBtn = document.querySelector('.btn-export');
+            const originalText = exportBtn.textContent;
+            exportBtn.classList.add('loading');
+            exportBtn.textContent = '正在导出';
+
+            setTimeout(() => {
+                const data = {
+                    version: currentVersion,
+                    company: {},
+                    questionMatrix: appData.questionMatrix,
+                    companyQuestions: appData.companyQuestions,
+                    smelters: [],
+                    products: []
+                };
+
+                document.querySelectorAll('#companyForm input, #companyForm select, #companyForm textarea').forEach(input => {
+                    if (input.id) data.company[input.id] = input.value;
+                });
+
+                document.querySelectorAll('#smelterTableBody tr').forEach(row => {
+                    data.smelters.push({
+                        metal: row.querySelector('[data-field="metal"]').value,
+                        lookup: row.querySelector('[data-field="lookup"]').value,
+                        name: row.querySelector('[data-field="name"]').value,
+                        country: row.querySelector('[data-field="country"]').value,
+                        id_input: row.querySelector('[data-field="id_input"]').value,
+                        smelter_id: row.querySelector('[data-field="smelter_id"]').value
+                    });
+                });
+
+                document.querySelectorAll('#productTableBody tr').forEach(row => {
+                    data.products.push({
+                        product_id: row.querySelector('[data-field="product_id"]').value,
+                        product_name: row.querySelector('[data-field="product_name"]').value,
+                        comments: row.querySelector('[data-field="comments"]').value
+                    });
+                });
+
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'crt-data.json';
+                a.click();
+
+                exportBtn.classList.remove('loading');
+                exportBtn.textContent = originalText;
+
+                showToast('数据已导出为 JSON 文件', 'success');
+            }, 600);
+        }
+
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

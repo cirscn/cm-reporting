@@ -1,0 +1,32 @@
+erDiagram
+    Declaration ||--o{ QuestionMatrix : contains
+    Declaration ||--o{ CompanyQuestion : contains
+    Declaration ||--o| SmelterList : references
+    Declaration ||--o| ProductList : conditional
+    
+    Declaration {
+        string company_name
+        enum scope
+        string scope_description
+        date effective_date
+    }
+    
+    QuestionMatrix {
+        enum metal
+        enum q1_answer
+        enum q2_answer
+        string comments
+    }
+    
+    SmelterList {
+        enum metal
+        string smelter_lookup
+        string smelter_name
+        string country
+    }
+    
+    ProductList {
+        string product_number
+        string product_name
+        string comments
+    }

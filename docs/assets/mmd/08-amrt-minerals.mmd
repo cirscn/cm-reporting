@@ -1,0 +1,23 @@
+flowchart TD
+    Start([开始]) --> SelectMethod{选择矿种输入方式}
+    
+    SelectMethod --> |标准列表| StdList[Minerals Scope 页面选择]
+    SelectMethod --> |自定义| CustomInput[手动输入矿种名称]
+    
+    StdList --> Check7[选择最多7种标准矿产]
+    Check7 --> FillDecl[继续填写 Declaration]
+    
+    CustomInput --> EnterName[输入矿种名称]
+    EnterName --> EnterAlias[输入别名 可选]
+    EnterAlias --> AddMore{添加更多?}
+    
+    AddMore --> |是| EnterName
+    AddMore --> |否| CheckCount{至少1种?}
+    
+    CheckCount --> |是| FillDecl
+    CheckCount --> |否| ErrorMsg[错误: 至少选择1种矿产]
+    ErrorMsg --> SelectMethod
+    
+    style SelectMethod fill:#fce4ec,stroke:#c2185b
+    style StdList fill:#e8f5e9,stroke:#388e3c
+    style CustomInput fill:#e3f2fd,stroke:#1976d2

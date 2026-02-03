@@ -1,0 +1,29 @@
+flowchart TD
+    Start([开始]) --> SelectLang[选择语言]
+    SelectLang --> FillCompany[填写公司信息]
+    FillCompany --> SelectScope[选择申报范围]
+    
+    SelectScope --> |A. Company| FillQ
+    SelectScope --> |B. Product| FillProduct[填写 Product List]
+    SelectScope --> |C. User defined| FillDesc[填写范围描述]
+    
+    FillProduct --> FillQ
+    FillDesc --> FillQ
+    
+    FillQ[填写问题矩阵 Q1-Q8] --> CheckQ1Q2{Q1或Q2有Yes?}
+    
+    CheckQ1Q2 --> |是| FillQ3Q8[填写 Q3-Q8]
+    CheckQ1Q2 --> |否| SkipQ3Q8[跳过 Q3-Q8]
+    
+    FillQ3Q8 --> FillAH[填写公司层面问题 A-H]
+    SkipQ3Q8 --> Review
+    
+    FillAH --> FillSmelter[填写 Smelter List]
+    FillSmelter --> Review[查看 Checker 校验结果]
+    
+    Review --> Fix{有错误?}
+    Fix --> |是| FixError[修正错误]
+    FixError --> Review
+    Fix --> |否| Export[导出/提交]
+    
+    Export --> End([结束])

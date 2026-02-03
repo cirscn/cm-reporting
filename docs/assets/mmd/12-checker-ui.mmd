@@ -1,0 +1,31 @@
+graph TB
+    subgraph Header["页面头部"]
+        Title["Checker - 校验结果"]
+        Stats["通过: 45 | 警告: 3 | 错误: 2"]
+    end
+    
+    subgraph ErrorSection["错误 (必须修正)"]
+        E1["❌ A15: Company Name 必填"]
+        E2["❌ A23: Declaration Scope 必选"]
+    end
+    
+    subgraph WarnSection["警告 (建议修正)"]
+        W1["⚠️ B12: Q3回答建议补充Comments"]
+        W2["⚠️ C5: Smelter未在官方列表中"]
+        W3["⚠️ C8: Mine List建议补充"]
+    end
+    
+    subgraph PassSection["通过"]
+        P1["✅ A-H 公司问题已完成"]
+        P2["✅ Q1-Q8 矩阵已填写"]
+        P3["✅ Smelter List 格式正确"]
+    end
+    
+    Header --> ErrorSection
+    ErrorSection --> WarnSection
+    WarnSection --> PassSection
+    
+    style Header fill:#7b1fa2,color:#fff
+    style ErrorSection fill:#ffebee,stroke:#c62828
+    style WarnSection fill:#fff8e1,stroke:#f9a825
+    style PassSection fill:#e8f5e9,stroke:#2e7d32

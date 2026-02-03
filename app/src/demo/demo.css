@@ -1,0 +1,22 @@
+/* --------------------------------------------------------------------------
+   Demo Header - 深色背景下 antd Select 样式覆盖
+   -------------------------------------------------------------------------- */
+/* antd 5.x: borderless Select 使用 .ant-select-content-value */
+.demo-header .demo-header-controls .ant-select .ant-select-content-value,
+.demo-header .demo-header-controls .ant-select .ant-select-selection-item {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+/* Demo Header Export Button hover */
+.demo-header .demo-header-export.ant-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5) !important;
+  filter: brightness(1.1);
+}
+
+.demo-header .demo-header-export.ant-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+}

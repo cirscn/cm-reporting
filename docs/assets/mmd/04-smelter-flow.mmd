@@ -1,0 +1,22 @@
+flowchart TD
+    Start([开始填写冶炼厂]) --> KnowID{已知冶炼厂识别号码?}
+    
+    KnowID --> |是| EnterID[输入识别号码]
+    EnterID --> AutoFill[自动填充其他字段]
+    AutoFill --> Done([完成])
+    
+    KnowID --> |否| SelectMetal[选择金属]
+    SelectMetal --> KnowSmelter{冶炼厂在目录中?}
+    
+    KnowSmelter --> |是| SelectLookup[从下拉选择冶炼厂]
+    SelectLookup --> AutoFill2[自动填充]
+    AutoFill2 --> Done
+    
+    KnowSmelter --> |否| SelectNotListed[选择 Smelter not listed]
+    SelectNotListed --> ManualFill[手填名称 + 选择国家]
+    ManualFill --> FillOther[补充其他信息]
+    FillOther --> Done
+    
+    KnowSmelter --> |尚未识别| SelectNotIdentified[选择 not yet identified]
+    SelectNotIdentified --> FillName[手填冶炼厂名称]
+    FillName --> Done

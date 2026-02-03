@@ -1,0 +1,12 @@
+graph TB
+    subgraph RMI[RMI 标准模板体系]
+        CMRT[CMRT<br/>冲突矿产报告模板<br/>3TG: 钽/锡/金/钨]
+        EMRT[EMRT<br/>扩展矿产报告模板<br/>钴/铜/石墨/锂/云母/镍]
+        CRT[CRT<br/>钴报告模板<br/>钴专用]
+        AMRT[AMRT<br/>其他矿产报告模板<br/>排除上述矿种]
+    end
+    
+    CMRT --> Supply[供应链披露]
+    EMRT --> Supply
+    CRT --> Supply
+    AMRT --> Supply

@@ -1,0 +1,9 @@
+graph TD
+    A[模板文字要求<br/>Instructions/表内说明] --> B{冲突?}
+    B -->|否| C[Excel 校验标记<br/>Checker/条件格式/数据验证]
+    B -->|是| A
+    C --> D[产品实现约束]
+    
+    style A fill:#ffcdd2,stroke:#c62828
+    style C fill:#fff9c4,stroke:#f9a825
+    style D fill:#c8e6c9,stroke:#2e7d32

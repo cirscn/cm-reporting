@@ -1,0 +1,215 @@
+/* CM Reporting CSS Variables */
+@import "./variables.css";
+
+/* Tailwind CSS v4 */
+@import "tailwindcss";
+
+/* 仅扫描 lib 代码，避免 demo 样式进入库产物 */
+@config "../../tailwind.lib.config.js";
+
+/* ==========================================================================
+   Global Styles - 仅保留 antd 组件内部覆盖和 CSS 动画
+   其他样式已内联到组件中
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   StepNav - 步骤导航条样式（颜色由 antd 主题控制）
+   -------------------------------------------------------------------------- */
+.step-nav-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background: var(--ant-color-bg-container);
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+}
+
+.step-nav-inner {
+  max-width: var(--cm-content-max-width);
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--cm-step-nav-padding);
+}
+
+.step-nav-steps {
+  width: 100%;
+}
+
+.step-nav-steps .ant-steps-item-title {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.02em;
+  line-height: 1.4 !important;
+}
+
+.step-nav-steps .ant-steps-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.step-nav-steps .ant-steps-item-title {
+  vertical-align: middle;
+}
+
+/* --------------------------------------------------------------------------
+   Smelter List Table - 表头不换行
+   -------------------------------------------------------------------------- */
+.smelter-list-table .ant-table-thead > tr > th {
+  white-space: nowrap;
+}
+
+.smelter-list-table .ant-table-thead > tr > th .ant-table-column-title {
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   Question Modules - 单卡片内的行分隔
+   -------------------------------------------------------------------------- */
+.question-matrix-row,
+.company-question-row {
+  padding: 12px 0;
+}
+
+.question-matrix-row + .question-matrix-row,
+.company-question-row + .company-question-row {
+  border-top: 1px solid var(--ant-color-border-secondary);
+}
+
+/* 问题矩阵 - 三列对齐布局（金属 / 回答 / 注释） */
+.question-matrix-grid {
+  display: grid;
+  grid-template-columns: var(--cm-question-matrix-label-width) var(--cm-question-matrix-answer-width) minmax(0, 1fr);
+  column-gap: 12px;
+  align-items: start;
+}
+
+.question-matrix-label {
+  padding-top: 5px;
+  padding-right: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+  justify-self: start;
+}
+
+.question-matrix-answer .ant-select,
+.question-matrix-answer .ant-select-selector,
+.question-matrix-comment .ant-input,
+.question-matrix-comment .ant-input-textarea {
+  width: 100%;
+}
+
+/* 公司层面问题 - 三列对齐布局（问题 / 回答 / 注释） */
+.company-question-grid {
+  display: grid;
+  grid-template-columns: var(--cm-company-question-label-width) var(--cm-company-question-answer-width) minmax(0, 1fr);
+  column-gap: 12px;
+  row-gap: 8px;
+  align-items: start;
+}
+
+.company-question-grid-per-mineral {
+  grid-template-columns: var(--cm-company-question-label-width) var(--cm-company-question-answer-width) minmax(0, 1fr);
+  row-gap: 8px;
+}
+
+.company-question-label {
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ant-color-text);
+}
+
+.company-question-label-full {
+  grid-column: 1 / -1;
+  padding-right: 12px;
+}
+
+.company-question-mineral-row {
+  display: contents;
+}
+
+.company-question-mineral-label {
+  grid-column: 1;
+  text-align: left;
+  padding-left: 12px;
+  line-height: 1.5;
+}
+
+.company-question-answer .ant-form-item,
+.company-question-comment .ant-form-item {
+  margin-bottom: 0;
+}
+
+.company-question-answer .ant-select,
+.company-question-answer .ant-select-selector,
+.company-question-comment .ant-input,
+.company-question-comment .ant-input-textarea {
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   Required Field Highlight - 需 !important 覆盖 antd 内部样式
+   -------------------------------------------------------------------------- */
+.field-required-empty .ant-input,
+.field-required-empty .ant-input-number,
+.field-required-empty .ant-picker,
+.field-required-empty.ant-input,
+.field-required-empty.ant-input-number,
+.field-required-empty.ant-picker {
+  background-color: var(--cm-field-required-bg) !important;
+  border-color: var(--cm-field-required-border) !important;
+}
+
+/* Select 组件 - 直接覆盖 outlined 变体的边框 */
+.field-required-empty.ant-select.ant-select-outlined {
+  --ant-select-active-border-color: var(--cm-field-required-border);
+  --ant-select-hover-border-color: var(--cm-field-required-border);
+}
+
+.field-required-empty.ant-select.ant-select-outlined:not(.ant-select-disabled) {
+  background-color: var(--cm-field-required-bg) !important;
+  border-color: var(--cm-field-required-border) !important;
+}
+
+/* 兼容有 selector 子元素的情况 */
+.field-required-empty.ant-select .ant-select-selector,
+.field-required-empty .ant-select .ant-select-selector {
+  background-color: var(--cm-field-required-bg) !important;
+  border-color: var(--cm-field-required-border) !important;
+}
+
+.field-required-empty .ant-input-number-input {
+  background-color: transparent !important;
+}
+
+/* --------------------------------------------------------------------------
+   Keyframe 动画 - 无法内联
+   -------------------------------------------------------------------------- */
+.app-field-focus {
+  animation: highlight-pulse 1.5s ease-in-out;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--cm-field-focus-shadow-color);
+  }
+  50% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
