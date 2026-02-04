@@ -1,0 +1,89 @@
+{
+    "name": "RMI_AMRT_1.3",
+    "questionnaireType": 3,
+    "cmtCompany": {
+        "companyName": "台湾企业",
+        "species": "A",
+        "rangeDescription": null,
+        "identify": null,
+        "authorization": null,
+        "address": null,
+        "contactName": "刘天",
+        "contactEmail": "1@qq.com",
+        "contactPhone": "13480870921",
+        "authorizerName": "liruocai",
+        "authorizerJobTitle": null,
+        "authorizerEmail": "1@qq.com",
+        "authorizerPhone": null,
+        "effectiveDate": "1769097600000"
+    },
+    "cmtRangeQuestions": [
+        {
+            "type": 1,
+            "question": "Zinc",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 2,
+            "question": "Zinc",
+            "answer": "100%",
+            "remark": ""
+        }
+    ],
+    "cmtCompanyQuestions": [],
+    "cmtSmelters": [
+        {
+            "id": "1956306649155981392",
+            "metal": "Zinc",
+            "smelterName": null,
+            "smelterLookUp": "Young Poong Sukpo Smelter",
+            "standardSmelterName": "Young Poong Sukpo Smelter",
+            "smelterNumber": "CID005224",
+            "smelterCountry": "KOREA, REPUBLIC OF",
+            "smelterProvince": "",
+            "smelterCity": "Bonghwa-gun",
+            "smelterStreet": "",
+            "smelterIdentification": "RMI",
+            "smelterType": "conflict.minerals.system.data",
+            "smelterContact": null,
+            "smelterEmail": null,
+            "suggest": null,
+            "mineName": null,
+            "mineCountry": null,
+            "isRecycle": null,
+            "remark": null,
+            "supplierCode": null,
+            "smelterOption": null,
+            "other": null,
+            "smelterId": null,
+            "smelterFiles": null
+        }
+    ],
+    "cmtParts": [],
+    "minList": [
+        {
+            "smelterId": "1956306649155981392",
+            "metal": "Zinc",
+            "smelterName": "Young Poong Sukpo Smelter",
+            "mineFacilityName": "123",
+            "mineIdentification": null,
+            "mineIdentificationNumber": null,
+            "mineFacilityCountry": null,
+            "mineFacilityStreet": null,
+            "mineFacilityCity": null,
+            "mineFacilityProvince": "",
+            "mineFacilityContact": null,
+            "mineFacilityEmail": null,
+            "proposedNextSteps": null,
+            "comments": null
+        }
+    ],
+    "amrtReasonList": [
+        {
+            "id": "2014161779414552576",
+            "metal": "Zinc",
+            "reason": "纳入AMRT原因"
+        }
+    ]
+}

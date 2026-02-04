@@ -47,7 +47,7 @@ export const CRT_Q2_OPTIONS_221: QuestionOption[] = [
 
 function buildCrtQuestions(q2Options: QuestionOption[]): QuestionDef[] {
   const percentageOptions: QuestionOption[] = [
-    { value: '1', labelKey: 'options.percentageOne' },
+    { value: '1', labelKey: 'options.percentage100' },
     { value: 'Greater than 90%', labelKey: 'options.percentageAbove90' },
     { value: 'Greater than 75%', labelKey: 'options.percentageAbove75' },
     { value: 'Greater than 50%', labelKey: 'options.percentageAbove50' },

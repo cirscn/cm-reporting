@@ -1,0 +1,39 @@
+{
+  "type": "crt",
+  "version": "RMI_CRT_2.2",
+  "cmtCompany": {
+    "companyName": "Acme CRT",
+    "species": "A",
+    "contactName": "Chris",
+    "contactEmail": "chris@example.com",
+    "contactPhone": "18888888888",
+    "authorizerName": "Chris",
+    "authorizerEmail": "chris@example.com",
+    "effectiveDate": 1760688235900
+  },
+  "cmtRangeQuestions": [
+    { "type": 1, "question": "Cobalt", "answer": "Yes", "remark": "" },
+    { "type": 2, "question": "Cobalt", "answer": "DRC or adjoining countries only", "remark": "" },
+    { "type": 3, "question": "Cobalt", "answer": "Unknown", "remark": "" },
+    { "type": 4, "question": "Cobalt", "answer": "50% or less", "remark": "" },
+    { "type": 5, "question": "Cobalt", "answer": "No", "remark": "" },
+    { "type": 6, "question": "Cobalt", "answer": "Yes", "remark": "" }
+  ],
+  "cmtCompanyQuestions": [
+    { "question": "A", "answer": "Yes", "remark": "url", "type": null }
+  ],
+  "cmtSmelters": [
+    {
+      "id": "CRT-S1",
+      "metal": "Cobalt",
+      "smelterLookUp": "Lookup",
+      "standardSmelterName": "Standard",
+      "smelterNumber": "CID000001",
+      "smelterName": "Manual Name",
+      "smelterCountry": "US"
+    }
+  ],
+  "minList": [],
+  "cmtParts": []
+}
+

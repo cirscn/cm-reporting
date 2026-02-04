@@ -30,3 +30,14 @@ export type { CMReportingApi } from './public/useCMReporting'
 // Excel 导出（基于模板赋值后导出）
 export { exportToExcel } from './public/excel'
 export type { ExportExcelInput } from './public/excel'
+
+// ---------------------------------------------------------------------------
+// Company Internal Adapter（cirs-gpm legacy JSON ↔ internal snapshot）
+// ---------------------------------------------------------------------------
+
+export { cirsGpmLegacyAdapter } from './public/adapters/cirsGpmLegacyAdapter'
+export type {
+  CirsGpmLegacyReport,
+  CirsGpmLegacyRoundtripContext,
+  ParsedCirsGpmLegacyReport,
+} from './public/adapters/cirsGpmLegacyAdapter'

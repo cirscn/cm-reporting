@@ -1,0 +1,89 @@
+{
+  "name": "RMI_CMRT_6.5",
+  "questionnaireType": 1,
+  "extraTopLevel": { "keep": true },
+  "cmtCompany": {
+    "companyName": "Acme Inc",
+    "species": "A",
+    "rangeDescription": null,
+    "identify": "ID-1",
+    "authorization": null,
+    "address": null,
+    "contactName": "Alice",
+    "contactEmail": "alice@example.com",
+    "contactPhone": "10000000000",
+    "authorizerName": "Bob",
+    "authorizerJobTitle": null,
+    "authorizerEmail": "bob@example.com",
+    "authorizerPhone": null,
+    "effectiveDate": "1760688235900",
+    "unknownCompanyField": "preserve"
+  },
+  "cmtRangeQuestions": [
+    { "type": 1, "question": "Tantalum", "answer": "No", "remark": "" },
+    { "type": 1, "question": "Tin", "answer": "Yes", "remark": "" },
+    { "type": 1, "question": "Gold", "answer": "No", "remark": "" },
+    { "type": 1, "question": "Tungsten", "answer": "No", "remark": "" },
+
+    { "type": 2, "question": "Tantalum", "answer": "No", "remark": "" },
+    { "type": 2, "question": "Tin", "answer": "Yes", "remark": "" },
+    { "type": 2, "question": "Gold", "answer": "No", "remark": "" },
+    { "type": 2, "question": "Tungsten", "answer": "No", "remark": "" },
+
+    { "type": 3, "question": "Tantalum", "answer": "Unknown", "remark": null },
+    { "type": 3, "question": "Tin", "answer": "Unknown", "remark": "" },
+    { "type": 3, "question": "Gold", "answer": "Unknown", "remark": "" },
+    { "type": 3, "question": "Tungsten", "answer": "Unknown", "remark": "" },
+
+    { "type": 4, "question": "Tantalum", "answer": "Unknown", "remark": "" },
+    { "type": 4, "question": "Tin", "answer": "Unknown", "remark": "" },
+    { "type": 4, "question": "Gold", "answer": "Unknown", "remark": "" },
+    { "type": 4, "question": "Tungsten", "answer": "Unknown", "remark": "" },
+
+    { "type": 5, "question": "Tantalum", "answer": "Unknown", "remark": "" },
+    { "type": 5, "question": "Tin", "answer": "Unknown", "remark": "" },
+    { "type": 5, "question": "Gold", "answer": "Unknown", "remark": "" },
+    { "type": 5, "question": "Tungsten", "answer": "Unknown", "remark": "" },
+
+    { "type": 6, "question": "Tantalum", "answer": "None", "remark": "" },
+    { "type": 6, "question": "Tin", "answer": "100%", "remark": "" },
+    { "type": 6, "question": "Gold", "answer": "None", "remark": "" },
+    { "type": 6, "question": "Tungsten", "answer": "None", "remark": "" },
+
+    { "type": 7, "question": "Tantalum", "answer": "No", "remark": "" },
+    { "type": 7, "question": "Tin", "answer": "No", "remark": "" },
+    { "type": 7, "question": "Gold", "answer": "No", "remark": "" },
+    { "type": 7, "question": "Tungsten", "answer": "No", "remark": "" },
+
+    { "type": 8, "question": "Tantalum", "answer": "No", "remark": "" },
+    { "type": 8, "question": "Tin", "answer": "No", "remark": "" },
+    { "type": 8, "question": "Gold", "answer": "No", "remark": "" },
+    { "type": 8, "question": "Tungsten", "answer": "No", "remark": "" }
+  ],
+  "cmtCompanyQuestions": [
+    { "question": "A", "answer": "No", "remark": "", "type": null, "x": 1 },
+    { "question": "B", "answer": "No", "remark": "", "type": null },
+    { "question": "C", "answer": "Yes", "remark": "", "type": null },
+    { "question": "D", "answer": "Yes", "remark": "", "type": null },
+    { "question": "E", "answer": "Yes, in conformance with IPC1755 (e.g., CMRT)", "remark": "", "type": null },
+    { "question": "F", "answer": "No", "remark": "", "type": null }
+  ],
+  "cmtSmelters": [
+    {
+      "id": "S1",
+      "metal": "Tin",
+      "smelterLookUp": "Modeltech Sdn Bhd",
+      "standardSmelterName": "Modeltech Sdn Bhd",
+      "smelterNumber": "CID002858",
+      "smelterName": null,
+      "smelterCountry": "MALAYSIA",
+      "smelterProvince": "Melaka",
+      "smelterType": "conflict.minerals.system.data",
+      "remark": null,
+      "unknownSmelterField": { "keep": true }
+    }
+  ],
+  "minList": [],
+  "cmtParts": []
+}
+

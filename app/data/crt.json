@@ -1,0 +1,140 @@
+{
+    "version": "RMI_CRT_2.2",
+    "type": "crt",
+    "cmtCompany": {
+        "companyName": "fdd瑞旭",
+        "species": "A",
+        "rangeDescription": null,
+        "identify": null,
+        "authorization": null,
+        "address": null,
+        "contactName": "fdd@cirscn.com",
+        "contactEmail": "fdd@cirscn.com",
+        "contactPhone": "13480870921",
+        "authorizerName": "fdd@cirscn.com",
+        "authorizerJobTitle": null,
+        "authorizerEmail": "fdd@cirscn.com",
+        "authorizerPhone": null,
+        "effectiveDate": "1770171210112"
+    },
+    "cmtRangeQuestions": [
+        {
+            "type": 1,
+            "question": "Cobalt",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 2,
+            "question": "Cobalt",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 3,
+            "question": "Cobalt",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 4,
+            "question": "Cobalt",
+            "answer": "100%",
+            "remark": ""
+        },
+        {
+            "type": 5,
+            "question": "Cobalt",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 6,
+            "question": "Cobalt",
+            "answer": "Yes",
+            "remark": ""
+        }
+    ],
+    "cmtCompanyQuestions": [
+        {
+            "question": "A",
+            "answer": "Yes",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "B",
+            "answer": "Yes",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "C",
+            "answer": "Yes",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "D",
+            "answer": "Yes",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "E",
+            "answer": "Yes",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "F",
+            "answer": "Yes",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "G",
+            "answer": "Yes, CRT",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "H",
+            "answer": "Yes",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "I",
+            "answer": "Yes",
+            "remark": "",
+            "type": null
+        }
+    ],
+    "cmtSmelters": [
+        {
+            "metal": "Cobalt",
+            "smelterName": "Zhuhai Kelixin Metal Materials Co., Ltd.",
+            "standardSmelterName": "Zhuhai Kelixin Metal Materials Co., Ltd.",
+            "smelterCountry": "CHINA",
+            "smelterNumber": "CID003211",
+            "smelterIdentification": "RMI",
+            "smelterStreet": null,
+            "smelterCity": "Zhuhai",
+            "smelterProvince": "Guangdong Sheng",
+            "smelterContact": "liutian",
+            "smelterEmail": "lt@cirscn.com",
+            "suggest": "建议的后续步骤",
+            "mineName": "矿井名称",
+            "mineCountry": "矿井所在国家/地区",
+            "isRecycle": "1",
+            "remark": "这是注释",
+            "smelterId": "1951216255847366715",
+            "type": 1,
+            "smelterFiles": null,
+            "minList": null
+        }
+    ],
+    "cmtParts": [],
+    "minList": []
+}

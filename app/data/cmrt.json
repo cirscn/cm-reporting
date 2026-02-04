@@ -1,0 +1,294 @@
+{
+    "name": "RMI_CMRT_6.5",
+    "questionnaireType": 1,
+    "cmtCompany": {
+        "companyName": "绿色公司BU-1",
+        "species": "A",
+        "rangeDescription": null,
+        "identify": null,
+        "authorization": null,
+        "address": null,
+        "contactName": "g德威",
+        "contactEmail": "jennifer1812@163.com",
+        "contactPhone": "13400000000",
+        "authorizerName": "g德威",
+        "authorizerJobTitle": null,
+        "authorizerEmail": "jennifer1812@163.com",
+        "authorizerPhone": "13400000000",
+        "effectiveDate": "1760688235900"
+    },
+    "cmtRangeQuestions": [
+        {
+            "type": 1,
+            "question": "Tantalum",
+            "answer": "No",
+            "remark": ""
+        },
+        {
+            "type": 1,
+            "question": "Tin",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 1,
+            "question": "Gold",
+            "answer": "No",
+            "remark": ""
+        },
+        {
+            "type": 1,
+            "question": "Tungsten",
+            "answer": "No",
+            "remark": ""
+        },
+        {
+            "type": 2,
+            "question": "Tantalum",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 2,
+            "question": "Tin",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 2,
+            "question": "Gold",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 2,
+            "question": "Tungsten",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 3,
+            "question": "Tantalum",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 3,
+            "question": "Tin",
+            "answer": "No",
+            "remark": ""
+        },
+        {
+            "type": 3,
+            "question": "Gold",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 3,
+            "question": "Tungsten",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 4,
+            "question": "Tantalum",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 4,
+            "question": "Tin",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 4,
+            "question": "Gold",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 4,
+            "question": "Tungsten",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 5,
+            "question": "Tantalum",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 5,
+            "question": "Tin",
+            "answer": "Unknown",
+            "remark": ""
+        },
+        {
+            "type": 5,
+            "question": "Gold",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 5,
+            "question": "Tungsten",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 6,
+            "question": "Tantalum",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 6,
+            "question": "Tin",
+            "answer": "100%",
+            "remark": ""
+        },
+        {
+            "type": 6,
+            "question": "Gold",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 6,
+            "question": "Tungsten",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 7,
+            "question": "Tantalum",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 7,
+            "question": "Tin",
+            "answer": "No",
+            "remark": ""
+        },
+        {
+            "type": 7,
+            "question": "Gold",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 7,
+            "question": "Tungsten",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 8,
+            "question": "Tantalum",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 8,
+            "question": "Tin",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 8,
+            "question": "Gold",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 8,
+            "question": "Tungsten",
+            "answer": "notApplicable",
+            "remark": ""
+        }
+    ],
+    "cmtCompanyQuestions": [
+        {
+            "question": "A",
+            "answer": "No",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "B",
+            "answer": "No",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "C",
+            "answer": "Yes",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "D",
+            "answer": "Yes",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "E",
+            "answer": "Yes, in conformance with IPC1755 (e.g., CMRT)",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "F",
+            "answer": "No",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "G",
+            "answer": "Yes",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "H",
+            "answer": "No",
+            "remark": "",
+            "type": null
+        }
+    ],
+    "cmtSmelters": [
+        {
+            "id": "1905500009923752484",
+            "metal": "Tin",
+            "smelterLookUp": "Modeltech Sdn Bhd",
+            "standardSmelterName": "Modeltech Sdn Bhd",
+            "smelterNumber": "CID002858",
+            "smelterName": null,
+            "smelterCountry": "MALAYSIA",
+            "smelterProvince": "Kawasan Perindustrian Bukit Rambai, Melaka",
+            "smelterCity": null,
+            "smelterStreet": null,
+            "smelterIdentification": null,
+            "smelterType": "conflict.minerals.system.data",
+            "smelterContact": null,
+            "smelterEmail": null,
+            "suggest": null,
+            "mineName": null,
+            "mineCountry": null,
+            "isRecycle": null,
+            "remark": null,
+            "supplierCode": null,
+            "smelterOption": null,
+            "other": null,
+            "smelterId": null,
+            "smelterFiles": null
+        }
+    ],
+    "cmtParts": [],
+    "minList": []
+}

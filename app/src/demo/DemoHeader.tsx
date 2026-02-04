@@ -3,7 +3,7 @@
  * @description Demo 环境专用 Header，深色玻璃态设计风格。
  */
 
-import { ExportOutlined, SwapOutlined } from '@ant-design/icons'
+import { ExportOutlined, ImportOutlined, SwapOutlined } from '@ant-design/icons'
 import type { Locale } from '@core/i18n'
 import { getVersions } from '@core/registry'
 import type { TemplateType } from '@core/registry/types'
@@ -28,6 +28,8 @@ interface DemoHeaderProps {
   onLocaleChange: (locale: Locale) => void
   /** 导出回调 */
   onExport?: () => void
+  /** 导入回调 */
+  onImport?: () => void
 }
 
 /** 模板切换选项 */
@@ -56,6 +58,7 @@ export function DemoHeader({
   onVersionChange,
   onLocaleChange,
   onExport,
+  onImport,
 }: DemoHeaderProps) {
   const { t } = useT()
 
@@ -82,6 +85,10 @@ export function DemoHeader({
 
   const handleExport = useMemoizedFn(() => {
     onExport?.()
+  })
+
+  const handleImport = useMemoizedFn(() => {
+    onImport?.()
   })
 
   return (
@@ -251,27 +258,39 @@ export function DemoHeader({
             </Flex>
 
             {/* 导出按钮 */}
-            <Button
-              type="primary"
-              icon={<ExportOutlined />}
-              onClick={handleExport}
-              className="demo-header-export"
-              style={{
-                height: 36,
-                paddingLeft: 16,
-                paddingRight: 16,
-                background: 'linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%)',
-                border: 'none',
-                borderRadius: 8,
-                fontWeight: 600,
-                fontSize: 13,
-                boxShadow:
-                  '0 4px 14px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              {t('common.export')}
-            </Button>
+            <Flex align="center" gap={8}>
+              <Button
+                icon={<ImportOutlined />}
+                onClick={handleImport}
+                style={{
+                  height: 36,
+                  borderRadius: 8,
+                }}
+              >
+                Import
+              </Button>
+              <Button
+                type="primary"
+                icon={<ExportOutlined />}
+                onClick={handleExport}
+                className="demo-header-export"
+                style={{
+                  height: 36,
+                  paddingLeft: 16,
+                  paddingRight: 16,
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%)',
+                  border: 'none',
+                  borderRadius: 8,
+                  fontWeight: 600,
+                  fontSize: 13,
+                  boxShadow:
+                    '0 4px 14px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                {t('common.export')}
+              </Button>
+            </Flex>
           </Flex>
         </Flex>
       </div>

@@ -7,9 +7,12 @@ import type { Locale } from '@core/i18n'
 import { getDefaultVersion } from '@core/registry'
 import type { PageKey, TemplateType } from '@core/registry/types'
 import { CMReportingApp } from '@lib/CMReportingApp'
+import type { ReportSnapshotV1 } from '@lib/public/snapshot'
 import { useCallback, useState } from 'react'
 
 import { DemoHeader } from './DemoHeader'
+import { DevImportBridge } from './DevImportBridge'
+import { ImportJsonModal } from './ImportJsonModal'
 
 const DEFAULT_TEMPLATE: TemplateType = 'cmrt'
 const DEFAULT_PAGE: PageKey = 'declaration'
@@ -27,18 +30,22 @@ export function DevApp({ locale, onLocaleChange }: DevAppProps) {
   const [templateType, setTemplateType] = useState<TemplateType>(DEFAULT_TEMPLATE)
   const [versionId, setVersionId] = useState(() => getDefaultVersion(DEFAULT_TEMPLATE))
   const [pageKey, setPageKey] = useState<PageKey>(DEFAULT_PAGE)
+  const [importOpen, setImportOpen] = useState(false)
+  const [pendingSnapshot, setPendingSnapshot] = useState<ReportSnapshotV1 | null>(null)
 
   // 模板切换：重置版本和页面
   const handleTemplateChange = useCallback((nextTemplate: TemplateType) => {
     setTemplateType(nextTemplate)
     setVersionId(getDefaultVersion(nextTemplate))
     setPageKey(DEFAULT_PAGE)
+    setPendingSnapshot(null)
   }, [])
 
   // 版本切换：重置页面
   const handleVersionChange = useCallback((nextVersion: string) => {
     setVersionId(nextVersion)
     setPageKey(DEFAULT_PAGE)
+    setPendingSnapshot(null)
   }, [])
 
   // 语言切换
@@ -51,6 +58,21 @@ export function DevApp({ locale, onLocaleChange }: DevAppProps) {
     setPageKey(nextPage)
   }, [])
 
+  const handleOpenImport = useCallback(() => {
+    setImportOpen(true)
+  }, [])
+
+  const handleCloseImport = useCallback(() => {
+    setImportOpen(false)
+  }, [])
+
+  const handleImported = useCallback((snapshot: ReportSnapshotV1) => {
+    setTemplateType(snapshot.templateType)
+    setVersionId(snapshot.versionId)
+    setPageKey(DEFAULT_PAGE)
+    setPendingSnapshot(snapshot)
+  }, [])
+
   // 导出处理
   const handleExport = useCallback(() => {
     console.log('Export triggered', { templateType, versionId, locale })
@@ -59,6 +81,7 @@ export function DevApp({ locale, onLocaleChange }: DevAppProps) {
 
   return (
     <>
+      <ImportJsonModal open={importOpen} onClose={handleCloseImport} onImported={handleImported} />
       <DemoHeader
         templateType={templateType}
         versionId={versionId}
@@ -67,6 +90,7 @@ export function DevApp({ locale, onLocaleChange }: DevAppProps) {
         onVersionChange={handleVersionChange}
         onLocaleChange={handleLocaleChange}
         onExport={handleExport}
+        onImport={handleOpenImport}
       />
       <CMReportingApp
         templateType={templateType}
@@ -74,7 +98,9 @@ export function DevApp({ locale, onLocaleChange }: DevAppProps) {
         pageKey={pageKey}
         onNavigatePage={handleNavigatePage}
         maxContentWidth={1400}
-      />
+      >
+        <DevImportBridge pendingSnapshot={pendingSnapshot} onApplied={() => setPendingSnapshot(null)} />
+      </CMReportingApp>
     </>
   )
 }

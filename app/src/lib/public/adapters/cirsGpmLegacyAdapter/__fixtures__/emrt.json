@@ -1,0 +1,47 @@
+{
+  "name": "RMI_EMRT_2.1",
+  "questionnaireType": 2,
+  "cmtCompany": {
+    "companyName": "Acme EMRT",
+    "species": "B",
+    "contactName": "Eve",
+    "contactEmail": "eve@example.com",
+    "contactPhone": "19999999999",
+    "authorizerName": "Eve",
+    "authorizerEmail": "eve@example.com",
+    "effectiveDate": "1760688235900"
+  },
+  "cmtRangeQuestions": [
+    { "type": 1, "question": "Cobalt", "answer": "Yes", "remark": "" },
+    { "type": 1, "question": "Copper", "answer": "No", "remark": "" },
+    { "type": 2, "question": "Cobalt", "answer": "Unknown", "remark": "" },
+    { "type": 2, "question": "Copper", "answer": "Unknown", "remark": "" }
+  ],
+  "cmtCompanyQuestions": [
+    { "question": "A", "answer": "Yes", "remark": "", "type": null },
+    { "question": "B", "answer": "No", "remark": "", "type": null },
+    { "question": "C", "answer": "Yes", "remark": "note", "type": "Cobalt" },
+    { "question": "C", "answer": "notApplicable", "remark": "", "type": "Copper" }
+  ],
+  "cmtSmelters": [],
+  "minList": [
+    {
+      "smelterId": "CID004620",
+      "metal": "Cobalt",
+      "smelterName": "Sichuan Jayson New Energy Technology Co., Ltd.",
+      "mineFacilityName": "Mine-1",
+      "mineIdentification": "SRC",
+      "mineIdentificationNumber": "1",
+      "mineFacilityCountry": "CN",
+      "mineFacilityStreet": "Street",
+      "mineFacilityCity": "City",
+      "mineFacilityProvince": "Province",
+      "mineFacilityContact": "Contact",
+      "mineFacilityEmail": "mine@example.com",
+      "proposedNextSteps": "Next",
+      "comments": "Comment",
+      "unknownMineField": 123
+    }
+  ]
+}
+

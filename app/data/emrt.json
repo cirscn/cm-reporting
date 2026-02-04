@@ -1,0 +1,492 @@
+{
+    "name": "RMI_EMRT_2.1",
+    "questionnaireType": 2,
+    "cmtCompany": {
+        "companyName": "绿色公司BU-1",
+        "species": "A",
+        "rangeDescription": null,
+        "identify": "绿色公司BU-1",
+        "authorization": "绿色公司BU-1",
+        "address": null,
+        "contactName": "g德威",
+        "contactEmail": "jennifer1812@163.com",
+        "contactPhone": "13400000000",
+        "authorizerName": "g德威",
+        "authorizerJobTitle": null,
+        "authorizerEmail": "jennifer1812@163.com",
+        "authorizerPhone": "13400000000",
+        "effectiveDate": "1770010794700"
+    },
+    "cmtRangeQuestions": [
+        {
+            "type": 1,
+            "question": "Cobalt",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 1,
+            "question": "Copper",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 1,
+            "question": "Graphite",
+            "answer": "No",
+            "remark": ""
+        },
+        {
+            "type": 1,
+            "question": "Lithium",
+            "answer": "Unknown",
+            "remark": ""
+        },
+        {
+            "type": 1,
+            "question": "Mica",
+            "answer": "Not declaring",
+            "remark": ""
+        },
+        {
+            "type": 1,
+            "question": "Nickel",
+            "answer": "No",
+            "remark": ""
+        },
+        {
+            "type": 2,
+            "question": "Cobalt",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 2,
+            "question": "Copper",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 2,
+            "question": "Graphite",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 2,
+            "question": "Lithium",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 2,
+            "question": "Mica",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 2,
+            "question": "Nickel",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 3,
+            "question": "Cobalt",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 3,
+            "question": "Copper",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 3,
+            "question": "Graphite",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 3,
+            "question": "Lithium",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 3,
+            "question": "Mica",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 3,
+            "question": "Nickel",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 4,
+            "question": "Cobalt",
+            "answer": "No",
+            "remark": ""
+        },
+        {
+            "type": 4,
+            "question": "Copper",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 4,
+            "question": "Graphite",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 4,
+            "question": "Lithium",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 4,
+            "question": "Mica",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 4,
+            "question": "Nickel",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 5,
+            "question": "Cobalt",
+            "answer": "Greater than 90%",
+            "remark": ""
+        },
+        {
+            "type": 5,
+            "question": "Copper",
+            "answer": "None",
+            "remark": ""
+        },
+        {
+            "type": 5,
+            "question": "Graphite",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 5,
+            "question": "Lithium",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 5,
+            "question": "Mica",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 5,
+            "question": "Nickel",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 6,
+            "question": "Cobalt",
+            "answer": "No",
+            "remark": ""
+        },
+        {
+            "type": 6,
+            "question": "Copper",
+            "answer": "No",
+            "remark": ""
+        },
+        {
+            "type": 6,
+            "question": "Graphite",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 6,
+            "question": "Lithium",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 6,
+            "question": "Mica",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 6,
+            "question": "Nickel",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 7,
+            "question": "Cobalt",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 7,
+            "question": "Copper",
+            "answer": "Yes",
+            "remark": ""
+        },
+        {
+            "type": 7,
+            "question": "Graphite",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 7,
+            "question": "Lithium",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 7,
+            "question": "Mica",
+            "answer": "notApplicable",
+            "remark": ""
+        },
+        {
+            "type": 7,
+            "question": "Nickel",
+            "answer": "notApplicable",
+            "remark": ""
+        }
+    ],
+    "cmtCompanyQuestions": [
+        {
+            "question": "A",
+            "answer": "Yes",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "B",
+            "answer": "No",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "C",
+            "answer": "Yes",
+            "remark": "",
+            "type": "Cobalt"
+        },
+        {
+            "question": "C",
+            "answer": "Yes",
+            "remark": "",
+            "type": "Copper"
+        },
+        {
+            "question": "C",
+            "answer": "notApplicable",
+            "remark": "",
+            "type": "Graphite"
+        },
+        {
+            "question": "C",
+            "answer": "Yes",
+            "remark": "",
+            "type": "Lithium"
+        },
+        {
+            "question": "C",
+            "answer": "Yes, when more processors are validated",
+            "remark": "",
+            "type": "Mica"
+        },
+        {
+            "question": "C",
+            "answer": "notApplicable",
+            "remark": "",
+            "type": "Nickel"
+        },
+        {
+            "question": "D",
+            "answer": "Yes",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "E",
+            "answer": "Yes, in conformance with IPC1755 (e.g., EMRT)",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "F",
+            "answer": "Yes",
+            "remark": "",
+            "type": null
+        },
+        {
+            "question": "G",
+            "answer": "Yes",
+            "remark": "",
+            "type": null
+        }
+    ],
+    "cmtSmelters": [
+        {
+            "id": "CID004620",
+            "metal": "Cobalt",
+            "smelterName": null,
+            "smelterLookUp": null,
+            "standardSmelterName": "Sichuan Jayson New Energy Technology Co., Ltd.",
+            "smelterNumber": "CID004620",
+            "smelterCountry": "CHINA",
+            "smelterProvince": "Meishan, Sichuan Sheng",
+            "smelterCity": null,
+            "smelterStreet": null,
+            "smelterIdentification": "RMI",
+            "smelterType": "conflict.minerals.system.data",
+            "smelterContact": null,
+            "smelterEmail": null,
+            "suggest": null,
+            "mineName": null,
+            "mineCountry": null,
+            "isRecycle": null,
+            "remark": null,
+            "supplierCode": null,
+            "smelterOption": null,
+            "other": null,
+            "smelterFiles": null
+        },
+        {
+            "id": "CID005351",
+            "metal": "Copper",
+            "smelterName": null,
+            "smelterLookUp": null,
+            "standardSmelterName": "Tongling Nonferrous Jinguan (Ausmelt) Copper Industry",
+            "smelterNumber": "CID005351",
+            "smelterCountry": "CHINA",
+            "smelterProvince": "West Building Nonferrous Yard, Changjiang West Road, Tongling City, Anhui Province 244000",
+            "smelterCity": null,
+            "smelterStreet": null,
+            "smelterIdentification": "RMI",
+            "smelterType": "conflict.minerals.system.data",
+            "smelterContact": null,
+            "smelterEmail": null,
+            "suggest": null,
+            "mineName": null,
+            "mineCountry": null,
+            "isRecycle": null,
+            "remark": null,
+            "supplierCode": null,
+            "smelterOption": null,
+            "other": null,
+            "smelterFiles": null
+        },
+        {
+            "id": "CID005580",
+            "metal": "Copper",
+            "smelterName": null,
+            "smelterLookUp": null,
+            "standardSmelterName": "Southwire Company, LLC (Carrolton Building Wire Plant)",
+            "smelterNumber": "CID005580",
+            "smelterCountry": "UNITED STATES OF AMERICA",
+            "smelterProvince": "United States",
+            "smelterCity": null,
+            "smelterStreet": null,
+            "smelterIdentification": "RMI",
+            "smelterType": "conflict.minerals.system.data",
+            "smelterContact": null,
+            "smelterEmail": null,
+            "suggest": null,
+            "mineName": null,
+            "mineCountry": null,
+            "isRecycle": null,
+            "remark": null,
+            "supplierCode": null,
+            "smelterOption": null,
+            "other": null,
+            "smelterFiles": null
+        }
+    ],
+    "cmtParts": [],
+    "minList": [
+        {
+            "smelterId": "CID004620",
+            "metal": "Cobalt",
+            "smelterName": "Sichuan Jayson New Energy Technology Co., Ltd.",
+            "mineFacilityName": "测试4",
+            "mineIdentification": "4",
+            "mineIdentificationNumber": "4",
+            "mineFacilityCountry": "4",
+            "mineFacilityStreet": "4",
+            "mineFacilityCity": "4",
+            "mineFacilityProvince": "4",
+            "mineFacilityContact": "4",
+            "mineFacilityEmail": "4",
+            "proposedNextSteps": "4",
+            "comments": "4"
+        },
+        {
+            "smelterId": "CID005351",
+            "metal": "Copper",
+            "smelterName": "Tongling Nonferrous Jinguan (Ausmelt) Copper Industry",
+            "mineFacilityName": "测试3",
+            "mineIdentification": null,
+            "mineIdentificationNumber": null,
+            "mineFacilityCountry": null,
+            "mineFacilityStreet": null,
+            "mineFacilityCity": null,
+            "mineFacilityProvince": "",
+            "mineFacilityContact": null,
+            "mineFacilityEmail": null,
+            "proposedNextSteps": null,
+            "comments": null
+        },
+        {
+            "smelterId": "CID004620",
+            "metal": "Cobalt",
+            "smelterName": "Sichuan Jayson New Energy Technology Co., Ltd.",
+            "mineFacilityName": "测试2",
+            "mineIdentification": null,
+            "mineIdentificationNumber": null,
+            "mineFacilityCountry": null,
+            "mineFacilityStreet": null,
+            "mineFacilityCity": null,
+            "mineFacilityProvince": "",
+            "mineFacilityContact": null,
+            "mineFacilityEmail": null,
+            "proposedNextSteps": null,
+            "comments": null
+        },
+        {
+            "smelterId": "CID005580",
+            "metal": "Copper",
+            "smelterName": "Southwire Company, LLC (Carrolton Building Wire Plant)",
+            "mineFacilityName": "测试1",
+            "mineIdentification": null,
+            "mineIdentificationNumber": null,
+            "mineFacilityCountry": null,
+            "mineFacilityStreet": null,
+            "mineFacilityCity": null,
+            "mineFacilityProvince": "",
+            "mineFacilityContact": null,
+            "mineFacilityEmail": null,
+            "proposedNextSteps": null,
+            "comments": null
+        }
+    ]
+}
