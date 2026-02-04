@@ -59,6 +59,22 @@ export function SelectField({
     onChange?.(nextValue ?? '')
   })
 
+  // 键盘快捷键：Y/N/U 快速选择 Yes/No/Unknown
+  const handleKeyDown = useMemoizedFn((e: React.KeyboardEvent) => {
+    if (disabled) return
+    const key = e.key.toLowerCase()
+    // 只处理 Y/N/U 快捷键
+    if (key !== 'y' && key !== 'n' && key !== 'u') return
+    // 查找以该字母开头的选项（忽略大小写）
+    const matchedOption = options.find((opt) =>
+      opt.value.toLowerCase().startsWith(key)
+    )
+    if (matchedOption) {
+      e.preventDefault()
+      onChange?.(matchedOption.value)
+    }
+  })
+
   const normalizedValue = value === '' ? undefined : value
 
   // 必填字段的黄色背景样式
@@ -79,6 +95,7 @@ export function SelectField({
       <Select
         value={normalizedValue}
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
         placeholder={resolvedPlaceholder}
         disabled={disabled}
         options={options}

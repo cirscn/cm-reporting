@@ -171,7 +171,18 @@
     "prev": "Previous",
     "next": "Next",
     "submit": "Submit",
-    "close": "Close"
+    "close": "Close",
+    "setAllTo": "Set all to",
+    "sameAsContact": "Same as Contact",
+    "batchDelete": "Delete Selected",
+    "cancelSelection": "Cancel"
+  },
+  "confirm": {
+    "batchDelete": "Confirm Batch Delete",
+    "batchDeleteContent": "Are you sure you want to delete the selected {{count}} records? This action cannot be undone."
+  },
+  "selection": {
+    "selected": "{{count}} selected"
   },
   "options": {
     "yes": "Yes",

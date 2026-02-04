@@ -17,6 +17,7 @@ import { TemplateShell } from '@shell/pages/TemplateShell'
 import { buildTemplatePath } from '@shell/routing/resolveTemplateRoute'
 import { compact } from 'lodash-es'
 import { useCallback, useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
 
 /**
  * CMReportingApp Props。
@@ -32,6 +33,8 @@ export interface CMReportingAppProps {
   onNavigatePage?: (pageKey: PageKey) => void
   /** 内容区域最大宽度（可选，不设置则填充父容器） */
   maxContentWidth?: number
+  /** 插入点：用于对外门面组件做 snapshot/export 绑定（不作为 public API 承诺）。 */
+  children?: ReactNode
 }
 
 const DEFAULT_PAGE: PageKey = 'declaration'
@@ -46,6 +49,7 @@ export function CMReportingApp({
   pageKey: controlledPageKey,
   onNavigatePage,
   maxContentWidth,
+  children,
 }: CMReportingAppProps) {
   // 内部页面状态（非受控模式）
   const [internalPageKey, setInternalPageKey] = useState<PageKey>(DEFAULT_PAGE)
@@ -130,7 +134,9 @@ export function CMReportingApp({
         onNavigatePage={handleNavigatePage}
         renderPage={renderPage}
         maxContentWidth={maxContentWidth}
-      />
+      >
+        {children}
+      </TemplateShell>
     </NavigationProvider>
   )
 }

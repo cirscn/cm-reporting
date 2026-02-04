@@ -4,14 +4,16 @@
  */
 
 // 说明：模块实现
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
+import { PlusOutlined, DeleteOutlined, CloseOutlined } from '@ant-design/icons'
 import type { ProductListConfig } from '@core/registry/types'
 import type { ProductRow } from '@core/types/tableRows'
 import { useT } from '@ui/i18n/useT'
 import { useCreation, useMemoizedFn } from 'ahooks'
-import { Button, Card, Flex, Table, Input, Tag, Typography } from 'antd'
+import { Button, Card, Flex, Modal, Table, Input, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
+import type { TableRowSelection } from 'antd/es/table/interface'
 import type { ChangeEvent, ReactNode } from 'react'
+import { useState } from 'react'
 
 interface ProductListTableProps {
   config: ProductListConfig
@@ -38,6 +40,13 @@ export function ProductListTable({
   required = false,
 }: ProductListTableProps) {
   const { t } = useT()
+  /** 批量选择状态（受控）。 */
+  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
+  const validSelectedRowKeys = useCreation(() => {
+    const valid = new Set(rows.map((r) => r.id))
+    return selectedRowKeys.filter((k) => valid.has(k))
+  }, [rows, selectedRowKeys])
+
   /** 行索引缓存：避免频繁全表 map/filter。 */
   const rowIndexMap = useCreation(
     () => new Map(rows.map((row, index) => [row.id, index])),
@@ -96,19 +105,53 @@ export function ProductListTable({
     return map
   }, [rows, handleCellChange])
 
-  const removeHandlers = useCreation(() => {
-    const map = new Map<string, () => void>()
-    rows.forEach((row) => {
-      map.set(row.id, () => handleRemoveRow(row.id))
-    })
-    return map
-  }, [rows, handleRemoveRow])
-
   const getInputHandler = useMemoizedFn((id: string, field: InputField) =>
     inputHandlers.get(`${id}:${field}`)
   )
+
+  const handleRemoveRowWithSelection = useMemoizedFn((id: string) => {
+    setSelectedRowKeys((prev) => prev.filter((k) => k !== id))
+    handleRemoveRow(id)
+  })
+
+  const removeHandlers = useCreation(() => {
+    const map = new Map<string, () => void>()
+    rows.forEach((row) => {
+      map.set(row.id, () => handleRemoveRowWithSelection(row.id))
+    })
+    return map
+  }, [rows, handleRemoveRowWithSelection])
+
   /** 获取稳定的删除按钮 handler（返回函数，不在渲染期执行）。 */
   const getRemoveHandler = useMemoizedFn((id: string) => removeHandlers.get(id))
+
+  /** 批量删除处理 */
+  const handleBatchDelete = useMemoizedFn(() => {
+    if (validSelectedRowKeys.length === 0) return
+    Modal.confirm({
+      title: t('confirm.batchDelete'),
+      content: t('confirm.batchDeleteContent', { count: validSelectedRowKeys.length }),
+      okText: t('actions.batchDelete'),
+      okType: 'danger',
+      cancelText: t('actions.cancelSelection'),
+      onOk: () => {
+        const selectedSet = new Set(validSelectedRowKeys)
+        onChange(rows.filter((row) => !selectedSet.has(row.id)))
+        setSelectedRowKeys([])
+      },
+    })
+  })
+
+  /** 取消选择 */
+  const handleCancelSelection = useMemoizedFn(() => {
+    setSelectedRowKeys([])
+  })
+
+  /** 行选择配置 */
+  const rowSelection: TableRowSelection<ProductRow> = {
+    selectedRowKeys: validSelectedRowKeys,
+    onChange: (keys) => setSelectedRowKeys(keys as string[]),
+  }
 
   const columns = useCreation<ColumnsType<ProductRow>>(() => {
     const base: ColumnsType<ProductRow> = [
@@ -205,7 +248,7 @@ export function ProductListTable({
     })
 
     return base
-  }, [config, t, handleCellChange, handleRemoveRow])
+  }, [config, getInputHandler, getRemoveHandler, required, t, wrapRequired])
 
   const emptyLocale = {
     emptyText: (
@@ -223,16 +266,50 @@ export function ProductListTable({
   return (
     <Card
       title={
-        <Flex align="center" justify="space-between" style={{ width: '100%' }}>
-          <Flex align="center" gap={8}>
-            <Typography.Title level={5} style={{ margin: 0 }}>
-              {t('tabs.productList')}
-            </Typography.Title>
-            <Tag color="blue">{t('badges.recordCount', { count: rows.length })}</Tag>
+        <Flex vertical gap={8} style={{ width: '100%' }}>
+          <Flex align="center" justify="space-between">
+            <Flex align="center" gap={8}>
+              <Typography.Title level={5} style={{ margin: 0 }}>
+                {t('tabs.productList')}
+              </Typography.Title>
+              <Tag color="blue">{t('badges.recordCount', { count: rows.length })}</Tag>
+            </Flex>
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
+              {t('actions.addRow')}
+            </Button>
           </Flex>
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
-            {t('actions.addRow')}
-          </Button>
+          {validSelectedRowKeys.length > 0 && (
+            <Flex
+              align="center"
+              gap={12}
+              style={{
+                padding: '8px 12px',
+                background: 'var(--ant-color-primary-bg)',
+                borderRadius: 6,
+              }}
+            >
+              <Typography.Text strong>
+                {t('selection.selected', { count: validSelectedRowKeys.length })}
+              </Typography.Text>
+              <Button
+                type="primary"
+                danger
+                size="small"
+                icon={<DeleteOutlined />}
+                onClick={handleBatchDelete}
+              >
+                {t('actions.batchDelete')}
+              </Button>
+              <Button
+                type="text"
+                size="small"
+                icon={<CloseOutlined />}
+                onClick={handleCancelSelection}
+              >
+                {t('actions.cancelSelection')}
+              </Button>
+            </Flex>
+          )}
         </Flex>
       }
     >
@@ -240,6 +317,7 @@ export function ProductListTable({
         columns={columns}
         dataSource={rows}
         rowKey="id"
+        rowSelection={rowSelection}
         pagination={false}
         scroll={{ x: 'max-content', y: rows.length > 20 ? 600 : undefined }}
         virtual={rows.length > 50}

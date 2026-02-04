@@ -63,6 +63,10 @@ interface TemplateActionsContextValue {
   setSmelterList: (rows: TemplateFormState['smelterList']) => void
   setMineList: (rows: TemplateFormState['mineList']) => void
   setProductList: (rows: TemplateFormState['productList']) => void
+  /** 全量回填表单（用于导入 JSON 快照）。 */
+  setFormData: (data: TemplateFormState) => void
+  /** 触发一次全量校验（用于导出前确认）。 */
+  validateForm: () => Promise<boolean>
   resetForm: () => void
 }
 

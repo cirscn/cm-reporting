@@ -169,6 +169,17 @@ export function QuestionMatrixForm({
     }
   )
 
+  // 批量设置处理：为所有支持该选项的金属设置值
+  const handleBatchSet = useMemoizedFn((questionKey: string, value: string) => {
+    minerals.forEach((mineral) => {
+      const opts = getOptions(questionKey, mineral.key, true)
+      // 只有当该金属支持此选项时才设置
+      if (opts.some((o) => o.value === value)) {
+        onChange(questionKey, mineral.key, value)
+      }
+    })
+  })
+
   return (
     <Card
       title={
@@ -201,6 +212,7 @@ export function QuestionMatrixForm({
             getOptions={getOptions}
             getCellHandler={getCellHandler}
             getCommentHandler={getCommentHandler}
+            onBatchSet={handleBatchSet}
             t={t}
           />
         ))}
@@ -223,6 +235,7 @@ function QuestionRow({
   getOptions,
   getCellHandler,
   getCommentHandler,
+  onBatchSet,
   t,
 }: {
   question: QuestionDef
@@ -247,6 +260,7 @@ function QuestionRow({
     mineralKey: string | null,
     perMineral: boolean
   ) => ((value: string) => void) | undefined
+  onBatchSet: (questionKey: string, value: string) => void
   t: (key: I18nKey) => string
 }) {
   // 判断整行是否禁用
@@ -260,15 +274,46 @@ function QuestionRow({
     }
   }
 
+  // 是否显示"全部设为"：perMineral=true 且金属数>1
+  const showBatchFill = question.perMineral && minerals.length > 1
+
+  // 计算所有金属选项的交集（只显示所有金属都有的选项）
+  const commonOptions = useCreation(() => {
+    if (!showBatchFill) return []
+    // 收集每个金属的选项值集合
+    const allOptionSets = minerals.map(
+      (m) => new Set(getOptions(question.key, m.key, true).map((o) => o.value))
+    )
+    // 取交集
+    const intersection = allOptionSets.reduce(
+      (acc, set) => new Set([...acc].filter((v) => set.has(v))),
+      allOptionSets[0] ?? new Set()
+    )
+    // 返回完整选项对象（保留 label）
+    const firstOptions = getOptions(question.key, minerals[0]?.key ?? null, true)
+    return firstOptions.filter((opt) => intersection.has(opt.value))
+  }, [showBatchFill, question.key, minerals, getOptions])
+
   return (
     <div className={`question-matrix-row ${rowDisabled ? 'question-row-disabled' : ''}`}>
       <Flex vertical gap={12}>
-        {/* 问题标题 - labelKey 已包含序号，不再额外添加 */}
-        <div>
-          <Typography.Text strong style={{ fontSize: 14 }}>
+        {/* 问题标题 + 全部设为下拉框 */}
+        <Flex align="center" justify="space-between" gap={12}>
+          <Typography.Text strong style={{ fontSize: 14, flex: 1 }}>
             {t(question.labelKey)}
           </Typography.Text>
-        </div>
+          {showBatchFill && commonOptions.length > 0 && !rowDisabled && (
+            <Select
+              placeholder={t('actions.setAllTo')}
+              options={commonOptions}
+              onChange={(value: string) => onBatchSet(question.key, value)}
+              style={{ width: 140 }}
+              size="small"
+              allowClear
+              value={undefined}
+            />
+          )}
+        </Flex>
 
         {/* 金属列表 - 纵向排列 */}
         <Flex vertical gap={8}>
@@ -308,6 +353,7 @@ function QuestionRow({
                   <Select
                     value={currentValue || undefined}
                     onChange={cellHandler}
+                    onKeyDown={createKeyDownHandler(options, cellHandler, isDisabled)}
                     options={options}
                     placeholder={t('placeholders.select')}
                     disabled={isDisabled}
@@ -344,6 +390,26 @@ function QuestionRow({
       </Flex>
     </div>
   )
+}
+
+/**
+ * 辅助函数：创建键盘快捷键处理器（Y/N/U 快速选择）
+ */
+function createKeyDownHandler(
+  options: QuestionOptionItem[],
+  handler: ((value: string) => void) | undefined,
+  disabled: boolean
+) {
+  return (e: React.KeyboardEvent) => {
+    if (disabled || !handler) return
+    const key = e.key.toLowerCase()
+    if (key !== 'y' && key !== 'n' && key !== 'u') return
+    const matched = options.find((opt) => opt.value.toLowerCase().startsWith(key))
+    if (matched) {
+      e.preventDefault()
+      handler(matched.value)
+    }
+  }
 }
 
 // 辅助函数：判断问题是否在 gating 下禁用

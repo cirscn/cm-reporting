@@ -42,16 +42,16 @@ pnpm add cm-reporting
 ## 使用方法
 
 ```tsx
-import { CMReportingApp } from 'cm-reporting'
+import { CMReporting } from 'cm-reporting'
 import 'cm-reporting/styles.css'
 
 function App() {
   return (
-    <CMReportingApp
+    <CMReporting
       templateType="cmrt"
-      version="6.5"
-      initialData={/* 你的数据 */}
-      onDataChange={(data) => console.log(data)}
+      versionId="6.5"
+      locale="zh-CN"
+      onSnapshotChange={(snapshot) => console.log(snapshot)}
     />
   )
 }

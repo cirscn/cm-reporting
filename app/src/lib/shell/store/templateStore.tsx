@@ -135,7 +135,7 @@ export function TemplateProvider({ templateType, versionId, children }: Template
     [schema]
   )
 
-  const { control, reset, setValue, formState } = useForm<TemplateFormState>({
+  const { control, reset, setValue, trigger, formState } = useForm<TemplateFormState>({
     defaultValues: defaultState,
     resolver,
     mode: 'onChange',
@@ -375,6 +375,15 @@ export function TemplateProvider({ templateType, versionId, children }: Template
     reset(defaultState)
   })
 
+  const setFormData = useMemoizedFn((data: TemplateFormState) => {
+    // 以全量快照为准：调用方应保证 templateType/versionId 匹配。
+    reset(data)
+  })
+
+  const validateForm = useMemoizedFn(async () => {
+    return trigger()
+  })
+
   const staticValue = useMemo(
     () => ({ templateType, versionId, versionDef }),
     [templateType, versionId, versionDef]
@@ -409,6 +418,8 @@ export function TemplateProvider({ templateType, versionId, children }: Template
       setSmelterList,
       setMineList,
       setProductList,
+      setFormData,
+      validateForm,
       resetForm,
     }),
     [
@@ -422,6 +433,8 @@ export function TemplateProvider({ templateType, versionId, children }: Template
       setSmelterList,
       setMineList,
       setProductList,
+      setFormData,
+      validateForm,
       resetForm,
     ]
   )

@@ -3,12 +3,13 @@
  * @description 公司信息表单，使用 Ant Design 组件和垂直布局。
  */
 
+import { CopyOutlined } from '@ant-design/icons'
 import type { I18nKey } from '@core/i18n'
 import type { FieldDef, TemplateVersionDef } from '@core/registry/types'
 import type { ErrorKey } from '@core/validation/errorKeys'
 import { useT } from '@ui/i18n'
 import { useCreation, useMemoizedFn } from 'ahooks'
-import { Card, Col, Flex, Row, Tag, Typography } from 'antd'
+import { Button, Card, Col, Flex, Row, Tag, Typography } from 'antd'
 import { groupBy, sumBy } from 'lodash-es'
 
 import { DateField, SelectField, TextField } from '../fields'
@@ -226,6 +227,16 @@ export function CompanyInfoForm({
 
   const sectionHeaderStyle = { marginBottom: 0 }
 
+  // 复制联系人信息到授权人
+  const handleCopyContactToAuthorizer = useMemoizedFn(() => {
+    if (values.contactName) onChange('authorizerName', values.contactName)
+    if (values.contactEmail) onChange('authorizerEmail', values.contactEmail)
+    if (values.contactPhone) onChange('authorizerPhone', values.contactPhone)
+  })
+
+  // 判断联系人信息是否有内容可复制
+  const hasContactInfo = Boolean(values.contactName || values.contactEmail || values.contactPhone)
+
   return (
     <Card
       title={
@@ -264,11 +275,26 @@ export function CompanyInfoForm({
         {/* 授权人信息 */}
         {authorizerFields.length > 0 && (
           <>
-            <div className="border-t border-gray-200 pt-4">
+            <Flex
+              align="center"
+              justify="space-between"
+              className="border-t border-gray-200 pt-4"
+            >
               <Typography.Text strong className="text-gray-600 text-sm">
                 {t('sections.authorizer')}
               </Typography.Text>
-            </div>
+              {contactFields.length > 0 && (
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<CopyOutlined />}
+                  onClick={handleCopyContactToAuthorizer}
+                  disabled={!hasContactInfo}
+                >
+                  {t('actions.sameAsContact')}
+                </Button>
+              )}
+            </Flex>
             <Row gutter={[24, 0]}>
               {authorizerFields.map((field) => renderField(field, 12))}
             </Row>

@@ -23,6 +23,8 @@ export interface TemplateShellProps {
   renderPage: (pageKey: PageKey) => ReactNode
   /** 内容区域最大宽度（可选，不设置则填充父容器） */
   maxContentWidth?: number
+  /** 插入点：用于对外门面组件做 snapshot/export 绑定（不作为 public API 承诺）。 */
+  children?: ReactNode
 }
 
 /** 判断是否为合法 PageKey。 */
@@ -38,9 +40,11 @@ export function TemplateShell({
   onNavigatePage,
   renderPage,
   maxContentWidth,
+  children,
 }: TemplateShellProps) {
   return (
     <TemplateProvider templateType={templateType} versionId={versionId}>
+      {children}
       <TemplateScaffold
         pageKey={pageKey}
         onNavigatePage={onNavigatePage}
