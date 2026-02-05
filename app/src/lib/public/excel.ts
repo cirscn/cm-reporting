@@ -214,13 +214,48 @@ function writeAmrtMineralSelection(
     'D13', 'E13', 'F13', 'G13', 'H13', 'I13',
   ]
   const selected = (snapshot.data.selectedMinerals ?? []).filter(Boolean)
-  const values = selected
-    .map((k) => optionByKey.get(k) ?? humanizeMineralKey(k))
-    .slice(0, 10)
+  const maxCount = versionDef.mineralScope.maxCount ?? 10
+  const baseSelected = selected.filter((k) => k !== 'other').slice(0, maxCount)
+  const hasOtherSelected = selected.includes('other')
+  const otherNamesByIndex = (snapshot.data.customMinerals ?? []).map((s) => s.trim())
+
+  const slotCount = selectionSlots.length
+  const selectionKeysBySlot = Array.from({ length: slotCount }, () => '')
+  const otherNameBySlot = Array.from({ length: slotCount }, () => '')
+
+  let filledCount = 0
+
+  // Other slots: keep index semantics (customMinerals[i] -> slot i)
+  if (hasOtherSelected) {
+    for (let i = 0; i < slotCount && filledCount < maxCount; i += 1) {
+      const label = otherNamesByIndex[i] ?? ''
+      if (!label) continue
+      selectionKeysBySlot[i] = 'other'
+      otherNameBySlot[i] = label
+      filledCount += 1
+    }
+    // If "other" is selected but user didn't provide any labels (invalid snapshot),
+    // still mark one Other slot so template logic can react.
+    if (filledCount === 0 && maxCount > 0) {
+      selectionKeysBySlot[0] = 'other'
+      filledCount = 1
+    }
+  }
+
+  // Base minerals: fill the remaining empty selection slots in order
+  for (const key of baseSelected) {
+    if (filledCount >= maxCount) break
+    const idx = selectionKeysBySlot.findIndex((v) => !v)
+    if (idx < 0) break
+    selectionKeysBySlot[idx] = key
+    filledCount += 1
+  }
 
   let next = declXml
   selectionSlots.forEach((slot, idx) => {
-    next = writeCellInlineStr(next, slot, values[idx] ?? '')
+    const key = selectionKeysBySlot[idx] ?? ''
+    const value = key ? (optionByKey.get(key) ?? humanizeMineralKey(key)) : ''
+    next = writeCellInlineStr(next, slot, value)
   })
 
   // 其他矿种文本输入区：D15:I16（12 槽位）
@@ -228,12 +263,9 @@ function writeAmrtMineralSelection(
     'D15', 'E15', 'F15', 'G15', 'H15', 'I15',
     'D16', 'E16', 'F16', 'G16', 'H16', 'I16',
   ]
-  const hasOther = selected.includes('other')
-  const others = hasOther
-    ? (snapshot.data.customMinerals ?? []).map((s) => s.trim()).filter(Boolean)
-    : []
   otherSlots.forEach((slot, idx) => {
-    next = writeCellInlineStr(next, slot, others[idx] ?? '')
+    const label = selectionKeysBySlot[idx] === 'other' ? (otherNameBySlot[idx] ?? '') : ''
+    next = writeCellInlineStr(next, slot, label)
   })
 
   return next

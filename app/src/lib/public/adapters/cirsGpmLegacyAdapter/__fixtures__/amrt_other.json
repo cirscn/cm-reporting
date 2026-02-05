@@ -1,0 +1,37 @@
+{
+  "name": "RMI_AMRT_1.3",
+  "questionnaireType": 3,
+  "extraTopLevel": { "keep": true },
+  "cmtCompany": {
+    "companyName": "Acme AMRT Other",
+    "species": "C",
+    "rangeDescription": null,
+    "contactName": "AMRT Contact",
+    "contactEmail": "amrt@example.com",
+    "contactPhone": "17777777777",
+    "authorizerName": "AMRT Auth",
+    "authorizerEmail": "amrt-auth@example.com",
+    "effectiveDate": "1760688235900"
+  },
+  "cmtRangeQuestions": [
+    { "type": 1, "question": "Zinc", "answer": "Yes", "remark": "" },
+    { "type": 1, "question": "My Custom Metal", "answer": "Yes", "remark": "" },
+    { "type": 2, "question": "Zinc", "answer": "Greater than 75%", "remark": "" },
+    { "type": 2, "question": "My Custom Metal", "answer": "Greater than 50%", "remark": null }
+  ],
+  "cmtCompanyQuestions": [],
+  "cmtSmelters": [
+    {
+      "id": "AMRT-S-OTHER",
+      "metal": "My Custom Metal",
+      "smelterLookUp": "LookUp",
+      "standardSmelterName": "Std Name",
+      "smelterName": null,
+      "smelterCountry": "CN"
+    }
+  ],
+  "minList": [],
+  "amrtReasonList": [
+    { "id": "R-CUSTOM", "metal": "My Custom Metal", "reason": "Reason" }
+  ]
+}

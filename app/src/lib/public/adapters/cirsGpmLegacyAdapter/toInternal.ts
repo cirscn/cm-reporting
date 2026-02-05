@@ -208,10 +208,12 @@ export function cirsGpmLegacyToInternal(input: unknown): { snapshot: ReportSnaps
 
   // minerals label map from legacy (for stable write-back)
   const mineralLabelByKey = new Map<string, string>()
+  const mineralLabelToKey = new Map<string, string>()
   const resolveMineralValue = (raw: unknown): string => {
     const label = typeof raw === 'string' ? raw : raw == null ? '' : String(raw)
     if (!label) return ''
-    const key = plan.mineralKeyByLabel.get(normalizeMineralLabel(label))
+    const norm = normalizeMineralLabel(label)
+    const key = plan.mineralKeyByLabel.get(norm) ?? mineralLabelToKey.get(norm)
     if (key && !mineralLabelByKey.has(key)) {
       mineralLabelByKey.set(key, label)
     }
@@ -219,7 +221,6 @@ export function cirsGpmLegacyToInternal(input: unknown): { snapshot: ReportSnaps
   }
 
   const range = legacy.cmtRangeQuestions ?? []
-  const mineralLabelToKey = new Map<string, string>()
   if (versionDef.mineralScope.mode !== 'fixed') {
     const mode = versionDef.mineralScope.mode
     const type1Labels: string[] = []
@@ -336,7 +337,7 @@ export function cirsGpmLegacyToInternal(input: unknown): { snapshot: ReportSnaps
 
     if (def.perMineral) {
       const labelNorm = normalizeMineralLabel(String(item.type ?? ''))
-      const mineralKey = plan.mineralKeyByLabel.get(labelNorm)
+      const mineralKey = plan.mineralKeyByLabel.get(labelNorm) ?? mineralLabelToKey.get(labelNorm)
       if (!mineralKey) continue
       mineralLabelByKey.set(mineralKey, String(item.type ?? ''))
       const record = ensureObjectRecord(data.companyQuestions, questionKey)

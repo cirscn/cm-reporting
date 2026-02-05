@@ -48,6 +48,41 @@ describe('cirsGpmLegacyAdapter', () => {
     expect(out).toEqual(legacy)
   })
 
+  test('roundtrip (AMRT other minerals) keeps legacy JSON exactly', () => {
+    const legacy = loadFixture('amrt_other.json')
+    const { snapshot, ctx } = cirsGpmLegacyAdapter.toInternal(legacy)
+    const out = cirsGpmLegacyAdapter.toExternal(snapshot, ctx)
+    expect(out).toEqual(legacy)
+  })
+
+  test('renaming other mineral label is written back to legacy (AMRT)', () => {
+    const legacy = loadFixture('amrt_other.json')
+    const { snapshot, ctx } = cirsGpmLegacyAdapter.toInternal(legacy)
+
+    snapshot.data.customMinerals[0] = 'Renamed Metal'
+
+    const out = cirsGpmLegacyAdapter.toExternal(snapshot, ctx)
+    const range = asArray(asRecord(out).cmtRangeQuestions).map(asRecord)
+    expect(range.some((x) => x.type === 1 && x.question === 'Renamed Metal')).toBe(true)
+
+    const smelters = asArray(asRecord(out).cmtSmelters).map(asRecord)
+    expect(smelters.some((x) => x.id === 'AMRT-S-OTHER' && x.metal === 'Renamed Metal')).toBe(true)
+
+    const reasons = asArray(asRecord(out).amrtReasonList).map(asRecord)
+    expect(reasons.some((x) => x.id === 'R-CUSTOM' && x.metal === 'Renamed Metal')).toBe(true)
+  })
+
+  test('clearing other mineral label prunes legacy perMineral rows (AMRT)', () => {
+    const legacy = loadFixture('amrt_other.json')
+    const { snapshot, ctx } = cirsGpmLegacyAdapter.toInternal(legacy)
+
+    snapshot.data.customMinerals[0] = ''
+
+    const out = cirsGpmLegacyAdapter.toExternal(snapshot, ctx)
+    const range = asArray(asRecord(out).cmtRangeQuestions).map(asRecord)
+    expect(range.some((x) => x.question === 'My Custom Metal')).toBe(false)
+  })
+
   test('patches company name + range question answer (CMRT)', () => {
     const legacy = loadFixture('cmrt.json')
     const { snapshot, ctx } = cirsGpmLegacyAdapter.toInternal(legacy)

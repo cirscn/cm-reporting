@@ -1,5 +1,6 @@
 import type { TemplateVersionDef } from '@core/registry/types'
 import type { FormData } from '@core/schema'
+import { getActiveMineralKeys, parseOtherMineralKey } from '@core/template/minerals'
 
 import type { ReportSnapshotV1 } from '../../snapshot'
 
@@ -68,9 +69,21 @@ function toLegacyYesNoUnknown(value: string): string {
   return raw
 }
 
-function resolveMineralLabel(plan: ReturnType<typeof getCirsGpmLegacyPlan>, ctx: CirsGpmLegacyRoundtripContext, value: string): string {
+function resolveMineralLabel(
+  plan: ReturnType<typeof getCirsGpmLegacyPlan>,
+  ctx: CirsGpmLegacyRoundtripContext,
+  value: string,
+  customMinerals: string[]
+): string {
   const raw = getString(value)
   if (!raw) return ''
+  const otherIndex = parseOtherMineralKey(raw)
+  if (otherIndex !== null) {
+    const label = customMinerals[otherIndex]?.trim()
+    if (label) return label
+  }
+  const direct = ctx.mineralLabelByKey.get(raw)
+  if (direct) return direct
   const key = plan.mineralKeyByLabel.get(normalizeMineralLabel(raw))
   if (!key) return raw
   return ctx.mineralLabelByKey.get(key) ?? plan.preferredMineralLabelByKey.get(key) ?? raw
@@ -153,6 +166,32 @@ function patchRangeQuestions(out: CirsGpmLegacyReport, data: FormData, ctx: Cirs
   const existing = out.cmtRangeQuestions ? range : null
 
   const questionsByKey = new Map(versionDef.questions.map((q) => [q.key, q]))
+  const activeMineralKeys = getActiveMineralKeys(
+    versionDef,
+    data.selectedMinerals ?? [],
+    data.customMinerals ?? []
+  )
+  const activeMineralKeySet = new Set(activeMineralKeys)
+
+  const labelToKeyFromCtx = new Map<string, string>()
+  for (const [key, label] of ctx.mineralLabelByKey.entries()) {
+    const norm = normalizeMineralLabel(label)
+    if (!norm || labelToKeyFromCtx.has(norm)) continue
+    labelToKeyFromCtx.set(norm, key)
+  }
+
+  const labelForMineralKey = (mineralKey: string): string => {
+    const otherIndex = parseOtherMineralKey(mineralKey)
+    if (otherIndex !== null) {
+      const label = data.customMinerals?.[otherIndex]?.trim()
+      if (label) return label
+    }
+    const fromCtx = ctx.mineralLabelByKey.get(mineralKey)
+    if (fromCtx) return fromCtx
+    const preferred = plan.preferredMineralLabelByKey.get(mineralKey)
+    if (preferred) return preferred
+    return mineralKey
+  }
 
   const ensure = () => {
     if (!out.cmtRangeQuestions) out.cmtRangeQuestions = [] as unknown as NonNullable<CirsGpmLegacyReport['cmtRangeQuestions']>
@@ -164,10 +203,10 @@ function patchRangeQuestions(out: CirsGpmLegacyReport, data: FormData, ctx: Cirs
     if (!def) continue
 
     if (def.perMineral) {
-      for (const mineral of versionDef.mineralScope.minerals) {
-        const mineralKey = mineral.key
-        const label = ctx.mineralLabelByKey.get(mineralKey) ?? plan.preferredMineralLabelByKey.get(mineralKey) ?? mineralKey
-        const idxKey = `${type}|${label}`
+      for (const mineralKey of activeMineralKeys) {
+        const label = labelForMineralKey(mineralKey)
+        const originalLabelForIndex = ctx.mineralLabelByKey.get(mineralKey) ?? label
+        const idxKey = `${type}|${originalLabelForIndex}`
         const idx = ctx.rangeQuestionIndexByKey.get(idxKey)
 
         const nextAnswer = getNestedString(data.questions, qKey, mineralKey)
@@ -223,12 +262,60 @@ function patchRangeQuestions(out: CirsGpmLegacyReport, data: FormData, ctx: Cirs
   if (!existing && out.cmtRangeQuestions && out.cmtRangeQuestions.length === 0) {
     delete out.cmtRangeQuestions
   }
+
+  // Prune perMineral legacy rows that no longer belong to active minerals
+  if (out.cmtRangeQuestions) {
+    const pruned = (out.cmtRangeQuestions as unknown as Array<Record<string, unknown>>).filter((item) => {
+      const type = typeof item.type === 'number' ? item.type : Number(item.type)
+      const qKey = Number.isFinite(type) ? plan.questionKeyByType.get(type) : undefined
+      if (!qKey) return true
+      const def = questionsByKey.get(qKey)
+      if (!def?.perMineral) return true
+      const q = typeof item.question === 'string' ? item.question : String(item.question ?? '')
+      const norm = normalizeMineralLabel(q)
+      const mineralKey = plan.mineralKeyByLabel.get(norm) ?? labelToKeyFromCtx.get(norm)
+      if (!mineralKey) return true
+      return activeMineralKeySet.has(mineralKey)
+    })
+    out.cmtRangeQuestions = pruned as unknown as CirsGpmLegacyReport['cmtRangeQuestions']
+
+    if (!existing && pruned.length === 0) {
+      delete out.cmtRangeQuestions
+    }
+  }
 }
 
 function patchCompanyQuestions(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpmLegacyRoundtripContext, versionDef: TemplateVersionDef) {
   const plan = getCirsGpmLegacyPlan(ctx.templateType, ctx.versionId)
   const list = (out.cmtCompanyQuestions ?? []) as Array<Record<string, unknown>>
   const existing = out.cmtCompanyQuestions ? list : null
+
+  const activeMineralKeys = getActiveMineralKeys(
+    versionDef,
+    data.selectedMinerals ?? [],
+    data.customMinerals ?? []
+  )
+  const activeMineralKeySet = new Set(activeMineralKeys)
+
+  const labelToKeyFromCtx = new Map<string, string>()
+  for (const [key, label] of ctx.mineralLabelByKey.entries()) {
+    const norm = normalizeMineralLabel(label)
+    if (!norm || labelToKeyFromCtx.has(norm)) continue
+    labelToKeyFromCtx.set(norm, key)
+  }
+
+  const labelForMineralKey = (mineralKey: string): string => {
+    const otherIndex = parseOtherMineralKey(mineralKey)
+    if (otherIndex !== null) {
+      const label = data.customMinerals?.[otherIndex]?.trim()
+      if (label) return label
+    }
+    const fromCtx = ctx.mineralLabelByKey.get(mineralKey)
+    if (fromCtx) return fromCtx
+    const preferred = plan.preferredMineralLabelByKey.get(mineralKey)
+    if (preferred) return preferred
+    return mineralKey
+  }
 
   const ensure = () => {
     if (!out.cmtCompanyQuestions) out.cmtCompanyQuestions = [] as unknown as NonNullable<CirsGpmLegacyReport['cmtCompanyQuestions']>
@@ -237,10 +324,10 @@ function patchCompanyQuestions(out: CirsGpmLegacyReport, data: FormData, ctx: Ci
 
   for (const def of versionDef.companyQuestions) {
     if (def.perMineral) {
-      for (const mineral of versionDef.mineralScope.minerals) {
-        const mineralKey = mineral.key
-        const typeLabel = ctx.mineralLabelByKey.get(mineralKey) ?? plan.preferredMineralLabelByKey.get(mineralKey) ?? mineralKey
-        const idxKey = `${def.key}|${typeLabel}`
+      for (const mineralKey of activeMineralKeys) {
+        const typeLabel = labelForMineralKey(mineralKey)
+        const originalTypeLabelForIndex = ctx.mineralLabelByKey.get(mineralKey) ?? typeLabel
+        const idxKey = `${def.key}|${originalTypeLabelForIndex}`
         const idx = ctx.companyQuestionIndexByKey.get(idxKey)
 
         const nextAnswer = getNestedString(data.companyQuestions, def.key, mineralKey)
@@ -292,6 +379,25 @@ function patchCompanyQuestions(out: CirsGpmLegacyReport, data: FormData, ctx: Ci
   if (!existing && out.cmtCompanyQuestions && out.cmtCompanyQuestions.length === 0) {
     delete out.cmtCompanyQuestions
   }
+
+  // Prune perMineral legacy rows that no longer belong to active minerals
+  if (out.cmtCompanyQuestions) {
+    const pruned = (out.cmtCompanyQuestions as unknown as Array<Record<string, unknown>>).filter((item) => {
+      const questionKey = typeof item.question === 'string' ? item.question : String(item.question ?? '')
+      const def = versionDef.companyQuestions.find((q) => q.key === questionKey)
+      if (!def?.perMineral) return true
+      const typeLabel = typeof item.type === 'string' ? item.type : item.type == null ? '' : String(item.type)
+      const norm = normalizeMineralLabel(typeLabel)
+      const mineralKey = plan.mineralKeyByLabel.get(norm) ?? labelToKeyFromCtx.get(norm)
+      if (!mineralKey) return true
+      return activeMineralKeySet.has(mineralKey)
+    })
+    out.cmtCompanyQuestions = pruned as unknown as CirsGpmLegacyReport['cmtCompanyQuestions']
+
+    if (!existing && pruned.length === 0) {
+      delete out.cmtCompanyQuestions
+    }
+  }
 }
 
 function patchSmelters(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpmLegacyRoundtripContext, plan: ReturnType<typeof getCirsGpmLegacyPlan>) {
@@ -328,7 +434,7 @@ function patchSmelters(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpmLeg
       const derivedSourceId = originalIdentification
       const derivedRecycled = normalizeLegacyYesNoUnknown((originalItem as Record<string, unknown>).isRecycle)
 
-      write('metal', resolveMineralLabel(plan, ctx, row.metal))
+      write('metal', resolveMineralLabel(plan, ctx, row.metal, data.customMinerals ?? []))
       if ((row.smelterLookup ?? '') !== derivedLookup) {
         write('smelterLookUp', row.smelterLookup)
       }
@@ -379,7 +485,7 @@ function patchSmelters(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpmLeg
 
     // New row
     const created: Record<string, unknown> = { id: row.id }
-    const metalLabel = resolveMineralLabel(plan, ctx, row.metal)
+    const metalLabel = resolveMineralLabel(plan, ctx, row.metal, data.customMinerals ?? [])
     if (!isEmpty(metalLabel)) created.metal = metalLabel
     if (!isEmpty(row.smelterLookup)) created.smelterLookUp = row.smelterLookup
     if (!isEmpty(row.smelterName)) {
@@ -423,7 +529,7 @@ function patchMines(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpmLegacy
         item[key] = written
       }
 
-      write('metal', resolveMineralLabel(plan, ctx, row.metal))
+      write('metal', resolveMineralLabel(plan, ctx, row.metal, data.customMinerals ?? []))
       write('smelterName', row.smelterName)
       write('mineFacilityName', row.mineName)
       write('mineFacilityCountry', row.mineCountry)
@@ -442,7 +548,7 @@ function patchMines(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpmLegacy
     }
 
     const created: Record<string, unknown> = {}
-    const metalLabel = resolveMineralLabel(plan, ctx, row.metal)
+    const metalLabel = resolveMineralLabel(plan, ctx, row.metal, data.customMinerals ?? [])
     if (!isEmpty(metalLabel)) created.metal = metalLabel
     if (!isEmpty(row.smelterName)) created.smelterName = row.smelterName
     if (!isEmpty(row.mineName)) created.mineFacilityName = row.mineName
@@ -518,7 +624,7 @@ function patchAmrtReasons(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpm
         item[key] = written
       }
 
-      write('metal', resolveMineralLabel(plan, ctx, row.mineral))
+      write('metal', resolveMineralLabel(plan, ctx, row.mineral, data.customMinerals ?? []))
       write('reason', row.reason)
       item.id = item.id ?? row.id
       next.push(item)
@@ -526,7 +632,7 @@ function patchAmrtReasons(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpm
     }
 
     const created: Record<string, unknown> = { id: row.id }
-    const metalLabel = resolveMineralLabel(plan, ctx, row.mineral)
+    const metalLabel = resolveMineralLabel(plan, ctx, row.mineral, data.customMinerals ?? [])
     if (!isEmpty(metalLabel)) created.metal = metalLabel
     if (!isEmpty(row.reason)) created.reason = row.reason
     next.push(created)
