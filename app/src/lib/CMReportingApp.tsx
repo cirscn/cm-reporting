@@ -19,6 +19,8 @@ import { compact } from 'lodash-es'
 import { useCallback, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 
+import type { CMReportingIntegrations } from './public/integrations'
+
 /**
  * CMReportingApp Props。
  */
@@ -33,6 +35,8 @@ export interface CMReportingAppProps {
   onNavigatePage?: (pageKey: PageKey) => void
   /** 内容区域最大宽度（可选，不设置则填充父容器） */
   maxContentWidth?: number
+  /** 宿主扩展点：外部选择/回写列表等。 */
+  integrations?: CMReportingIntegrations
   /** 插入点：用于对外门面组件做 snapshot/export 绑定（不作为 public API 承诺）。 */
   children?: ReactNode
 }
@@ -49,6 +53,7 @@ export function CMReportingApp({
   pageKey: controlledPageKey,
   onNavigatePage,
   maxContentWidth,
+  integrations,
   children,
 }: CMReportingAppProps) {
   // 内部页面状态（非受控模式）
@@ -134,6 +139,7 @@ export function CMReportingApp({
         onNavigatePage={handleNavigatePage}
         renderPage={renderPage}
         maxContentWidth={maxContentWidth}
+        integrations={integrations}
       >
         {children}
       </TemplateShell>

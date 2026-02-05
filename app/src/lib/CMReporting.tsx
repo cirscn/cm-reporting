@@ -13,6 +13,7 @@ import { CMReportingProvider } from './providers/CMReportingProvider'
 import type { CMReportingProviderProps } from './providers/CMReportingProvider'
 import type { ExportExcelInput } from './public/excel'
 import { exportToExcel } from './public/excel'
+import type { CMReportingIntegrations } from './public/integrations'
 import type { ReportSnapshotV1 } from './public/snapshot'
 import { stringifySnapshot } from './public/snapshot'
 import { useTemplateActions, useTemplateState } from './shell/store'
@@ -33,6 +34,8 @@ export interface CMReportingProps {
   theme?: CMReportingProviderProps['theme']
   cssVariables?: CMReportingProviderProps['cssVariables']
   maxContentWidth?: number
+  /** 宿主扩展点：外部选择/回写列表等。 */
+  integrations?: CMReportingIntegrations
   /** 初始全量快照（用于“编辑旧报告”）。 */
   initialSnapshot?: ReportSnapshotV1
   /** 任意字段变化时回调全量快照（建议宿主自行节流/落库）。 */
@@ -127,6 +130,7 @@ export const CMReporting = forwardRef<CMReportingRef, CMReportingProps>(function
     theme,
     cssVariables,
     maxContentWidth,
+    integrations,
     initialSnapshot,
     onSnapshotChange,
     fallback,
@@ -148,7 +152,12 @@ export const CMReporting = forwardRef<CMReportingRef, CMReportingProps>(function
       cssVariables={cssVariables}
       fallback={fallback}
     >
-      <CMReportingApp templateType={templateType} versionId={versionId} maxContentWidth={maxContentWidth}>
+      <CMReportingApp
+        templateType={templateType}
+        versionId={versionId}
+        maxContentWidth={maxContentWidth}
+        integrations={integrations}
+      >
         <SnapshotController
           controllerRef={ref}
           templateType={templateType}

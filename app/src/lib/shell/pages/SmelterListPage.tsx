@@ -8,7 +8,7 @@ import {
   SMELTER_LOOKUP_DATA,
   SMELTER_LOOKUP_META,
 } from '@core/data/lookups'
-import { useTemplateActions, useTemplateDerived, useTemplateState } from '@shell/store'
+import { useTemplateActions, useTemplateDerived, useTemplateIntegrations, useTemplateState } from '@shell/store'
 import { SmelterListTable } from '@ui/tables/SmelterListTable'
 import { LAYOUT } from '@ui/theme/spacing'
 import { Flex } from 'antd'
@@ -23,12 +23,12 @@ export function SmelterListPage() {
   const { smelterList: rows } = lists
   const { setSmelterList } = useTemplateActions()
   const { viewModels } = useTemplateDerived()
+  const integrations = useTemplateIntegrations()
 
   // 页面派生数据：输出可选金属/国家/lookup 选项，页面只负责渲染表格。
   const {
     availableMetals,
     countryOptions,
-    smelterLookupOptions,
     showNotYetIdentifiedCountryHint,
   } = viewModels.smelterList
 
@@ -38,15 +38,18 @@ export function SmelterListPage() {
     <Flex vertical gap={LAYOUT.sectionGap}>
       <DocNote section="smelterList" />
       <SmelterListTable
+        templateType={meta.templateType}
+        versionId={meta.versionId}
+        versionDef={versionDef}
         config={versionDef.smelterList}
         availableMetals={availableMetals}
         rows={rows}
         onChange={setSmelterList}
         countryOptions={countryOptions}
-        smelterLookupOptions={smelterLookupOptions}
         smelterLookupRecords={SMELTER_LOOKUP_DATA}
         smelterLookupMeta={SMELTER_LOOKUP_META}
         showNotYetIdentifiedCountryHint={showNotYetIdentifiedCountryHint}
+        integration={integrations?.smelterList}
       />
     </Flex>
   )

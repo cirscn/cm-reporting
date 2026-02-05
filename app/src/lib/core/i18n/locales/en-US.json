@@ -81,7 +81,7 @@
     "authorizerEmail": "example@company.com",
     "authorizerPhone": "+86 xxx xxxx xxxx",
     "authorizationDate": "DD-MMM-YYYY",
-    "smelterIdInput": "Enter identification number…",
+    "smelterIdInput": "e.g. CID001105",
     "smelterLookup": "Search smelter…",
     "smelterName": "Smelter name",
     "smelterNameRequired": "Required: Smelter name",
@@ -168,6 +168,9 @@
   },
   "actions": {
     "addRow": "Add Row",
+    "pickExternal": "Pick from External",
+    "chooseSmelter": "Choose Smelter",
+    "edit": "Edit",
     "prev": "Previous",
     "next": "Next",
     "submit": "Submit",
@@ -1190,6 +1193,8 @@
     },
     "email": {
       "invalid": "Invalid email address"
-    }
+    },
+    "externalPickFailedTitle": "External selection failed",
+    "externalPickFailedContent": "The external picker did not return data successfully. Please try again."
   }
 }

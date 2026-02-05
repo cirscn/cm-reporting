@@ -120,7 +120,6 @@ export function useTemplateDerived(): TemplateDerived {
         questionAnswers: form.questions,
         selectedMinerals: form.selectedMinerals,
         customMinerals: form.customMinerals,
-        lookupSeparatorLabel: t('common.lookupSeparator'),
       }),
     [meta.templateType, meta.versionDef, form.questions, form.selectedMinerals, form.customMinerals, t]
   )

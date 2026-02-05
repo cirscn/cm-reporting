@@ -8,7 +8,6 @@
 import { compact, uniq } from 'lodash-es'
 
 import { getCountryOptions } from '../data/countries'
-import { getSmelterLookupOptions, SMELTER_LOOKUP_META } from '../data/lookups'
 import type { TemplateType, TemplateVersionDef } from '../registry/types'
 import { getCustomMineralLabels, getDisplayMinerals, getMetalsForSource } from '../template/minerals'
 import { isSmelterNotIdentified, isSmelterNotListed } from '../transform'
@@ -42,14 +41,12 @@ export function buildSmelterListViewModel({
   questionAnswers,
   selectedMinerals,
   customMinerals,
-  lookupSeparatorLabel,
 }: {
   templateType: TemplateType
   versionDef: TemplateVersionDef
   questionAnswers: Record<string, Record<string, string> | string>
   selectedMinerals?: string[]
   customMinerals?: string[]
-  lookupSeparatorLabel: string
 }) {
   const labelOverrides = getCustomMineralLabels(
     versionDef,
@@ -63,13 +60,6 @@ export function buildSmelterListViewModel({
     { selectedMinerals, customMinerals }
   ).map((mineral) => ({ ...mineral, label: labelOverrides.get(mineral.key) }))
   const countryOptions = getCountryOptions(templateType)
-  const smelterLookupOptions = getSmelterLookupOptions(templateType)
-    .filter((value) => value !== SMELTER_LOOKUP_META.placeholder)
-    .map((value) =>
-      value === SMELTER_LOOKUP_META.separator
-        ? { value, label: lookupSeparatorLabel, disabled: true }
-        : { value, label: value }
-    )
 
   const showNotYetIdentifiedCountryHint =
     (templateType === 'emrt' && versionDef.version.id === '2.1') ||
@@ -78,7 +68,6 @@ export function buildSmelterListViewModel({
   return {
     availableMetals,
     countryOptions,
-    smelterLookupOptions,
     showNotYetIdentifiedCountryHint,
   }
 }

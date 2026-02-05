@@ -6,7 +6,12 @@
 // 说明：模块导出入口
 export { TemplateProvider } from './templateStore'
 /** 读取模板状态（静态信息 + 表单主体 + 列表）。 */
-export { useTemplateState, useTemplateErrors, useTemplateActions } from './templateContext'
+export {
+  useTemplateState,
+  useTemplateErrors,
+  useTemplateActions,
+  useTemplateIntegrations,
+} from './templateContext'
 /** 读取模板派生数据（规则/校验/视图模型/状态）。 */
 export { useTemplateDerived } from './useTemplateDerived'
 /**

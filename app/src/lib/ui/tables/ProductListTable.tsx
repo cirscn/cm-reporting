@@ -5,10 +5,15 @@
 
 // 说明：模块实现
 import { PlusOutlined, DeleteOutlined, CloseOutlined } from '@ant-design/icons'
-import type { ProductListConfig } from '@core/registry/types'
+import type { ProductListConfig, TemplateType, TemplateVersionDef } from '@core/registry/types'
 import type { ProductRow } from '@core/types/tableRows'
+import type {
+  ExternalAddMode,
+  ProductListIntegration,
+  ProductPickContext,
+} from '@lib/public/integrations'
 import { useT } from '@ui/i18n/useT'
-import { useCreation, useMemoizedFn } from 'ahooks'
+import { useCreation, useLatest, useMemoizedFn } from 'ahooks'
 import { Button, Card, Flex, Modal, Table, Input, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
@@ -16,12 +21,20 @@ import type { ChangeEvent, ReactNode } from 'react'
 import { useState } from 'react'
 
 interface ProductListTableProps {
+  templateType: TemplateType
+  versionId: string
+  versionDef: TemplateVersionDef
   config: ProductListConfig
   rows: ProductRow[]
   onChange: (rows: ProductRow[]) => void
   required?: boolean
-  /** 当模板版本未开启 requester 列，但数据包含 requester 字段时允许展示/编辑。 */
+  /**
+   * 是否展示 requester 列。
+   * - 默认使用模板版本配置：config.hasRequesterColumns
+   * - 宿主如需强制展示可显式传入 true（不建议用于非该模板版本）。
+   */
   showRequesterColumns?: boolean
+  integration?: ProductListIntegration
 }
 
 const INPUT_FIELDS = [
@@ -36,25 +49,28 @@ type InputField = (typeof INPUT_FIELDS)[number]
 
 /** 产品清单表格：支持增删行与行内编辑。 */
 export function ProductListTable({
+  templateType,
+  versionId,
+  versionDef,
   config,
   rows,
   onChange,
   required = false,
   showRequesterColumns,
+  integration,
 }: ProductListTableProps) {
-  const { t } = useT()
+  const { t, locale } = useT()
   /** 批量选择状态（受控）。 */
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
+  const [externalPicking, setExternalPicking] = useState(false)
+  const rowsRef = useLatest(rows)
   const validSelectedRowKeys = useCreation(() => {
     const valid = new Set(rows.map((r) => r.id))
     return selectedRowKeys.filter((k) => valid.has(k))
   }, [rows, selectedRowKeys])
 
   /** 行索引缓存：避免频繁全表 map/filter。 */
-  const rowIndexMap = useCreation(
-    () => new Map(rows.map((row, index) => [row.id, index])),
-    [rows]
-  )
+  const rowIndexMap = useCreation(() => new Map(rows.map((row, index) => [row.id, index])), [rows])
 
   /** 必填字段包裹：用于标记黄色必填背景。 */
   const wrapRequired = useMemoizedFn((isRequired: boolean, node: ReactNode) => {
@@ -71,6 +87,57 @@ export function ProductListTable({
       comments: '',
     }
     onChange([...rows, newRow])
+  })
+
+  const integrationAddMode: ExternalAddMode = integration?.addMode ?? 'append-empty-row'
+  const showExternalPick = Boolean(integration) && integrationAddMode !== 'append-empty-row'
+  const showAddRow = integrationAddMode !== 'external-only'
+  const externalPickLabel = integration?.label ?? t('actions.pickExternal')
+  const showLoadingIndicator = integration?.showLoadingIndicator ?? false
+
+  const normalizeExternalProductRow = useMemoizedFn(
+    (partial: Partial<ProductRow>, seq: number): ProductRow => {
+      const idBase = `product-${Date.now()}-${seq}`
+      return {
+        ...(partial as Record<string, string | undefined>),
+        id: typeof partial.id === 'string' && partial.id.trim() ? partial.id : idBase,
+        productNumber: partial.productNumber ?? '',
+        productName: partial.productName ?? '',
+        requesterNumber: partial.requesterNumber ?? '',
+        requesterName: partial.requesterName ?? '',
+        comments: partial.comments ?? '',
+      }
+    },
+  )
+
+  const getCurrentRowsSnapshot = useMemoizedFn(() => rowsRef.current.map((row) => ({ ...row })))
+
+  const handleExternalPick = useMemoizedFn(async () => {
+    if (!integration || externalPicking) return
+    const currentRows = getCurrentRowsSnapshot()
+    const ctx: ProductPickContext = {
+      templateType,
+      versionId,
+      locale,
+      versionDef,
+      config,
+      currentRows,
+    }
+    setExternalPicking(true)
+    try {
+      const result = await integration.onPickProducts(ctx)
+      const items = result?.items ?? []
+      if (items.length === 0) return
+      const normalized = items.map((item, index) => normalizeExternalProductRow(item, index))
+      onChange([...rowsRef.current, ...normalized])
+    } catch {
+      Modal.error({
+        title: t('errors.externalPickFailedTitle'),
+        content: t('errors.externalPickFailedContent'),
+      })
+    } finally {
+      setExternalPicking(false)
+    }
   })
 
   /** 删除指定行（基于缓存索引定位）。 */
@@ -99,7 +166,7 @@ export function ProductListTable({
     rows.forEach((row) => {
       INPUT_FIELDS.forEach((field) => {
         map.set(`${row.id}:${field}`, (event) =>
-          handleCellChange(row.id, field, event.target.value)
+          handleCellChange(row.id, field, event.target.value),
         )
       })
     })
@@ -107,7 +174,7 @@ export function ProductListTable({
   }, [rows, handleCellChange])
 
   const getInputHandler = useMemoizedFn((id: string, field: InputField) =>
-    inputHandlers.get(`${id}:${field}`)
+    inputHandlers.get(`${id}:${field}`),
   )
 
   const handleRemoveRowWithSelection = useMemoizedFn((id: string) => {
@@ -162,16 +229,15 @@ export function ProductListTable({
         key: 'productNumber',
         width: 180,
         fixed: 'left',
-        render: (value: string, record: ProductRow) => (
+        render: (value: string, record: ProductRow) =>
           wrapRequired(
             required,
             <Input
               value={value || undefined}
               onChange={getInputHandler(record.id, 'productNumber')}
               placeholder={t('productPlaceholders.productNumber')}
-            />
-          )
-        ),
+            />,
+          ),
       },
       {
         title: t(config.productNameLabelKey),
@@ -216,7 +282,7 @@ export function ProductListTable({
               placeholder={t('productPlaceholders.requesterName')}
             />
           ),
-        }
+        },
       )
     }
 
@@ -258,9 +324,24 @@ export function ProductListTable({
         <Typography.Text type="secondary" style={{ fontSize: 14 }}>
           {t('tables.noData')}
         </Typography.Text>
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
-          {t('actions.addRow')}
-        </Button>
+        <Flex align="center" gap={8}>
+          {showAddRow && (
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
+              {t('actions.addRow')}
+            </Button>
+          )}
+          {showExternalPick && (
+            <Button
+              type={showAddRow ? 'default' : 'primary'}
+              icon={<PlusOutlined />}
+              onClick={handleExternalPick}
+              loading={showLoadingIndicator && externalPicking}
+              disabled={externalPicking}
+            >
+              {externalPickLabel}
+            </Button>
+          )}
+        </Flex>
       </Flex>
     ),
   }
@@ -276,9 +357,24 @@ export function ProductListTable({
               </Typography.Title>
               <Tag color="blue">{t('badges.recordCount', { count: rows.length })}</Tag>
             </Flex>
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
-              {t('actions.addRow')}
-            </Button>
+            <Flex align="center" gap={8}>
+              {showAddRow && (
+                <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
+                  {t('actions.addRow')}
+                </Button>
+              )}
+              {showExternalPick && (
+                <Button
+                  type={showAddRow ? 'default' : 'primary'}
+                  icon={<PlusOutlined />}
+                  onClick={handleExternalPick}
+                  loading={showLoadingIndicator && externalPicking}
+                  disabled={externalPicking}
+                >
+                  {externalPickLabel}
+                </Button>
+              )}
+            </Flex>
           </Flex>
           {validSelectedRowKeys.length > 0 && (
             <Flex

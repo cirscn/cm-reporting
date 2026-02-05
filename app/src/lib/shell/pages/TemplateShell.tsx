@@ -5,6 +5,7 @@
 
 import type { PageKey, TemplateType } from '@core/registry/types'
 import { getWorkflowPages } from '@core/template/workflow'
+import type { CMReportingIntegrations } from '@lib/public/integrations'
 import { TemplateProvider, useTemplateDerived, useTemplateState } from '@shell/store'
 import { useT } from '@ui/i18n/useT'
 import { AppLayout } from '@ui/layout/AppLayout'
@@ -21,6 +22,7 @@ export interface TemplateShellProps {
   pageKey: PageKey
   onNavigatePage: (pageKey: PageKey) => void
   renderPage: (pageKey: PageKey) => ReactNode
+  integrations?: CMReportingIntegrations
   /** 内容区域最大宽度（可选，不设置则填充父容器） */
   maxContentWidth?: number
   /** 插入点：用于对外门面组件做 snapshot/export 绑定（不作为 public API 承诺）。 */
@@ -39,11 +41,12 @@ export function TemplateShell({
   pageKey,
   onNavigatePage,
   renderPage,
+  integrations,
   maxContentWidth,
   children,
 }: TemplateShellProps) {
   return (
-    <TemplateProvider templateType={templateType} versionId={versionId}>
+    <TemplateProvider templateType={templateType} versionId={versionId} integrations={integrations}>
       {children}
       <TemplateScaffold
         pageKey={pageKey}

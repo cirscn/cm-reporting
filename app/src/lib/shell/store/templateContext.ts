@@ -5,6 +5,7 @@
 
 // 说明：状态管理与业务模型
 import type { TemplateType, TemplateVersionDef } from '@core/registry/types'
+import type { CMReportingIntegrations } from '@lib/public/integrations'
 import { createContext, useContext, useMemo } from 'react'
 
 import type { TemplateFormErrors, TemplateFormState } from './templateTypes'
@@ -14,6 +15,11 @@ interface TemplateStaticContextValue {
   templateType: TemplateType
   versionId: string
   versionDef: TemplateVersionDef
+}
+
+/** 对外 integrations 上下文（用于宿主接管外部选择/回写）。 */
+interface TemplateIntegrationsContextValue {
+  integrations?: CMReportingIntegrations
 }
 
 /** 公司信息表单片段上下文。 */
@@ -89,6 +95,10 @@ interface TemplateState {
 
 /** 模板静态信息 Provider。 */
 export const TemplateStaticContext = createContext<TemplateStaticContextValue | null>(null)
+/** 对外 integrations Provider。 */
+export const TemplateIntegrationsContext = createContext<TemplateIntegrationsContextValue | null>(
+  null
+)
 /** 公司信息 Provider。 */
 export const TemplateCompanyInfoContext = createContext<TemplateCompanyInfoContextValue | null>(
   null
@@ -122,6 +132,15 @@ function useRequiredContext<T>(context: React.Context<T | null>, name: string): 
 /** 读取模板静态信息（模板/版本/定义）。 */
 function useTemplateMetaInternal() {
   return useRequiredContext(TemplateStaticContext, 'useTemplateState')
+}
+
+/** 读取对外 integrations（宿主扩展点）。 */
+export function useTemplateIntegrations() {
+  const { integrations } = useRequiredContext(
+    TemplateIntegrationsContext,
+    'useTemplateIntegrations'
+  )
+  return integrations
 }
 
 /** 读取表单主体数据（companyInfo/矿产范围/问题矩阵/公司问题）。 */

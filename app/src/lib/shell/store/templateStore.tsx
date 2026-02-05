@@ -11,6 +11,7 @@ import { buildFormSchema } from '@core/schema'
 import type { MineRow, MineralsScopeRow, ProductRow, SmelterRow } from '@core/types/tableRows'
 import type { ErrorKey } from '@core/validation/errorKeys'
 import { zodResolver } from '@hookform/resolvers/zod'
+import type { CMReportingIntegrations } from '@lib/public/integrations'
 import { useMemoizedFn } from 'ahooks'
 import type { ReactNode } from 'react'
 import { useEffect, useMemo } from 'react'
@@ -22,6 +23,7 @@ import {
   TemplateCompanyInfoContext,
   TemplateCompanyQuestionsContext,
   TemplateErrorsContext,
+  TemplateIntegrationsContext,
   TemplateListsContext,
   TemplateMineralScopeContext,
   TemplateQuestionsContext,
@@ -32,6 +34,7 @@ import type { TemplateFormErrors, TemplateFormState } from './templateTypes'
 interface TemplateProviderProps {
   templateType: TemplateType
   versionId: string
+  integrations?: CMReportingIntegrations
   children: ReactNode
 }
 
@@ -121,7 +124,13 @@ function createEmptyState(versionDef: TemplateVersionDef): TemplateFormState {
 }
 
 /** 模板表单 Provider：负责表单默认值、校验与状态切片。 */
-export function TemplateProvider({ templateType, versionId, children }: TemplateProviderProps) {
+export function TemplateProvider({
+  templateType,
+  versionId,
+  integrations,
+  children,
+}: TemplateProviderProps) {
+  // NOTE: integrations 不参与表单 schema 与默认值；仅用于 UI 层“外部选择/回写”扩展点。
   const versionDef = useMemo(
     () => getVersionDef(templateType, versionId),
     [templateType, versionId]
@@ -388,6 +397,10 @@ export function TemplateProvider({ templateType, versionId, children }: Template
     () => ({ templateType, versionId, versionDef }),
     [templateType, versionId, versionDef]
   )
+  const integrationsValue = useMemo(
+    () => ({ integrations }),
+    [integrations]
+  )
   const companyInfoValue = useMemo(() => ({ companyInfo }), [companyInfo])
   const mineralScopeValue = useMemo(
     () => ({ selectedMinerals, customMinerals }),
@@ -441,21 +454,23 @@ export function TemplateProvider({ templateType, versionId, children }: Template
 
   return (
     <TemplateStaticContext.Provider value={staticValue}>
-      <TemplateCompanyInfoContext.Provider value={companyInfoValue}>
-        <TemplateMineralScopeContext.Provider value={mineralScopeValue}>
-          <TemplateQuestionsContext.Provider value={questionsValue}>
-            <TemplateCompanyQuestionsContext.Provider value={companyQuestionsValue}>
-              <TemplateListsContext.Provider value={listsValue}>
-                <TemplateErrorsContext.Provider value={errorsValue}>
-                  <TemplateActionsContext.Provider value={actionsValue}>
-                    {children}
-                  </TemplateActionsContext.Provider>
-                </TemplateErrorsContext.Provider>
-              </TemplateListsContext.Provider>
-            </TemplateCompanyQuestionsContext.Provider>
-          </TemplateQuestionsContext.Provider>
-        </TemplateMineralScopeContext.Provider>
-      </TemplateCompanyInfoContext.Provider>
+      <TemplateIntegrationsContext.Provider value={integrationsValue}>
+        <TemplateCompanyInfoContext.Provider value={companyInfoValue}>
+          <TemplateMineralScopeContext.Provider value={mineralScopeValue}>
+            <TemplateQuestionsContext.Provider value={questionsValue}>
+              <TemplateCompanyQuestionsContext.Provider value={companyQuestionsValue}>
+                <TemplateListsContext.Provider value={listsValue}>
+                  <TemplateErrorsContext.Provider value={errorsValue}>
+                    <TemplateActionsContext.Provider value={actionsValue}>
+                      {children}
+                    </TemplateActionsContext.Provider>
+                  </TemplateErrorsContext.Provider>
+                </TemplateListsContext.Provider>
+              </TemplateCompanyQuestionsContext.Provider>
+            </TemplateQuestionsContext.Provider>
+          </TemplateMineralScopeContext.Provider>
+        </TemplateCompanyInfoContext.Provider>
+      </TemplateIntegrationsContext.Provider>
     </TemplateStaticContext.Provider>
   )
 }

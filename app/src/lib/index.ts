@@ -14,6 +14,7 @@ export type { CMReportingProps, CMReportingRef } from './CMReporting'
 
 export type { Locale } from './core/i18n'
 export type { TemplateType } from './core/registry/types'
+export type { SmelterRow, ProductRow, MineRow, MineralsScopeRow } from './core/types/tableRows'
 
 // 全量 JSON 快照契约
 export type { ReportSnapshotV1 } from './public/snapshot'
@@ -26,6 +27,19 @@ export {
 // 对外 hook（用于宿主获取/回填快照与导出）
 export { useCMReporting } from './public/useCMReporting'
 export type { CMReportingApi } from './public/useCMReporting'
+
+// 对外 integrations（宿主接管外部选择与回写）
+export type {
+  CMReportingIntegrations,
+  ExternalAddMode,
+  ExternalPickResult,
+  SmelterLookupMode,
+  SmelterRowPickContext,
+  ProductListIntegration,
+  ProductPickContext,
+  SmelterListIntegration,
+  SmelterPickContext,
+} from './public/integrations'
 
 // Excel 导出（基于模板赋值后导出）
 export { exportToExcel } from './public/excel'

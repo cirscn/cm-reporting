@@ -6,15 +6,22 @@
 // 说明：模块实现
 import { PlusOutlined, DeleteOutlined, CloseOutlined } from '@ant-design/icons'
 import type { SmelterLookupRecord } from '@core/data/lookups'
-import type { MineralDef, SmelterListConfig } from '@core/registry/types'
+import type { MineralDef, SmelterListConfig, TemplateType, TemplateVersionDef } from '@core/registry/types'
 import {
   isSmelterNotIdentified,
   isSmelterNotListed,
   normalizeSmelterLookup,
 } from '@core/transform'
 import type { SmelterRow } from '@core/types/tableRows'
+import type {
+  ExternalAddMode,
+  SmelterListIntegration,
+  SmelterPickContext,
+  SmelterRowPickContext,
+  SmelterLookupMode,
+} from '@lib/public/integrations'
 import { useT } from '@ui/i18n/useT'
-import { useCreation, useMemoizedFn } from 'ahooks'
+import { useCreation, useLatest, useMemoizedFn } from 'ahooks'
 import { AutoComplete, Button, Card, Flex, Modal, Table, Select, Input, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
@@ -22,18 +29,21 @@ import type { ChangeEvent, ReactNode } from 'react'
 import { useState } from 'react'
 
 interface SmelterListTableProps {
+  templateType: TemplateType
+  versionId: string
+  versionDef: TemplateVersionDef
   config: SmelterListConfig
   availableMetals: Array<MineralDef & { label?: string }>
   rows: SmelterRow[]
   onChange: (rows: SmelterRow[]) => void
   countryOptions?: Array<{ value: string; label: string }>
-  smelterLookupOptions?: Array<{ value: string; label: string; disabled?: boolean }>
   smelterLookupRecords?: Record<string, SmelterLookupRecord>
   smelterLookupMeta?: {
     notListed: string
     notYetIdentified: string
   }
   showNotYetIdentifiedCountryHint?: boolean
+  integration?: SmelterListIntegration
 }
 
 const INPUT_FIELDS = [
@@ -66,19 +76,25 @@ type SelectField = (typeof SELECT_FIELDS)[number]
 
 /** 冶炼厂清单表格：支持 lookup 自动填充与行内编辑。 */
 export function SmelterListTable({
+  templateType,
+  versionId,
+  versionDef,
   config,
   availableMetals,
   rows,
   onChange,
   countryOptions = [],
-  smelterLookupOptions = [],
   smelterLookupRecords,
   smelterLookupMeta,
   showNotYetIdentifiedCountryHint = false,
+  integration,
 }: SmelterListTableProps) {
-  const { t } = useT()
+  const { t, locale } = useT()
   /** 批量选择状态（受控）。 */
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
+  const [externalPicking, setExternalPicking] = useState(false)
+  const rowsRef = useLatest(rows)
+  const [rowPickingId, setRowPickingId] = useState<string | null>(null)
   const validSelectedRowKeys = useCreation(() => {
     const valid = new Set(rows.map((r) => r.id))
     return selectedRowKeys.filter((k) => valid.has(k))
@@ -97,8 +113,12 @@ export function SmelterListTable({
   const isNotYetIdentified = (value: string) =>
     Boolean(smelterLookupMeta && isSmelterNotIdentified(value))
   /** 判断：lookup 值来自已识别记录。 */
-  const isFromLookup = (value: string) =>
-    Boolean(value && !isNotListed(value) && !isNotYetIdentified(value))
+  const isFromLookup = (value: string) => {
+    if (!value) return false
+    if (isNotListed(value) || isNotYetIdentified(value)) return false
+    const normalized = normalizeSmelterLookup(value)
+    return Boolean(smelterLookupRecords?.[normalized])
+  }
   /** “Smelter not listed” 是否要求名称+国家（默认 true）。 */
   const notListedRequiresNameCountry = config.notListedRequireNameCountry ?? true
 
@@ -142,6 +162,135 @@ export function SmelterListTable({
     onChange([...rows, newRow])
   })
 
+  const integrationAddMode: ExternalAddMode = integration?.addMode ?? 'append-empty-row'
+  const showExternalPick = Boolean(integration?.onPickSmelters) && integrationAddMode !== 'append-empty-row'
+  const showAddRow = integrationAddMode !== 'external-only'
+  const externalPickLabel = integration?.label ?? t('actions.pickExternal')
+  const showLoadingIndicator = integration?.showLoadingIndicator ?? false
+  const smelterLookupMode: SmelterLookupMode = integration?.lookupMode ?? 'internal'
+  const useExternalLookup = smelterLookupMode === 'external' || smelterLookupMode === 'hybrid'
+
+  const getCurrentRowsSnapshot = useMemoizedFn(() => rowsRef.current.map((r) => ({ ...r })))
+
+  const normalizeExternalSmelterRow = useMemoizedFn((partial: Partial<SmelterRow>, seq: number): SmelterRow => {
+    const idBase = `smelter-${Date.now()}-${seq}`
+    return {
+      ...(partial as Record<string, string | undefined>),
+      id: typeof partial.id === 'string' && partial.id.trim() ? partial.id : idBase,
+      metal: partial.metal ?? '',
+      smelterLookup: partial.smelterLookup ?? '',
+      smelterName: partial.smelterName ?? '',
+      smelterCountry: partial.smelterCountry ?? '',
+      combinedMetal: partial.combinedMetal ?? '',
+      combinedSmelter: partial.combinedSmelter ?? '',
+      smelterId: partial.smelterId ?? '',
+      smelterIdentification: partial.smelterIdentification ?? '',
+      sourceId: partial.sourceId ?? '',
+      smelterStreet: partial.smelterStreet ?? '',
+      smelterCity: partial.smelterCity ?? '',
+      smelterState: partial.smelterState ?? '',
+      smelterContactName: partial.smelterContactName ?? '',
+      smelterContactEmail: partial.smelterContactEmail ?? '',
+      proposedNextSteps: partial.proposedNextSteps ?? '',
+      mineName: partial.mineName ?? '',
+      mineCountry: partial.mineCountry ?? '',
+      recycledScrap: partial.recycledScrap ?? '',
+      comments: partial.comments ?? '',
+    }
+  })
+
+  const handleExternalPick = useMemoizedFn(async () => {
+    if (!integration || !integration.onPickSmelters || externalPicking) return
+    const currentRows = getCurrentRowsSnapshot()
+    const ctx: SmelterPickContext = {
+      templateType,
+      versionId,
+      locale,
+      versionDef,
+      config,
+      currentRows,
+    }
+    setExternalPicking(true)
+    try {
+      const result = await integration.onPickSmelters(ctx)
+      const items = result?.items ?? []
+      if (items.length === 0) return
+      const normalized = items.map((item, index) => normalizeExternalSmelterRow(item, index))
+      onChange([...rowsRef.current, ...normalized])
+    } catch {
+      Modal.error({
+        title: t('errors.externalPickFailedTitle'),
+        content: t('errors.externalPickFailedContent'),
+      })
+    } finally {
+      setExternalPicking(false)
+    }
+  })
+
+  const applyExternalPickToRow = useMemoizedFn(
+    (row: SmelterRow, partial: Partial<SmelterRow>): SmelterRow => {
+      const merged: SmelterRow = {
+        ...row,
+        ...(partial as Record<string, string | undefined>),
+        id: row.id,
+        metal: row.metal,
+      }
+      if (!merged.smelterLookup) return merged
+      if (!smelterLookupMeta) return merged
+      const mergedWithName: SmelterRow =
+        !merged.smelterName &&
+        !isNotListed(merged.smelterLookup) &&
+        !isNotYetIdentified(merged.smelterLookup)
+          ? { ...merged, smelterName: merged.smelterLookup }
+          : merged
+      if (isFromLookup(mergedWithName.smelterLookup)) {
+        return applySmelterLookup(mergedWithName, mergedWithName.smelterLookup)
+      }
+      return mergedWithName
+    }
+  )
+
+  const updateRowById = useMemoizedFn((id: string, nextRow: SmelterRow) => {
+    const currentRows = rowsRef.current
+    const index = currentRows.findIndex((r) => r.id === id)
+    if (index < 0) return
+    const next = currentRows.slice()
+    next[index] = nextRow
+    onChange(next)
+  })
+
+  const handleExternalPickForRow = useMemoizedFn(async (id: string) => {
+    if (!integration?.onPickSmelterForRow || rowPickingId) return
+    const currentRows = rowsRef.current
+    const row = currentRows.find((r) => r.id === id)
+    if (!row || !row.metal) return
+    const ctx: SmelterRowPickContext = {
+      templateType,
+      versionId,
+      locale,
+      versionDef,
+      config,
+      currentRows: getCurrentRowsSnapshot(),
+      rowId: id,
+      row: { ...row },
+      metal: row.metal,
+    }
+    setRowPickingId(id)
+    try {
+      const result = await integration.onPickSmelterForRow(ctx)
+      const picked = result?.items?.[0]
+      if (!picked) return
+      updateRowById(id, applyExternalPickToRow(row, picked))
+    } catch {
+      Modal.error({
+        title: t('errors.externalPickFailedTitle'),
+        content: t('errors.externalPickFailedContent'),
+      })
+    } finally {
+      setRowPickingId(null)
+    }
+  })
+
   /** 删除指定行（基于缓存索引定位）。 */
   const handleRemoveRow = useMemoizedFn((id: string) => {
     const index = rowIndexMap.get(id)
@@ -160,12 +309,11 @@ export function SmelterListTable({
   const applySmelterLookup = (row: SmelterRow, value: string) => {
     const normalizedValue = normalizeSmelterLookup(value)
     const next: SmelterRow = { ...row, smelterLookup: normalizedValue }
-    if (!smelterLookupRecords || !smelterLookupMeta || !value) {
-      return next
-    }
+    if (!smelterLookupMeta || !value) return next
     if (isSmelterNotListed(normalizedValue)) {
       return {
         ...next,
+        smelterId: '',
         smelterName: '',
         smelterCountry: '',
         smelterIdentification: '',
@@ -181,6 +329,7 @@ export function SmelterListTable({
         ...next,
         smelterName: 'Unknown',
         smelterCountry: country,
+        smelterId: 'Unknown',
         smelterIdentification: 'Unknown',
         sourceId: '',
         smelterStreet: '',
@@ -188,11 +337,21 @@ export function SmelterListTable({
         smelterState: '',
       }
     }
-    const record = smelterLookupRecords[normalizedValue]
+
+    // internal：不再使用内置 smelter lookup 选项；允许 free text 并同步到 Smelter Name。
+    if (!useExternalLookup) {
+      return {
+        ...next,
+        smelterName: normalizedValue,
+      }
+    }
+
+    const record = smelterLookupRecords?.[normalizedValue]
     if (!record) return next
     return {
       ...next,
       smelterName: normalizedValue,
+      smelterId: record.smelterId,
       smelterIdentification: record.smelterId,
       sourceId: record.sourceId,
       smelterCountry: record.country,
@@ -333,24 +492,6 @@ export function SmelterListTable({
   const columns = useCreation<ColumnsType<SmelterRow>>(() => {
     const columns: ColumnsType<SmelterRow> = []
 
-    // Smelter ID input column (if configured)
-    if (config.hasIdColumn) {
-      columns.push({
-        title: t('tables.smelterId'),
-        dataIndex: 'smelterId',
-        key: 'smelterId',
-        width: 180,
-        render: (value: string, record: SmelterRow) => (
-          <Input
-            value={value || undefined}
-            onChange={getInputHandler(record.id, 'smelterId')}
-            placeholder={t('placeholders.smelterIdInput')}
-            className="font-mono text-xs"
-          />
-        ),
-      })
-    }
-
     columns.push({
       title: t('tables.metal'),
       dataIndex: 'metal',
@@ -372,28 +513,113 @@ export function SmelterListTable({
 
     if (config.hasLookup) {
       columns.push({
-        title: t('tables.smelterLookup'),
+        title: t('tables.smelterName'),
         dataIndex: 'smelterLookup',
         key: 'smelterLookup',
         width: 220,
+        fixed: 'left',
         render: (value: string, record: SmelterRow) =>
           wrapRequired(
             Boolean(record.metal),
-            <Select
-              value={value || undefined}
-              onChange={getSelectHandler(record.id, 'smelterLookup')}
-              options={smelterLookupOptions}
-              placeholder={t('placeholders.smelterLookup')}
-              showSearch
-              filterOption={filterOptionByLabel}
-              className="w-full"
-            />
+            useExternalLookup && integration?.onPickSmelterForRow
+              ? (
+                <Flex align="center" gap={8}>
+                  {isNotListed(record.smelterLookup) && notListedRequiresNameCountry ? (
+                    <Input
+                      value={record.smelterName || undefined}
+                      onChange={getInputHandler(record.id, 'smelterName')}
+                      placeholder={t('placeholders.smelterNameRequired')}
+                    />
+                  ) : record.smelterLookup ? (
+                    <>
+                      <Typography.Text ellipsis style={{ maxWidth: 150 }}>
+                        {record.smelterLookup}
+                      </Typography.Text>
+                      <Button
+                        type="link"
+                        size="small"
+                        onClick={() => handleExternalPickForRow(record.id)}
+                        disabled={!record.metal || rowPickingId === record.id}
+                        loading={showLoadingIndicator && rowPickingId === record.id}
+                      >
+                        {t('actions.edit')}
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      type="link"
+                      size="small"
+                      onClick={() => handleExternalPickForRow(record.id)}
+                      disabled={!record.metal || rowPickingId === record.id}
+                      loading={showLoadingIndicator && rowPickingId === record.id}
+                    >
+                      {t('actions.chooseSmelter')}
+                    </Button>
+                  )}
+                  {smelterLookupMode === 'hybrid' && (
+                    <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                      {t('actions.pickExternal')}
+                    </Typography.Text>
+                  )}
+                </Flex>
+              )
+              : (
+                <Flex vertical gap={4}>
+                  <AutoComplete
+                    value={value || undefined}
+                    onChange={getSelectHandler(record.id, 'smelterLookup')}
+                    options={
+                      smelterLookupMeta
+                        ? [
+                            { value: smelterLookupMeta.notListed, label: smelterLookupMeta.notListed },
+                            { value: smelterLookupMeta.notYetIdentified, label: smelterLookupMeta.notYetIdentified },
+                          ]
+                        : []
+                    }
+                    placeholder={t('placeholders.smelterName')}
+                    allowClear
+                    className="w-full"
+                  />
+                  {isNotListed(record.smelterLookup) && notListedRequiresNameCountry && (
+                    <Input
+                      value={record.smelterName || undefined}
+                      onChange={getInputHandler(record.id, 'smelterName')}
+                      placeholder={t('placeholders.smelterNameRequired')}
+                    />
+                  )}
+                </Flex>
+              )
           ),
       })
     }
 
-    columns.push(
-      {
+    // Smelter ID input column (if configured) - keep after metal + lookup/name
+    if (config.hasIdColumn) {
+      columns.push({
+        title: t('tables.smelterId'),
+        dataIndex: 'smelterId',
+        key: 'smelterId',
+        width: 180,
+        fixed: 'left',
+        render: (value: string, record: SmelterRow) => (
+          <Input
+            value={value || undefined}
+            onChange={getInputHandler(record.id, 'smelterId')}
+            placeholder={t('placeholders.smelterIdInput')}
+            className="font-mono text-xs"
+            disabled={
+              useExternalLookup &&
+              isFromLookup(record.smelterLookup)
+            }
+          />
+        ),
+      })
+    }
+
+    const hideSmelterNameColumn = Boolean(config.hasLookup)
+
+    if (!hideSmelterNameColumn) {
+      columns.push({
         title: t('tables.smelterName'),
         dataIndex: 'smelterName',
         key: 'smelterName',
@@ -413,11 +639,17 @@ export function SmelterListTable({
               value={value || undefined}
               onChange={getInputHandler(record.id, 'smelterName')}
               placeholder={placeholder}
-              disabled={fromLookup}
+              disabled={
+                useExternalLookup &&
+                fromLookup
+              }
             />
           )
         },
-      },
+      })
+    }
+
+    columns.push(
       {
         title: t('tables.country'),
         dataIndex: 'smelterCountry',
@@ -442,7 +674,10 @@ export function SmelterListTable({
                 showSearch
                 filterOption={filterOptionByLabel}
                 className="w-full"
-                disabled={fromLookup}
+                disabled={
+                  useExternalLookup &&
+                  fromLookup
+                }
               />
               {showHint && (
                 <Typography.Text type="secondary" style={{ fontSize: 12 }}>
@@ -463,7 +698,10 @@ export function SmelterListTable({
             value={value || undefined}
             onChange={getInputHandler(record.id, 'smelterIdentification')}
             placeholder={t('placeholders.smelterIdentification')}
-            disabled
+            disabled={
+              useExternalLookup &&
+              isFromLookup(record.smelterLookup)
+            }
           />
         ),
       },
@@ -477,7 +715,10 @@ export function SmelterListTable({
             value={value || undefined}
             onChange={getInputHandler(record.id, 'sourceId')}
             placeholder={t('placeholders.smelterSourceId')}
-            disabled
+            disabled={
+              useExternalLookup &&
+              isFromLookup(record.smelterLookup)
+            }
           />
         ),
       },
@@ -491,7 +732,10 @@ export function SmelterListTable({
             value={value || undefined}
             onChange={getInputHandler(record.id, 'smelterStreet')}
             placeholder={t('placeholders.smelterStreet')}
-            disabled
+            disabled={
+              useExternalLookup &&
+              isFromLookup(record.smelterLookup)
+            }
           />
         ),
       },
@@ -505,7 +749,10 @@ export function SmelterListTable({
             value={value || undefined}
             onChange={getInputHandler(record.id, 'smelterCity')}
             placeholder={t('placeholders.smelterCity')}
-            disabled
+            disabled={
+              useExternalLookup &&
+              isFromLookup(record.smelterLookup)
+            }
           />
         ),
       },
@@ -519,7 +766,10 @@ export function SmelterListTable({
             value={value || undefined}
             onChange={getInputHandler(record.id, 'smelterState')}
             placeholder={t('placeholders.smelterState')}
-            disabled
+            disabled={
+              useExternalLookup &&
+              isFromLookup(record.smelterLookup)
+            }
           />
         ),
       },
@@ -675,11 +925,17 @@ export function SmelterListTable({
     config,
     countryOptions,
     handleCellChange,
+    handleExternalPickForRow,
     handleRemoveRow,
+    integration,
     metalOptions,
+    notListedRequiresNameCountry,
+    rowPickingId,
+    showLoadingIndicator,
     smelterLookupMeta,
-    smelterLookupOptions,
+    smelterLookupMode,
     t,
+    useExternalLookup,
     yesNoUnknownOptions,
     yesNoOptions,
     recycledScrapOptions,
@@ -691,9 +947,24 @@ export function SmelterListTable({
         <Typography.Text type="secondary" style={{ fontSize: 14 }}>
           {t('tables.noData')}
         </Typography.Text>
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
-          {t('actions.addRow')}
-        </Button>
+        <Flex align="center" gap={8}>
+          {showAddRow && (
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
+              {t('actions.addRow')}
+            </Button>
+          )}
+          {showExternalPick && (
+            <Button
+              type={showAddRow ? 'default' : 'primary'}
+              icon={<PlusOutlined />}
+              onClick={handleExternalPick}
+              loading={showLoadingIndicator && externalPicking}
+              disabled={externalPicking}
+            >
+              {externalPickLabel}
+            </Button>
+          )}
+        </Flex>
       </Flex>
     ),
   }
@@ -709,9 +980,24 @@ export function SmelterListTable({
               </Typography.Title>
               <Tag color="blue">{t('badges.recordCount', { count: rows.length })}</Tag>
             </Flex>
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
-              {t('actions.addRow')}
-            </Button>
+            <Flex align="center" gap={8}>
+              {showAddRow && (
+                <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
+                  {t('actions.addRow')}
+                </Button>
+              )}
+              {showExternalPick && (
+                <Button
+                  type={showAddRow ? 'default' : 'primary'}
+                  icon={<PlusOutlined />}
+                  onClick={handleExternalPick}
+                  loading={showLoadingIndicator && externalPicking}
+                  disabled={externalPicking}
+                >
+                  {externalPickLabel}
+                </Button>
+              )}
+            </Flex>
           </Flex>
           {validSelectedRowKeys.length > 0 && (
             <Flex

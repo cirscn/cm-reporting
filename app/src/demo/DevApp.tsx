@@ -12,6 +12,7 @@ import { useCallback, useState } from 'react'
 
 import { DemoHeader } from './DemoHeader'
 import { DevImportBridge } from './DevImportBridge'
+import { useDemoExternalPickers } from './ExternalPickers'
 import { ImportJsonModal } from './ImportJsonModal'
 
 const DEFAULT_TEMPLATE: TemplateType = 'cmrt'
@@ -32,6 +33,7 @@ export function DevApp({ locale, onLocaleChange }: DevAppProps) {
   const [pageKey, setPageKey] = useState<PageKey>(DEFAULT_PAGE)
   const [importOpen, setImportOpen] = useState(false)
   const [pendingSnapshot, setPendingSnapshot] = useState<ReportSnapshotV1 | null>(null)
+  const { onPickProducts, onPickSmelterForRow, productModal, smelterModal } = useDemoExternalPickers()
 
   // 模板切换：重置版本和页面
   const handleTemplateChange = useCallback((nextTemplate: TemplateType) => {
@@ -82,6 +84,8 @@ export function DevApp({ locale, onLocaleChange }: DevAppProps) {
   return (
     <>
       <ImportJsonModal open={importOpen} onClose={handleCloseImport} onImported={handleImported} />
+      {smelterModal}
+      {productModal}
       <DemoHeader
         templateType={templateType}
         versionId={versionId}
@@ -98,6 +102,19 @@ export function DevApp({ locale, onLocaleChange }: DevAppProps) {
         pageKey={pageKey}
         onNavigatePage={handleNavigatePage}
         maxContentWidth={1400}
+        integrations={{
+          smelterList: {
+            lookupMode: 'external',
+            showLoadingIndicator: false,
+            onPickSmelterForRow,
+          },
+          productList: {
+            addMode: 'external-only',
+            label: '外部选择（Demo）',
+            showLoadingIndicator: false,
+            onPickProducts,
+          },
+        }}
       >
         <DevImportBridge pendingSnapshot={pendingSnapshot} onApplied={() => setPendingSnapshot(null)} />
       </CMReportingApp>
