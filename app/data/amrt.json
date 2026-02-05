@@ -2,47 +2,135 @@
     "name": "RMI_AMRT_1.3",
     "questionnaireType": 3,
     "cmtCompany": {
-        "companyName": "台湾企业",
-        "species": "A",
+        "companyName": "深圳市恒达华宇科技有限公司",
+        "species": "B",
         "rangeDescription": null,
-        "identify": null,
-        "authorization": null,
-        "address": null,
-        "contactName": "刘天",
-        "contactEmail": "1@qq.com",
+        "identify": "公司唯一识别信息",
+        "authorization": "公司唯一授权识别信息",
+        "address": "地址",
+        "contactName": "Liutian liu",
+        "contactEmail": "liutiannj@gmail.com",
         "contactPhone": "13480870921",
-        "authorizerName": "liruocai",
-        "authorizerJobTitle": null,
-        "authorizerEmail": "1@qq.com",
-        "authorizerPhone": null,
-        "effectiveDate": "1769097600000"
+        "authorizerName": "Liutian liu",
+        "authorizerJobTitle": "IT",
+        "authorizerEmail": "liutiannj@gmail.com",
+        "authorizerPhone": "13400000000",
+        "effectiveDate": "1770912000000"
     },
     "cmtRangeQuestions": [
         {
             "type": 1,
-            "question": "Zinc",
+            "question": "Aluminum",
+            "answer": "No",
+            "remark": "注释1"
+        },
+        {
+            "type": 1,
+            "question": "Iridium",
             "answer": "Yes",
-            "remark": ""
+            "remark": "注释2"
+        },
+        {
+            "type": 1,
+            "question": "Lime",
+            "answer": "Yes",
+            "remark": "注释3"
+        },
+        {
+            "type": 1,
+            "question": "Manganese",
+            "answer": "Yes",
+            "remark": "注释4"
         },
         {
             "type": 2,
-            "question": "Zinc",
+            "question": "Aluminum",
+            "answer": "notApplicable",
+            "remark": "注释5"
+        },
+        {
+            "type": 2,
+            "question": "Iridium",
             "answer": "100%",
-            "remark": ""
+            "remark": "注释6"
+        },
+        {
+            "type": 2,
+            "question": "Lime",
+            "answer": "Greater than 90%",
+            "remark": "注释7"
+        },
+        {
+            "type": 2,
+            "question": "Manganese",
+            "answer": "Greater than 75%",
+            "remark": "注释8"
         }
     ],
     "cmtCompanyQuestions": [],
     "cmtSmelters": [
         {
-            "id": "1956306649155981392",
-            "metal": "Zinc",
+            "id": "1956306894845726760",
+            "metal": "Manganese",
             "smelterName": null,
-            "smelterLookUp": "Young Poong Sukpo Smelter",
-            "standardSmelterName": "Young Poong Sukpo Smelter",
-            "smelterNumber": "CID005224",
-            "smelterCountry": "KOREA, REPUBLIC OF",
+            "smelterLookUp": "Hunan Brunp Recycling Technology Co., Ltd.",
+            "standardSmelterName": "Hunan Brunp Recycling Technology Co., Ltd.",
+            "smelterNumber": "CID004795",
+            "smelterCountry": "CHINA",
+            "smelterProvince": "Changsha, Hunan Sheng",
+            "smelterCity": "Changsha",
+            "smelterStreet": "",
+            "smelterIdentification": "RMI",
+            "smelterType": "conflict.minerals.system.data",
+            "smelterContact": null,
+            "smelterEmail": null,
+            "suggest": null,
+            "mineName": null,
+            "mineCountry": null,
+            "isRecycle": null,
+            "remark": null,
+            "supplierCode": null,
+            "smelterOption": null,
+            "other": null,
+            "smelterId": null,
+            "smelterFiles": null
+        },
+        {
+            "id": "1956306894845726767",
+            "metal": "Lime",
+            "smelterName": null,
+            "smelterLookUp": "Jiangsu Baozong & Baoda Pharmachem Co. Ltd.",
+            "standardSmelterName": "Jiangsu Baozong & Baoda Pharmachem Co. Ltd.",
+            "smelterNumber": "CID004752",
+            "smelterCountry": "CHINA",
             "smelterProvince": "",
-            "smelterCity": "Bonghwa-gun",
+            "smelterCity": "Rugao",
+            "smelterStreet": "",
+            "smelterIdentification": "RMI",
+            "smelterType": "conflict.minerals.system.data",
+            "smelterContact": null,
+            "smelterEmail": null,
+            "suggest": null,
+            "mineName": null,
+            "mineCountry": null,
+            "isRecycle": null,
+            "remark": null,
+            "supplierCode": null,
+            "smelterOption": null,
+            "other": null,
+            "smelterId": null,
+            "smelterFiles": null
+        },
+        {
+            "id": "1956306894845726775",
+            "metal": "Iridium",
+            "smelterName": null,
+            "smelterLookUp": "Impala Refineries – Platinum Metals Refinery (PMR)",
+            "standardSmelterName": "Impala Platinum - Platinum Metals Refinery (PMR)",
+            "smelterNumber": "CID004715",
+            "smelterCountry": "SOUTH AFRICA",
+            "smelterProvince": "",
+            "smelterCity": "Springs",
             "smelterStreet": "",
             "smelterIdentification": "RMI",
             "smelterType": "conflict.minerals.system.data",
@@ -60,30 +148,94 @@
             "smelterFiles": null
         }
     ],
-    "cmtParts": [],
+    "cmtParts": [
+        {
+            "partName": "制造商物料名称1",
+            "partNumber": "制造商物料号1",
+            "remark": "备注1",
+            "partId": "1770255401321",
+            "requestPartNumber": "请求方物料号1",
+            "requestPartName": "请求方物料名称1"
+        },
+        {
+            "partName": "制造商物料名称2",
+            "partNumber": "制造商物料号2",
+            "remark": "备注2",
+            "partId": "1770255403958",
+            "requestPartNumber": "请求方物料号2",
+            "requestPartName": "请求方物料名称2"
+        }
+    ],
     "minList": [
         {
-            "smelterId": "1956306649155981392",
-            "metal": "Zinc",
-            "smelterName": "Young Poong Sukpo Smelter",
-            "mineFacilityName": "123",
-            "mineIdentification": null,
-            "mineIdentificationNumber": null,
-            "mineFacilityCountry": null,
-            "mineFacilityStreet": null,
-            "mineFacilityCity": null,
-            "mineFacilityProvince": "",
-            "mineFacilityContact": null,
-            "mineFacilityEmail": null,
-            "proposedNextSteps": null,
-            "comments": null
+            "smelterId": "1956306894845726775",
+            "metal": "Iridium",
+            "smelterName": "Impala Platinum - Platinum Metals Refinery (PMR)",
+            "mineFacilityName": "矿厂（矿场）名称1",
+            "mineIdentification": "矿厂识别（例如 CID）1",
+            "mineIdentificationNumber": "冶炼厂出处识别号1",
+            "mineFacilityCountry": "矿厂所在国家或地区1",
+            "mineFacilityStreet": "矿厂所在街道1",
+            "mineFacilityCity": "矿厂所在城市1",
+            "mineFacilityProvince": "矿厂地址：州/省1",
+            "mineFacilityContact": "矿厂联系人1",
+            "mineFacilityEmail": "矿厂联系人电子邮件1",
+            "proposedNextSteps": "建议的后续步骤1",
+            "comments": "注释1"
+        },
+        {
+            "smelterId": "1956306894845726767",
+            "metal": "Lime",
+            "smelterName": "Jiangsu Baozong & Baoda Pharmachem Co. Ltd.",
+            "mineFacilityName": "矿厂（矿场）名称2",
+            "mineIdentification": "矿厂识别（例如 CID）2",
+            "mineIdentificationNumber": "冶炼厂出处识别号2",
+            "mineFacilityCountry": "矿厂所在国家或地区2",
+            "mineFacilityStreet": "矿厂所在街道2",
+            "mineFacilityCity": "矿厂所在城市2",
+            "mineFacilityProvince": "矿厂地址：州/省2",
+            "mineFacilityContact": "矿厂联系人2",
+            "mineFacilityEmail": "矿厂联系人电子邮件2",
+            "proposedNextSteps": "建议的后续步骤2",
+            "comments": "注释2"
+        },
+        {
+            "smelterId": "1956306894845726760",
+            "metal": "Manganese",
+            "smelterName": "Hunan Brunp Recycling Technology Co., Ltd.",
+            "mineFacilityName": "矿厂（矿场）名称3",
+            "mineIdentification": "矿厂识别（例如 CID）3",
+            "mineIdentificationNumber": "冶炼厂出处识别号3",
+            "mineFacilityCountry": "矿厂所在国家或地区3",
+            "mineFacilityStreet": "矿厂所在街道3",
+            "mineFacilityCity": "矿厂所在城市3",
+            "mineFacilityProvince": "矿厂地址：州/省3",
+            "mineFacilityContact": "矿厂联系人3",
+            "mineFacilityEmail": "矿厂联系人电子邮件3",
+            "proposedNextSteps": "建议的后续步骤3",
+            "comments": "注释3"
         }
     ],
     "amrtReasonList": [
         {
-            "id": "2014161779414552576",
-            "metal": "Zinc",
-            "reason": "纳入AMRT原因"
+            "id": "2019223553665728512",
+            "metal": "Aluminum",
+            "reason": "纳入AMRT原因1"
+        },
+        {
+            "id": "2019223553665728513",
+            "metal": "Iridium",
+            "reason": "纳入AMRT原因2"
+        },
+        {
+            "id": "2019223553665728514",
+            "metal": "Lime",
+            "reason": "纳入AMRT原因3"
+        },
+        {
+            "id": "2019223553665728515",
+            "metal": "Manganese",
+            "reason": "纳入AMRT原因4"
         }
     ]
 }

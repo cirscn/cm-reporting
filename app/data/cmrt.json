@@ -2,275 +2,275 @@
     "name": "RMI_CMRT_6.5",
     "questionnaireType": 1,
     "cmtCompany": {
-        "companyName": "绿色公司BU-1",
-        "species": "A",
+        "companyName": "南京瑞旭产品技术有限公司",
+        "species": "B",
         "rangeDescription": null,
-        "identify": null,
-        "authorization": null,
-        "address": null,
+        "identify": "公司唯一识别信息",
+        "authorization": "公司唯一授权识别信息",
+        "address": "地址",
         "contactName": "g德威",
         "contactEmail": "jennifer1812@163.com",
         "contactPhone": "13400000000",
         "authorizerName": "g德威",
-        "authorizerJobTitle": null,
+        "authorizerJobTitle": "授权人职务",
         "authorizerEmail": "jennifer1812@163.com",
         "authorizerPhone": "13400000000",
-        "effectiveDate": "1760688235900"
+        "effectiveDate": "1760544000000"
     },
     "cmtRangeQuestions": [
         {
             "type": 1,
             "question": "Tantalum",
-            "answer": "No",
-            "remark": ""
+            "answer": "Yes",
+            "remark": "钽的问题1注释"
         },
         {
             "type": 1,
             "question": "Tin",
             "answer": "Yes",
-            "remark": ""
+            "remark": "锡的问题1注释"
         },
         {
             "type": 1,
             "question": "Gold",
             "answer": "No",
-            "remark": ""
+            "remark": "金的问题1注释"
         },
         {
             "type": 1,
             "question": "Tungsten",
             "answer": "No",
-            "remark": ""
+            "remark": "钨的问题1注释"
         },
         {
             "type": 2,
             "question": "Tantalum",
-            "answer": "notApplicable",
-            "remark": ""
+            "answer": "Yes",
+            "remark": "钽的问题2注释"
         },
         {
             "type": 2,
             "question": "Tin",
             "answer": "Yes",
-            "remark": ""
+            "remark": "锡的问题2注释"
         },
         {
             "type": 2,
             "question": "Gold",
             "answer": "notApplicable",
-            "remark": ""
+            "remark": "金的问题2注释"
         },
         {
             "type": 2,
             "question": "Tungsten",
             "answer": "notApplicable",
-            "remark": ""
+            "remark": "钨的问题2注释"
         },
         {
             "type": 3,
             "question": "Tantalum",
-            "answer": "notApplicable",
-            "remark": ""
-        },
-        {
-            "type": 3,
-            "question": "Tin",
-            "answer": "No",
-            "remark": ""
-        },
-        {
-            "type": 3,
-            "question": "Gold",
-            "answer": "notApplicable",
-            "remark": ""
-        },
-        {
-            "type": 3,
-            "question": "Tungsten",
-            "answer": "notApplicable",
-            "remark": ""
-        },
-        {
-            "type": 4,
-            "question": "Tantalum",
-            "answer": "notApplicable",
-            "remark": ""
-        },
-        {
-            "type": 4,
-            "question": "Tin",
             "answer": "Yes",
-            "remark": ""
+            "remark": "钽的问题3注释"
         },
         {
-            "type": 4,
-            "question": "Gold",
-            "answer": "notApplicable",
-            "remark": ""
-        },
-        {
-            "type": 4,
-            "question": "Tungsten",
-            "answer": "notApplicable",
-            "remark": ""
-        },
-        {
-            "type": 5,
-            "question": "Tantalum",
-            "answer": "notApplicable",
-            "remark": ""
-        },
-        {
-            "type": 5,
+            "type": 3,
             "question": "Tin",
             "answer": "Unknown",
-            "remark": ""
+            "remark": "锡的问题3注释"
         },
         {
-            "type": 5,
+            "type": 3,
             "question": "Gold",
             "answer": "notApplicable",
-            "remark": ""
+            "remark": "金的问题3注释"
         },
         {
-            "type": 5,
+            "type": 3,
             "question": "Tungsten",
             "answer": "notApplicable",
-            "remark": ""
+            "remark": "钨的问题3注释"
         },
         {
-            "type": 6,
+            "type": 4,
             "question": "Tantalum",
-            "answer": "notApplicable",
-            "remark": ""
+            "answer": "Unknown",
+            "remark": "钽的问题4注释"
         },
         {
-            "type": 6,
-            "question": "Tin",
-            "answer": "100%",
-            "remark": ""
-        },
-        {
-            "type": 6,
-            "question": "Gold",
-            "answer": "notApplicable",
-            "remark": ""
-        },
-        {
-            "type": 6,
-            "question": "Tungsten",
-            "answer": "notApplicable",
-            "remark": ""
-        },
-        {
-            "type": 7,
-            "question": "Tantalum",
-            "answer": "notApplicable",
-            "remark": ""
-        },
-        {
-            "type": 7,
-            "question": "Tin",
-            "answer": "No",
-            "remark": ""
-        },
-        {
-            "type": 7,
-            "question": "Gold",
-            "answer": "notApplicable",
-            "remark": ""
-        },
-        {
-            "type": 7,
-            "question": "Tungsten",
-            "answer": "notApplicable",
-            "remark": ""
-        },
-        {
-            "type": 8,
-            "question": "Tantalum",
-            "answer": "notApplicable",
-            "remark": ""
-        },
-        {
-            "type": 8,
+            "type": 4,
             "question": "Tin",
             "answer": "Yes",
-            "remark": ""
+            "remark": "锡的问题4注释"
+        },
+        {
+            "type": 4,
+            "question": "Gold",
+            "answer": "notApplicable",
+            "remark": "金的问题4注释"
+        },
+        {
+            "type": 4,
+            "question": "Tungsten",
+            "answer": "notApplicable",
+            "remark": "钨的问题4注释"
+        },
+        {
+            "type": 5,
+            "question": "Tantalum",
+            "answer": "No",
+            "remark": "钽的问题5注释"
+        },
+        {
+            "type": 5,
+            "question": "Tin",
+            "answer": "Yes",
+            "remark": "锡的问题5注释"
+        },
+        {
+            "type": 5,
+            "question": "Gold",
+            "answer": "notApplicable",
+            "remark": "金的问题5注释"
+        },
+        {
+            "type": 5,
+            "question": "Tungsten",
+            "answer": "notApplicable",
+            "remark": "钨的问题5注释"
+        },
+        {
+            "type": 6,
+            "question": "Tantalum",
+            "answer": "Greater than 90%",
+            "remark": "钽的问题6注释"
+        },
+        {
+            "type": 6,
+            "question": "Tin",
+            "answer": "50% or less",
+            "remark": "锡的问题6注释"
+        },
+        {
+            "type": 6,
+            "question": "Gold",
+            "answer": "notApplicable",
+            "remark": "金的问题6注释"
+        },
+        {
+            "type": 6,
+            "question": "Tungsten",
+            "answer": "notApplicable",
+            "remark": "钨的问题6注释"
+        },
+        {
+            "type": 7,
+            "question": "Tantalum",
+            "answer": "No",
+            "remark": "钽的问题7注释"
+        },
+        {
+            "type": 7,
+            "question": "Tin",
+            "answer": "Yes",
+            "remark": "锡的问题7注释"
+        },
+        {
+            "type": 7,
+            "question": "Gold",
+            "answer": "notApplicable",
+            "remark": "金的问题7注释"
+        },
+        {
+            "type": 7,
+            "question": "Tungsten",
+            "answer": "notApplicable",
+            "remark": "钨的问题7注释"
+        },
+        {
+            "type": 8,
+            "question": "Tantalum",
+            "answer": "Yes",
+            "remark": "钽的问题8注释"
+        },
+        {
+            "type": 8,
+            "question": "Tin",
+            "answer": "No",
+            "remark": "锡的问题8注释"
         },
         {
             "type": 8,
             "question": "Gold",
             "answer": "notApplicable",
-            "remark": ""
+            "remark": "金的问题8注释"
         },
         {
             "type": 8,
             "question": "Tungsten",
             "answer": "notApplicable",
-            "remark": ""
+            "remark": "钨的问题8注释"
         }
     ],
     "cmtCompanyQuestions": [
         {
             "question": "A",
             "answer": "No",
-            "remark": "",
+            "remark": "问题a的注释",
             "type": null
         },
         {
             "question": "B",
             "answer": "No",
-            "remark": "",
+            "remark": "问题b的注释",
             "type": null
         },
         {
             "question": "C",
-            "answer": "Yes",
-            "remark": "",
+            "answer": "No",
+            "remark": "问题c的注释",
             "type": null
         },
         {
             "question": "D",
-            "answer": "Yes",
-            "remark": "",
+            "answer": "No",
+            "remark": "问题d的注释",
             "type": null
         },
         {
             "question": "E",
             "answer": "Yes, in conformance with IPC1755 (e.g., CMRT)",
-            "remark": "",
+            "remark": "问题e的注释",
             "type": null
         },
         {
             "question": "F",
-            "answer": "No",
-            "remark": "",
+            "answer": "Yes",
+            "remark": "问题f的注释",
             "type": null
         },
         {
             "question": "G",
             "answer": "Yes",
-            "remark": "",
+            "remark": "问题g的注释",
             "type": null
         },
         {
             "question": "H",
-            "answer": "No",
-            "remark": "",
+            "answer": "Yes, with the EU",
+            "remark": "问题h的注释",
             "type": null
         }
     ],
     "cmtSmelters": [
         {
-            "id": "1905500009923752484",
+            "id": "1905500009923752479",
             "metal": "Tin",
-            "smelterLookUp": "Modeltech Sdn Bhd",
-            "standardSmelterName": "Modeltech Sdn Bhd",
-            "smelterNumber": "CID002858",
+            "smelterLookUp": "Metallic Resources, Inc.",
+            "standardSmelterName": "Metallic Resources, Inc.",
+            "smelterNumber": "CID001142",
             "smelterName": null,
-            "smelterCountry": "MALAYSIA",
-            "smelterProvince": "Kawasan Perindustrian Bukit Rambai, Melaka",
+            "smelterCountry": "UNITED STATES OF AMERICA",
+            "smelterProvince": "Twinsburg, Ohio",
             "smelterCity": null,
             "smelterStreet": null,
             "smelterIdentification": null,
@@ -287,8 +287,103 @@
             "other": null,
             "smelterId": null,
             "smelterFiles": null
+        },
+        {
+            "id": "1905500009923752403",
+            "metal": "Tantalum",
+            "smelterLookUp": "Jiangxi Suns Nonferrous Materials Co. Ltd.",
+            "standardSmelterName": "Jiangxi Suns Nonferrous Materials Co. Ltd.",
+            "smelterNumber": "CID004813",
+            "smelterName": null,
+            "smelterCountry": "CHINA",
+            "smelterProvince": "Jiangxi , China",
+            "smelterCity": null,
+            "smelterStreet": null,
+            "smelterIdentification": null,
+            "smelterType": "conflict.minerals.system.data",
+            "smelterContact": null,
+            "smelterEmail": null,
+            "suggest": null,
+            "mineName": null,
+            "mineCountry": null,
+            "isRecycle": null,
+            "remark": null,
+            "supplierCode": null,
+            "smelterOption": null,
+            "other": null,
+            "smelterId": null,
+            "smelterFiles": null
+        },
+        {
+            "id": "2019221651709841412",
+            "metal": null,
+            "smelterLookUp": null,
+            "standardSmelterName": null,
+            "smelterNumber": null,
+            "smelterName": null,
+            "smelterCountry": null,
+            "smelterProvince": null,
+            "smelterCity": null,
+            "smelterStreet": null,
+            "smelterIdentification": null,
+            "smelterType": null,
+            "smelterContact": null,
+            "smelterEmail": null,
+            "suggest": null,
+            "mineName": null,
+            "mineCountry": null,
+            "isRecycle": null,
+            "remark": null,
+            "supplierCode": null,
+            "smelterOption": null,
+            "other": null,
+            "smelterId": null,
+            "smelterFiles": null
+        },
+        {
+            "id": "1154839517300133895",
+            "metal": "Tin",
+            "smelterLookUp": "Aurubis Beerse",
+            "standardSmelterName": "Aurubis Beerse",
+            "smelterNumber": "CID002773",
+            "smelterName": null,
+            "smelterCountry": "BELGIUM",
+            "smelterProvince": "Beerse, Antwerpen",
+            "smelterCity": "Beerse",
+            "smelterStreet": "",
+            "smelterIdentification": "RMI",
+            "smelterType": "conflict.minerals.system.data",
+            "smelterContact": "",
+            "smelterEmail": "",
+            "suggest": "",
+            "mineName": "",
+            "mineCountry": "",
+            "isRecycle": "",
+            "remark": "",
+            "supplierCode": null,
+            "smelterOption": null,
+            "other": null,
+            "smelterId": null,
+            "smelterFiles": null
         }
     ],
-    "cmtParts": [],
+    "cmtParts": [
+        {
+            "partName": "物料名称1",
+            "partNumber": "物料号1",
+            "remark": "备注1",
+            "partId": null,
+            "requestPartNumber": null,
+            "requestPartName": null
+        },
+        {
+            "partName": "物料名称2",
+            "partNumber": "物料号2",
+            "remark": "备注2",
+            "partId": null,
+            "requestPartNumber": null,
+            "requestPartName": null
+        }
+    ],
     "minList": []
 }
