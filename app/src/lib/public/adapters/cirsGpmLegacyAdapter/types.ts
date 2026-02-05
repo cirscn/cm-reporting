@@ -88,11 +88,17 @@ const mineFacilitySchema = z
 const cmtPartSchema = z
   .object({
     id: z.union([z.string(), z.number()]).optional(),
+    partId: z.union([z.string(), z.number()]).nullable().optional(),
     productNumber: nullableString.optional(),
+    partNumber: nullableString.optional(),
     productName: nullableString.optional(),
+    partName: nullableString.optional(),
     requesterNumber: nullableString.optional(),
+    requestPartNumber: nullableString.optional(),
     requesterName: nullableString.optional(),
+    requestPartName: nullableString.optional(),
     comments: nullableString.optional(),
+    remark: nullableString.optional(),
   })
   .passthrough()
 
@@ -161,6 +167,7 @@ export interface CirsGpmLegacyRoundtripContext {
 
   productLegacyIndexByInternalId: Map<string, number>
   productFieldStatesByIndex: Map<number, Map<string, NullableFieldState>>
+  productLegacyKeyByInternalKeyByIndex: Map<number, Map<'productNumber' | 'productName' | 'requesterNumber' | 'requesterName' | 'comments', string>>
 
   amrtReasonIndexByInternalId: Map<string, number>
   amrtReasonFieldStatesByIndex: Map<number, Map<string, NullableFieldState>>

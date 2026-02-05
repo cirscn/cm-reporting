@@ -20,6 +20,8 @@ interface ProductListTableProps {
   rows: ProductRow[]
   onChange: (rows: ProductRow[]) => void
   required?: boolean
+  /** 当模板版本未开启 requester 列，但数据包含 requester 字段时允许展示/编辑。 */
+  showRequesterColumns?: boolean
 }
 
 const INPUT_FIELDS = [
@@ -38,6 +40,7 @@ export function ProductListTable({
   rows,
   onChange,
   required = false,
+  showRequesterColumns,
 }: ProductListTableProps) {
   const { t } = useT()
   /** 批量选择状态（受控）。 */
@@ -65,8 +68,6 @@ export function ProductListTable({
       id: `product-${Date.now()}`,
       productNumber: '',
       productName: '',
-      requesterNumber: '',
-      requesterName: '',
       comments: '',
     }
     onChange([...rows, newRow])
@@ -187,7 +188,8 @@ export function ProductListTable({
       },
     ]
 
-    if (config.hasRequesterColumns) {
+    const enableRequesterColumns = showRequesterColumns ?? config.hasRequesterColumns
+    if (enableRequesterColumns) {
       base.push(
         {
           title: t('tables.requesterNumber'),
@@ -248,7 +250,7 @@ export function ProductListTable({
     })
 
     return base
-  }, [config, getInputHandler, getRemoveHandler, required, t, wrapRequired])
+  }, [config, getInputHandler, getRemoveHandler, required, showRequesterColumns, t, wrapRequired])
 
   const emptyLocale = {
     emptyText: (

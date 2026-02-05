@@ -32,6 +32,19 @@ function toNullableString(value: unknown): string {
   return typeof value === 'string' ? value : ''
 }
 
+function toAnyString(value: unknown): string {
+  if (typeof value === 'string') return value
+  if (typeof value === 'number' && Number.isFinite(value)) return String(value)
+  return ''
+}
+
+function pickLegacyKey(obj: Record<string, unknown>, keys: string[]): string {
+  for (const k of keys) {
+    if (Object.prototype.hasOwnProperty.call(obj, k)) return k
+  }
+  return keys[0] ?? ''
+}
+
 function normalizeLegacyAnswer(templateType: string, questionKey: string, value: unknown): string {
   if (typeof value !== 'string') return ''
   const trimmed = value.trim()
@@ -445,25 +458,60 @@ export function cirsGpmLegacyToInternal(input: unknown): { snapshot: ReportSnaps
   // products
   const productLegacyIndexByInternalId = new Map<string, number>()
   const productFieldStatesByIndex = new Map<number, Map<string, NullableFieldState>>()
+  const productLegacyKeyByInternalKeyByIndex = new Map<
+    number,
+    Map<'productNumber' | 'productName' | 'requesterNumber' | 'requesterName' | 'comments', string>
+  >()
   const legacyProducts = legacy.cmtParts ?? []
   const productList: ProductRow[] = []
   for (let i = 0; i < legacyProducts.length; i++) {
     const item = legacyProducts[i]!
-    const internalId = coerceId(item.id, `product-${i}`)
+    const obj = item as unknown as Record<string, unknown>
+    const internalId = coerceId(obj.id ?? obj.partId, `product-${i}`)
     productLegacyIndexByInternalId.set(internalId, i)
     const stateMap = new Map<string, NullableFieldState>()
-    for (const key of ['productNumber', 'productName', 'requesterNumber', 'requesterName', 'comments']) {
+    for (const key of [
+      'productNumber',
+      'partNumber',
+      'productName',
+      'partName',
+      'requesterNumber',
+      'requestPartNumber',
+      'requesterName',
+      'requestPartName',
+      'comments',
+      'remark',
+    ]) {
       stateMap.set(key, readFieldState(item as unknown as Record<string, unknown>, key))
     }
     productFieldStatesByIndex.set(i, stateMap)
 
+    const legacyKeyByInternal = new Map<
+      'productNumber' | 'productName' | 'requesterNumber' | 'requesterName' | 'comments',
+      string
+    >()
+    legacyKeyByInternal.set('productNumber', pickLegacyKey(obj, ['productNumber', 'partNumber']))
+    legacyKeyByInternal.set('productName', pickLegacyKey(obj, ['productName', 'partName']))
+    legacyKeyByInternal.set('requesterNumber', pickLegacyKey(obj, ['requesterNumber', 'requestPartNumber']))
+    legacyKeyByInternal.set('requesterName', pickLegacyKey(obj, ['requesterName', 'requestPartName']))
+    legacyKeyByInternal.set('comments', pickLegacyKey(obj, ['comments', 'remark']))
+    productLegacyKeyByInternalKeyByIndex.set(i, legacyKeyByInternal)
+
+    const numValue = toAnyString(obj[legacyKeyByInternal.get('productNumber')!])
+    const nameValue = toAnyString(obj[legacyKeyByInternal.get('productName')!])
+    const requesterNumberKey = legacyKeyByInternal.get('requesterNumber')!
+    const requesterNameKey = legacyKeyByInternal.get('requesterName')!
+    const requesterNumberValue = toAnyString(obj[requesterNumberKey])
+    const requesterNameValue = toAnyString(obj[requesterNameKey])
+    const commentsValue = toAnyString(obj[legacyKeyByInternal.get('comments')!])
+
     productList.push({
       id: internalId,
-      productNumber: item.productNumber ?? '',
-      productName: item.productName ?? '',
-      requesterNumber: item.requesterNumber ?? undefined,
-      requesterName: item.requesterName ?? undefined,
-      comments: item.comments ?? '',
+      productNumber: numValue,
+      productName: nameValue,
+      requesterNumber: requesterNumberValue ? requesterNumberValue : undefined,
+      requesterName: requesterNameValue ? requesterNameValue : undefined,
+      comments: commentsValue,
     })
   }
   data.productList = productList
@@ -516,6 +564,7 @@ export function cirsGpmLegacyToInternal(input: unknown): { snapshot: ReportSnaps
     mineFieldStatesByIndex,
     productLegacyIndexByInternalId,
     productFieldStatesByIndex,
+    productLegacyKeyByInternalKeyByIndex,
     amrtReasonIndexByInternalId,
     amrtReasonFieldStatesByIndex,
   }

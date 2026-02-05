@@ -566,11 +566,22 @@ function patchProducts(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpmLeg
   const original = (out.cmtParts ?? []) as Array<Record<string, unknown>>
   const next: Array<Record<string, unknown>> = []
 
+  const defaultLegacyKeys = (() => {
+    for (const mapping of ctx.productLegacyKeyByInternalKeyByIndex.values()) return mapping
+    return null
+  })()
+  const keyFor = (
+    mapping: Map<'productNumber' | 'productName' | 'requesterNumber' | 'requesterName' | 'comments', string> | null | undefined,
+    internalKey: 'productNumber' | 'productName' | 'requesterNumber' | 'requesterName' | 'comments',
+    fallback: string
+  ): string => mapping?.get(internalKey) ?? fallback
+
   for (const row of data.productList ?? []) {
     const legacyIndex = ctx.productLegacyIndexByInternalId.get(row.id)
     if (legacyIndex !== undefined) {
       const item = deepCloneJson(original[legacyIndex] ?? {}) as Record<string, unknown>
       const states = ctx.productFieldStatesByIndex.get(legacyIndex) ?? new Map()
+      const mapping = ctx.productLegacyKeyByInternalKeyByIndex.get(legacyIndex) ?? null
 
       const write = (key: string, value: string) => {
         const state = states.get(key) ?? { exists: key in item, wasNull: item[key] === null, wasString: typeof item[key] === 'string', wasNumber: typeof item[key] === 'number' }
@@ -582,20 +593,28 @@ function patchProducts(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpmLeg
         item[key] = written
       }
 
-      write('productNumber', row.productNumber)
-      write('productName', row.productName)
-      write('requesterNumber', row.requesterNumber ?? '')
-      write('requesterName', row.requesterName ?? '')
-      write('comments', row.comments ?? '')
-      item.id = item.id ?? row.id
+      write(keyFor(mapping, 'productNumber', 'productNumber'), row.productNumber)
+      write(keyFor(mapping, 'productName', 'productName'), row.productName)
+      write(keyFor(mapping, 'requesterNumber', 'requesterNumber'), row.requesterNumber ?? '')
+      write(keyFor(mapping, 'requesterName', 'requesterName'), row.requesterName ?? '')
+      write(keyFor(mapping, 'comments', 'comments'), row.comments ?? '')
       next.push(item)
       continue
     }
 
     const created: Record<string, unknown> = { id: row.id }
-    if (!isEmpty(row.productNumber)) created.productNumber = row.productNumber
-    if (!isEmpty(row.productName)) created.productName = row.productName
-    if (!isEmpty(row.comments)) created.comments = row.comments
+    const map = defaultLegacyKeys
+    const numberKey = keyFor(map, 'productNumber', 'productNumber')
+    const nameKey = keyFor(map, 'productName', 'productName')
+    const requesterNumberKey = keyFor(map, 'requesterNumber', 'requesterNumber')
+    const requesterNameKey = keyFor(map, 'requesterName', 'requesterName')
+    const commentsKey = keyFor(map, 'comments', 'comments')
+
+    if (!isEmpty(row.productNumber)) created[numberKey] = row.productNumber
+    if (!isEmpty(row.productName)) created[nameKey] = row.productName
+    if (!isEmpty(row.requesterNumber)) created[requesterNumberKey] = row.requesterNumber
+    if (!isEmpty(row.requesterName)) created[requesterNameKey] = row.requesterName
+    if (!isEmpty(row.comments)) created[commentsKey] = row.comments
     next.push(created)
   }
 

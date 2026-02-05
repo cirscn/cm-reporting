@@ -272,17 +272,18 @@ export function buildMineRowSchema(versionDef: TemplateVersionDef) {
 /**
  * 导出函数：buildProductRowSchema。
  */
-export function buildProductRowSchema(versionDef: TemplateVersionDef) {
+export function buildProductRowSchema(_versionDef: TemplateVersionDef) {
+  void _versionDef
   const shape: Record<string, z.ZodType> = {
     productNumber: z.string().optional(),
     productName: z.string().optional(),
     comments: z.string().optional(),
   }
 
-  if (versionDef.productList.hasRequesterColumns) {
-    shape.requesterNumber = z.string().optional()
-    shape.requesterName = z.string().optional()
-  }
+  // requester 字段对部分模板版本在 UI/Excel 中不可见，但 legacy JSON 可能携带；
+  // 为确保导入后不被 schema strip，统一保留为可选字段。
+  shape.requesterNumber = z.string().optional()
+  shape.requesterName = z.string().optional()
 
   return z.object(shape)
 }

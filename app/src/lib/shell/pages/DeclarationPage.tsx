@@ -16,7 +16,6 @@ import { MineralScopeForm } from '@ui/forms/MineralScopeForm'
 import { QuestionMatrixForm } from '@ui/forms/QuestionMatrixForm'
 import { useT } from '@ui/i18n/useT'
 import { LAYOUT } from '@ui/theme/spacing'
-import { useCreation } from 'ahooks'
 import { Flex } from 'antd'
 
 import { useFieldFocus } from './useFieldFocus'
@@ -49,18 +48,6 @@ export function DeclarationPage() {
 
   // 页面派生数据：集中输出"展示矿产 + 公司问题 gating"的结果，页面只消费渲染。
   const { displayMinerals } = viewModels.declaration
-  const shouldSortMinerals = versionDef.templateType === 'emrt' || versionDef.templateType === 'amrt'
-  const sortedMinerals = useCreation(() => {
-    if (!shouldSortMinerals) return displayMinerals
-    const resolveLabel = (mineral: typeof displayMinerals[number]) =>
-      (mineral.label ?? t(mineral.labelKey)).trim()
-    return [...displayMinerals].sort((a, b) => {
-      const left = resolveLabel(a)
-      const right = resolveLabel(b)
-      const result = left.localeCompare(right)
-      return result !== 0 ? result : a.key.localeCompare(b.key)
-    })
-  }, [displayMinerals, shouldSortMinerals, t])
 
   useFieldFocus()
 
@@ -87,26 +74,26 @@ export function DeclarationPage() {
         }}
       />
 
-      <QuestionMatrixForm
-        versionDef={versionDef}
-        minerals={sortedMinerals}
-        values={questions}
-        commentValues={questionComments}
-        onChange={setQuestionValue}
-        onCommentChange={setQuestionComment}
-        gatingByMineral={gatingByMineral}
-        requiredByQuestion={requiredFields.questions}
-        errors={errors.questions}
-      />
+	      <QuestionMatrixForm
+	        versionDef={versionDef}
+	        minerals={displayMinerals}
+	        values={questions}
+	        commentValues={questionComments}
+	        onChange={setQuestionValue}
+	        onCommentChange={setQuestionComment}
+	        gatingByMineral={gatingByMineral}
+	        requiredByQuestion={requiredFields.questions}
+	        errors={errors.questions}
+	      />
 
-      <CompanyQuestionsForm
-        questions={versionDef.companyQuestions}
-        questionDefs={versionDef.questions}
-        minerals={sortedMinerals}
-        values={companyQuestions}
-        onChange={setCompanyQuestionValue}
-        gatingByMineral={gatingByMineral}
-        gatingCondition={versionDef.gating.companyQuestionsGating}
+	      <CompanyQuestionsForm
+	        questions={versionDef.companyQuestions}
+	        questionDefs={versionDef.questions}
+	        minerals={displayMinerals}
+	        values={companyQuestions}
+	        onChange={setCompanyQuestionValue}
+	        gatingByMineral={gatingByMineral}
+	        gatingCondition={versionDef.gating.companyQuestionsGating}
         requiredByQuestion={requiredFields.companyQuestions}
         errors={errors.companyQuestions}
       />

@@ -20,6 +20,10 @@ export function ProductListPage() {
   const { setProductList } = useTemplateActions()
   const { requiredFields } = useTemplateDerived()
 
+  const showRequesterColumns =
+    versionDef.productList.hasRequesterColumns ||
+    rows.some((row) => Boolean(row.requesterNumber?.trim() || row.requesterName?.trim()))
+
   useFieldFocus()
 
   return (
@@ -31,6 +35,7 @@ export function ProductListPage() {
         rows={rows}
         onChange={setProductList}
         required={requiredFields.productListRequired}
+        showRequesterColumns={showRequesterColumns}
       />
     </Flex>
   )

@@ -1,0 +1,37 @@
+{
+  "name": "RMI_CMRT_6.5",
+  "questionnaireType": 1,
+  "cmtCompany": {
+    "companyName": "Acme Inc",
+    "species": "A",
+    "contactName": "Alice",
+    "contactEmail": "alice@example.com",
+    "contactPhone": "10000000000",
+    "authorizerName": "Bob",
+    "authorizerEmail": "bob@example.com",
+    "effectiveDate": "1760688235900"
+  },
+  "cmtRangeQuestions": [],
+  "cmtCompanyQuestions": [],
+  "cmtSmelters": [],
+  "minList": [],
+  "cmtParts": [
+    {
+      "partName": "物料名称1",
+      "partNumber": "物料号1",
+      "remark": "备注1",
+      "partId": null,
+      "requestPartNumber": null,
+      "requestPartName": null
+    },
+    {
+      "partName": "物料名称2",
+      "partNumber": "物料号2",
+      "remark": "备注2",
+      "partId": null,
+      "requestPartNumber": null,
+      "requestPartName": null
+    }
+  ]
+}
+
