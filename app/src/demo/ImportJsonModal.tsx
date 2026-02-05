@@ -1,7 +1,13 @@
+import {
+  CheckCircleOutlined,
+  CloudUploadOutlined,
+  InfoCircleOutlined,
+  WarningOutlined,
+} from '@ant-design/icons'
 import { cirsGpmLegacyAdapter, parseSnapshot } from '@lib/index'
 import type { ReportSnapshotV1 } from '@lib/public/snapshot'
 import { useMemoizedFn } from 'ahooks'
-import { Alert, Button, Flex, Form, Input, Modal, Upload, message } from 'antd'
+import { Button, Flex, Input, Modal, Upload, message } from 'antd'
 import type { UploadProps } from 'antd'
 import { useMemo, useState } from 'react'
 
@@ -10,7 +16,13 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isProbablySnapshot(input: unknown): boolean {
-  return isRecord(input) && input.schemaVersion === 1 && 'templateType' in input && 'versionId' in input && 'data' in input
+  return (
+    isRecord(input) &&
+    input.schemaVersion === 1 &&
+    'templateType' in input &&
+    'versionId' in input &&
+    'data' in input
+  )
 }
 
 export interface ImportJsonModalProps {
@@ -87,7 +99,7 @@ export function ImportJsonModal({ open, onClose, onImported }: ImportJsonModalPr
         ? parseSnapshot(json)
         : cirsGpmLegacyAdapter.toInternal(json).snapshot
       onImported(snapshot)
-      msgApi.success(`Imported: RMI_${snapshot.templateType.toUpperCase()}_${snapshot.versionId}`)
+      msgApi.success(`导入成功: RMI_${snapshot.templateType.toUpperCase()}_${snapshot.versionId}`)
       onClose()
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
@@ -102,72 +114,204 @@ export function ImportJsonModal({ open, onClose, onImported }: ImportJsonModalPr
     onClose()
   })
 
+  const getDetectionStatus = () => {
+    if (detection.info) return 'success'
+    if (detection.error) return 'error'
+    return 'waiting'
+  }
+
+  const status = getDetectionStatus()
+
   return (
     <>
       {contextHolder}
       <Modal
-        title="Import JSON"
+        title="导入 JSON"
         open={open}
         onCancel={handleClose}
-        onOk={handleImport}
-        okButtonProps={{ disabled: !canImport, loading }}
-        cancelButtonProps={{ disabled: loading }}
-        width={760}
+        footer={null}
+        width={680}
+        styles={{
+          body: { padding: 0 },
+        }}
+        closable
+        destroyOnHidden
       >
-        <Flex vertical gap={12}>
-          <Alert
-            type="info"
-            showIcon
-            message="本地导入（不上传）"
-            description="自动识别 RMI JSON / ReportSnapshotV1。导入后将重置到 Declaration 页并渲染为可编辑状态。"
-          />
+        {/* Content */}
+        <div>
+          {/* Info Banner */}
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #e8f4fd 0%, #f0f7fc 100%)',
+              borderRadius: 10,
+              padding: '14px 18px',
+              marginBottom: 24,
+              border: '1px solid #cce5f6',
+            }}
+          >
+            <Flex align="flex-start" gap={12}>
+              <InfoCircleOutlined style={{ color: '#1976d2', fontSize: 18, marginTop: 2 }} />
+              <div style={{ color: '#1565c0', fontSize: 13, lineHeight: 1.6 }}>
+                自动识别 RMI JSON / ReportSnapshotV1。导入后将重置到 Declaration
+                页并渲染为可编辑状态。
+              </div>
+            </Flex>
+          </div>
 
-          <Form layout="vertical">
-            <Form.Item label="Upload">
-              <Upload
-                accept=".json,application/json"
-                maxCount={1}
-                beforeUpload={beforeUpload}
-                showUploadList={false}
+          {/* Upload Section */}
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 10 }}>
+              上传文件
+            </div>
+            <Upload
+              accept=".json,application/json"
+              maxCount={1}
+              beforeUpload={beforeUpload}
+              showUploadList={false}
+            >
+              <Button
+                icon={<CloudUploadOutlined />}
+                style={{
+                  height: 40,
+                  paddingLeft: 20,
+                  paddingRight: 20,
+                  borderRadius: 8,
+                  borderStyle: 'dashed',
+                  borderWidth: 1.5,
+                }}
               >
-                <Button>Choose JSON file</Button>
-              </Upload>
-            </Form.Item>
+                选择 JSON 文件
+              </Button>
+            </Upload>
+          </div>
 
-            <Form.Item label="Paste JSON">
-              <Input.TextArea
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                rows={12}
-                placeholder="Paste RMI JSON or ReportSnapshotV1 here…"
-                spellCheck={false}
-              />
-            </Form.Item>
+          {/* Paste Section */}
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 10 }}>
+              粘贴 JSON
+            </div>
+            <Input.TextArea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              rows={10}
+              placeholder="在此粘贴 RMI JSON 或 ReportSnapshotV1..."
+              spellCheck={false}
+              style={{
+                borderRadius: 10,
+                fontSize: 13,
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                resize: 'vertical',
+              }}
+            />
+          </div>
 
-            <Form.Item label="识别结果">
-              <Alert
-                type={detection.info ? 'success' : detection.error ? 'error' : 'info'}
-                showIcon
-                message={
-                  detection.info
-                    ? `已识别：${formatDetected(detection.info)}`
-                    : detection.error
-                      ? '未识别'
-                      : '等待输入'
-                }
-                description={
-                  detection.info
-                    ? detection.info.source === 'legacy'
-                      ? '来源：RMI legacy JSON（从 RMI_* 标识推断类型与版本）'
-                      : '来源：ReportSnapshotV1'
-                    : detection.error
-                      ? detection.error
-                      : '上传或粘贴 JSON 后自动识别'
-                }
-              />
-            </Form.Item>
-          </Form>
-        </Flex>
+          {/* Detection Result */}
+          <div style={{ marginBottom: 8 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 10 }}>
+              识别结果
+            </div>
+            <div
+              style={{
+                borderRadius: 10,
+                padding: '16px 18px',
+                background:
+                  status === 'success'
+                    ? 'linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%)'
+                    : status === 'error'
+                      ? 'linear-gradient(135deg, #ffebee 0%, #fce4ec 100%)'
+                      : 'linear-gradient(135deg, #f5f5f5 0%, #fafafa 100%)',
+                border: `1px solid ${
+                  status === 'success' ? '#a5d6a7' : status === 'error' ? '#ef9a9a' : '#e0e0e0'
+                }`,
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <Flex align="center" gap={12}>
+                {status === 'success' && (
+                  <CheckCircleOutlined style={{ fontSize: 20, color: '#43a047' }} />
+                )}
+                {status === 'error' && (
+                  <WarningOutlined style={{ fontSize: 20, color: '#e53935' }} />
+                )}
+                {status === 'waiting' && (
+                  <InfoCircleOutlined style={{ fontSize: 20, color: '#9e9e9e' }} />
+                )}
+                <div style={{ flex: 1 }}>
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      fontSize: 14,
+                      color:
+                        status === 'success'
+                          ? '#2e7d32'
+                          : status === 'error'
+                            ? '#c62828'
+                            : '#616161',
+                    }}
+                  >
+                    {status === 'success' && `已识别: ${formatDetected(detection.info!)}`}
+                    {status === 'error' && '未识别'}
+                    {status === 'waiting' && '等待输入'}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 12,
+                      marginTop: 4,
+                      color:
+                        status === 'success'
+                          ? '#558b2f'
+                          : status === 'error'
+                            ? '#d32f2f'
+                            : '#9e9e9e',
+                    }}
+                  >
+                    {status === 'success' &&
+                      (detection.info?.source === 'legacy'
+                        ? '来源：RMI legacy JSON（从 RMI_* 标识推断类型与版本）'
+                        : '来源：ReportSnapshotV1')}
+                    {status === 'error' && detection.error}
+                    {status === 'waiting' && '上传或粘贴 JSON 后自动识别'}
+                  </div>
+                </div>
+              </Flex>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div
+          style={{
+            padding: '16px 28px',
+            borderTop: '1px solid #f0f0f0',
+            background: '#fafafa',
+            borderRadius: '0 0 8px 8px',
+          }}
+        >
+          <Flex justify="flex-end" gap={12}>
+            <Button
+              onClick={handleClose}
+              disabled={loading}
+              style={{ height: 38, paddingLeft: 20, paddingRight: 20, borderRadius: 8 }}
+            >
+              取消
+            </Button>
+            <Button
+              type="primary"
+              onClick={handleImport}
+              disabled={!canImport}
+              loading={loading}
+              style={{
+                height: 38,
+                paddingLeft: 24,
+                paddingRight: 24,
+                borderRadius: 8,
+                fontWeight: 600,
+              }}
+            >
+              确定
+            </Button>
+          </Flex>
+        </div>
       </Modal>
     </>
   )

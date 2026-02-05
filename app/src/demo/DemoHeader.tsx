@@ -267,7 +267,7 @@ export function DemoHeader({
                   borderRadius: 8,
                 }}
               >
-                Import
+                导入
               </Button>
               <Button
                 type="primary"

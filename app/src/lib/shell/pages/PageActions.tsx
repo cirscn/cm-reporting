@@ -44,7 +44,10 @@ export function PageActions({
 
   /** 基于当前页计算上一页/下一页（仅包含可用页面）。 */
   const { prev, next } = useCreation(() => {
-    const pages = pageOrder && pageOrder.length > 0 ? pageOrder : versionDef.pages.filter((page) => page.available)
+    const pages =
+      pageOrder && pageOrder.length > 0
+        ? pageOrder
+        : versionDef.pages.filter((page) => page.available)
     const index = pages.findIndex((page) => page.key === currentPageKey)
     if (index < 0) return { prev: null, next: null }
 
@@ -84,7 +87,7 @@ export function PageActions({
   })
 
   const translateError = useMemoizedFn(
-    (key: ErrorKey, values?: Record<string, string | undefined>) => t(key, values)
+    (key: ErrorKey, values?: Record<string, string | undefined>) => t(key, values),
   )
   const completion = checkerSummary?.completion ?? (checkerErrors.length ? 0 : 100)
   const totalRequired = checkerSummary?.totalRequired ?? 0
@@ -93,10 +96,7 @@ export function PageActions({
   if (!prev && !next && !isReview) return null
 
   return (
-    <Flex
-      align="center"
-      justify="space-between"
-    >
+    <Flex align="center" justify="space-between">
       <Button onClick={handlePrev} disabled={!prev} style={{ minWidth: 96 }}>
         {t('actions.prev')}
       </Button>
@@ -118,7 +118,10 @@ export function PageActions({
                 status="success"
                 icon={<CheckCircleOutlined />}
                 title={t('checker.submitAllPass')}
-                subTitle={t('checker.progressDetail', { done: completedRequired, total: totalRequired })}
+                subTitle={t('checker.progressDetail', {
+                  done: completedRequired,
+                  total: totalRequired,
+                })}
                 extra={
                   <Button type="primary" onClick={closeSubmit}>
                     {t('actions.close')}
@@ -143,7 +146,10 @@ export function PageActions({
                   />
                   <Flex vertical gap={4}>
                     <Text style={{ fontSize: 16 }}>
-                      {t('checker.progressDetail', { done: completedRequired, total: totalRequired })}
+                      {t('checker.progressDetail', {
+                        done: completedRequired,
+                        total: totalRequired,
+                      })}
                     </Text>
                     <Flex align="center" gap={6}>
                       <ExclamationCircleOutlined style={{ color: 'var(--ant-color-error)' }} />
@@ -178,7 +184,8 @@ export function PageActions({
                         style={{ padding: '6px 0', borderBottom: 'none' }}
                       >
                         <Text style={{ fontSize: 13 }}>
-                          • {translateError(error.messageKey, {
+                          •{' '}
+                          {translateError(error.messageKey, {
                             field: error.fieldLabelKey ? t(error.fieldLabelKey) : undefined,
                             ...(error.messageValues ?? {}),
                           })}
