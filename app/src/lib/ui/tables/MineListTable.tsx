@@ -7,6 +7,7 @@
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import type { MineralDef, MineListConfig } from '@core/registry/types'
 import type { MineRow } from '@core/types/tableRows'
+import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useCreation, useMemoizedFn } from 'ahooks'
 import { AutoComplete, Button, Card, Flex, Table, Select, Input, Tag, Typography } from 'antd'
@@ -38,9 +39,6 @@ const INPUT_FIELDS = [
 ] as const
 
 const SELECT_FIELDS = ['metal', 'smelterName', 'mineCountry'] as const
-
-type InputField = (typeof INPUT_FIELDS)[number]
-type SelectField = (typeof SELECT_FIELDS)[number]
 
 /** 矿山清单表格：支持增删行与行内编辑。 */
 export function MineListTable({
@@ -107,8 +105,8 @@ export function MineListTable({
     onChange(next)
   })
 
-  /** 缓存输入/下拉/删除回调，减少表格内联函数开销。 */
-  const inputHandlers = useCreation(() => {
+  /** 缓存输入回调，减少表格内联函数开销。 */
+  const getInputHandler = useHandlerMap(() => {
     const map = new Map<string, (event: ChangeEvent<HTMLInputElement>) => void>()
     rows.forEach((row) => {
       INPUT_FIELDS.forEach((field) => {
@@ -120,7 +118,8 @@ export function MineListTable({
     return map
   }, [rows, handleCellChange])
 
-  const selectHandlers = useCreation(() => {
+  /** 缓存下拉回调。 */
+  const getSelectHandler = useHandlerMap(() => {
     const map = new Map<string, (value: string) => void>()
     rows.forEach((row) => {
       SELECT_FIELDS.forEach((field) => {
@@ -130,22 +129,14 @@ export function MineListTable({
     return map
   }, [rows, handleCellChange])
 
-  const removeHandlers = useCreation(() => {
+  /** 缓存删除按钮回调。 */
+  const getRemoveHandler = useHandlerMap(() => {
     const map = new Map<string, () => void>()
     rows.forEach((row) => {
       map.set(row.id, () => handleRemoveRow(row.id))
     })
     return map
   }, [rows, handleRemoveRow])
-
-  const getInputHandler = useMemoizedFn((id: string, field: InputField) =>
-    inputHandlers.get(`${id}:${field}`)
-  )
-  const getSelectHandler = useMemoizedFn((id: string, field: SelectField) =>
-    selectHandlers.get(`${id}:${field}`)
-  )
-  /** 获取稳定的删除按钮 handler（返回函数，不在渲染期执行）。 */
-  const getRemoveHandler = useMemoizedFn((id: string) => removeHandlers.get(id))
 
   const metalOptions = useCreation(
     () =>
@@ -171,7 +162,7 @@ export function MineListTable({
           true,
           <Select
             value={value || undefined}
-            onChange={getSelectHandler(record.id, 'metal')}
+            onChange={getSelectHandler(`${record.id}:metal`)}
             options={metalOptions}
             placeholder={t('placeholders.select')}
             className="w-full"
@@ -194,7 +185,7 @@ export function MineListTable({
               required,
               <Select
                 value={value || undefined}
-                onChange={getSelectHandler(record.id, 'smelterName')}
+                onChange={getSelectHandler(`${record.id}:smelterName`)}
                 options={filteredOptions}
                 placeholder={t('placeholders.mineSmelterSelect')}
                 showSearch
@@ -206,7 +197,7 @@ export function MineListTable({
               required,
               <AutoComplete
                 value={value || undefined}
-                onChange={getSelectHandler(record.id, 'smelterName')}
+                onChange={getSelectHandler(`${record.id}:smelterName`)}
                 placeholder={t('placeholders.mineSmelterInput')}
                 options={filteredOptions}
                 allowClear
@@ -226,7 +217,7 @@ export function MineListTable({
           Boolean(record.metal),
           <Input
             value={value || undefined}
-            onChange={getInputHandler(record.id, 'mineName')}
+            onChange={getInputHandler(`${record.id}:mineName`)}
             placeholder={t('placeholders.mineName')}
           />
         )
@@ -240,7 +231,7 @@ export function MineListTable({
       render: (value: string, record: MineRow) => (
         <Input
           value={value || undefined}
-          onChange={getInputHandler(record.id, 'mineId')}
+          onChange={getInputHandler(`${record.id}:mineId`)}
           placeholder={t('placeholders.mineId')}
         />
       ),
@@ -253,7 +244,7 @@ export function MineListTable({
       render: (value: string, record: MineRow) => (
         <Input
           value={value || undefined}
-          onChange={getInputHandler(record.id, 'mineIdSource')}
+          onChange={getInputHandler(`${record.id}:mineIdSource`)}
           placeholder={t('placeholders.mineSourceId')}
         />
       ),
@@ -268,7 +259,7 @@ export function MineListTable({
           Boolean(record.metal),
           <Select
             value={value || undefined}
-            onChange={getSelectHandler(record.id, 'mineCountry')}
+            onChange={getSelectHandler(`${record.id}:mineCountry`)}
             options={countryOptions}
             placeholder={t('placeholders.mineCountry')}
             showSearch
@@ -286,7 +277,7 @@ export function MineListTable({
       render: (value: string, record: MineRow) => (
         <Input
           value={value || undefined}
-          onChange={getInputHandler(record.id, 'mineStreet')}
+          onChange={getInputHandler(`${record.id}:mineStreet`)}
           placeholder={t('placeholders.mineStreet')}
         />
       ),
@@ -299,7 +290,7 @@ export function MineListTable({
       render: (value: string, record: MineRow) => (
         <Input
           value={value || undefined}
-          onChange={getInputHandler(record.id, 'mineCity')}
+          onChange={getInputHandler(`${record.id}:mineCity`)}
           placeholder={t('placeholders.mineCity')}
         />
       ),
@@ -312,7 +303,7 @@ export function MineListTable({
       render: (value: string, record: MineRow) => (
         <Input
           value={value || undefined}
-          onChange={getInputHandler(record.id, 'mineProvince')}
+          onChange={getInputHandler(`${record.id}:mineProvince`)}
           placeholder={t('placeholders.mineState')}
         />
       ),
@@ -325,7 +316,7 @@ export function MineListTable({
       render: (value: string, record: MineRow) => (
         <Input
           value={value || undefined}
-          onChange={getInputHandler(record.id, 'mineContactName')}
+          onChange={getInputHandler(`${record.id}:mineContactName`)}
           placeholder={t('placeholders.mineContactName')}
         />
       ),
@@ -338,7 +329,7 @@ export function MineListTable({
       render: (value: string, record: MineRow) => (
         <Input
           value={value || undefined}
-          onChange={getInputHandler(record.id, 'mineContactEmail')}
+          onChange={getInputHandler(`${record.id}:mineContactEmail`)}
           placeholder={t('placeholders.mineContactEmail')}
         />
       ),
@@ -351,7 +342,7 @@ export function MineListTable({
       render: (value: string, record: MineRow) => (
         <Input
           value={value || undefined}
-          onChange={getInputHandler(record.id, 'proposedNextSteps')}
+          onChange={getInputHandler(`${record.id}:proposedNextSteps`)}
           placeholder={t('placeholders.mineNextSteps')}
         />
       ),
@@ -364,7 +355,7 @@ export function MineListTable({
       render: (value: string, record: MineRow) => (
         <Input
           value={value || undefined}
-          onChange={getInputHandler(record.id, 'comments')}
+          onChange={getInputHandler(`${record.id}:comments`)}
           placeholder={t('placeholders.mineComments')}
         />
       ),

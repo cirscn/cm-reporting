@@ -9,10 +9,10 @@ import type { TemplateVersionDef } from '@core/registry/types'
 import type { CheckerError } from '@core/rules/checker'
 import { groupCheckerErrors } from '@core/rules/errorGroups'
 import type { ErrorKey } from '@core/validation/errorKeys'
+import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n'
-import { useCreation, useMemoizedFn } from 'ahooks'
+import { useBoolean, useCreation, useMemoizedFn } from 'ahooks'
 import { Button, Card, Collapse, Flex, List, Tag, Typography } from 'antd'
-import { useState } from 'react'
 
 import type { CheckerSummary, PassedItem } from './types'
 
@@ -79,7 +79,7 @@ export function CheckerPanel({
     (key: ErrorKey, values?: Record<string, string | undefined>) => t(key, values),
   )
   const hasErrors = errors.length > 0
-  const [showPassedDetails, setShowPassedDetails] = useState(false)
+  const [showPassedDetails, { toggle: togglePassedDetails }] = useBoolean(false)
   const totalRequired = summary?.totalRequired ?? 0
   const completedRequired = summary?.completedRequired ?? 0
   const passedLabel = summary
@@ -96,7 +96,7 @@ export function CheckerPanel({
     onGoToField?.(error)
   })
   /** 缓存跳转按钮 handler（返回函数，不在渲染期执行）。 */
-  const goToFieldHandlers = useCreation(() => {
+  const getGoToFieldHandler = useHandlerMap(() => {
     const map = new Map<string, () => void>()
     if (!onGoToField) return map
     errors.forEach((error) => {
@@ -104,13 +104,6 @@ export function CheckerPanel({
     })
     return map
   }, [errors, handleGoToField, onGoToField])
-  /** 获取稳定的跳转 handler。 */
-  const getGoToFieldHandler = useMemoizedFn((error: CheckerError) =>
-    goToFieldHandlers.get(`${error.code}-${error.fieldPath}`),
-  )
-  const togglePassedDetails = useMemoizedFn(() => {
-    setShowPassedDetails((prev) => !prev)
-  })
   const passedBodyStyle = showPassedDetails ? undefined : { display: 'none' }
 
   return (
@@ -174,7 +167,7 @@ export function CheckerPanel({
                         {onGoToField && (
                           <Button
                             type="link"
-                            onClick={getGoToFieldHandler(error)}
+                            onClick={getGoToFieldHandler(`${error.code}-${error.fieldPath}`)}
                             className="shrink-0"
                           >
                             {t('checker.goToField')}

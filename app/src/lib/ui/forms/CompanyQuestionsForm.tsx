@@ -7,6 +7,7 @@ import type { I18nKey } from '@core/i18n'
 import type { CompanyQuestionDef, GatingCondition, MineralDef, QuestionDef } from '@core/registry/types'
 import type { GatingResult } from '@core/rules/gating'
 import type { ErrorKey } from '@core/validation/errorKeys'
+import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useCreation, useMemoizedFn } from 'ahooks'
 import { Card, Flex, Tag, Typography } from 'antd'
@@ -104,7 +105,7 @@ export function CompanyQuestionsForm({
     onChange(key, value)
   })
   /** 预构建回调映射，减少 JSX 内联函数。 */
-  const selectHandlers = useCreation(() => {
+  const getSelectHandler = useHandlerMap(() => {
     const map = new Map<string, (value: string) => void>()
     questions.forEach((cq) => {
       if (cq.perMineral) return
@@ -112,7 +113,8 @@ export function CompanyQuestionsForm({
     })
     return map
   }, [questions, questionSignature, handleChange])
-  const perMineralHandlers = useCreation(() => {
+
+  const getPerMineralHandler = useHandlerMap(() => {
     const map = new Map<string, (value: string) => void>()
     questions.forEach((cq) => {
       if (!cq.perMineral) return
@@ -124,7 +126,8 @@ export function CompanyQuestionsForm({
     })
     return map
   }, [questions, minerals, onChange, questionSignature])
-  const commentHandlers = useCreation(() => {
+
+  const getCommentHandler = useHandlerMap(() => {
     const map = new Map<string, (value: string) => void>()
     questions.forEach((cq) => {
       if (!cq.hasCommentField || cq.perMineral) return
@@ -133,7 +136,8 @@ export function CompanyQuestionsForm({
     })
     return map
   }, [questions, questionSignature, handleChange])
-  const perMineralCommentHandlers = useCreation(() => {
+
+  const getPerMineralCommentHandler = useHandlerMap(() => {
     const map = new Map<string, (value: string) => void>()
     questions.forEach((cq) => {
       if (!cq.hasCommentField || !cq.perMineral) return
@@ -146,14 +150,6 @@ export function CompanyQuestionsForm({
     })
     return map
   }, [questions, minerals, onChange, questionSignature])
-  const getSelectHandler = useMemoizedFn((key: string) => selectHandlers.get(key)!)
-  const getPerMineralHandler = useMemoizedFn((key: string, mineralKey: string) =>
-    perMineralHandlers.get(`${key}:${mineralKey}`)
-  )
-  const getCommentHandler = useMemoizedFn((key: string) => commentHandlers.get(key)!)
-  const getPerMineralCommentHandler = useMemoizedFn(
-    (key: string, mineralKey: string) => perMineralCommentHandlers.get(`${key}:${mineralKey}`)
-  )
 
   if (questions.length === 0) return null
 
@@ -299,11 +295,8 @@ function renderPerMineralQuestionRow({
   errors: Record<string, Record<string, ErrorKey> | ErrorKey>
   gatingByMineral?: Map<string, GatingResult>
   options: Array<{ value: string; label: string }>
-  getPerMineralHandler: (key: string, mineralKey: string) => ((value: string) => void) | undefined
-  getPerMineralCommentHandler: (
-    key: string,
-    mineralKey: string
-  ) => ((value: string) => void) | undefined
+  getPerMineralHandler: (key: string) => ((value: string) => void) | undefined
+  getPerMineralCommentHandler: (key: string) => ((value: string) => void) | undefined
   t: (key: I18nKey) => string
 }) {
   if (minerals.length === 0) return null
@@ -319,7 +312,7 @@ function renderPerMineralQuestionRow({
           const required = gatingByMineral?.get(mineral.key)?.companyQuestionsEnabled === true
           const value = getCompanyQuestionValue(values, question.key, mineral.key, true)
           const error = getCompanyQuestionError(errors, question.key, mineral.key, true)
-          const handler = getPerMineralHandler(question.key, mineral.key)
+          const handler = getPerMineralHandler(`${question.key}:${mineral.key}`)
           const commentValue = getCompanyQuestionCommentValue(values, commentKey, mineral.key, true)
           const commentError = getCompanyQuestionCommentError(
             errors,
@@ -332,8 +325,7 @@ function renderPerMineralQuestionRow({
             question.hasCommentField && commentRequiredWhen.includes(value || '')
           const commentRequired = required && shouldRequireComment
           const perMineralCommentHandler = getPerMineralCommentHandler(
-            commentKey,
-            mineral.key
+            `${commentKey}:${mineral.key}`
           )
           return (
             <div key={mineral.key} className="company-question-mineral-row">

@@ -1,42 +1,92 @@
 /**
- * @file app/store/templateStore.tsx
- * @description 状态管理与业务模型。
+ * @file shell/store/templateStore.tsx
+ * @description zustand 状态管理：替代原 9 层 Context + react-hook-form 架构。
+ *
+ * 核心设计：
+ * - 使用 zustand `createStore` + immer middleware 管理全量表单状态
+ * - 通过 React Context 提供 store 实例（支持多实例/测试隔离）
+ * - 消费侧用 selector 精确订阅，天然实现按需更新
+ * - 校验使用 zod schema.safeParse 直接完成（无需 react-hook-form）
+ * - 校验通过 queueMicrotask 延迟执行，同一帧内多次状态变更仅触发一次校验
  */
 
-// 说明：状态管理与业务模型
 import { getVersionDef } from '@core/registry'
 import type { TemplateType, TemplateVersionDef } from '@core/registry/types'
 import { calculateGating } from '@core/rules/gating'
 import { buildFormSchema } from '@core/schema'
 import type { MineRow, MineralsScopeRow, ProductRow, SmelterRow } from '@core/types/tableRows'
 import type { ErrorKey } from '@core/validation/errorKeys'
-import { zodResolver } from '@hookform/resolvers/zod'
 import type { CMReportingIntegrations } from '@lib/public/integrations'
-import { useMemoizedFn } from 'ahooks'
+import { enableMapSet } from 'immer'
 import type { ReactNode } from 'react'
-import { useEffect, useMemo } from 'react'
-import type { FieldErrors, Resolver } from 'react-hook-form'
-import { useForm, useWatch } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+import { createStore } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
 
-import {
-  TemplateActionsContext,
-  TemplateCompanyInfoContext,
-  TemplateCompanyQuestionsContext,
-  TemplateErrorsContext,
-  TemplateIntegrationsContext,
-  TemplateListsContext,
-  TemplateMineralScopeContext,
-  TemplateQuestionsContext,
-  TemplateStaticContext,
-} from './templateContext'
+import { TemplateStoreContext } from './templateStoreContext'
 import type { TemplateFormErrors, TemplateFormState } from './templateTypes'
 
-interface TemplateProviderProps {
+enableMapSet()
+
+// ---------------------------------------------------------------------------
+// 空错误常量
+// ---------------------------------------------------------------------------
+
+const EMPTY_ERRORS: TemplateFormErrors = {
+  companyInfo: {},
+  customMinerals: {},
+  mineralsScopeRows: {},
+  questions: {},
+  companyQuestions: {},
+}
+
+// ---------------------------------------------------------------------------
+// Store 类型定义
+// ---------------------------------------------------------------------------
+
+/** zustand store 的完整类型（状态 + 元信息 + 错误 + 操作）。 */
+export interface TemplateStoreState {
+  // ── 静态元信息 ──
   templateType: TemplateType
   versionId: string
+  versionDef: TemplateVersionDef
   integrations?: CMReportingIntegrations
-  children: ReactNode
+
+  // ── 表单数据（即 TemplateFormState 的展开） ──
+  companyInfo: Record<string, string>
+  selectedMinerals: string[]
+  customMinerals: string[]
+  questions: Record<string, Record<string, string> | string>
+  questionComments: Record<string, Record<string, string> | string>
+  companyQuestions: Record<string, Record<string, string> | string>
+  mineralsScope: MineralsScopeRow[]
+  smelterList: SmelterRow[]
+  mineList: MineRow[]
+  productList: ProductRow[]
+
+  // ── 校验 ──
+  errors: TemplateFormErrors
+  isDirty: boolean
+
+  // ── 操作 ──
+  setCompanyInfoField: (key: string, value: string) => void
+  setSelectedMinerals: (minerals: string[]) => void
+  setCustomMinerals: (minerals: string[]) => void
+  setQuestionValue: (questionKey: string, mineralKey: string | null, value: string) => void
+  setQuestionComment: (questionKey: string, mineralKey: string | null, value: string) => void
+  setCompanyQuestionValue: (key: string, value: string, mineralKey?: string) => void
+  setMineralsScope: (rows: MineralsScopeRow[]) => void
+  setSmelterList: (rows: SmelterRow[]) => void
+  setMineList: (rows: MineRow[]) => void
+  setProductList: (rows: ProductRow[]) => void
+  setFormData: (data: TemplateFormState) => void
+  validateForm: () => Promise<boolean>
+  resetForm: () => void
 }
+
+// ---------------------------------------------------------------------------
+// 辅助函数
+// ---------------------------------------------------------------------------
 
 /** 将 key 转为更友好的展示形式（用于默认自定义矿产名）。 */
 function humanizeKey(value: string): string {
@@ -93,11 +143,8 @@ function createEmptyState(versionDef: TemplateVersionDef): TemplateFormState {
     }
   }
 
-  const mineralsScope: MineralsScopeRow[] = []
-
   const allMinerals = versionDef.mineralScope.minerals.map((m) => m.key)
-  const selectedMinerals =
-    versionDef.mineralScope.mode === 'fixed' ? allMinerals : []
+  const selectedMinerals = versionDef.mineralScope.mode === 'fixed' ? allMinerals : []
   const customMinerals =
     versionDef.mineralScope.mode === 'free-text'
       ? allMinerals.map((mineral, index) => {
@@ -116,462 +163,407 @@ function createEmptyState(versionDef: TemplateVersionDef): TemplateFormState {
     questions,
     questionComments,
     companyQuestions,
-    mineralsScope,
+    mineralsScope: [],
     smelterList: [],
     mineList: [],
     productList: [],
   }
 }
 
-/** 模板表单 Provider：负责表单默认值、校验与状态切片。 */
+// ---------------------------------------------------------------------------
+// Zod 错误映射
+// ---------------------------------------------------------------------------
+
+/** 将 Zod issues 映射为 UI 友好的 TemplateFormErrors。 */
+function mapZodErrors(issues: Array<{ path: PropertyKey[]; message: string }>): TemplateFormErrors {
+  const result: TemplateFormErrors = {
+    companyInfo: {},
+    customMinerals: {},
+    mineralsScopeRows: {},
+    questions: {},
+    companyQuestions: {},
+  }
+
+  for (const issue of issues) {
+    const [root, ...rest] = issue.path
+    const msg = issue.message as ErrorKey
+
+    switch (root) {
+      case 'companyInfo': {
+        const key = rest[0]
+        if (typeof key === 'string') result.companyInfo[key] = msg
+        break
+      }
+      case 'selectedMinerals':
+        result.mineralsScope = msg
+        break
+      case 'customMinerals': {
+        const idx = rest[0]
+        if (typeof idx === 'number') result.customMinerals[idx] = msg
+        break
+      }
+      case 'mineralsScope': {
+        const idx = rest[0]
+        const field = rest[1]
+        if (typeof idx === 'number' && (field === 'mineral' || field === 'reason')) {
+          const existing = result.mineralsScopeRows[idx] ?? {}
+          existing[field] = msg
+          result.mineralsScopeRows[idx] = existing
+        }
+        break
+      }
+      case 'questions': {
+        const qKey = rest[0]
+        const mKey = rest[1]
+        if (typeof qKey === 'string') {
+          if (typeof mKey === 'string') {
+            const existing = result.questions[qKey]
+            if (existing && typeof existing === 'object') {
+              (existing as Record<string, ErrorKey>)[mKey] = msg
+            } else {
+              result.questions[qKey] = { [mKey]: msg }
+            }
+          } else {
+            result.questions[qKey] = msg
+          }
+        }
+        break
+      }
+      case 'companyQuestions': {
+        const cqKey = rest[0]
+        const mKey = rest[1]
+        if (typeof cqKey === 'string') {
+          if (typeof mKey === 'string') {
+            const existing = result.companyQuestions[cqKey]
+            if (existing && typeof existing === 'object') {
+              (existing as Record<string, ErrorKey>)[mKey] = msg
+            } else {
+              result.companyQuestions[cqKey] = { [mKey]: msg }
+            }
+          } else {
+            result.companyQuestions[cqKey] = msg
+          }
+        }
+        break
+      }
+    }
+  }
+
+  return result
+}
+
+// ---------------------------------------------------------------------------
+// 获取 TemplateFormState 快照（从 store 中提取表单字段）
+// ---------------------------------------------------------------------------
+
+function getFormData(s: TemplateStoreState): TemplateFormState {
+  return {
+    companyInfo: s.companyInfo,
+    selectedMinerals: s.selectedMinerals,
+    customMinerals: s.customMinerals,
+    questions: s.questions,
+    questionComments: s.questionComments,
+    companyQuestions: s.companyQuestions,
+    mineralsScope: s.mineralsScope,
+    smelterList: s.smelterList,
+    mineList: s.mineList,
+    productList: s.productList,
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Store 工厂
+// ---------------------------------------------------------------------------
+
+/** 创建 zustand store 实例（每个 TemplateProvider 一个）。 */
+function createTemplateStore(
+  templateType: TemplateType,
+  versionId: string,
+  integrations?: CMReportingIntegrations
+) {
+  const versionDef = getVersionDef(templateType, versionId)
+  const defaultState = createEmptyState(versionDef)
+  const schema = buildFormSchema(versionDef)
+
+  const questionDefsByKey = new Map(versionDef.questions.map((q) => [q.key, q]))
+  const questionKeyOrder = versionDef.questions.map((q) => q.key)
+
+  /** 同步运行 zod 全量校验（用于 validateForm 等需要立即获取结果的场景）。 */
+  function runValidationSync(state: TemplateStoreState): TemplateFormErrors {
+    const result = schema.safeParse(getFormData(state))
+    if (result.success) return EMPTY_ERRORS
+    return mapZodErrors(result.error.issues)
+  }
+
+  /**
+   * 延迟校验调度器：通过 queueMicrotask 将校验推迟到当前微任务队列末尾。
+   *
+   * 优势：
+   * - 同一帧内多次 set() 仅触发一次校验（例如门控级联清空多个字段）
+   * - 校验在浏览器绘制前完成（microtask），UI 不会闪烁
+   * - 避免每次按键都跑一遍完整 zod schema
+   */
+  let validationPending = false
+  function scheduleValidation(
+    set: (partial: Partial<TemplateStoreState>) => void,
+    get: () => TemplateStoreState
+  ) {
+    if (validationPending) return
+    validationPending = true
+    queueMicrotask(() => {
+      validationPending = false
+      const state = get()
+      const errors = runValidationSync(state)
+      // 仅在 errors 引用变化时更新（EMPTY_ERRORS 是稳定引用）
+      if (errors !== state.errors) {
+        set({ errors })
+      }
+    })
+  }
+
+  return createStore<TemplateStoreState>()(
+    immer((set, get) => ({
+      // ── 静态元信息 ──
+      templateType,
+      versionId,
+      versionDef,
+      integrations,
+
+      // ── 表单数据 ──
+      ...defaultState,
+
+      // ── 校验 ──
+      errors: EMPTY_ERRORS,
+      isDirty: false,
+
+      // ── Actions ──
+      // 每个 action 仅调用一次 set()，校验通过 scheduleValidation 延迟到微任务。
+
+      setCompanyInfoField: (key, value) => {
+        set((s) => { s.companyInfo[key] = value; s.isDirty = true })
+        scheduleValidation(set, get)
+      },
+
+      setSelectedMinerals: (minerals) => {
+        set({ selectedMinerals: minerals, isDirty: true })
+        scheduleValidation(set, get)
+      },
+
+      setCustomMinerals: (minerals) => {
+        set({ customMinerals: minerals, isDirty: true })
+        scheduleValidation(set, get)
+      },
+
+      setQuestionValue: (questionKey, mineralKey, value) => {
+        set((s) => {
+          // 写入回答
+          const def = questionDefsByKey.get(questionKey)
+          if (!def) return
+          if (def.perMineral) {
+            if (!mineralKey) return
+            const current = s.questions[questionKey]
+            if (typeof current === 'object') {
+              current[mineralKey] = value
+            } else {
+              s.questions[questionKey] = { [mineralKey]: value }
+            }
+          } else {
+            s.questions[questionKey] = value
+          }
+          s.isDirty = true
+
+          // 门控级联：Q1/Q2 变更时清空受影响的后续问题
+          if (questionKey !== 'Q1' && questionKey !== 'Q2') return
+          const nextQuestions = { ...getFormData(s).questions }
+          if (def.perMineral && mineralKey) {
+            const cur = typeof nextQuestions[questionKey] === 'object' ? nextQuestions[questionKey] : {}
+            nextQuestions[questionKey] = { ...(cur as Record<string, string>), [mineralKey]: value }
+          } else if (!def.perMineral) {
+            nextQuestions[questionKey] = value
+          }
+
+          const gating = calculateGating(
+            versionDef,
+            nextQuestions,
+            def.perMineral ? mineralKey ?? undefined : undefined
+          )
+          const q2Index = questionKeyOrder.indexOf('Q2')
+          if (q2Index < 0) return
+          const laterKeys = questionKeyOrder.slice(q2Index + 1)
+
+          const clearQuestion = (k: string, m: string | null) => {
+            const d = questionDefsByKey.get(k)
+            if (!d) return
+            if (d.perMineral && m) {
+              const qv = s.questions[k]
+              if (typeof qv === 'object') qv[m] = ''
+              const cv = s.questionComments[k]
+              if (typeof cv === 'object') cv[m] = ''
+            } else if (!d.perMineral) {
+              s.questions[k] = ''
+              s.questionComments[k] = ''
+            }
+          }
+
+          if (!gating.q2Enabled) {
+            clearQuestion('Q2', mineralKey)
+            laterKeys.forEach((k) => clearQuestion(k, mineralKey))
+          } else if (!gating.laterQuestionsEnabled) {
+            laterKeys.forEach((k) => clearQuestion(k, mineralKey))
+          }
+        })
+        scheduleValidation(set, get)
+      },
+
+      setQuestionComment: (questionKey, mineralKey, value) => {
+        set((s) => {
+          const def = questionDefsByKey.get(questionKey)
+          if (!def) return
+          if (def.perMineral) {
+            if (!mineralKey) return
+            const current = s.questionComments[questionKey]
+            if (typeof current === 'object') {
+              current[mineralKey] = value
+            } else {
+              s.questionComments[questionKey] = { [mineralKey]: value }
+            }
+          } else {
+            s.questionComments[questionKey] = value
+          }
+          s.isDirty = true
+        })
+        scheduleValidation(set, get)
+      },
+
+      setCompanyQuestionValue: (key, value, mineralKey?) => {
+        set((s) => {
+          if (mineralKey) {
+            const current = s.companyQuestions[key]
+            if (typeof current === 'object') {
+              current[mineralKey] = value
+            } else {
+              s.companyQuestions[key] = { [mineralKey]: value }
+            }
+          } else {
+            s.companyQuestions[key] = value
+          }
+          s.isDirty = true
+        })
+        scheduleValidation(set, get)
+      },
+
+      setMineralsScope: (rows) => {
+        set({ mineralsScope: rows, isDirty: true })
+        scheduleValidation(set, get)
+      },
+
+      setSmelterList: (rows) => {
+        set({ smelterList: rows, isDirty: true })
+        scheduleValidation(set, get)
+      },
+
+      setMineList: (rows) => {
+        set({ mineList: rows, isDirty: true })
+        scheduleValidation(set, get)
+      },
+
+      setProductList: (rows) => {
+        set({ productList: rows, isDirty: true })
+        scheduleValidation(set, get)
+      },
+
+      setFormData: (data) => {
+        set({ ...data, isDirty: false })
+        scheduleValidation(set, get)
+      },
+
+      /** 同步全量校验（用于导出前确认），不走 scheduleValidation。 */
+      validateForm: async () => {
+        const state = get()
+        const result = schema.safeParse(getFormData(state))
+        if (result.success) {
+          set({ errors: EMPTY_ERRORS })
+          return true
+        }
+        set({ errors: mapZodErrors(result.error.issues) })
+        return false
+      },
+
+      resetForm: () => {
+        set({ ...defaultState, errors: EMPTY_ERRORS, isDirty: false })
+      },
+    }))
+  )
+}
+
+// ---------------------------------------------------------------------------
+// React Provider
+// ---------------------------------------------------------------------------
+
+interface TemplateProviderProps {
+  templateType: TemplateType
+  versionId: string
+  integrations?: CMReportingIntegrations
+  children: ReactNode
+}
+
+/**
+ * 模板 Provider：创建/重置 zustand store 实例。
+ *
+ * 使用 React 官方 "Storing information from previous renders" 模式
+ * （https://react.dev/reference/react/useState#storing-information-from-previous-renders）
+ * 在 templateType/versionId 变更时同步重建 store，避免子组件看到过期实例。
+ */
 export function TemplateProvider({
   templateType,
   versionId,
   integrations,
   children,
 }: TemplateProviderProps) {
-  // NOTE: integrations 不参与表单 schema 与默认值；仅用于 UI 层“外部选择/回写”扩展点。
-  const versionDef = useMemo(
-    () => getVersionDef(templateType, versionId),
-    [templateType, versionId]
+  const currentKey = `${templateType}:${versionId}`
+
+  // "derive state from props" 模式：在 render 期间检测 key 变化并同步重建 store。
+  // React 会在 setState 后立即重新渲染本组件，子组件不会看到过期 store。
+  const [prevKey, setPrevKey] = useState(currentKey)
+  const [store, setStore] = useState(() =>
+    createTemplateStore(templateType, versionId, integrations)
   )
+  if (currentKey !== prevKey) {
+    setPrevKey(currentKey)
+    setStore(createTemplateStore(templateType, versionId, integrations))
+  }
 
-  const defaultState = useMemo(() => createEmptyState(versionDef), [versionDef])
-  const schema = useMemo(() => buildFormSchema(versionDef), [versionDef])
-
-  const resolver = useMemo<Resolver<TemplateFormState>>(
-    () => zodResolver(schema),
-    [schema]
-  )
-
-  const { control, reset, setValue, trigger, formState } = useForm<TemplateFormState>({
-    defaultValues: defaultState,
-    resolver,
-    mode: 'onChange',
-  })
-  const companyInfo = useWatch({
-    control,
-    name: 'companyInfo',
-    defaultValue: defaultState.companyInfo,
-  }) as TemplateFormState['companyInfo']
-  const selectedMinerals = useWatch({
-    control,
-    name: 'selectedMinerals',
-    defaultValue: defaultState.selectedMinerals,
-  }) as TemplateFormState['selectedMinerals']
-  const customMinerals = useWatch({
-    control,
-    name: 'customMinerals',
-    defaultValue: defaultState.customMinerals,
-  }) as TemplateFormState['customMinerals']
-  const questions = useWatch({
-    control,
-    name: 'questions',
-    defaultValue: defaultState.questions,
-  }) as TemplateFormState['questions']
-  const questionComments = useWatch({
-    control,
-    name: 'questionComments',
-    defaultValue: defaultState.questionComments,
-  }) as TemplateFormState['questionComments']
-  const companyQuestions = useWatch({
-    control,
-    name: 'companyQuestions',
-    defaultValue: defaultState.companyQuestions,
-  }) as TemplateFormState['companyQuestions']
-  const mineralsScope = useWatch({
-    control,
-    name: 'mineralsScope',
-    defaultValue: defaultState.mineralsScope,
-  }) as TemplateFormState['mineralsScope']
-  const smelterList = useWatch({
-    control,
-    name: 'smelterList',
-    defaultValue: defaultState.smelterList,
-  }) as TemplateFormState['smelterList']
-  const mineList = useWatch({
-    control,
-    name: 'mineList',
-    defaultValue: defaultState.mineList,
-  }) as TemplateFormState['mineList']
-  const productList = useWatch({
-    control,
-    name: 'productList',
-    defaultValue: defaultState.productList,
-  }) as TemplateFormState['productList']
-
+  // integrations 变更时仅更新引用（不重建 store）
   useEffect(() => {
-    reset(defaultState)
-  }, [defaultState, reset])
+    store.setState({ integrations })
+  }, [store, integrations])
 
+  // 离开页面前提示（isDirty）
   useEffect(() => {
     if (typeof window === 'undefined') return
-    if (!formState.isDirty) return
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+
+    const handler = (event: BeforeUnloadEvent) => {
       event.preventDefault()
       event.returnValue = ''
     }
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [formState.isDirty])
 
-  const errors = useMemo(
-    () => mapFormErrors(formState.errors),
-    [formState.errors]
-  )
-
-  const setCompanyInfoField = useMemoizedFn((key: string, value: string) => {
-    setValue(`companyInfo.${key}`, value, { shouldDirty: true, shouldValidate: true })
-  })
-
-  const setSelectedMinerals = useMemoizedFn((minerals: string[]) => {
-    setValue('selectedMinerals', minerals, { shouldDirty: true, shouldValidate: true })
-  })
-
-  const setCustomMinerals = useMemoizedFn((minerals: string[]) => {
-    setValue('customMinerals', minerals, { shouldDirty: true, shouldValidate: true })
-  })
-
-  const questionDefsByKey = useMemo(
-    () => new Map(versionDef.questions.map((question) => [question.key, question])),
-    [versionDef.questions]
-  )
-  const questionKeyOrder = useMemo(
-    () => versionDef.questions.map((question) => question.key),
-    [versionDef.questions]
-  )
-
-  /** 写入问题回答（值未变则跳过，避免不必要的 re-render）。 */
-  const applyQuestionValue = useMemoizedFn(
-    (key: string, targetMineral: string | null, nextValue: string) => {
-      const def = questionDefsByKey.get(key)
-      if (!def) return
-      if (def.perMineral) {
-        if (!targetMineral) return
-        if (
-          typeof questions[key] === 'object' &&
-          (questions[key] as Record<string, string>)[targetMineral] === nextValue
-        ) return
-        setValue(`questions.${key}.${targetMineral}`, nextValue, { shouldDirty: true, shouldValidate: true })
-        return
-      }
-      if (questions[key] === nextValue) return
-      setValue(`questions.${key}`, nextValue, { shouldDirty: true, shouldValidate: true })
-    }
-  )
-
-  /** 写入问题备注（值未变则跳过）。 */
-  const applyQuestionComment = useMemoizedFn(
-    (key: string, targetMineral: string | null, nextValue: string) => {
-      const def = questionDefsByKey.get(key)
-      if (!def) return
-      if (def.perMineral) {
-        if (!targetMineral) return
-        if (
-          typeof questionComments[key] === 'object' &&
-          (questionComments[key] as Record<string, string>)[targetMineral] === nextValue
-        ) return
-        setValue(`questionComments.${key}.${targetMineral}`, nextValue, { shouldDirty: true, shouldValidate: true })
-        return
-      }
-      if (questionComments[key] === nextValue) return
-      setValue(`questionComments.${key}`, nextValue, { shouldDirty: true, shouldValidate: true })
-    }
-  )
-
-  /**
-   * Q1/Q2 变更时的门控级联：根据 gating 结果清空受影响的后续问题。
-   * 仅在 Q1 或 Q2 变更时触发。
-   */
-  const applyGatingCascade = useMemoizedFn(
-    (questionKey: string, mineralKey: string | null, value: string) => {
-      const questionDef = questionDefsByKey.get(questionKey)
-      if (!questionDef || (questionKey !== 'Q1' && questionKey !== 'Q2')) return
-
-      // 构建包含本次变更的问题快照，用于 gating 计算
-      const nextQuestions: TemplateFormState['questions'] = { ...questions }
-      if (questionDef.perMineral) {
-        if (!mineralKey) return
-        const current = typeof nextQuestions[questionKey] === 'object' ? nextQuestions[questionKey] : {}
-        nextQuestions[questionKey] = { ...(current as Record<string, string>), [mineralKey]: value }
+    const unsubscribe = store.subscribe((state) => {
+      if (state.isDirty) {
+        window.addEventListener('beforeunload', handler)
       } else {
-        nextQuestions[questionKey] = value
+        window.removeEventListener('beforeunload', handler)
       }
+    })
 
-      const gating = calculateGating(
-        versionDef,
-        nextQuestions,
-        questionDef.perMineral ? mineralKey ?? undefined : undefined
-      )
-      const q2Index = questionKeyOrder.indexOf('Q2')
-      if (q2Index < 0) return
-      const laterKeys = questionKeyOrder.slice(q2Index + 1)
-
-      // Q2 被门控禁用：清空 Q2 及后续所有问题
-      if (!gating.q2Enabled) {
-        applyQuestionValue('Q2', mineralKey, '')
-        applyQuestionComment('Q2', mineralKey, '')
-        laterKeys.forEach((k) => { applyQuestionValue(k, mineralKey, ''); applyQuestionComment(k, mineralKey, '') })
-        return
-      }
-
-      // 后续问题被门控禁用：仅清空 Q3+
-      if (!gating.laterQuestionsEnabled) {
-        laterKeys.forEach((k) => { applyQuestionValue(k, mineralKey, ''); applyQuestionComment(k, mineralKey, '') })
-      }
+    return () => {
+      unsubscribe()
+      window.removeEventListener('beforeunload', handler)
     }
-  )
-
-  const setQuestionValue = useMemoizedFn(
-    (questionKey: string, mineralKey: string | null, value: string) => {
-      applyQuestionValue(questionKey, mineralKey, value)
-      applyGatingCascade(questionKey, mineralKey, value)
-    }
-  )
-
-  const setQuestionComment = useMemoizedFn(
-    (questionKey: string, mineralKey: string | null, value: string) => {
-      const questionDef = questionDefsByKey.get(questionKey)
-      if (!questionDef) return
-      if (questionDef.perMineral) {
-        if (!mineralKey) return
-        setValue(`questionComments.${questionKey}.${mineralKey}`, value, {
-          shouldDirty: true,
-          shouldValidate: true,
-        })
-        return
-      }
-      setValue(`questionComments.${questionKey}`, value, {
-        shouldDirty: true,
-        shouldValidate: true,
-      })
-    }
-  )
-
-  const setCompanyQuestionValue = useMemoizedFn(
-    (key: string, value: string, mineralKey?: string) => {
-      if (mineralKey) {
-        setValue(`companyQuestions.${key}.${mineralKey}`, value, {
-          shouldDirty: true,
-          shouldValidate: true,
-        })
-        return
-      }
-      setValue(`companyQuestions.${key}`, value, { shouldDirty: true, shouldValidate: true })
-    }
-  )
-
-  const setMineralsScope = useMemoizedFn((rows: MineralsScopeRow[]) => {
-    setValue('mineralsScope', rows, { shouldDirty: true, shouldValidate: true })
-  })
-
-  const setSmelterList = useMemoizedFn((rows: SmelterRow[]) => {
-    setValue('smelterList', rows, { shouldDirty: true, shouldValidate: true })
-  })
-
-  const setMineList = useMemoizedFn((rows: MineRow[]) => {
-    setValue('mineList', rows, { shouldDirty: true, shouldValidate: true })
-  })
-
-  const setProductList = useMemoizedFn((rows: ProductRow[]) => {
-    setValue('productList', rows, { shouldDirty: true, shouldValidate: true })
-  })
-
-  const resetForm = useMemoizedFn(() => {
-    reset(defaultState)
-  })
-
-  const setFormData = useMemoizedFn((data: TemplateFormState) => {
-    // 以全量快照为准：调用方应保证 templateType/versionId 匹配。
-    reset(data)
-  })
-
-  const validateForm = useMemoizedFn(async () => {
-    return trigger()
-  })
-
-  const staticValue = useMemo(
-    () => ({ templateType, versionId, versionDef }),
-    [templateType, versionId, versionDef]
-  )
-  const integrationsValue = useMemo(
-    () => ({ integrations }),
-    [integrations]
-  )
-  const companyInfoValue = useMemo(() => ({ companyInfo }), [companyInfo])
-  const mineralScopeValue = useMemo(
-    () => ({ selectedMinerals, customMinerals }),
-    [selectedMinerals, customMinerals]
-  )
-  const questionsValue = useMemo(
-    () => ({ questions, questionComments }),
-    [questions, questionComments]
-  )
-  const companyQuestionsValue = useMemo(
-    () => ({ companyQuestions }),
-    [companyQuestions]
-  )
-  const listsValue = useMemo(
-    () => ({ mineralsScope, smelterList, mineList, productList }),
-    [mineralsScope, smelterList, mineList, productList]
-  )
-  const errorsValue = useMemo(() => ({ errors }), [errors])
-  const actionsValue = useMemo(
-    () => ({
-      setCompanyInfoField,
-      setSelectedMinerals,
-      setCustomMinerals,
-      setQuestionValue,
-      setQuestionComment,
-      setCompanyQuestionValue,
-      setMineralsScope,
-      setSmelterList,
-      setMineList,
-      setProductList,
-      setFormData,
-      validateForm,
-      resetForm,
-    }),
-    [
-      setCompanyInfoField,
-      setSelectedMinerals,
-      setCustomMinerals,
-      setQuestionValue,
-      setQuestionComment,
-      setCompanyQuestionValue,
-      setMineralsScope,
-      setSmelterList,
-      setMineList,
-      setProductList,
-      setFormData,
-      validateForm,
-      resetForm,
-    ]
-  )
+  }, [store])
 
   return (
-    <TemplateStaticContext.Provider value={staticValue}>
-      <TemplateIntegrationsContext.Provider value={integrationsValue}>
-        <TemplateCompanyInfoContext.Provider value={companyInfoValue}>
-          <TemplateMineralScopeContext.Provider value={mineralScopeValue}>
-            <TemplateQuestionsContext.Provider value={questionsValue}>
-              <TemplateCompanyQuestionsContext.Provider value={companyQuestionsValue}>
-                <TemplateListsContext.Provider value={listsValue}>
-                  <TemplateErrorsContext.Provider value={errorsValue}>
-                    <TemplateActionsContext.Provider value={actionsValue}>
-                      {children}
-                    </TemplateActionsContext.Provider>
-                  </TemplateErrorsContext.Provider>
-                </TemplateListsContext.Provider>
-              </TemplateCompanyQuestionsContext.Provider>
-            </TemplateQuestionsContext.Provider>
-          </TemplateMineralScopeContext.Provider>
-        </TemplateCompanyInfoContext.Provider>
-      </TemplateIntegrationsContext.Provider>
-    </TemplateStaticContext.Provider>
+    <TemplateStoreContext.Provider value={store}>
+      {children}
+    </TemplateStoreContext.Provider>
   )
-}
-
-/** 将 react-hook-form 的 errors 转为 UI 友好结构。 */
-function mapFormErrors(errors: FieldErrors<TemplateFormState>): TemplateFormErrors {
-  return {
-    companyInfo: mapFlatErrors(errors.companyInfo),
-    mineralsScope: getErrorMessage(errors.selectedMinerals),
-    customMinerals: mapArrayErrors(errors.customMinerals as FieldErrors<string[]> | undefined),
-    mineralsScopeRows: mapMineralsScopeErrors(
-      errors.mineralsScope as FieldErrors<MineralsScopeRow[]> | undefined
-    ),
-    questions: mapQuestionErrors(errors.questions),
-    companyQuestions: mapQuestionErrors(
-      errors.companyQuestions as FieldErrors<Record<string, Record<string, string> | string>> | undefined
-    ),
-  }
-}
-
-/** 平铺 Record 类型的错误。 */
-function mapFlatErrors(fieldErrors: FieldErrors<Record<string, string>> | undefined) {
-  const result: Record<string, ErrorKey> = {}
-  if (!fieldErrors) return result
-
-  Object.entries(fieldErrors).forEach(([key, value]) => {
-    const message = getErrorMessage(value)
-    if (message) result[key] = message
-  })
-
-  return result
-}
-
-/** 处理按问题/矿产维度嵌套的错误结构。 */
-function mapQuestionErrors(
-  fieldErrors: FieldErrors<Record<string, Record<string, string> | string>> | undefined
-): Record<string, Record<string, ErrorKey> | ErrorKey> {
-  const result: Record<string, Record<string, ErrorKey> | ErrorKey> = {}
-  if (!fieldErrors) return result
-
-  Object.entries(fieldErrors).forEach(([questionKey, errorValue]) => {
-    const message = getErrorMessage(errorValue)
-    if (message) {
-      result[questionKey] = message
-      return
-    }
-    if (errorValue && typeof errorValue === 'object') {
-      const mineralErrors: Record<string, ErrorKey> = {}
-      Object.entries(errorValue as Record<string, unknown>).forEach(([mineralKey, mineralError]) => {
-        const mineralMessage = getErrorMessage(mineralError)
-        if (mineralMessage) mineralErrors[mineralKey] = mineralMessage
-      })
-      if (Object.keys(mineralErrors).length > 0) {
-        result[questionKey] = mineralErrors
-      }
-    }
-  })
-
-  return result
-}
-
-/** 处理数组错误（含 root 错误）。 */
-function mapArrayErrors(fieldErrors: FieldErrors<string[]> | undefined) {
-  const result: Record<number, ErrorKey> = {}
-  if (!fieldErrors || typeof fieldErrors !== 'object') return result
-
-  Object.entries(fieldErrors).forEach(([key, value]) => {
-    if (key === 'root') {
-      const message = getErrorMessage(value)
-      if (message) result[-1] = message
-      return
-    }
-    const index = Number(key)
-    if (!Number.isNaN(index)) {
-      const message = getErrorMessage(value)
-      if (message) result[index] = message
-    }
-  })
-
-  return result
-}
-
-/** 处理 Minerals Scope 行错误。 */
-function mapMineralsScopeErrors(fieldErrors: FieldErrors<MineralsScopeRow[]> | undefined) {
-  const result: Record<number, { mineral?: ErrorKey; reason?: ErrorKey }> = {}
-  if (!fieldErrors || typeof fieldErrors !== 'object') return result
-
-  Object.entries(fieldErrors).forEach(([key, value]) => {
-    const index = Number(key)
-    if (Number.isNaN(index) || typeof value !== 'object' || !value) return
-    const mineralMessage = getErrorMessage((value as { mineral?: unknown }).mineral)
-    const reasonMessage = getErrorMessage((value as { reason?: unknown }).reason)
-    if (mineralMessage || reasonMessage) {
-      result[index] = { mineral: mineralMessage, reason: reasonMessage }
-    }
-  })
-
-  return result
-}
-
-/** 提取错误 message 并强制为 ErrorKey。 */
-function getErrorMessage(error: unknown): ErrorKey | undefined {
-  if (!error || typeof error !== 'object') return undefined
-  const message = (error as { message?: unknown }).message
-  if (typeof message === 'string') return message as ErrorKey
-  return undefined
 }

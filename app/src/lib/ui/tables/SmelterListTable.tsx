@@ -20,8 +20,9 @@ import type {
   SmelterRowPickContext,
   SmelterLookupMode,
 } from '@lib/public/integrations'
+import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
-import { useCreation, useLatest, useMemoizedFn } from 'ahooks'
+import { useBoolean, useCreation, useLatest, useMemoizedFn } from 'ahooks'
 import {
   AutoComplete,
   Button,
@@ -82,9 +83,6 @@ const SELECT_FIELDS = [
   'combinedMetal',
 ] as const
 
-type InputField = (typeof INPUT_FIELDS)[number]
-type SelectField = (typeof SELECT_FIELDS)[number]
-
 /** 冶炼厂清单表格：支持 lookup 自动填充、行内编辑与外部选择。 */
 export const SmelterListTable = memo(function SmelterListTable({
   templateType,
@@ -103,7 +101,7 @@ export const SmelterListTable = memo(function SmelterListTable({
   const { t, locale } = useT()
   /** 批量选择状态（受控）。 */
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
-  const [externalPicking, setExternalPicking] = useState(false)
+  const [externalPicking, { setTrue: startPicking, setFalse: stopPicking }] = useBoolean(false)
   const rowsRef = useLatest(rows)
   const [rowPickingId, setRowPickingId] = useState<string | null>(null)
   const validSelectedRowKeys = useCreation(() => {
@@ -220,7 +218,7 @@ export const SmelterListTable = memo(function SmelterListTable({
       config,
       currentRows,
     }
-    setExternalPicking(true)
+    startPicking()
     try {
       const result = await integration.onPickSmelters(ctx)
       const items = result?.items ?? []
@@ -233,7 +231,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         content: t('errors.externalPickFailedContent'),
       })
     } finally {
-      setExternalPicking(false)
+      stopPicking()
     }
   })
 
@@ -400,8 +398,8 @@ export const SmelterListTable = memo(function SmelterListTable({
     onChange(next)
   })
 
-  /** 缓存输入/下拉/删除回调，减少表格内联函数开销。 */
-  const inputHandlers = useCreation(() => {
+  /** 缓存输入回调，减少表格内联函数开销。 */
+  const getInputHandler = useHandlerMap(() => {
     const map = new Map<string, (event: ChangeEvent<HTMLInputElement>) => void>()
     rows.forEach((row) => {
       INPUT_FIELDS.forEach((field) => {
@@ -413,7 +411,8 @@ export const SmelterListTable = memo(function SmelterListTable({
     return map
   }, [rows, handleCellChange])
 
-  const selectHandlers = useCreation(() => {
+  /** 缓存下拉回调。 */
+  const getSelectHandler = useHandlerMap(() => {
     const map = new Map<string, (value: string) => void>()
     rows.forEach((row) => {
       SELECT_FIELDS.forEach((field) => {
@@ -423,22 +422,14 @@ export const SmelterListTable = memo(function SmelterListTable({
     return map
   }, [rows, handleCellChange])
 
-  const removeHandlers = useCreation(() => {
+  /** 缓存删除按钮回调。 */
+  const getRemoveHandler = useHandlerMap(() => {
     const map = new Map<string, () => void>()
     rows.forEach((row) => {
       map.set(row.id, () => handleRemoveRowWithSelection(row.id))
     })
     return map
   }, [rows, handleRemoveRowWithSelection])
-
-  const getInputHandler = useMemoizedFn((id: string, field: InputField) =>
-    inputHandlers.get(`${id}:${field}`),
-  )
-  const getSelectHandler = useMemoizedFn((id: string, field: SelectField) =>
-    selectHandlers.get(`${id}:${field}`),
-  )
-  /** 获取稳定的删除按钮 handler（返回函数，不在渲染期执行）。 */
-  const getRemoveHandler = useMemoizedFn((id: string) => removeHandlers.get(id))
 
   /** 批量删除处理 */
   const handleBatchDelete = useMemoizedFn(() => {
@@ -512,7 +503,7 @@ export const SmelterListTable = memo(function SmelterListTable({
           true,
           <Select
             value={value || undefined}
-            onChange={getSelectHandler(record.id, 'metal')}
+            onChange={getSelectHandler(`${record.id}:metal`)}
             options={metalOptions}
             placeholder={t('placeholders.select')}
             className="w-full"
@@ -535,7 +526,7 @@ export const SmelterListTable = memo(function SmelterListTable({
                 {isNotListed(record.smelterLookup) && notListedRequiresNameCountry ? (
                   <Input
                     value={record.smelterName || undefined}
-                    onChange={getInputHandler(record.id, 'smelterName')}
+                    onChange={getInputHandler(`${record.id}:smelterName`)}
                     placeholder={t('placeholders.smelterNameRequired')}
                   />
                 ) : record.smelterLookup ? (
@@ -574,7 +565,7 @@ export const SmelterListTable = memo(function SmelterListTable({
               <Flex vertical gap={4}>
                 <AutoComplete
                   value={value || undefined}
-                  onChange={getSelectHandler(record.id, 'smelterLookup')}
+                  onChange={getSelectHandler(`${record.id}:smelterLookup`)}
                   options={
                     smelterLookupMeta
                       ? [
@@ -596,7 +587,7 @@ export const SmelterListTable = memo(function SmelterListTable({
                 {isNotListed(record.smelterLookup) && notListedRequiresNameCountry && (
                   <Input
                     value={record.smelterName || undefined}
-                    onChange={getInputHandler(record.id, 'smelterName')}
+                    onChange={getInputHandler(`${record.id}:smelterName`)}
                     placeholder={t('placeholders.smelterNameRequired')}
                   />
                 )}
@@ -617,7 +608,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         render: (value: string, record: SmelterRow) => (
           <Input
             value={value || undefined}
-            onChange={getInputHandler(record.id, 'smelterId')}
+            onChange={getInputHandler(`${record.id}:smelterId`)}
             placeholder={t('placeholders.smelterIdInput')}
             className="font-mono text-xs"
             disabled={useExternalLookup && isFromLookup(record.smelterLookup)}
@@ -647,7 +638,7 @@ export const SmelterListTable = memo(function SmelterListTable({
             notListed,
             <Input
               value={value || undefined}
-              onChange={getInputHandler(record.id, 'smelterName')}
+              onChange={getInputHandler(`${record.id}:smelterName`)}
               placeholder={placeholder}
               disabled={useExternalLookup && fromLookup}
             />,
@@ -675,7 +666,7 @@ export const SmelterListTable = memo(function SmelterListTable({
             <Flex vertical gap={4}>
               <Select
                 value={value || undefined}
-                onChange={getSelectHandler(record.id, 'smelterCountry')}
+                onChange={getSelectHandler(`${record.id}:smelterCountry`)}
                 options={countryOptions}
                 placeholder={placeholder}
                 showSearch
@@ -700,7 +691,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         render: (value: string, record: SmelterRow) => (
           <Input
             value={value || undefined}
-            onChange={getInputHandler(record.id, 'smelterIdentification')}
+            onChange={getInputHandler(`${record.id}:smelterIdentification`)}
             placeholder={t('placeholders.smelterIdentification')}
             disabled={useExternalLookup && isFromLookup(record.smelterLookup)}
           />
@@ -714,7 +705,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         render: (value: string, record: SmelterRow) => (
           <Input
             value={value || undefined}
-            onChange={getInputHandler(record.id, 'sourceId')}
+            onChange={getInputHandler(`${record.id}:sourceId`)}
             placeholder={t('placeholders.smelterSourceId')}
             disabled={useExternalLookup && isFromLookup(record.smelterLookup)}
           />
@@ -728,7 +719,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         render: (value: string, record: SmelterRow) => (
           <Input
             value={value || undefined}
-            onChange={getInputHandler(record.id, 'smelterStreet')}
+            onChange={getInputHandler(`${record.id}:smelterStreet`)}
             placeholder={t('placeholders.smelterStreet')}
             disabled={useExternalLookup && isFromLookup(record.smelterLookup)}
           />
@@ -742,7 +733,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         render: (value: string, record: SmelterRow) => (
           <Input
             value={value || undefined}
-            onChange={getInputHandler(record.id, 'smelterCity')}
+            onChange={getInputHandler(`${record.id}:smelterCity`)}
             placeholder={t('placeholders.smelterCity')}
             disabled={useExternalLookup && isFromLookup(record.smelterLookup)}
           />
@@ -756,7 +747,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         render: (value: string, record: SmelterRow) => (
           <Input
             value={value || undefined}
-            onChange={getInputHandler(record.id, 'smelterState')}
+            onChange={getInputHandler(`${record.id}:smelterState`)}
             placeholder={t('placeholders.smelterState')}
             disabled={useExternalLookup && isFromLookup(record.smelterLookup)}
           />
@@ -770,7 +761,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         render: (value: string, record: SmelterRow) => (
           <Input
             value={value || undefined}
-            onChange={getInputHandler(record.id, 'smelterContactName')}
+            onChange={getInputHandler(`${record.id}:smelterContactName`)}
             placeholder={t('placeholders.smelterContactName')}
           />
         ),
@@ -783,7 +774,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         render: (value: string, record: SmelterRow) => (
           <Input
             value={value || undefined}
-            onChange={getInputHandler(record.id, 'smelterContactEmail')}
+            onChange={getInputHandler(`${record.id}:smelterContactEmail`)}
             placeholder={t('placeholders.smelterContactEmail')}
           />
         ),
@@ -796,7 +787,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         render: (value: string, record: SmelterRow) => (
           <Input
             value={value || undefined}
-            onChange={getInputHandler(record.id, 'proposedNextSteps')}
+            onChange={getInputHandler(`${record.id}:proposedNextSteps`)}
             placeholder={t('placeholders.smelterNextSteps')}
           />
         ),
@@ -809,7 +800,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         render: (value: string, record: SmelterRow) => (
           <Input
             value={value || undefined}
-            onChange={getInputHandler(record.id, 'mineName')}
+            onChange={getInputHandler(`${record.id}:mineName`)}
             placeholder={t('placeholders.smelterMineName')}
           />
         ),
@@ -822,7 +813,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         render: (value: string, record: SmelterRow) => (
           <AutoComplete
             value={value || undefined}
-            onChange={getSelectHandler(record.id, 'mineCountry')}
+            onChange={getSelectHandler(`${record.id}:mineCountry`)}
             placeholder={t('placeholders.smelterMineCountry')}
             options={countryOptions}
             allowClear
@@ -838,7 +829,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         render: (value: string, record: SmelterRow) => (
           <Select
             value={value || undefined}
-            onChange={getSelectHandler(record.id, 'recycledScrap')}
+            onChange={getSelectHandler(`${record.id}:recycledScrap`)}
             options={recycledScrapOptions}
             placeholder={t('placeholders.select')}
             className="w-full"
@@ -853,7 +844,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         render: (value: string, record: SmelterRow) => (
           <Input
             value={value || undefined}
-            onChange={getInputHandler(record.id, 'comments')}
+            onChange={getInputHandler(`${record.id}:comments`)}
             placeholder={t('placeholders.smelterComments')}
           />
         ),
@@ -870,7 +861,7 @@ export const SmelterListTable = memo(function SmelterListTable({
           render: (value: string, record: SmelterRow) => (
             <Select
               value={value || undefined}
-              onChange={getSelectHandler(record.id, 'combinedMetal')}
+              onChange={getSelectHandler(`${record.id}:combinedMetal`)}
               options={metalOptions}
               placeholder={t('placeholders.smelterCombinedMetal')}
               className="w-full"
@@ -885,7 +876,7 @@ export const SmelterListTable = memo(function SmelterListTable({
           render: (value: string, record: SmelterRow) => (
             <Input
               value={value || undefined}
-              onChange={getInputHandler(record.id, 'combinedSmelter')}
+              onChange={getInputHandler(`${record.id}:combinedSmelter`)}
               placeholder={t('placeholders.smelterCombinedSmelter')}
             />
           ),

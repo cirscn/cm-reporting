@@ -1,80 +1,23 @@
 /**
- * @file app/store/templateContext.ts
- * @description 状态管理与业务模型。
+ * @file shell/store/templateContext.ts
+ * @description 消费侧 hooks：基于 zustand selector 实现，保持原有公开 API 不变。
+ *
+ * 公开 hooks：
+ * - useTemplateState()       → { meta, form, lists }
+ * - useTemplateErrors()      → TemplateFormErrors
+ * - useTemplateActions()     → 所有 setter/reset/validate
+ * - useTemplateIntegrations() → CMReportingIntegrations | undefined
  */
 
-// 说明：状态管理与业务模型
-import type { TemplateType, TemplateVersionDef } from '@core/registry/types'
-import type { CMReportingIntegrations } from '@lib/public/integrations'
-import { createContext, useContext, useMemo } from 'react'
+import { useMemo } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 
+import { useTemplateStore } from './templateStoreContext'
 import type { TemplateFormErrors, TemplateFormState } from './templateTypes'
 
-/** 模板静态信息上下文（模板类型/版本/定义）。 */
-interface TemplateStaticContextValue {
-  templateType: TemplateType
-  versionId: string
-  versionDef: TemplateVersionDef
-}
-
-/** 对外 integrations 上下文（用于宿主接管外部选择/回写）。 */
-interface TemplateIntegrationsContextValue {
-  integrations?: CMReportingIntegrations
-}
-
-/** 公司信息表单片段上下文。 */
-interface TemplateCompanyInfoContextValue {
-  companyInfo: TemplateFormState['companyInfo']
-}
-
-/** 矿产范围表单片段上下文。 */
-interface TemplateMineralScopeContextValue {
-  selectedMinerals: TemplateFormState['selectedMinerals']
-  customMinerals: TemplateFormState['customMinerals']
-}
-
-/** 问题矩阵表单片段上下文。 */
-interface TemplateQuestionsContextValue {
-  questions: TemplateFormState['questions']
-  questionComments: TemplateFormState['questionComments']
-}
-
-/** 公司问题表单片段上下文。 */
-interface TemplateCompanyQuestionsContextValue {
-  companyQuestions: TemplateFormState['companyQuestions']
-}
-
-/** 表格列表表单片段上下文。 */
-interface TemplateListsContextValue {
-  mineralsScope: TemplateFormState['mineralsScope']
-  smelterList: TemplateFormState['smelterList']
-  mineList: TemplateFormState['mineList']
-  productList: TemplateFormState['productList']
-}
-
-/** 表单错误上下文。 */
-interface TemplateErrorsContextValue {
-  errors: TemplateFormErrors
-}
-
-/** 表单写操作上下文（setter/重置）。 */
-interface TemplateActionsContextValue {
-  setCompanyInfoField: (key: string, value: string) => void
-  setSelectedMinerals: (minerals: string[]) => void
-  setCustomMinerals: (minerals: string[]) => void
-  setQuestionValue: (questionKey: string, mineralKey: string | null, value: string) => void
-  setQuestionComment: (questionKey: string, mineralKey: string | null, value: string) => void
-  setCompanyQuestionValue: (key: string, value: string, mineralKey?: string) => void
-  setMineralsScope: (rows: TemplateFormState['mineralsScope']) => void
-  setSmelterList: (rows: TemplateFormState['smelterList']) => void
-  setMineList: (rows: TemplateFormState['mineList']) => void
-  setProductList: (rows: TemplateFormState['productList']) => void
-  /** 全量回填表单（用于导入 JSON 快照）。 */
-  setFormData: (data: TemplateFormState) => void
-  /** 触发一次全量校验（用于导出前确认）。 */
-  validateForm: () => Promise<boolean>
-  resetForm: () => void
-}
+// ---------------------------------------------------------------------------
+// 公开类型（保持向后兼容）
+// ---------------------------------------------------------------------------
 
 /** 表单主体读取切片（不含列表与错误）。 */
 interface TemplateFormSlice {
@@ -86,117 +29,121 @@ interface TemplateFormSlice {
   companyQuestions: TemplateFormState['companyQuestions']
 }
 
+/** 列表数据读取切片。 */
+interface TemplateListsSlice {
+  mineralsScope: TemplateFormState['mineralsScope']
+  smelterList: TemplateFormState['smelterList']
+  mineList: TemplateFormState['mineList']
+  productList: TemplateFormState['productList']
+}
+
+/** 模板静态信息。 */
+interface TemplateMetaSlice {
+  templateType: import('@core/registry/types').TemplateType
+  versionId: string
+  versionDef: import('@core/registry/types').TemplateVersionDef
+}
+
 /** 模板完整读取视图（静态信息 + 表单主体 + 列表）。 */
 interface TemplateState {
-  meta: TemplateStaticContextValue
+  meta: TemplateMetaSlice
   form: TemplateFormSlice
-  lists: TemplateListsContextValue
+  lists: TemplateListsSlice
 }
 
-/** 模板静态信息 Provider。 */
-export const TemplateStaticContext = createContext<TemplateStaticContextValue | null>(null)
-/** 对外 integrations Provider。 */
-export const TemplateIntegrationsContext = createContext<TemplateIntegrationsContextValue | null>(
-  null
-)
-/** 公司信息 Provider。 */
-export const TemplateCompanyInfoContext = createContext<TemplateCompanyInfoContextValue | null>(
-  null
-)
-/** 矿产范围 Provider。 */
-export const TemplateMineralScopeContext = createContext<TemplateMineralScopeContextValue | null>(
-  null
-)
-/** 问题矩阵 Provider。 */
-export const TemplateQuestionsContext = createContext<TemplateQuestionsContextValue | null>(null)
-/** 公司问题 Provider。 */
-export const TemplateCompanyQuestionsContext = createContext<TemplateCompanyQuestionsContextValue | null>(
-  null
-)
-/** 列表数据 Provider。 */
-export const TemplateListsContext = createContext<TemplateListsContextValue | null>(null)
-/** 错误信息 Provider。 */
-export const TemplateErrorsContext = createContext<TemplateErrorsContextValue | null>(null)
-/** 表单写操作 Provider。 */
-export const TemplateActionsContext = createContext<TemplateActionsContextValue | null>(null)
-
-/** 统一的 Context 安全读取，避免空 Provider。 */
-function useRequiredContext<T>(context: React.Context<T | null>, name: string): T {
-  const value = useContext(context)
-  if (!value) {
-    throw new Error(`${name} must be used within TemplateProvider`)
-  }
-  return value
+/** 表单写操作。 */
+interface TemplateActionsValue {
+  setCompanyInfoField: (key: string, value: string) => void
+  setSelectedMinerals: (minerals: string[]) => void
+  setCustomMinerals: (minerals: string[]) => void
+  setQuestionValue: (questionKey: string, mineralKey: string | null, value: string) => void
+  setQuestionComment: (questionKey: string, mineralKey: string | null, value: string) => void
+  setCompanyQuestionValue: (key: string, value: string, mineralKey?: string) => void
+  setMineralsScope: (rows: TemplateFormState['mineralsScope']) => void
+  setSmelterList: (rows: TemplateFormState['smelterList']) => void
+  setMineList: (rows: TemplateFormState['mineList']) => void
+  setProductList: (rows: TemplateFormState['productList']) => void
+  setFormData: (data: TemplateFormState) => void
+  validateForm: () => Promise<boolean>
+  resetForm: () => void
 }
 
-/** 读取模板静态信息（模板/版本/定义）。 */
-function useTemplateMetaInternal() {
-  return useRequiredContext(TemplateStaticContext, 'useTemplateState')
+// ---------------------------------------------------------------------------
+// Selectors（提升到模块顶层避免每次渲染创建新引用）
+// ---------------------------------------------------------------------------
+
+const selectMeta = (s: { templateType: TemplateMetaSlice['templateType']; versionId: string; versionDef: TemplateMetaSlice['versionDef'] }): TemplateMetaSlice => ({
+  templateType: s.templateType,
+  versionId: s.versionId,
+  versionDef: s.versionDef,
+})
+
+const selectForm = (s: TemplateFormSlice): TemplateFormSlice => ({
+  companyInfo: s.companyInfo,
+  selectedMinerals: s.selectedMinerals,
+  customMinerals: s.customMinerals,
+  questions: s.questions,
+  questionComments: s.questionComments,
+  companyQuestions: s.companyQuestions,
+})
+
+const selectLists = (s: TemplateListsSlice): TemplateListsSlice => ({
+  mineralsScope: s.mineralsScope,
+  smelterList: s.smelterList,
+  mineList: s.mineList,
+  productList: s.productList,
+})
+
+const selectErrors = (s: { errors: TemplateFormErrors }): TemplateFormErrors => s.errors
+
+const selectIntegrations = (s: { integrations?: import('@lib/public/integrations').CMReportingIntegrations }) => s.integrations
+
+/**
+ * Actions selector：虽然 zustand store 中 action 引用在 store 生命周期内不变，
+ * 但 selector 每次返回新对象。搭配 useShallow 做属性级浅比较，
+ * 确保 action 引用未变时不触发消费组件 re-render。
+ * 开销极低（~13 个属性的 === 比较），无需额外优化。
+ */
+const selectActions = (s: TemplateActionsValue): TemplateActionsValue => ({
+  setCompanyInfoField: s.setCompanyInfoField,
+  setSelectedMinerals: s.setSelectedMinerals,
+  setCustomMinerals: s.setCustomMinerals,
+  setQuestionValue: s.setQuestionValue,
+  setQuestionComment: s.setQuestionComment,
+  setCompanyQuestionValue: s.setCompanyQuestionValue,
+  setMineralsScope: s.setMineralsScope,
+  setSmelterList: s.setSmelterList,
+  setMineList: s.setMineList,
+  setProductList: s.setProductList,
+  setFormData: s.setFormData,
+  validateForm: s.validateForm,
+  resetForm: s.resetForm,
+})
+
+// ---------------------------------------------------------------------------
+// 公开 hooks
+// ---------------------------------------------------------------------------
+
+/** 读取模板状态（静态信息 + 表单主体 + 列表）。 */
+export function useTemplateState(): TemplateState {
+  const meta = useTemplateStore(useShallow(selectMeta))
+  const form = useTemplateStore(useShallow(selectForm))
+  const lists = useTemplateStore(useShallow(selectLists))
+
+  return useMemo(() => ({ meta, form, lists }), [meta, form, lists])
+}
+
+/** 读取表单错误信息。 */
+export function useTemplateErrors(): TemplateFormErrors {
+  return useTemplateStore(selectErrors)
+}
+
+/** 读取表单写操作。 */
+export function useTemplateActions(): TemplateActionsValue {
+  return useTemplateStore(useShallow(selectActions))
 }
 
 /** 读取对外 integrations（宿主扩展点）。 */
 export function useTemplateIntegrations() {
-  const { integrations } = useRequiredContext(
-    TemplateIntegrationsContext,
-    'useTemplateIntegrations'
-  )
-  return integrations
-}
-
-/** 读取表单主体数据（companyInfo/矿产范围/问题矩阵/公司问题）。 */
-function useTemplateFormInternal(): TemplateFormSlice {
-  const { companyInfo } = useRequiredContext(
-    TemplateCompanyInfoContext,
-    'useTemplateState'
-  )
-  const { selectedMinerals, customMinerals } = useRequiredContext(
-    TemplateMineralScopeContext,
-    'useTemplateState'
-  )
-  const { questions } = useRequiredContext(TemplateQuestionsContext, 'useTemplateState')
-  const { questionComments } = useRequiredContext(TemplateQuestionsContext, 'useTemplateState')
-  const { companyQuestions } = useRequiredContext(
-    TemplateCompanyQuestionsContext,
-    'useTemplateState'
-  )
-
-  return useMemo(
-    () => ({
-      companyInfo,
-      selectedMinerals,
-      customMinerals,
-      questions,
-      questionComments,
-      companyQuestions,
-    }),
-    [companyInfo, selectedMinerals, customMinerals, questions, questionComments, companyQuestions]
-  )
-}
-
-/** 读取表单错误信息。 */
-export function useTemplateErrors() {
-  const { errors } = useRequiredContext(TemplateErrorsContext, 'useTemplateErrors')
-  return errors
-}
-
-/** 读取列表数据（冶炼厂/矿山/产品）。 */
-function useTemplateListsInternal() {
-  return useRequiredContext(TemplateListsContext, 'useTemplateState')
-}
-
-/** 读取表单写操作。 */
-export function useTemplateActions() {
-  return useRequiredContext(TemplateActionsContext, 'useTemplateActions')
-}
-
-/** 读取模板状态（静态信息 + 表单主体 + 列表）。 */
-export function useTemplateState(): TemplateState {
-  const meta = useTemplateMetaInternal()
-  const form = useTemplateFormInternal()
-  const lists = useTemplateListsInternal()
-
-  return useMemo(
-    () => ({ meta, form, lists }),
-    [meta, form, lists]
-  )
+  return useTemplateStore(selectIntegrations)
 }

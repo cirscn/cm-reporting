@@ -6,6 +6,7 @@
 import type { I18nKey } from '@core/i18n'
 import type { MineralDef, TemplateVersionDef } from '@core/registry/types'
 import type { ErrorKey } from '@core/validation/errorKeys'
+import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n'
 import { useCreation, useMemoizedFn } from 'ahooks'
 import { Checkbox, Col, Tag, Input, Row, Select, Tooltip, Typography, Flex } from 'antd'
@@ -73,43 +74,25 @@ export function MineralScopeForm({
     next[index] = value
     onCustomMineralsChange?.(next)
   })
-  const toggleHandlers = useCreation(() => {
-    const map = new Map<string, (checked: boolean) => void>()
+  const customSlots = mineralScope.mode === 'free-text' ? freeTextSlots : otherSlots
+
+  /** 复选框 onChange handler（合并原 toggleHandlers + checkboxHandlers）。 */
+  const getCheckboxHandler = useHandlerMap(() => {
+    const map = new Map<string, (event: { target: { checked: boolean } }) => void>()
     mineralScope.minerals.forEach((mineral) => {
-      map.set(mineral.key, (checked) => handleMineralToggle(mineral, checked))
+      map.set(mineral.key, (event) => handleMineralToggle(mineral, event.target.checked))
     })
     return map
-  }, [handleMineralToggle, mineralScope.minerals])
-  const customSlots = mineralScope.mode === 'free-text' ? freeTextSlots : otherSlots
-  const customMineralHandlers = useCreation(() => {
-    const map = new Map<number, (value: string) => void>()
+  }, [mineralScope.minerals, handleMineralToggle])
+
+  /** 自定义矿产名输入 handler（合并原 customMineralHandlers + customInputHandlers）。 */
+  const getCustomInputHandler = useHandlerMap(() => {
+    const map = new Map<number, (event: { target: { value: string } }) => void>()
     customSlots.forEach((index) => {
-      map.set(index, (value) => handleCustomMineralChange(index, value))
+      map.set(index, (event) => handleCustomMineralChange(index, event.target.value))
     })
     return map
   }, [customSlots, handleCustomMineralChange])
-  const checkboxHandlers = useCreation(() => {
-    const map = new Map<string, (event: { target: { checked: boolean } }) => void>()
-    mineralScope.minerals.forEach((mineral) => {
-      const handler = toggleHandlers.get(mineral.key)
-      if (!handler) return
-      map.set(mineral.key, (event) => handler(event.target.checked))
-    })
-    return map
-  }, [mineralScope.minerals, toggleHandlers])
-  const customInputHandlers = useCreation(() => {
-    const map = new Map<number, (event: { target: { value: string } }) => void>()
-    customSlots.forEach((index) => {
-      const handler = customMineralHandlers.get(index)
-      if (!handler) return
-      map.set(index, (event) => handler(event.target.value))
-    })
-    return map
-  }, [customMineralHandlers, customSlots])
-  const getCheckboxHandler = useMemoizedFn((key: string) => checkboxHandlers.get(key))
-  const getCustomInputHandler = useMemoizedFn((index: number) =>
-    customInputHandlers.get(index)
-  )
 
   // 固定模式：仅展示矿种标签（只读）。
   if (mineralScope.mode === 'fixed') {

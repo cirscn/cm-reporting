@@ -11,8 +11,9 @@ import type {
   ProductListIntegration,
   ProductPickContext,
 } from '@lib/public/integrations'
+import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
-import { useCreation, useLatest, useMemoizedFn } from 'ahooks'
+import { useBoolean, useCreation, useLatest, useMemoizedFn } from 'ahooks'
 import { Button, Card, Flex, Modal, Table, Input, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
@@ -44,8 +45,6 @@ const INPUT_FIELDS = [
   'comments',
 ] as const
 
-type InputField = (typeof INPUT_FIELDS)[number]
-
 /** 产品清单表格：支持增删行、行内编辑与外部选择。 */
 export const ProductListTable = memo(function ProductListTable({
   templateType,
@@ -61,7 +60,7 @@ export const ProductListTable = memo(function ProductListTable({
   const { t, locale } = useT()
   /** 批量选择状态（受控）。 */
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
-  const [externalPicking, setExternalPicking] = useState(false)
+  const [externalPicking, { setTrue: startPicking, setFalse: stopPicking }] = useBoolean(false)
   const rowsRef = useLatest(rows)
   const validSelectedRowKeys = useCreation(() => {
     const valid = new Set(rows.map((r) => r.id))
@@ -122,7 +121,7 @@ export const ProductListTable = memo(function ProductListTable({
       config,
       currentRows,
     }
-    setExternalPicking(true)
+    startPicking()
     try {
       const result = await integration.onPickProducts(ctx)
       const items = result?.items ?? []
@@ -135,7 +134,7 @@ export const ProductListTable = memo(function ProductListTable({
         content: t('errors.externalPickFailedContent'),
       })
     } finally {
-      setExternalPicking(false)
+      stopPicking()
     }
   })
 
@@ -160,7 +159,7 @@ export const ProductListTable = memo(function ProductListTable({
   })
 
   /** 缓存输入项 onChange 处理器，避免表格内联函数扩散。 */
-  const inputHandlers = useCreation(() => {
+  const getInputHandler = useHandlerMap(() => {
     const map = new Map<string, (event: ChangeEvent<HTMLInputElement>) => void>()
     rows.forEach((row) => {
       INPUT_FIELDS.forEach((field) => {
@@ -172,25 +171,19 @@ export const ProductListTable = memo(function ProductListTable({
     return map
   }, [rows, handleCellChange])
 
-  const getInputHandler = useMemoizedFn((id: string, field: InputField) =>
-    inputHandlers.get(`${id}:${field}`),
-  )
-
   const handleRemoveRowWithSelection = useMemoizedFn((id: string) => {
     setSelectedRowKeys((prev) => prev.filter((k) => k !== id))
     handleRemoveRow(id)
   })
 
-  const removeHandlers = useCreation(() => {
+  /** 缓存删除按钮 handler。 */
+  const getRemoveHandler = useHandlerMap(() => {
     const map = new Map<string, () => void>()
     rows.forEach((row) => {
       map.set(row.id, () => handleRemoveRowWithSelection(row.id))
     })
     return map
   }, [rows, handleRemoveRowWithSelection])
-
-  /** 获取稳定的删除按钮 handler（返回函数，不在渲染期执行）。 */
-  const getRemoveHandler = useMemoizedFn((id: string) => removeHandlers.get(id))
 
   /** 批量删除处理 */
   const handleBatchDelete = useMemoizedFn(() => {
@@ -233,7 +226,7 @@ export const ProductListTable = memo(function ProductListTable({
             required,
             <Input
               value={value || undefined}
-              onChange={getInputHandler(record.id, 'productNumber')}
+              onChange={getInputHandler(`${record.id}:productNumber`)}
               placeholder={t('productPlaceholders.productNumber')}
             />,
           ),
@@ -246,7 +239,7 @@ export const ProductListTable = memo(function ProductListTable({
         render: (value: string, record: ProductRow) => (
           <Input
             value={value || undefined}
-            onChange={getInputHandler(record.id, 'productName')}
+            onChange={getInputHandler(`${record.id}:productName`)}
             placeholder={t('productPlaceholders.productName')}
           />
         ),
@@ -264,7 +257,7 @@ export const ProductListTable = memo(function ProductListTable({
           render: (value: string, record: ProductRow) => (
             <Input
               value={value || undefined}
-              onChange={getInputHandler(record.id, 'requesterNumber')}
+              onChange={getInputHandler(`${record.id}:requesterNumber`)}
               placeholder={t('productPlaceholders.requesterNumber')}
             />
           ),
@@ -277,7 +270,7 @@ export const ProductListTable = memo(function ProductListTable({
           render: (value: string, record: ProductRow) => (
             <Input
               value={value || undefined}
-              onChange={getInputHandler(record.id, 'requesterName')}
+              onChange={getInputHandler(`${record.id}:requesterName`)}
               placeholder={t('productPlaceholders.requesterName')}
             />
           ),
@@ -293,7 +286,7 @@ export const ProductListTable = memo(function ProductListTable({
       render: (value: string, record: ProductRow) => (
         <Input
           value={value || undefined}
-          onChange={getInputHandler(record.id, 'comments')}
+          onChange={getInputHandler(`${record.id}:comments`)}
           placeholder={t('productPlaceholders.comments')}
         />
       ),

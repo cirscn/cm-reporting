@@ -13,9 +13,8 @@ import { useOptionalNavigation } from '@shell/navigation/useNavigation'
 import { buildTemplatePath } from '@shell/routing/resolveTemplateRoute'
 import { useTemplateState } from '@shell/store'
 import { useT } from '@ui/i18n/useT'
-import { useCreation, useMemoizedFn } from 'ahooks'
+import { useBoolean, useCreation, useMemoizedFn } from 'ahooks'
 import { Button, Flex, List, Modal, Progress, Result, Typography } from 'antd'
-import { useState } from 'react'
 
 const { Text } = Typography
 
@@ -40,7 +39,7 @@ export function PageActions({
   const { templateType, versionId, versionDef } = meta
   const navigation = useOptionalNavigation()
   const { t } = useT()
-  const [submitOpen, setSubmitOpen] = useState(false)
+  const [submitOpen, { setTrue: openSubmit, setFalse: closeSubmit }] = useBoolean(false)
 
   /** 基于当前页计算上一页/下一页（仅包含可用页面）。 */
   const { prev, next } = useCreation(() => {
@@ -66,8 +65,6 @@ export function PageActions({
     if (next) onNavigatePage(next.key)
   })
 
-  const openSubmit = useMemoizedFn(() => setSubmitOpen(true))
-  const closeSubmit = useMemoizedFn(() => setSubmitOpen(false))
   const handleFixErrors = useMemoizedFn(() => {
     const firstError = checkerErrors[0]
     closeSubmit()

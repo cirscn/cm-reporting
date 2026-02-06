@@ -9,6 +9,7 @@ import type { MineralDef, TemplateVersionDef } from '@core/registry/types'
 import { getDisplayMinerals } from '@core/template/minerals'
 import type { MineralsScopeRow } from '@core/types/tableRows'
 import type { ErrorKey } from '@core/validation/errorKeys'
+import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { LAYOUT } from '@ui/theme/spacing'
 import { useCreation, useMemoizedFn } from 'ahooks'
@@ -99,26 +100,23 @@ export function MineralsScopeReasonsForm({
     }
   )
 
-  const inputHandlers = useCreation(() => {
+  const getInputHandler = useHandlerMap(() => {
     const map = new Map<string, (event: ChangeEvent<HTMLInputElement>) => void>()
     rows.forEach((row) => {
-      map.set(`${row.id}:reason`, (event) =>
+      map.set(row.id, (event) =>
         handleCellChange(row.id, 'reason', event.target.value)
       )
     })
     return map
   }, [rows, handleCellChange])
 
-  const selectHandlers = useCreation(() => {
+  const getSelectHandler = useHandlerMap(() => {
     const map = new Map<string, (value: string) => void>()
     rows.forEach((row) => {
-      map.set(`${row.id}:mineral`, (value) => handleCellChange(row.id, 'mineral', value))
+      map.set(row.id, (value) => handleCellChange(row.id, 'mineral', value))
     })
     return map
   }, [rows, handleCellChange])
-
-  const getInputHandler = useMemoizedFn((id: string) => inputHandlers.get(`${id}:reason`))
-  const getSelectHandler = useMemoizedFn((id: string) => selectHandlers.get(`${id}:mineral`))
 
   const columns = useCreation<ColumnsType<MineralsScopeRow>>(
     () => [

@@ -7,6 +7,7 @@ import type { I18nKey } from '@core/i18n'
 import type { MineralDef, QuestionDef, TemplateVersionDef } from '@core/registry/types'
 import type { GatingResult } from '@core/rules/gating'
 import type { ErrorKey } from '@core/validation/errorKeys'
+import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useCreation, useMemoizedFn } from 'ahooks'
 import { Card, Flex, Input, Select, Tag, Typography } from 'antd'
@@ -115,8 +116,8 @@ export function QuestionMatrixForm({
     }
   )
 
-  // 预构建回调
-  const cellHandlers = useCreation(() => {
+  /** 预构建问题回答回调映射。 */
+  const getCellHandlerByKey = useHandlerMap(() => {
     const map = new Map<string, (value: string) => void>()
     questions.forEach((question) => {
       if (question.perMineral) {
@@ -132,7 +133,8 @@ export function QuestionMatrixForm({
     return map
   }, [handleChange, minerals, questions, mineralSignature, questionSignature])
 
-  const commentHandlers = useCreation(() => {
+  /** 预构建问题备注回调映射。 */
+  const getCommentHandlerByKey = useHandlerMap(() => {
     const map = new Map<string, (value: string) => void>()
     questions.forEach((question) => {
       if (question.perMineral) {
@@ -148,17 +150,18 @@ export function QuestionMatrixForm({
     return map
   }, [handleCommentChange, minerals, questions, mineralSignature, questionSignature])
 
+  /** 根据问题类型（全局/按矿产）计算 Map key。 */
   const getCellHandler = useMemoizedFn(
     (questionKey: string, mineralKey: string | null, perMineral: boolean) => {
       const key = perMineral ? `${questionKey}:${mineralKey ?? ''}` : `${questionKey}:__all`
-      return cellHandlers.get(key)!
+      return getCellHandlerByKey(key)!
     }
   )
 
   const getCommentHandler = useMemoizedFn(
     (questionKey: string, mineralKey: string | null, perMineral: boolean) => {
       const key = perMineral ? `${questionKey}:${mineralKey ?? ''}` : `${questionKey}:__all`
-      return commentHandlers.get(key)!
+      return getCommentHandlerByKey(key)!
     }
   )
 

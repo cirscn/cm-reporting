@@ -7,6 +7,7 @@ import { CopyOutlined } from '@ant-design/icons'
 import type { I18nKey } from '@core/i18n'
 import type { FieldDef, TemplateVersionDef } from '@core/registry/types'
 import type { ErrorKey } from '@core/validation/errorKeys'
+import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n'
 import { useCreation, useMemoizedFn } from 'ahooks'
 import { Button, Card, Col, Flex, Row, Tag, Typography } from 'antd'
@@ -105,15 +106,13 @@ export function CompanyInfoForm({
     onChange(key, value)
   })
 
-  const fieldHandlers = useCreation(() => {
+  const getFieldHandler = useHandlerMap(() => {
     const map = new Map<string, (value: string) => void>()
     versionDef.companyInfoFields.forEach((field) => {
       map.set(field.key, (value) => handleChange(field.key, value))
     })
     return map
   }, [versionDef.companyInfoFields, handleChange])
-
-  const getFieldHandler = useMemoizedFn((key: string) => fieldHandlers.get(key)!)
 
   const getPlaceholder = (fieldKey: string) => {
     const key = PLACEHOLDER_KEYS[fieldKey]
