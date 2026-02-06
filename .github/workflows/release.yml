@@ -21,8 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: npm-release
-    env:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     defaults:
       run:
         working-directory: app
@@ -70,44 +68,52 @@ jobs:
       - name: Build library
         run: pnpm build:lib
 
-      - name: Version packages and push
-        id: version
+      - name: Version packages and decide publish
+        id: release_state
         run: |
           CHANGESET_COUNT=$(find .changeset -maxdepth 1 -type f -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')
-          if [ "$CHANGESET_COUNT" = "0" ]; then
+
+          if [ "$CHANGESET_COUNT" != "0" ]; then
+            pnpm version-packages
+
+            if git diff --quiet; then
+              echo "No version diff after changeset version."
+            else
+              git config user.name "github-actions[bot]"
+              git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+              git add -A
+              git commit -m "chore(release): version packages [skip ci]"
+              git push origin "HEAD:${GITHUB_REF_NAME}"
+            fi
+          else
             echo "No unreleased changesets found."
-            echo "published=false" >> "$GITHUB_OUTPUT"
-            exit 0
           fi
 
-          pnpm version-packages
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          echo "package_name=${PACKAGE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "package_version=${PACKAGE_VERSION}" >> "$GITHUB_OUTPUT"
 
-          if git diff --quiet; then
-            echo "No version diff after changeset version."
-            echo "published=false" >> "$GITHUB_OUTPUT"
-            exit 0
+          if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version --registry https://registry.npmjs.org >/dev/null 2>&1; then
+            echo "Version ${PACKAGE_VERSION} is already published."
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Version ${PACKAGE_VERSION} is not published yet."
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
           fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "chore(release): version packages [skip ci]"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
-          echo "published=true" >> "$GITHUB_OUTPUT"
 
       - name: Publish to npm
-        if: steps.version.outputs.published == 'true'
+        if: steps.release_state.outputs.should_publish == 'true'
         run: pnpm release
 
       - name: Sync next dist-tag to latest
-        if: steps.version.outputs.published == 'true' && env.NPM_TOKEN != ''
+        if: steps.release_state.outputs.should_publish == 'true'
         env:
-          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          PACKAGE_NAME=$(node -p "require('./package.json').name")
-          PACKAGE_VERSION=$(node -p "require('./package.json').version")
-          npm dist-tag add "${PACKAGE_NAME}@${PACKAGE_VERSION}" next --registry https://registry.npmjs.org
+          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
+            echo "::notice title=dist-tag skipped::NPM_TOKEN is not configured; next tag was not updated."
+            exit 0
+          fi
 
-      - name: Skip next dist-tag sync (missing NPM_TOKEN)
-        if: steps.version.outputs.published == 'true' && env.NPM_TOKEN == ''
-        run: echo "::notice title=dist-tag skipped::NPM_TOKEN is not configured; next tag was not updated."
+          npm dist-tag add "${{ steps.release_state.outputs.package_name }}@${{ steps.release_state.outputs.package_version }}" next --registry https://registry.npmjs.org

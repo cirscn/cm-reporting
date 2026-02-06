@@ -30,7 +30,7 @@ pnpm sg:scan
 - 日常功能开发 PR 必须包含 changeset 文件（在 `app` 目录执行 `pnpm changeset` 生成）。
 - 版本号由 Changesets 自动维护，禁止手工修改 `app/package.json` 的 `version`（紧急修复场景除外，且需在 PR 描述说明原因）。
 - 发布流程会在 `main` 自动执行 `changeset version`、提交版本变更回 `main`、随后执行 `changeset publish`。
-- `release.yml` 在发布成功后自动同步 `next` dist-tag 到当前发布版本；需在 GitHub Environment `npm-release` 配置 `NPM_TOKEN`（npm automation token，write 权限）。
+- `release.yml` 使用 npm Trusted Publishing（OIDC）执行发布；`NPM_TOKEN` 仅用于可选的 `next` dist-tag 同步（建议在 GitHub Environment `npm-release` 配置 npm automation token，write 权限）。
 - 保留 `.github/workflows/publish-npm.yml` 作为应急兜底流程（手动/标签触发），默认不作为主流程。
 - 触发发布前仍需满足 `app` 强制校验：`pnpm lint`、`pnpm exec tsc -b --pretty false`、`pnpm test`、`pnpm sg:scan`。
 
