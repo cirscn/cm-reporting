@@ -9,13 +9,14 @@ import type { MineralDef, TemplateVersionDef } from '@core/registry/types'
 import { getDisplayMinerals } from '@core/template/minerals'
 import type { MineralsScopeRow } from '@core/types/tableRows'
 import type { ErrorKey } from '@core/validation/errorKeys'
+import { wrapRequired } from '@ui/helpers/fieldRequired'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { LAYOUT } from '@ui/theme/spacing'
 import { useCreation, useMemoizedFn } from 'ahooks'
 import { Button, Flex, Input, Select, Table, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import type { ChangeEvent, ReactNode } from 'react'
+import type { ChangeEvent } from 'react'
 
 interface MineralsScopeReasonsFormProps {
   versionDef: TemplateVersionDef
@@ -66,10 +67,7 @@ export function MineralsScopeReasonsForm({
     [rows]
   )
 
-  /** 必填字段包裹：用于标记黄色必填背景。 */
-  const wrapRequired = useMemoizedFn((node: ReactNode) => (
-    <div className="field-required">{node}</div>
-  ))
+  // wrapRequired 已提取到 @ui/helpers/fieldRequired（此组件始终传 required=true）
 
   const handleAddRow = useMemoizedFn(() => {
     const newRow: MineralsScopeRow = {
@@ -128,6 +126,7 @@ export function MineralsScopeReasonsForm({
         render: (value: string, record: MineralsScopeRow) => {
           const error = errors[rowIndexMap.get(record.id) ?? -1]?.mineral
           return wrapRequired(
+            true,
             <Select
               value={value || undefined}
               onChange={getSelectHandler(record.id)}
@@ -135,7 +134,7 @@ export function MineralsScopeReasonsForm({
               placeholder={t('placeholders.select')}
               className="w-full"
               status={error ? 'error' : undefined}
-            />
+            />,
           )
         },
       },
@@ -149,12 +148,13 @@ export function MineralsScopeReasonsForm({
         render: (value: string, record: MineralsScopeRow) => {
           const error = errors[rowIndexMap.get(record.id) ?? -1]?.reason
           return wrapRequired(
+            true,
             <Input
               value={value || undefined}
               onChange={getInputHandler(record.id)}
               placeholder={t('placeholders.mineralsScopeReason')}
               status={error ? 'error' : undefined}
-            />
+            />,
           )
         },
       },

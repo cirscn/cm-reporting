@@ -1,18 +1,25 @@
+/**
+ * @file adapters/cirsGpmLegacyAdapter/toExternal.ts
+ * @description 内部 Snapshot → CIRS GPM Legacy 格式转换。
+ *
+ * 核心流程：
+ * 1. 深拷贝原始 legacy 对象（保留未映射字段）
+ * 2. 按模块 patch：companyInfo → rangeQuestions → companyQuestions →
+ *    smelters → mines → products → amrtReasons
+ * 3. 每个 patch 函数使用 writeLegacyField 还原字段的原始 null/string/missing 状态
+ * 4. 对 perMineral 数据：只写入活跃矿种，裁剪已取消的矿种行
+ */
+
 import type { TemplateVersionDef } from '@core/registry/types'
 import type { FormData } from '@core/schema'
 import { getActiveMineralKeys, parseOtherMineralKey } from '@core/template/minerals'
+import { deepCloneJson } from '@core/template/strings'
 
 import type { ReportSnapshotV1 } from '../../snapshot'
 
+import { normalizeLegacyYesNoUnknown, writeLegacyField, writeNullableString } from './adapterUtils'
 import { getCirsGpmLegacyPlan, normalizeMineralLabel } from './planCache'
-import type { CirsGpmLegacyReport, CirsGpmLegacyRoundtripContext, NullableFieldState } from './types'
-
-function deepCloneJson<T>(value: T): T {
-  if (typeof structuredClone === 'function') {
-    return structuredClone(value)
-  }
-  return JSON.parse(JSON.stringify(value)) as T
-}
+import type { CirsGpmLegacyReport, CirsGpmLegacyRoundtripContext } from './types'
 
 function isEmpty(value: unknown): boolean {
   return value === '' || value === null || value === undefined
@@ -28,15 +35,7 @@ function dateStringToEpochMsUtc(value: string): number | null {
   return Date.UTC(y, m - 1, d, 0, 0, 0, 0)
 }
 
-function writeNullableString(state: NullableFieldState, next: string): unknown {
-  const trimmed = next ?? ''
-  if (!trimmed) {
-    if (!state.exists) return undefined
-    if (state.wasNull) return null
-    return ''
-  }
-  return trimmed
-}
+// writeNullableString 已提取到 adapterUtils.ts
 
 function getString(value: unknown): string {
   return typeof value === 'string' ? value : ''
@@ -48,16 +47,7 @@ function getAnyString(value: unknown): string {
   return raw.trim()
 }
 
-function normalizeLegacyYesNoUnknown(value: unknown): string {
-  if (value === null || value === undefined) return ''
-  const raw = String(value).trim()
-  if (!raw) return ''
-  const lower = raw.toLowerCase()
-  if (lower === '1' || lower === 'yes' || lower === 'y' || lower === 'true') return 'Yes'
-  if (lower === '0' || lower === 'no' || lower === 'n' || lower === 'false') return 'No'
-  if (lower === 'unknown' || lower === 'unk') return 'Unknown'
-  return raw
-}
+// normalizeLegacyYesNoUnknown 已提取到 adapterUtils.ts
 
 function toLegacyYesNoUnknown(value: string): string {
   const raw = getString(value).trim()
@@ -409,16 +399,8 @@ function patchSmelters(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpmLeg
     if (legacyIndex !== undefined) {
       const item = deepCloneJson(original[legacyIndex] ?? {}) as Record<string, unknown>
       const states = ctx.smelterFieldStatesByIndex.get(legacyIndex) ?? new Map()
-
-      const write = (key: string, value: string) => {
-        const state = states.get(key) ?? { exists: key in item, wasNull: item[key] === null, wasString: typeof item[key] === 'string', wasNumber: typeof item[key] === 'number' }
-        const written = writeNullableString(state, value)
-        if (written === undefined) {
-          if (state.exists) delete item[key]
-          return
-        }
-        item[key] = written
-      }
+      /** 简写：使用共享 writeLegacyField 写回单字段。 */
+      const write = (key: string, value: string) => writeLegacyField(item, states, key, value)
 
       const originalItem = original[legacyIndex] ?? {}
       const originalLookup = getAnyString((originalItem as Record<string, unknown>).smelterLookUp)
@@ -518,16 +500,7 @@ function patchMines(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpmLegacy
     if (legacyIndex !== undefined) {
       const item = deepCloneJson(original[legacyIndex] ?? {}) as Record<string, unknown>
       const states = ctx.mineFieldStatesByIndex.get(legacyIndex) ?? new Map()
-
-      const write = (key: string, value: string) => {
-        const state = states.get(key) ?? { exists: key in item, wasNull: item[key] === null, wasString: typeof item[key] === 'string', wasNumber: typeof item[key] === 'number' }
-        const written = writeNullableString(state, value)
-        if (written === undefined) {
-          if (state.exists) delete item[key]
-          return
-        }
-        item[key] = written
-      }
+      const write = (key: string, value: string) => writeLegacyField(item, states, key, value)
 
       write('metal', resolveMineralLabel(plan, ctx, row.metal, data.customMinerals ?? []))
       write('smelterName', row.smelterName)
@@ -582,16 +555,7 @@ function patchProducts(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpmLeg
       const item = deepCloneJson(original[legacyIndex] ?? {}) as Record<string, unknown>
       const states = ctx.productFieldStatesByIndex.get(legacyIndex) ?? new Map()
       const mapping = ctx.productLegacyKeyByInternalKeyByIndex.get(legacyIndex) ?? null
-
-      const write = (key: string, value: string) => {
-        const state = states.get(key) ?? { exists: key in item, wasNull: item[key] === null, wasString: typeof item[key] === 'string', wasNumber: typeof item[key] === 'number' }
-        const written = writeNullableString(state, value)
-        if (written === undefined) {
-          if (state.exists) delete item[key]
-          return
-        }
-        item[key] = written
-      }
+      const write = (key: string, value: string) => writeLegacyField(item, states, key, value)
 
       write(keyFor(mapping, 'productNumber', 'productNumber'), row.productNumber)
       write(keyFor(mapping, 'productName', 'productName'), row.productName)
@@ -632,16 +596,7 @@ function patchAmrtReasons(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpm
     if (legacyIndex !== undefined) {
       const item = deepCloneJson(original[legacyIndex] ?? {}) as Record<string, unknown>
       const states = ctx.amrtReasonFieldStatesByIndex.get(legacyIndex) ?? new Map()
-
-      const write = (key: string, value: string) => {
-        const state = states.get(key) ?? { exists: key in item, wasNull: item[key] === null, wasString: typeof item[key] === 'string', wasNumber: typeof item[key] === 'number' }
-        const written = writeNullableString(state, value)
-        if (written === undefined) {
-          if (state.exists) delete item[key]
-          return
-        }
-        item[key] = written
-      }
+      const write = (key: string, value: string) => writeLegacyField(item, states, key, value)
 
       write('metal', resolveMineralLabel(plan, ctx, row.mineral, data.customMinerals ?? []))
       write('reason', row.reason)

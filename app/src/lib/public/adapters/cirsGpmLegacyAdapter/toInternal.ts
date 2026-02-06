@@ -1,19 +1,24 @@
-import type { TemplateVersionDef } from '@core/registry/types'
-import type { FormData } from '@core/schema'
+/**
+ * @file adapters/cirsGpmLegacyAdapter/toInternal.ts
+ * @description CIRS GPM Legacy 格式 → 内部 Snapshot 转换。
+ *
+ * 核心流程：
+ * 1. 解析原始 legacy JSON，识别 templateType / versionId
+ * 2. 以 createEmptyFormData 构造空白表单，再按模块填充
+ * 3. 矿种识别：从 legacy 标签还原内部 mineralKey，支持 dynamic-dropdown / free-text
+ * 4. 记录字段原始状态（NullableFieldState / mineralLabelByKey 等）用于写回时还原
+ */
+
+import { createEmptyFormData } from '@core/template/formDefaults'
+import { deepCloneJson } from '@core/template/strings'
 import type { MineRow, MineralsScopeRow, ProductRow, SmelterRow } from '@core/types/tableRows'
 
 import type { ReportSnapshotV1 } from '../../snapshot'
 
+import { normalizeLegacyYesNoUnknown } from './adapterUtils'
 import { parseCirsGpmLegacyReport } from './parse'
 import { getCirsGpmLegacyPlan, normalizeMineralLabel } from './planCache'
 import type { CirsGpmLegacyRoundtripContext, NullableFieldState } from './types'
-
-function deepCloneJson<T>(value: T): T {
-  if (typeof structuredClone === 'function') {
-    return structuredClone(value)
-  }
-  return JSON.parse(JSON.stringify(value)) as T
-}
 
 function readFieldState(obj: Record<string, unknown> | undefined, key: string): NullableFieldState {
   if (!obj) return { exists: false, wasNull: false, wasString: false, wasNumber: false }
@@ -66,87 +71,7 @@ function epochMsToDateString(value: string | number | null | undefined): string 
   return `${y}-${m}-${day}`
 }
 
-function humanizeKey(value: string): string {
-  return value
-    .split(/[-_]/)
-    .map((part) => (part ? part[0]!.toUpperCase() + part.slice(1) : part))
-    .join(' ')
-}
-
-function createEmptyFormData(versionDef: TemplateVersionDef): FormData {
-  const companyInfo: Record<string, string> = {}
-  for (const field of versionDef.companyInfoFields) {
-    companyInfo[field.key] = ''
-  }
-
-  const questions: Record<string, Record<string, string> | string> = {}
-  const questionComments: Record<string, Record<string, string> | string> = {}
-  for (const question of versionDef.questions) {
-    if (question.perMineral) {
-      const perMineral: Record<string, string> = {}
-      for (const mineral of versionDef.mineralScope.minerals) {
-        perMineral[mineral.key] = ''
-      }
-      questions[question.key] = perMineral
-      questionComments[question.key] = { ...perMineral }
-    } else {
-      questions[question.key] = ''
-      questionComments[question.key] = ''
-    }
-  }
-
-  const companyQuestions: Record<string, Record<string, string> | string> = {}
-  for (const cq of versionDef.companyQuestions) {
-    if (cq.perMineral) {
-      const perMineral: Record<string, string> = {}
-      for (const mineral of versionDef.mineralScope.minerals) {
-        perMineral[mineral.key] = ''
-      }
-      companyQuestions[cq.key] = perMineral
-    } else {
-      companyQuestions[cq.key] = ''
-    }
-    if (cq.hasCommentField) {
-      if (cq.perMineral) {
-        const perMineralComment: Record<string, string> = {}
-        for (const mineral of versionDef.mineralScope.minerals) {
-          perMineralComment[mineral.key] = ''
-        }
-        companyQuestions[`${cq.key}_comment`] = perMineralComment
-      } else {
-        companyQuestions[`${cq.key}_comment`] = ''
-      }
-    }
-  }
-
-  const mineralsScope: MineralsScopeRow[] = []
-
-  const allMinerals = versionDef.mineralScope.minerals.map((m) => m.key)
-  const selectedMinerals = versionDef.mineralScope.mode === 'fixed' ? allMinerals : []
-  const customMinerals =
-    versionDef.mineralScope.mode === 'free-text'
-      ? allMinerals.map((mineral, index) => {
-          const defaults = versionDef.mineralScope.defaultCustomMinerals
-          if (defaults && defaults.length > 0) {
-            return defaults[index] ?? humanizeKey(mineral)
-          }
-          return humanizeKey(mineral)
-        })
-      : []
-
-  return {
-    companyInfo,
-    selectedMinerals,
-    customMinerals,
-    questions,
-    questionComments,
-    companyQuestions,
-    mineralsScope,
-    smelterList: [],
-    mineList: [],
-    productList: [],
-  }
-}
+// humanizeKey / createEmptyFormData / deepCloneJson 已提取到 @core/template/strings.ts 和 @core/template/formDefaults.ts
 
 function coerceId(value: unknown, fallback: string): string {
   if (typeof value === 'string' && value.trim()) return value
@@ -162,16 +87,7 @@ function ensureObjectRecord(value: Record<string, Record<string, string> | strin
   return next
 }
 
-function normalizeLegacyYesNoUnknown(value: unknown): string {
-  if (value === null || value === undefined) return ''
-  const raw = String(value).trim()
-  if (!raw) return ''
-  const lower = raw.toLowerCase()
-  if (lower === '1' || lower === 'yes' || lower === 'y' || lower === 'true') return 'Yes'
-  if (lower === '0' || lower === 'no' || lower === 'n' || lower === 'false') return 'No'
-  if (lower === 'unknown' || lower === 'unk') return 'Unknown'
-  return raw
-}
+// normalizeLegacyYesNoUnknown 已提取到 adapterUtils.ts
 
 export function cirsGpmLegacyToInternal(input: unknown): { snapshot: ReportSnapshotV1; ctx: CirsGpmLegacyRoundtripContext } {
   const parsed = parseCirsGpmLegacyReport(input)

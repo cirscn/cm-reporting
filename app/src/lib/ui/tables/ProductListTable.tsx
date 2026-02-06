@@ -11,13 +11,14 @@ import type {
   ProductListIntegration,
   ProductPickContext,
 } from '@lib/public/integrations'
+import { wrapRequired } from '@ui/helpers/fieldRequired'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useBoolean, useCreation, useLatest, useMemoizedFn } from 'ahooks'
 import { Button, Card, Flex, Modal, Table, Input, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
-import type { ChangeEvent, ReactNode } from 'react'
+import type { ChangeEvent } from 'react'
 import { memo, useState } from 'react'
 
 interface ProductListTableProps {
@@ -70,12 +71,7 @@ export const ProductListTable = memo(function ProductListTable({
   /** 行索引缓存：避免频繁全表 map/filter。 */
   const rowIndexMap = useCreation(() => new Map(rows.map((row, index) => [row.id, index])), [rows])
 
-  /** 必填字段包裹：用于标记黄色必填背景。 */
-  const wrapRequired = useMemoizedFn((isRequired: boolean, node: ReactNode) => {
-    if (!isRequired) return node
-    return <div className="field-required">{node}</div>
-  })
-
+  // wrapRequired 已提取到 @ui/helpers/fieldRequired
   /** 添加空行（保持字段结构完整）。 */
   const handleAddRow = useMemoizedFn(() => {
     const newRow: ProductRow = {

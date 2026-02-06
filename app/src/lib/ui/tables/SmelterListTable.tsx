@@ -20,6 +20,7 @@ import type {
   SmelterRowPickContext,
   SmelterLookupMode,
 } from '@lib/public/integrations'
+import { wrapRequired } from '@ui/helpers/fieldRequired'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useBoolean, useCreation, useLatest, useMemoizedFn } from 'ahooks'
@@ -37,7 +38,7 @@ import {
 } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
-import type { ChangeEvent, ReactNode } from 'react'
+import type { ChangeEvent } from 'react'
 import { memo, useState } from 'react'
 
 interface SmelterListTableProps {
@@ -134,12 +135,7 @@ export const SmelterListTable = memo(function SmelterListTable({
     return config.notYetIdentifiedCountryDefault ?? 'Unknown'
   }
 
-  /** 必填字段包裹：仅在 required 时添加样式容器。 */
-  const wrapRequired = (required: boolean, node: ReactNode) => {
-    if (!required) return node
-    return <div className="field-required">{node}</div>
-  }
-
+  // wrapRequired 已提取到 @ui/helpers/fieldRequired
   /** 添加空行（保持字段结构完整）。 */
   const handleAddRow = useMemoizedFn(() => {
     const newRow: SmelterRow = {
@@ -313,7 +309,15 @@ export const SmelterListTable = memo(function SmelterListTable({
     handleRemoveRow(id)
   })
 
-  /** lookup 变更时同步填充/清空相关字段。 */
+  /**
+   * lookup 变更时同步填充/清空相关字段。
+   *
+   * 业务逻辑：
+   * - "Smelter not listed" → 清空所有 ID/地址字段，要求手动填写名称和国家
+   * - "Smelter not yet identified" → 填入 Unknown 值，按 metal 自动匹配国家
+   * - 内部 lookup 模式 → 以 lookup 值作为名称
+   * - 外部 lookup 模式 → 从 smelterLookupRecords 匹配并填充完整信息
+   */
   const applySmelterLookup = (row: SmelterRow, value: string) => {
     const normalizedValue = normalizeSmelterLookup(value)
     const next: SmelterRow = { ...row, smelterLookup: normalizedValue }
@@ -369,7 +373,15 @@ export const SmelterListTable = memo(function SmelterListTable({
     }
   }
 
-  /** 更新单元格（lookup 字段需走联动逻辑）。 */
+  /**
+   * 更新单元格值（lookup / metal 字段有联动逻辑）。
+   *
+   * 特殊处理：
+   * - smelterLookup 变更 → 走 applySmelterLookup 联动
+   * - metal 变更 + 当前为 "not yet identified" → 同步更新国家
+   * - combinedMetal 变更 → 同时更新 metal
+   * - 其它字段 → 直接更新
+   */
   const handleCellChange = useMemoizedFn((id: string, field: keyof SmelterRow, value: string) => {
     const index = rowIndexMap.get(id)
     if (index === undefined) return
@@ -489,6 +501,12 @@ export const SmelterListTable = memo(function SmelterListTable({
     (option?.label ?? '').toLowerCase().includes(input.toLowerCase()),
   )
 
+  // ---------------------------------------------------------------------------
+  // 列定义（约 430 行）
+  // 按业务逻辑顺序构建：metal → smelterLookup/smelterName → smelterId →
+  // country → identification → sourceId → 地址字段 → recycledScrap → comments → 操作
+  // 每列的 render 函数负责行内编辑（Input/Select/AutoComplete）和必填标记。
+  // ---------------------------------------------------------------------------
   const columns = useCreation<ColumnsType<SmelterRow>>(() => {
     const columns: ColumnsType<SmelterRow> = []
 

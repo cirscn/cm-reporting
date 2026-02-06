@@ -7,12 +7,13 @@
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import type { MineralDef, MineListConfig } from '@core/registry/types'
 import type { MineRow } from '@core/types/tableRows'
+import { wrapRequired } from '@ui/helpers/fieldRequired'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useCreation, useMemoizedFn } from 'ahooks'
 import { AutoComplete, Button, Card, Flex, Table, Select, Input, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import type { ChangeEvent, ReactNode } from 'react'
+import type { ChangeEvent } from 'react'
 
 interface MineListTableProps {
   config: MineListConfig
@@ -57,12 +58,7 @@ export function MineListTable({
     [rows]
   )
 
-  /** 必填字段包裹：用于标记黄色必填背景。 */
-  const wrapRequired = useMemoizedFn((required: boolean, node: ReactNode) => {
-    if (!required) return node
-    return <div className="field-required">{node}</div>
-  })
-
+  // wrapRequired 已提取到 @ui/helpers/fieldRequired
   /** 添加空行（保持字段结构完整）。 */
   const handleAddRow = useMemoizedFn(() => {
     const newRow: MineRow = {

@@ -14,6 +14,7 @@ import { getVersionDef } from '@core/registry'
 import type { TemplateType, TemplateVersionDef } from '@core/registry/types'
 import { calculateGating } from '@core/rules/gating'
 import { buildFormSchema } from '@core/schema'
+import { createEmptyFormData } from '@core/template/formDefaults'
 import type { MineRow, MineralsScopeRow, ProductRow, SmelterRow } from '@core/types/tableRows'
 import type { ErrorKey } from '@core/validation/errorKeys'
 import type { CMReportingIntegrations } from '@lib/public/integrations'
@@ -95,85 +96,41 @@ export interface TemplateStoreState {
 // 辅助函数
 // ---------------------------------------------------------------------------
 
-/** 将 key 转为更友好的展示形式（用于默认自定义矿产名）。 */
-function humanizeKey(value: string): string {
-  return value
-    .split(/[-_]/)
-    .map((part) => (part ? part[0].toUpperCase() + part.slice(1) : part))
-    .join(' ')
+/** 嵌套字段写入器：处理 Record<key, Record<subKey, value> | value> 结构。 */
+function writeNestedField(
+  target: Record<string, Record<string, string> | string>,
+  key: string,
+  value: string,
+  subKey?: string | null,
+) {
+  if (subKey) {
+    const current = target[key]
+    if (typeof current === 'object') {
+      current[subKey] = value
+    } else {
+      target[key] = { [subKey]: value }
+    }
+  } else {
+    target[key] = value
+  }
 }
 
-/** 基于模板定义构造空表单默认值。 */
-function createEmptyState(versionDef: TemplateVersionDef): TemplateFormState {
-  const companyInfo: Record<string, string> = {}
-  for (const field of versionDef.companyInfoFields) {
-    companyInfo[field.key] = ''
-  }
-
-  const questions: Record<string, Record<string, string> | string> = {}
-  const questionComments: Record<string, Record<string, string> | string> = {}
-  for (const question of versionDef.questions) {
-    if (question.perMineral) {
-      const perMineral: Record<string, string> = {}
-      for (const mineral of versionDef.mineralScope.minerals) {
-        perMineral[mineral.key] = ''
-      }
-      questions[question.key] = perMineral
-      questionComments[question.key] = { ...perMineral }
-    } else {
-      questions[question.key] = ''
-      questionComments[question.key] = ''
-    }
-  }
-
-  const companyQuestions: Record<string, Record<string, string> | string> = {}
-  for (const cq of versionDef.companyQuestions) {
-    if (cq.perMineral) {
-      const perMineral: Record<string, string> = {}
-      for (const mineral of versionDef.mineralScope.minerals) {
-        perMineral[mineral.key] = ''
-      }
-      companyQuestions[cq.key] = perMineral
-    } else {
-      companyQuestions[cq.key] = ''
-    }
-    if (cq.hasCommentField) {
-      if (cq.perMineral) {
-        const perMineralComment: Record<string, string> = {}
-        for (const mineral of versionDef.mineralScope.minerals) {
-          perMineralComment[mineral.key] = ''
-        }
-        companyQuestions[`${cq.key}_comment`] = perMineralComment
-      } else {
-        companyQuestions[`${cq.key}_comment`] = ''
-      }
-    }
-  }
-
-  const allMinerals = versionDef.mineralScope.minerals.map((m) => m.key)
-  const selectedMinerals = versionDef.mineralScope.mode === 'fixed' ? allMinerals : []
-  const customMinerals =
-    versionDef.mineralScope.mode === 'free-text'
-      ? allMinerals.map((mineral, index) => {
-          const defaults = versionDef.mineralScope.defaultCustomMinerals
-          if (defaults && defaults.length > 0) {
-            return defaults[index] ?? humanizeKey(mineral)
-          }
-          return humanizeKey(mineral)
-        })
-      : []
-
-  return {
-    companyInfo,
-    selectedMinerals,
-    customMinerals,
-    questions,
-    questionComments,
-    companyQuestions,
-    mineralsScope: [],
-    smelterList: [],
-    mineList: [],
-    productList: [],
+/**
+ * 问题字段写入器：按 perMineral 决定写入 Record<mineral, string> 还是纯 string。
+ * 同时用于 questions 和 questionComments。
+ */
+function writeQuestionField(
+  target: Record<string, Record<string, string> | string>,
+  def: { perMineral: boolean },
+  questionKey: string,
+  mineralKey: string | null,
+  value: string,
+) {
+  if (def.perMineral) {
+    if (!mineralKey) return
+    writeNestedField(target, questionKey, value, mineralKey)
+  } else {
+    target[questionKey] = value
   }
 }
 
@@ -289,7 +246,7 @@ function createTemplateStore(
   integrations?: CMReportingIntegrations
 ) {
   const versionDef = getVersionDef(templateType, versionId)
-  const defaultState = createEmptyState(versionDef)
+  const defaultState = createEmptyFormData(versionDef)
   const schema = buildFormSchema(versionDef)
 
   const questionDefsByKey = new Map(versionDef.questions.map((q) => [q.key, q]))
@@ -326,6 +283,65 @@ function createTemplateStore(
         set({ errors })
       }
     })
+  }
+
+  /**
+   * 门控级联清空：Q1/Q2 变更时，按 gating 规则清空受影响的后续问题。
+   *
+   * 逻辑：
+   * 1. 仅 Q1/Q2 触发级联
+   * 2. 计算当前 gating 状态
+   * 3. 若 Q2 被禁用：清空 Q2 + Q2 之后所有问题
+   * 4. 若仅后续问题被禁用：清空 Q2 之后所有问题
+   */
+  function applyGatingCascade(
+    s: TemplateStoreState,
+    questionKey: string,
+    mineralKey: string | null,
+    value: string,
+    def: { perMineral: boolean },
+  ) {
+    if (questionKey !== 'Q1' && questionKey !== 'Q2') return
+
+    // 构建包含最新值的 questions 快照用于 gating 计算
+    const nextQuestions = { ...getFormData(s).questions }
+    if (def.perMineral && mineralKey) {
+      const cur = typeof nextQuestions[questionKey] === 'object' ? nextQuestions[questionKey] : {}
+      nextQuestions[questionKey] = { ...(cur as Record<string, string>), [mineralKey]: value }
+    } else if (!def.perMineral) {
+      nextQuestions[questionKey] = value
+    }
+
+    const gating = calculateGating(
+      versionDef,
+      nextQuestions,
+      def.perMineral ? mineralKey ?? undefined : undefined,
+    )
+    const q2Index = questionKeyOrder.indexOf('Q2')
+    if (q2Index < 0) return
+    const laterKeys = questionKeyOrder.slice(q2Index + 1)
+
+    /** 清空指定问题的回答与备注。 */
+    const clearQuestion = (k: string, m: string | null) => {
+      const d = questionDefsByKey.get(k)
+      if (!d) return
+      if (d.perMineral && m) {
+        const qv = s.questions[k]
+        if (typeof qv === 'object') qv[m] = ''
+        const cv = s.questionComments[k]
+        if (typeof cv === 'object') cv[m] = ''
+      } else if (!d.perMineral) {
+        s.questions[k] = ''
+        s.questionComments[k] = ''
+      }
+    }
+
+    if (!gating.q2Enabled) {
+      clearQuestion('Q2', mineralKey)
+      laterKeys.forEach((k) => clearQuestion(k, mineralKey))
+    } else if (!gating.laterQuestionsEnabled) {
+      laterKeys.forEach((k) => clearQuestion(k, mineralKey))
+    }
   }
 
   return createStore<TemplateStoreState>()(
@@ -374,61 +390,14 @@ function createTemplateStore(
 
       setQuestionValue: (questionKey, mineralKey, value) => {
         set((s) => {
-          // 写入回答
+          // ── 1. 写入回答值 ──
           const def = questionDefsByKey.get(questionKey)
           if (!def) return
-          if (def.perMineral) {
-            if (!mineralKey) return
-            const current = s.questions[questionKey]
-            if (typeof current === 'object') {
-              current[mineralKey] = value
-            } else {
-              s.questions[questionKey] = { [mineralKey]: value }
-            }
-          } else {
-            s.questions[questionKey] = value
-          }
+          writeQuestionField(s.questions, def, questionKey, mineralKey, value)
           s.isDirty = true
 
-          // 门控级联：Q1/Q2 变更时清空受影响的后续问题
-          if (questionKey !== 'Q1' && questionKey !== 'Q2') return
-          const nextQuestions = { ...getFormData(s).questions }
-          if (def.perMineral && mineralKey) {
-            const cur = typeof nextQuestions[questionKey] === 'object' ? nextQuestions[questionKey] : {}
-            nextQuestions[questionKey] = { ...(cur as Record<string, string>), [mineralKey]: value }
-          } else if (!def.perMineral) {
-            nextQuestions[questionKey] = value
-          }
-
-          const gating = calculateGating(
-            versionDef,
-            nextQuestions,
-            def.perMineral ? mineralKey ?? undefined : undefined
-          )
-          const q2Index = questionKeyOrder.indexOf('Q2')
-          if (q2Index < 0) return
-          const laterKeys = questionKeyOrder.slice(q2Index + 1)
-
-          const clearQuestion = (k: string, m: string | null) => {
-            const d = questionDefsByKey.get(k)
-            if (!d) return
-            if (d.perMineral && m) {
-              const qv = s.questions[k]
-              if (typeof qv === 'object') qv[m] = ''
-              const cv = s.questionComments[k]
-              if (typeof cv === 'object') cv[m] = ''
-            } else if (!d.perMineral) {
-              s.questions[k] = ''
-              s.questionComments[k] = ''
-            }
-          }
-
-          if (!gating.q2Enabled) {
-            clearQuestion('Q2', mineralKey)
-            laterKeys.forEach((k) => clearQuestion(k, mineralKey))
-          } else if (!gating.laterQuestionsEnabled) {
-            laterKeys.forEach((k) => clearQuestion(k, mineralKey))
-          }
+          // ── 2. 门控级联：Q1/Q2 变更时清空受影响的后续问题 ──
+          applyGatingCascade(s, questionKey, mineralKey, value, def)
         })
         scheduleValidation(set, get)
       },
@@ -437,17 +406,7 @@ function createTemplateStore(
         set((s) => {
           const def = questionDefsByKey.get(questionKey)
           if (!def) return
-          if (def.perMineral) {
-            if (!mineralKey) return
-            const current = s.questionComments[questionKey]
-            if (typeof current === 'object') {
-              current[mineralKey] = value
-            } else {
-              s.questionComments[questionKey] = { [mineralKey]: value }
-            }
-          } else {
-            s.questionComments[questionKey] = value
-          }
+          writeQuestionField(s.questionComments, def, questionKey, mineralKey, value)
           s.isDirty = true
         })
         scheduleValidation(set, get)
@@ -455,16 +414,7 @@ function createTemplateStore(
 
       setCompanyQuestionValue: (key, value, mineralKey?) => {
         set((s) => {
-          if (mineralKey) {
-            const current = s.companyQuestions[key]
-            if (typeof current === 'object') {
-              current[mineralKey] = value
-            } else {
-              s.companyQuestions[key] = { [mineralKey]: value }
-            }
-          } else {
-            s.companyQuestions[key] = value
-          }
+          writeNestedField(s.companyQuestions, key, value, mineralKey)
           s.isDirty = true
         })
         scheduleValidation(set, get)

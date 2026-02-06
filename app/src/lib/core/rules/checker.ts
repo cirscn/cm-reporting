@@ -206,90 +206,75 @@ function checkCompanyQuestions(
 ) {
   if (versionDef.companyQuestions.length === 0) return
 
-  const asText = (value: unknown) => (typeof value === 'string' ? value : '')
-
   const activeMinerals = getActiveMineralKeys(versionDef, formState)
   const gatingByMineral = calculateAllGating(versionDef, formState.questionAnswers, activeMinerals)
   const hasRequiredMineral = some(
     activeMinerals,
-    (mineralKey) => gatingByMineral.get(mineralKey)?.companyQuestionsEnabled === true
+    (mineralKey) => gatingByMineral.get(mineralKey)?.companyQuestionsEnabled === true,
   )
-
   if (!hasRequiredMineral) return
 
   for (const question of versionDef.companyQuestions) {
     if (question.perMineral) {
+      // ── perMineral 公司问题：每个活跃矿种独立校验 ──
       for (const mineralKey of activeMinerals) {
-        const gating = gatingByMineral.get(mineralKey)
-        if (!gating?.companyQuestionsEnabled) continue
-        const valueRecord = formData.companyQuestions[question.key]
-        const rawValue =
-          valueRecord && typeof valueRecord === 'object' ? valueRecord[mineralKey] ?? '' : ''
-        const value = asText(rawValue)
-        if (!value.trim()) {
-          pushError(
-            errors,
-            'E',
-            ERROR_KEYS.checker.requiredField,
-            `companyQuestions.${question.key}.${mineralKey}`,
-            question.labelKey
-          )
-          continue
-        }
-        if (question.hasCommentField) {
-          const requiredWhen = question.commentRequiredWhen ?? []
-          if (requiredWhen.length === 0 || !requiredWhen.includes(value)) {
-            continue
-          }
-          const commentRecord = formData.companyQuestions[`${question.key}_comment`]
-          const rawComment =
-            commentRecord && typeof commentRecord === 'object'
-              ? commentRecord[mineralKey] ?? ''
-              : ''
-          const comment = asText(rawComment)
-          if (!comment.trim()) {
-            pushError(
-              errors,
-              'E',
-              ERROR_KEYS.checker.requiredCompanyQuestionComment,
-              `companyQuestions.${question.key}_comment.${mineralKey}`,
-              question.commentLabelKey ?? question.labelKey
-            )
-          }
-        }
+        if (!gatingByMineral.get(mineralKey)?.companyQuestionsEnabled) continue
+        checkSingleCompanyQuestion(formData, question, errors, mineralKey)
       }
-      continue
-    }
-
-    const value = asText(formData.companyQuestions[question.key])
-    if (!value.trim()) {
-      pushError(
-        errors,
-        'E',
-        ERROR_KEYS.checker.requiredField,
-        `companyQuestions.${question.key}`,
-        question.labelKey
-      )
-      continue
-    }
-
-    if (question.hasCommentField) {
-      const requiredWhen = question.commentRequiredWhen ?? []
-      if (requiredWhen.length === 0 || !requiredWhen.includes(value)) {
-        continue
-      }
-      const comment = asText(formData.companyQuestions[`${question.key}_comment`])
-      if (!comment.trim()) {
-        pushError(
-          errors,
-          'E',
-          ERROR_KEYS.checker.requiredCompanyQuestionComment,
-          `companyQuestions.${question.key}_comment`,
-          question.commentLabelKey ?? question.labelKey
-        )
-      }
+    } else {
+      // ── 全局公司问题 ──
+      checkSingleCompanyQuestion(formData, question, errors)
     }
   }
+}
+
+/**
+ * 校验单个公司级问题（含 comment 条件校验）。
+ *
+ * @param mineralKey - 若为 perMineral 问题则传入矿种 key，否则 undefined
+ */
+function checkSingleCompanyQuestion(
+  formData: FormDataForChecker,
+  question: TemplateVersionDef['companyQuestions'][number],
+  errors: CheckerError[],
+  mineralKey?: string,
+) {
+  const asText = (v: unknown) => (typeof v === 'string' ? v : '')
+  const fieldSuffix = mineralKey ? `.${mineralKey}` : ''
+
+  // ── 1. 校验回答值是否为空 ──
+  const value = mineralKey
+    ? asText(extractNestedValue(formData.companyQuestions[question.key], mineralKey))
+    : asText(formData.companyQuestions[question.key])
+
+  if (!value.trim()) {
+    pushError(errors, 'E', ERROR_KEYS.checker.requiredField, `companyQuestions.${question.key}${fieldSuffix}`, question.labelKey)
+    return
+  }
+
+  // ── 2. 条件校验 comment：仅当回答值匹配 commentRequiredWhen 时 ──
+  if (!question.hasCommentField) return
+  const requiredWhen = question.commentRequiredWhen ?? []
+  if (requiredWhen.length === 0 || !requiredWhen.includes(value)) return
+
+  const commentKey = `${question.key}_comment`
+  const comment = mineralKey
+    ? asText(extractNestedValue(formData.companyQuestions[commentKey], mineralKey))
+    : asText(formData.companyQuestions[commentKey])
+
+  if (!comment.trim()) {
+    pushError(
+      errors, 'E', ERROR_KEYS.checker.requiredCompanyQuestionComment,
+      `companyQuestions.${commentKey}${fieldSuffix}`,
+      question.commentLabelKey ?? question.labelKey,
+    )
+  }
+}
+
+/** 从嵌套 Record<string, Record<string, string> | string> 中提取 mineralKey 对应值。 */
+function extractNestedValue(record: Record<string, string> | string | undefined, mineralKey: string): string {
+  if (record && typeof record === 'object') return record[mineralKey] ?? ''
+  return ''
 }
 
 // ---------------------------------------------------------------------------
