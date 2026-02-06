@@ -102,18 +102,35 @@ jobs:
             echo "should_publish=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Publish to npm
+      - name: Ensure OIDC context for npm publish
         if: steps.release_state.outputs.should_publish == 'true'
-        run: pnpm release
+        run: |
+          if [ -z "${ACTIONS_ID_TOKEN_REQUEST_URL:-}" ] || [ -z "${ACTIONS_ID_TOKEN_REQUEST_TOKEN:-}" ]; then
+            echo "::error title=OIDC unavailable::GitHub OIDC token context is missing. Check workflow permission id-token: write."
+            exit 1
+          fi
+
+      - name: Publish to npm (Trusted Publishing)
+        if: steps.release_state.outputs.should_publish == 'true'
+        env:
+          NODE_AUTH_TOKEN: ''
+          NPM_TOKEN: ''
+          NPM_CONFIG_USERCONFIG: ${{ runner.temp }}/npmrc-trusted
+        run: |
+          printf "registry=https://registry.npmjs.org/\n" > "$NPM_CONFIG_USERCONFIG"
+          pnpm release
 
       - name: Sync next dist-tag to latest
         if: steps.release_state.outputs.should_publish == 'true'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_USERCONFIG: ${{ runner.temp }}/npmrc-disttag
         run: |
           if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
             echo "::notice title=dist-tag skipped::NPM_TOKEN is not configured; next tag was not updated."
             exit 0
           fi
+
+          printf "%s\n" "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" "registry=https://registry.npmjs.org/" > "$NPM_CONFIG_USERCONFIG"
 
           npm dist-tag add "${{ steps.release_state.outputs.package_name }}@${{ steps.release_state.outputs.package_version }}" next --registry https://registry.npmjs.org
