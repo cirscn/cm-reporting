@@ -73,7 +73,7 @@ jobs:
         run: pnpm test
 
       - name: Security scan
-        run: pnpm sg:scan
+        run: pnpm --package=@ast-grep/cli dlx ast-grep scan -c ../sgconfig.yml ./src
 
       - name: Build library
         run: pnpm build:lib
