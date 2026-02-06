@@ -22,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: npm-release
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     defaults:
       run:
         working-directory: app
@@ -72,6 +74,7 @@ jobs:
           ln -s app/.changeset ../.changeset
 
       - name: Create release PR or publish
+        id: changesets
         uses: changesets/action@v1
         with:
           cwd: app
@@ -81,3 +84,16 @@ jobs:
           publish: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync next dist-tag to latest
+        if: steps.changesets.outputs.published == 'true' && env.NPM_TOKEN != ''
+        env:
+          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          npm dist-tag add "${PACKAGE_NAME}@${PACKAGE_VERSION}" next --registry https://registry.npmjs.org
+
+      - name: Skip next dist-tag sync (missing NPM_TOKEN)
+        if: steps.changesets.outputs.published == 'true' && env.NPM_TOKEN == ''
+        run: echo "::notice title=dist-tag skipped::NPM_TOKEN is not configured; next tag was not updated."
