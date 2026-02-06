@@ -66,6 +66,11 @@ jobs:
       - name: Build library
         run: pnpm build:lib
 
+      - name: Link root .changeset for action compatibility
+        run: |
+          rm -rf ../.changeset
+          ln -s app/.changeset ../.changeset
+
       - name: Create release PR or publish
         uses: changesets/action@v1
         with:
