@@ -1,6 +1,6 @@
 /**
- * @file demo/DemoHeader.tsx
- * @description Demo 环境专用 Header，深色玻璃态设计风格。
+ * @file examples/ExamplesHeader.tsx
+ * @description Example 环境专用 Header，深色玻璃态设计风格。
  */
 
 import { ExportOutlined, ImportOutlined, SwapOutlined } from '@ant-design/icons'
@@ -13,7 +13,7 @@ import { Button, Flex, Select, Typography } from 'antd'
 
 const { Text } = Typography
 
-interface DemoHeaderProps {
+interface ExamplesHeaderProps {
   /** 当前模板类型 */
   templateType: TemplateType
   /** 当前版本 */
@@ -47,10 +47,10 @@ const localeOptions: { value: Locale; label: string }[] = [
 ]
 
 /**
- * DemoHeader：Demo 环境专用顶部导航栏。
+ * ExamplesHeader：Example 环境专用顶部导航栏。
  * 深色玻璃态设计，包含模板选择器、版本选择器、语言切换器和导出按钮。
  */
-export function DemoHeader({
+export function ExamplesHeader({
   templateType,
   versionId,
   locale,
@@ -59,7 +59,7 @@ export function DemoHeader({
   onLocaleChange,
   onExport,
   onImport,
-}: DemoHeaderProps) {
+}: ExamplesHeaderProps) {
   const { t } = useT()
 
   /** 当前模板的版本列表 */
@@ -92,7 +92,7 @@ export function DemoHeader({
   })
 
   return (
-    <header className="demo-header sticky top-0 z-[60]">
+    <header className="examples-header sticky top-[44px] z-[70]">
       {/* 主导航区域 - 深色玻璃态背景 */}
       <div
         className="relative overflow-hidden px-4"
@@ -192,7 +192,7 @@ export function DemoHeader({
             <Flex
               align="center"
               gap={8}
-              className="demo-header-controls"
+              className="examples-header-controls"
               style={{
                 padding: '6px 12px',
                 background: 'rgba(255, 255, 255, 0.04)',
@@ -273,7 +273,7 @@ export function DemoHeader({
                 type="primary"
                 icon={<ExportOutlined />}
                 onClick={handleExport}
-                className="demo-header-export"
+                className="examples-header-export"
                 style={{
                   height: 36,
                   paddingLeft: 16,

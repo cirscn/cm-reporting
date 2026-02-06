@@ -6,6 +6,7 @@
 import { useMemo } from 'react'
 
 import { useTemplateActions, useTemplateState } from '../shell/store'
+import { useT } from '../ui/i18n/useT'
 
 import type { ExportExcelInput } from './excel'
 import { exportToExcel } from './excel'
@@ -24,15 +25,17 @@ export interface CMReportingApi {
 export function useCMReporting(): CMReportingApi {
   const { meta, form, lists } = useTemplateState()
   const { setFormData, validateForm } = useTemplateActions()
+  const { locale } = useT()
 
   const snapshot = useMemo<ReportSnapshotV1>(() => {
     return {
       schemaVersion: 1,
       templateType: meta.templateType,
       versionId: meta.versionId,
+      locale,
       data: { ...form, ...lists },
     }
-  }, [meta.templateType, meta.versionId, form, lists])
+  }, [meta.templateType, meta.versionId, form, lists, locale])
 
   return useMemo(
     () => ({

@@ -9,10 +9,10 @@ import 'antd/dist/reset.css'
 import { StrictMode, useCallback, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import { DevApp } from './demo/DevApp'
+import { ExamplesApp } from './examples/ExamplesApp'
 import './index.css'
 import './lib/styles.css'
-import './demo/demo.css'
+import './examples/examples.css'
 
 export function Root() {
   const [locale, setLocale] = useState<Locale>('zh-CN')
@@ -22,7 +22,7 @@ export function Root() {
 
   return (
     <CMReportingProvider locale={locale}>
-      <DevApp locale={locale} onLocaleChange={handleLocaleChange} />
+      <ExamplesApp locale={locale} onLocaleChange={handleLocaleChange} />
     </CMReportingProvider>
   )
 }

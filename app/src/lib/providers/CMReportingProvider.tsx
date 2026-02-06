@@ -3,8 +3,7 @@
  * @description 顶层 Provider，负责 i18n 初始化和 Ant Design 配置。
  */
 
-import type { Locale } from '@core/i18n'
-import { initI18n } from '@core/i18n'
+import i18n, { initI18n, isI18nInitialized, type Locale } from '@core/i18n'
 import { AppThemeScope } from '@ui/theme/AppThemeScope'
 import type { CMCSSVariables } from '@ui/theme/index'
 import { defaultAntdTheme } from '@ui/theme/index'
@@ -15,7 +14,10 @@ import zhCN from 'antd/locale/zh_CN'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import type { ReactNode } from 'react'
-import { Suspense, useLayoutEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef } from 'react'
+
+// 确保 react-i18next 在任何组件渲染前就拿到已注册的 i18n 实例（避免在 render 阶段 init 导致订阅组件更新）。
+if (!isI18nInitialized()) initI18n('en-US')
 
 const ANT_LOCALE_BY_APP: Record<Locale, typeof enUS> = {
   'en-US': enUS,
@@ -62,18 +64,23 @@ export function CMReportingProvider({
   children,
   fallback,
 }: CMReportingProviderProps) {
-  useState(() => {
-    applyLocale(locale)
-    return true
-  })
-  const lastLocaleRef = useRef<Locale>(locale)
+  const notifiedLocaleRef = useRef<Locale>(locale)
 
-  // 在首帧绘制前完成初始化，避免 useTranslation 无实例或 key 闪烁
-  useLayoutEffect(() => {
-    if (lastLocaleRef.current === locale) return
+  // 在首轮 render 前同步应用语言，确保 SSR 与首屏输出和传入 locale 一致。
+  const expectedDayjsLocale = DAYJS_LOCALE_BY_APP[locale] ?? 'en'
+  const missingResourceBundles =
+    !i18n.hasResourceBundle('en-US', 'translation') ||
+    !i18n.hasResourceBundle('zh-CN', 'translation')
+
+  if (missingResourceBundles || i18n.language !== locale || dayjs.locale() !== expectedDayjsLocale) {
     applyLocale(locale)
-    lastLocaleRef.current = locale
-    onLocaleChange?.(locale)
+  }
+
+  useEffect(() => {
+    if (notifiedLocaleRef.current !== locale) {
+      notifiedLocaleRef.current = locale
+      onLocaleChange?.(locale)
+    }
   }, [locale, onLocaleChange])
 
   const loadingFallback = fallback ?? (

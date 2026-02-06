@@ -16,15 +16,23 @@ const resources = {
   'zh-CN': { translation: zhCN },
 }
 
-let initialized = false
+const ensureReactI18nextBound = () => {
+  i18n.use(initReactI18next)
+  initReactI18next.init(i18n)
+}
 
 /**
  * 初始化 i18n 实例。
- * 如果已初始化，则只切换语言。
+ * 如果已初始化，则补齐 react-i18next 绑定、资源并切换语言。
  */
 export function initI18n(locale: Locale = 'en-US') {
-  if (initialized) {
-    i18n.changeLanguage(locale)
+  // HMR/StrictMode 下避免用模块内变量作为真值来源：以 i18next 实例状态为准。
+  if (i18n.isInitialized) {
+    ensureReactI18nextBound()
+    Object.entries(resources).forEach(([language, value]) => {
+      i18n.addResourceBundle(language, 'translation', value.translation, true, false)
+    })
+    if (i18n.language !== locale) i18n.changeLanguage(locale)
     return i18n
   }
 
@@ -39,7 +47,6 @@ export function initI18n(locale: Locale = 'en-US') {
     },
   })
 
-  initialized = true
   return i18n
 }
 
@@ -47,5 +54,5 @@ export function initI18n(locale: Locale = 'en-US') {
  * 检查 i18n 是否已初始化。
  */
 export function isI18nInitialized(): boolean {
-  return initialized
+  return i18n.isInitialized
 }

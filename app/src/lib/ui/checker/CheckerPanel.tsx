@@ -76,7 +76,7 @@ export function CheckerPanel({
   const { t } = useT()
   /** 错误文案翻译：使用稳定引用避免子树重复渲染。 */
   const translateError = useMemoizedFn(
-    (key: ErrorKey, values?: Record<string, string | undefined>) => t(key, values)
+    (key: ErrorKey, values?: Record<string, string | undefined>) => t(key, values),
   )
   const hasErrors = errors.length > 0
   const [showPassedDetails, setShowPassedDetails] = useState(false)
@@ -87,7 +87,10 @@ export function CheckerPanel({
     : t('checker.noErrors')
 
   /** 仅在 errors/versionDef 变化时重分组，减少渲染成本。 */
-  const groupedErrors = useCreation(() => groupCheckerErrors(errors, versionDef), [errors, versionDef])
+  const groupedErrors = useCreation(
+    () => groupCheckerErrors(errors, versionDef),
+    [errors, versionDef],
+  )
   /** 统一的跳转回调，避免在列表内创建多层函数。 */
   const handleGoToField = useMemoizedFn((error: CheckerError) => {
     onGoToField?.(error)
@@ -103,7 +106,7 @@ export function CheckerPanel({
   }, [errors, handleGoToField, onGoToField])
   /** 获取稳定的跳转 handler。 */
   const getGoToFieldHandler = useMemoizedFn((error: CheckerError) =>
-    goToFieldHandlers.get(`${error.code}-${error.fieldPath}`)
+    goToFieldHandlers.get(`${error.code}-${error.fieldPath}`),
   )
   const togglePassedDetails = useMemoizedFn(() => {
     setShowPassedDetails((prev) => !prev)
@@ -113,7 +116,9 @@ export function CheckerPanel({
   return (
     <Flex vertical gap={16}>
       <div>
-        <Title level={5} style={{ margin: 0 }}>{t('tabs.checker')}</Title>
+        <Title level={5} style={{ margin: 0 }}>
+          {t('tabs.checker')}
+        </Title>
         <Text type="secondary">{t('checker.subtitle')}</Text>
       </div>
 
@@ -122,7 +127,9 @@ export function CheckerPanel({
           <Flex align="center" justify="space-between" style={{ width: '100%' }}>
             <Flex align="center" gap={8}>
               <span aria-hidden>❌</span>
-              <Text type="danger" strong>{t('checker.errorsTitle')}</Text>
+              <Text type="danger" strong>
+                {t('checker.errorsTitle')}
+              </Text>
             </Flex>
             <Tag color="error">{t('checker.errorBadge', { count: errors.length })}</Tag>
           </Flex>
@@ -153,7 +160,9 @@ export function CheckerPanel({
                       <Flex key={errorKey} align="flex-start" justify="space-between" gap={12}>
                         <Flex align="baseline" gap={8} wrap>
                           {mineralLabel && (
-                            <Tag color="blue" className="shrink-0">{mineralLabel}</Tag>
+                            <Tag color="blue" className="shrink-0">
+                              {mineralLabel}
+                            </Tag>
                           )}
                           <Text>
                             {translateError(error.messageKey, {
@@ -163,7 +172,11 @@ export function CheckerPanel({
                           </Text>
                         </Flex>
                         {onGoToField && (
-                          <Button type="link" onClick={getGoToFieldHandler(error)} className="shrink-0">
+                          <Button
+                            type="link"
+                            onClick={getGoToFieldHandler(error)}
+                            className="shrink-0"
+                          >
                             {t('checker.goToField')}
                           </Button>
                         )}
@@ -178,7 +191,9 @@ export function CheckerPanel({
       </Card>
 
       <Card
-        bodyStyle={passedBodyStyle}
+        styles={{
+          body: passedBodyStyle,
+        }}
         title={
           <Flex
             align="center"
@@ -186,30 +201,28 @@ export function CheckerPanel({
             style={{ width: '100%', cursor: 'pointer' }}
             onClick={togglePassedDetails}
           >
-            <Text type="success" strong>✅ {passedLabel}</Text>
+            <Text type="success" strong>
+              ✅ {passedLabel}
+            </Text>
             <Text type="secondary" style={{ fontSize: 12 }}>
               {showPassedDetails ? t('checker.passedToggleHide') : t('checker.passedToggleShow')}
             </Text>
           </Flex>
         }
       >
-        {showPassedDetails && (
-          passedItems.length === 0 ? (
+        {showPassedDetails &&
+          (passedItems.length === 0 ? (
             <Text type="secondary">{t('checker.passedEmpty')}</Text>
           ) : (
             <List
               dataSource={passedItems}
               renderItem={(item) => (
                 <List.Item key={item.key}>
-                  <List.Item.Meta
-                    title={item.label}
-                    description={item.location}
-                  />
+                  <List.Item.Meta title={item.label} description={item.location} />
                 </List.Item>
               )}
             />
-          )
-        )}
+          ))}
       </Card>
     </Flex>
   )

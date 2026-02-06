@@ -1,0 +1,42 @@
+/* --------------------------------------------------------------------------
+   Examples Header - 深色背景下 antd Select 样式覆盖
+   -------------------------------------------------------------------------- */
+/* antd 5.x: borderless Select 使用 .ant-select-content-value */
+.examples-header .examples-header-controls .ant-select .ant-select-content-value,
+.examples-header .examples-header-controls .ant-select .ant-select-selection-item {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+/* Examples Header Export Button hover */
+.examples-header .examples-header-export.ant-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5) !important;
+  filter: brightness(1.1);
+}
+
+.examples-header .examples-header-export.ant-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Examples - Smelter List: 未列出的冶炼厂标红示例
+   宿主可通过 SmelterListIntegration.rowClassName 自定义规则与样式
+   -------------------------------------------------------------------------- */
+.smelter-list-table .smelter-row-unlisted .ant-typography,
+.smelter-list-table .smelter-row-unlisted .ant-input,
+.smelter-list-table .smelter-row-unlisted .ant-select-selector,
+.smelter-list-table .smelter-row-unlisted .ant-select-selection-item,
+.smelter-list-table .smelter-row-unlisted .ant-tag {
+  color: var(--ant-color-error);
+}
+
+.smelter-list-table .smelter-row-unlisted .ant-select-selection-placeholder {
+  color: var(--ant-color-error-text);
+}
+
+.smelter-list-table .smelter-row-unlisted .ant-input::placeholder {
+  color: var(--ant-color-error-text);
+}

@@ -1,6 +1,6 @@
 /**
- * @file demo/ExternalPickers.tsx
- * @description Demo：宿主侧实现外部选择器，并通过 integrations 回写冶炼厂/产品列表。
+ * @file examples/ExternalPickers.tsx
+ * @description Examples：宿主侧实现外部选择器，并通过 integrations 回写冶炼厂/产品列表。
  */
 
 import { SMELTER_LOOKUP_DATA, SMELTER_LOOKUP_META } from '@core/data/lookups'
@@ -43,7 +43,7 @@ function buildSmelterCandidatesByMetal({
     smelterCity: record.city,
     smelterState: record.state,
     demoExtra: 'kept-by-normalizer',
-    comments: '[demo] picked from external (with extra field preserved)',
+    comments: '[examples] picked from external (with extra field preserved)',
   }))
 
   const notListed: Array<Partial<SmelterRow> & { key: string }> = [
@@ -51,12 +51,12 @@ function buildSmelterCandidatesByMetal({
       key: 'demo-not-listed',
       metal,
       smelterLookup: SMELTER_LOOKUP_META.notListed,
-      smelterName: 'Demo Custom Smelter',
+      smelterName: 'Examples Custom Smelter',
       smelterCountry: 'Unknown',
       smelterIdentification: '',
       sourceId: '',
       demoExtra: 'not-listed-extra',
-      comments: '[demo] Smelter not listed',
+      comments: '[examples] Smelter not listed',
     },
   ]
 
@@ -70,15 +70,15 @@ function buildProductCandidates(params: {
     {
       key: 'prd-001',
       productNumber: 'PRD-001',
-      productName: 'Demo Product A',
-      comments: '[demo] picked from external (with extra field preserved)',
+      productName: 'Examples Product A',
+      comments: '[examples] picked from external (with extra field preserved)',
       demoExtra: 'kept-by-normalizer',
     },
     {
       key: 'prd-002',
       productNumber: 'PRD-002',
-      productName: 'Demo Product B',
-      comments: '[demo] picked from external',
+      productName: 'Examples Product B',
+      comments: '[examples] picked from external',
       demoExtra: 'kept-by-normalizer',
     },
   ]
@@ -86,11 +86,11 @@ function buildProductCandidates(params: {
   return base.map((row, index) => ({
     ...row,
     requesterNumber: `REQ-00${index + 1}`,
-    requesterName: 'Demo Requester',
+    requesterName: 'Examples Requester',
   }))
 }
 
-export function useDemoExternalPickers() {
+export function useExampleExternalPickers() {
   const [productCandidates, setProductCandidates] = useState<
     Array<Partial<ProductRow> & { key: string }>
   >([])
@@ -230,7 +230,7 @@ export function useDemoExternalPickers() {
 
   const smelterModal = (
     <Modal
-      title="External Smelter Picker (Demo)"
+      title="External Smelter Picker (Examples)"
       open={smelterOpen}
       onCancel={() => finalizeSmelter(null)}
       width={980}
@@ -273,7 +273,7 @@ export function useDemoExternalPickers() {
 
   const productModal = (
     <Modal
-      title="External Product Picker (Demo)"
+      title="External Product Picker (Examples)"
       open={productOpen}
       onCancel={() => finalizeProduct(null)}
       width={980}

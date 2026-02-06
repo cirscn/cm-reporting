@@ -4,6 +4,7 @@ import {
   InfoCircleOutlined,
   WarningOutlined,
 } from '@ant-design/icons'
+import type { CirsGpmLegacyRoundtripContext } from '@lib/index'
 import { cirsGpmLegacyAdapter, parseSnapshot } from '@lib/index'
 import type { ReportSnapshotV1 } from '@lib/public/snapshot'
 import { useMemoizedFn } from 'ahooks'
@@ -28,13 +29,19 @@ function isProbablySnapshot(input: unknown): boolean {
 export interface ImportJsonModalProps {
   open: boolean
   onClose: () => void
-  onImported: (snapshot: ReportSnapshotV1) => void
+  onImported: (result: ImportJsonResult) => void
 }
 
 interface DetectedInfo {
   source: 'snapshot' | 'legacy'
   templateType: ReportSnapshotV1['templateType']
   versionId: string
+}
+
+export interface ImportJsonResult {
+  source: DetectedInfo['source']
+  snapshot: ReportSnapshotV1
+  legacyCtx?: CirsGpmLegacyRoundtripContext
 }
 
 function formatDetected(info: DetectedInfo): string {
@@ -95,11 +102,16 @@ export function ImportJsonModal({ open, onClose, onImported }: ImportJsonModalPr
     setLoading(true)
     try {
       const json = JSON.parse(text) as unknown
-      const snapshot = isProbablySnapshot(json)
-        ? parseSnapshot(json)
-        : cirsGpmLegacyAdapter.toInternal(json).snapshot
-      onImported(snapshot)
-      msgApi.success(`导入成功: RMI_${snapshot.templateType.toUpperCase()}_${snapshot.versionId}`)
+      const result: ImportJsonResult = isProbablySnapshot(json)
+        ? { source: 'snapshot', snapshot: parseSnapshot(json) }
+        : (() => {
+            const parsed = cirsGpmLegacyAdapter.toInternal(json)
+            return { source: 'legacy', snapshot: parsed.snapshot, legacyCtx: parsed.ctx }
+          })()
+      onImported(result)
+      msgApi.success(
+        `导入成功: RMI_${result.snapshot.templateType.toUpperCase()}_${result.snapshot.versionId}`
+      )
       onClose()
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)

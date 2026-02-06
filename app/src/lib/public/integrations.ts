@@ -49,6 +49,8 @@ export interface SmelterListIntegration {
   label?: string
   /** 是否在触发外部选择时展示按钮 loading（默认 false）。 */
   showLoadingIndicator?: boolean
+  /** 表格行样式：返回 className，交由宿主自行提供 CSS（不内置任何表现）。 */
+  rowClassName?: (record: SmelterRow, index: number) => string
   /** 宿主接管外部选择并返回要回写的行数据。 */
   onPickSmelters?: (ctx: SmelterPickContext) => Promise<ExternalPickResult<Partial<SmelterRow>>>
   /**
