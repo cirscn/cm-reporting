@@ -1,5 +1,8 @@
 # 冲突矿产报告组件库
 
+[![npm version](https://img.shields.io/npm/v/cm-reporting.svg)](https://www.npmjs.com/package/cm-reporting)
+[![License: PolyForm Noncommercial](https://img.shields.io/badge/License-PolyForm%20Noncommercial%201.0.0-orange.svg)](LICENSE)
+
 基于 React 的冲突矿产报告应用组件库，支持 RMI（负责任矿产倡议）模板，包括 CMRT、EMRT、CRT 和 AMRT。
 
 ## 功能特性
@@ -132,16 +135,14 @@ All template validations passed.
 
 ## 贡献指南
 
-1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/amazing-feature`)
-3. 运行检查和测试 (`pnpm lint && pnpm test`)
-4. 提交更改 (`git commit -m 'Add amazing feature'`)
-5. 推送分支 (`git push origin feature/amazing-feature`)
-6. 创建 Pull Request
+详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
+## 行为准则
+
+本项目遵循 [行为准则](CODE_OF_CONDUCT.md)，参与贡献即表示同意遵守该准则。
 
 ## 许可证
 
-[PolyForm-Noncommercial-1.0.0](LICENSE)
+[PolyForm Noncommercial 1.0.0](LICENSE)
 
-- 禁止商业用途（Noncommercial only）。
-- 如需商业使用，请联系版权所有者获取单独商业授权。
+> **注意**：本项目仅允许非商业用途。如需商业使用，请联系版权所有者获取单独商业授权。
