@@ -37,7 +37,10 @@
     "pretest": "pnpm validate:templates && pnpm validate:excel-mapping",
     "test": "vitest run",
     "sg:scan": "sg scan -c ../sgconfig.yml ./src",
-    "sg:fix": "sg scan -c ../sgconfig.yml ./src -U"
+    "sg:fix": "sg scan -c ../sgconfig.yml ./src -U",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish"
   },
   "peerDependencies": {
     "@ant-design/icons": "^5.0.0 || ^6.0.0",
@@ -66,6 +69,7 @@
   },
   "devDependencies": {
     "@ant-design/icons": "^6.1.0",
+    "@changesets/cli": "^2.29.8",
     "@eslint/js": "^9.39.1",
     "@tailwindcss/cli": "^4.1.18",
     "@tailwindcss/postcss": "^4.1.18",

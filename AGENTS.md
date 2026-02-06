@@ -23,3 +23,12 @@ pnpm sg:scan
 - 禁止保留“无意义的兼容/过渡代码”（例如：旧接口的兼容包装、重复适配、无调用的兼容转换、过渡期标记）；需要变更时直接全量改动并删除旧接口。
 - PRD 与 Excel 冲突时，以 Excel 为准，需同步更新文档与 `app/src` 实现。
 - 当修改 `app/src/lib` 下的**公开 API**（组件 Props/Ref、导出函数/类型、integrations 接口、snapshot 结构、Excel 导出接口、legacy adapter 接口）时，必须同步更新 `app/src/lib/README.md` 中对应章节，确保文档与代码一致。
+
+## 自动发布流程（Changesets）
+
+- 默认发版路径：`main` 分支触发 `.github/workflows/release.yml`（自动创建/更新 `Version Packages` PR；合并后自动发布 npm）。
+- 日常功能开发 PR 必须包含 changeset 文件（在 `app` 目录执行 `pnpm changeset` 生成）。
+- 版本号由 Changesets 自动维护，禁止手工修改 `app/package.json` 的 `version`（紧急修复场景除外，且需在 PR 描述说明原因）。
+- 合并 `Version Packages` PR 后由流水线执行发布；正常情况下不再手动打 tag 发布。
+- 保留 `.github/workflows/publish-npm.yml` 作为应急兜底流程（手动/标签触发），默认不作为主流程。
+- 触发发布前仍需满足 `app` 强制校验：`pnpm lint`、`pnpm exec tsc -b --pretty false`、`pnpm test`、`pnpm sg:scan`。
