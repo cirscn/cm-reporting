@@ -23,8 +23,13 @@ import { useEffect, useState } from 'react'
 import { createStore } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
+import { buildMineralReconcileNotice } from './mineralReconcile'
 import { TemplateStoreContext } from './templateStoreContext'
-import type { TemplateFormErrors, TemplateFormState } from './templateTypes'
+import type {
+  MineralReconcileNotice,
+  TemplateFormErrors,
+  TemplateFormState,
+} from './templateTypes'
 
 enableMapSet()
 
@@ -67,6 +72,7 @@ export interface TemplateStoreState {
   // ── 校验 ──
   errors: TemplateFormErrors
   isDirty: boolean
+  mineralReconcileNotice: MineralReconcileNotice | null
 
   // ── 操作 ──
   setCompanyInfoField: (key: string, value: string) => void
@@ -82,6 +88,7 @@ export interface TemplateStoreState {
   setFormData: (data: TemplateFormState) => void
   validateForm: () => Promise<boolean>
   resetForm: () => void
+  clearMineralReconcileNotice: () => void
 }
 
 // ---------------------------------------------------------------------------
@@ -335,6 +342,7 @@ function createTemplateStore(
       // ── 校验 ──
       errors: EMPTY_ERRORS,
       isDirty: false,
+      mineralReconcileNotice: null,
 
       // ── Actions ──
       // 每个 action 仅调用一次 set()，校验通过 scheduleValidation 延迟到微任务。
@@ -345,7 +353,17 @@ function createTemplateStore(
       },
 
       setSelectedMinerals: (minerals) => {
-        set({ selectedMinerals: minerals, isDirty: true })
+        set((s) => {
+          const previous = s.selectedMinerals
+          s.selectedMinerals = minerals
+          s.isDirty = true
+          s.mineralReconcileNotice = buildMineralReconcileNotice(
+            versionDef,
+            previous,
+            minerals,
+            s.mineralReconcileNotice
+          )
+        })
         scheduleValidation(set, get)
       },
 
@@ -473,7 +491,7 @@ function createTemplateStore(
       },
 
       setFormData: (data) => {
-        set({ ...data, isDirty: false })
+        set({ ...data, isDirty: false, mineralReconcileNotice: null })
         scheduleValidation(set, get)
       },
 
@@ -490,7 +508,16 @@ function createTemplateStore(
       },
 
       resetForm: () => {
-        set({ ...defaultState, errors: EMPTY_ERRORS, isDirty: false })
+        set({
+          ...defaultState,
+          errors: EMPTY_ERRORS,
+          isDirty: false,
+          mineralReconcileNotice: null,
+        })
+      },
+
+      clearMineralReconcileNotice: () => {
+        set({ mineralReconcileNotice: null })
       },
     }))
   )

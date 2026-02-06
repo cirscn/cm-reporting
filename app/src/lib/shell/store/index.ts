@@ -11,6 +11,7 @@ export {
   useTemplateErrors,
   useTemplateActions,
   useTemplateIntegrations,
+  useMineralReconcileNotice,
 } from './templateContext'
 /** 读取模板派生数据（规则/校验/视图模型/状态）。 */
 export { useTemplateDerived } from './useTemplateDerived'

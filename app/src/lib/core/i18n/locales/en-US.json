@@ -131,6 +131,8 @@
     "authorizerName": "Do not enter placeholders like \"same\".",
     "authorizationDate": "Format: DD-MMM-YYYY (e.g., 01-Jan-2026)",
     "smelterNotYetIdentifiedCountry": "Not yet identified: leave country blank.",
+    "emrtMineralDeleteReconcileTitle": "Minerals were removed. Please reconcile affected answers.",
+    "emrtMineralDeleteReconcileDesc": "Removed: {{minerals}}. Please verify Q1-Q7, company question C, and Smelter/Mine rows for alignment.",
     "mineralsMaxCount": "Select up to {{max}} minerals",
     "mineralsMaxCountReached": "Maximum minerals selected"
   },
@@ -176,6 +178,7 @@
     "submit": "Submit",
     "close": "Close",
     "setAllTo": "Set all to",
+    "markChecked": "Marked as checked",
     "sameAsContact": "Same as Contact",
     "batchDelete": "Delete Selected",
     "cancelSelection": "Cancel"

@@ -5,6 +5,7 @@
 
 // 说明：页面组件
 import {
+  useMineralReconcileNotice,
   useTemplateActions,
   useTemplateDerived,
   useTemplateErrors,
@@ -16,7 +17,7 @@ import { MineralScopeForm } from '@ui/forms/MineralScopeForm'
 import { QuestionMatrixForm } from '@ui/forms/QuestionMatrixForm'
 import { useT } from '@ui/i18n/useT'
 import { LAYOUT } from '@ui/theme/spacing'
-import { Flex } from 'antd'
+import { Alert, Button, Flex } from 'antd'
 
 import { useFieldFocus } from './useFieldFocus'
 
@@ -32,6 +33,7 @@ export function DeclarationPage() {
     questionComments,
     companyQuestions,
   } = form
+  const reconcileNotice = useMineralReconcileNotice()
   const errors = useTemplateErrors()
   const {
     setCompanyInfoField,
@@ -40,6 +42,7 @@ export function DeclarationPage() {
     setQuestionValue,
     setQuestionComment,
     setCompanyQuestionValue,
+    clearMineralReconcileNotice,
   } = useTemplateActions()
   const { t } = useT()
 
@@ -48,11 +51,39 @@ export function DeclarationPage() {
 
   // 页面派生数据：集中输出"展示矿产 + 公司问题 gating"的结果，页面只消费渲染。
   const { displayMinerals } = viewModels.declaration
+  const showReconcileNotice =
+    reconcileNotice !== null &&
+    versionDef.templateType === 'emrt' &&
+    (versionDef.version.id === '2.0' || versionDef.version.id === '2.1')
+
+  const removedMineralsLabel =
+    reconcileNotice?.removedMinerals
+      .map((mineralKey) => {
+        const mineral = versionDef.mineralScope.minerals.find((item) => item.key === mineralKey)
+        return mineral ? t(mineral.labelKey) : mineralKey
+      })
+      .join(', ') ?? ''
 
   useFieldFocus()
 
   return (
     <Flex vertical gap={LAYOUT.sectionGap}>
+      {showReconcileNotice && (
+        <Alert
+          type="warning"
+          showIcon
+          message={t('hints.emrtMineralDeleteReconcileTitle')}
+          description={t('hints.emrtMineralDeleteReconcileDesc', {
+            minerals: removedMineralsLabel,
+          })}
+          action={
+            <Button size="small" onClick={clearMineralReconcileNotice}>
+              {t('actions.markChecked')}
+            </Button>
+          }
+        />
+      )}
+
       <CompanyInfoForm
         versionDef={versionDef}
         values={companyInfo}
