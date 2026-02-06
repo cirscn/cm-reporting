@@ -22,3 +22,4 @@ pnpm sg:scan
 - “全版本支持”指：各模板/各版本的规则与选项必须完整实现；允许版本差异分支，但不得缩减版本覆盖。
 - 禁止保留“无意义的兼容/过渡代码”（例如：旧接口的兼容包装、重复适配、无调用的兼容转换、过渡期标记）；需要变更时直接全量改动并删除旧接口。
 - PRD 与 Excel 冲突时，以 Excel 为准，需同步更新文档与 `app/src` 实现。
+- 当修改 `app/src/lib` 下的**公开 API**（组件 Props/Ref、导出函数/类型、integrations 接口、snapshot 结构、Excel 导出接口、legacy adapter 接口）时，必须同步更新 `app/src/lib/README.md` 中对应章节，确保文档与代码一致。
