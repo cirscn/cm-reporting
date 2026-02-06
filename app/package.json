@@ -1,6 +1,6 @@
 {
   "name": "cm-reporting",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Conflict Minerals Reporting Template Components",
   "license": "PolyForm-Noncommercial-1.0.0",
   "packageManager": "pnpm@10.28.2",
