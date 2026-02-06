@@ -241,72 +241,62 @@ export function TemplateProvider({
     [versionDef.questions]
   )
 
-  const setQuestionValue = useMemoizedFn(
+  /** 写入问题回答（值未变则跳过，避免不必要的 re-render）。 */
+  const applyQuestionValue = useMemoizedFn(
+    (key: string, targetMineral: string | null, nextValue: string) => {
+      const def = questionDefsByKey.get(key)
+      if (!def) return
+      if (def.perMineral) {
+        if (!targetMineral) return
+        if (
+          typeof questions[key] === 'object' &&
+          (questions[key] as Record<string, string>)[targetMineral] === nextValue
+        ) return
+        setValue(`questions.${key}.${targetMineral}`, nextValue, { shouldDirty: true, shouldValidate: true })
+        return
+      }
+      if (questions[key] === nextValue) return
+      setValue(`questions.${key}`, nextValue, { shouldDirty: true, shouldValidate: true })
+    }
+  )
+
+  /** 写入问题备注（值未变则跳过）。 */
+  const applyQuestionComment = useMemoizedFn(
+    (key: string, targetMineral: string | null, nextValue: string) => {
+      const def = questionDefsByKey.get(key)
+      if (!def) return
+      if (def.perMineral) {
+        if (!targetMineral) return
+        if (
+          typeof questionComments[key] === 'object' &&
+          (questionComments[key] as Record<string, string>)[targetMineral] === nextValue
+        ) return
+        setValue(`questionComments.${key}.${targetMineral}`, nextValue, { shouldDirty: true, shouldValidate: true })
+        return
+      }
+      if (questionComments[key] === nextValue) return
+      setValue(`questionComments.${key}`, nextValue, { shouldDirty: true, shouldValidate: true })
+    }
+  )
+
+  /**
+   * Q1/Q2 变更时的门控级联：根据 gating 结果清空受影响的后续问题。
+   * 仅在 Q1 或 Q2 变更时触发。
+   */
+  const applyGatingCascade = useMemoizedFn(
     (questionKey: string, mineralKey: string | null, value: string) => {
       const questionDef = questionDefsByKey.get(questionKey)
-      const applyQuestionValue = (key: string, targetMineral: string | null, nextValue: string) => {
-        const def = questionDefsByKey.get(key)
-        if (!def) return
-        if (def.perMineral) {
-          if (!targetMineral) return
-          if (
-            typeof questions[key] === 'object' &&
-            (questions[key] as Record<string, string>)[targetMineral] === nextValue
-          ) {
-            return
-          }
-          setValue(`questions.${key}.${targetMineral}`, nextValue, {
-            shouldDirty: true,
-            shouldValidate: true,
-          })
-          return
-        }
-        if (questions[key] === nextValue) return
-        setValue(`questions.${key}`, nextValue, { shouldDirty: true, shouldValidate: true })
-      }
-      const applyQuestionComment = (
-        key: string,
-        targetMineral: string | null,
-        nextValue: string
-      ) => {
-        const def = questionDefsByKey.get(key)
-        if (!def) return
-        if (def.perMineral) {
-          if (!targetMineral) return
-          if (
-            typeof questionComments[key] === 'object' &&
-            (questionComments[key] as Record<string, string>)[targetMineral] === nextValue
-          ) {
-            return
-          }
-          setValue(`questionComments.${key}.${targetMineral}`, nextValue, {
-            shouldDirty: true,
-            shouldValidate: true,
-          })
-          return
-        }
-        if (questionComments[key] === nextValue) return
-        setValue(`questionComments.${key}`, nextValue, {
-          shouldDirty: true,
-          shouldValidate: true,
-        })
-      }
-
-      applyQuestionValue(questionKey, mineralKey, value)
-
       if (!questionDef || (questionKey !== 'Q1' && questionKey !== 'Q2')) return
 
-      const nextQuestions = (() => {
-        const next: TemplateFormState['questions'] = { ...questions }
-        if (questionDef.perMineral) {
-          if (!mineralKey) return next
-          const current = typeof next[questionKey] === 'object' ? next[questionKey] : {}
-          next[questionKey] = { ...(current as Record<string, string>), [mineralKey]: value }
-          return next
-        }
-        next[questionKey] = value
-        return next
-      })()
+      // 构建包含本次变更的问题快照，用于 gating 计算
+      const nextQuestions: TemplateFormState['questions'] = { ...questions }
+      if (questionDef.perMineral) {
+        if (!mineralKey) return
+        const current = typeof nextQuestions[questionKey] === 'object' ? nextQuestions[questionKey] : {}
+        nextQuestions[questionKey] = { ...(current as Record<string, string>), [mineralKey]: value }
+      } else {
+        nextQuestions[questionKey] = value
+      }
 
       const gating = calculateGating(
         versionDef,
@@ -315,20 +305,27 @@ export function TemplateProvider({
       )
       const q2Index = questionKeyOrder.indexOf('Q2')
       if (q2Index < 0) return
-      const laterQuestions = questionKeyOrder.slice(q2Index + 1)
+      const laterKeys = questionKeyOrder.slice(q2Index + 1)
 
+      // Q2 被门控禁用：清空 Q2 及后续所有问题
       if (!gating.q2Enabled) {
         applyQuestionValue('Q2', mineralKey, '')
-        laterQuestions.forEach((key) => applyQuestionValue(key, mineralKey, ''))
         applyQuestionComment('Q2', mineralKey, '')
-        laterQuestions.forEach((key) => applyQuestionComment(key, mineralKey, ''))
+        laterKeys.forEach((k) => { applyQuestionValue(k, mineralKey, ''); applyQuestionComment(k, mineralKey, '') })
         return
       }
 
+      // 后续问题被门控禁用：仅清空 Q3+
       if (!gating.laterQuestionsEnabled) {
-        laterQuestions.forEach((key) => applyQuestionValue(key, mineralKey, ''))
-        laterQuestions.forEach((key) => applyQuestionComment(key, mineralKey, ''))
+        laterKeys.forEach((k) => { applyQuestionValue(k, mineralKey, ''); applyQuestionComment(k, mineralKey, '') })
       }
+    }
+  )
+
+  const setQuestionValue = useMemoizedFn(
+    (questionKey: string, mineralKey: string | null, value: string) => {
+      applyQuestionValue(questionKey, mineralKey, value)
+      applyGatingCascade(questionKey, mineralKey, value)
     }
   )
 

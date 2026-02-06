@@ -1,9 +1,8 @@
 /**
  * @file ui/tables/SmelterListTable.tsx
- * @description 模块实现。
+ * @description 冶炼厂清单表格：支持 lookup 自动填充、行内编辑、外部选择与批量操作。
  */
 
-// 说明：模块实现
 import { PlusOutlined, DeleteOutlined, CloseOutlined } from '@ant-design/icons'
 import type { SmelterLookupRecord } from '@core/data/lookups'
 import type {
@@ -38,7 +37,7 @@ import {
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
 import type { ChangeEvent, ReactNode } from 'react'
-import { useState } from 'react'
+import { memo, useState } from 'react'
 
 interface SmelterListTableProps {
   templateType: TemplateType
@@ -86,8 +85,8 @@ const SELECT_FIELDS = [
 type InputField = (typeof INPUT_FIELDS)[number]
 type SelectField = (typeof SELECT_FIELDS)[number]
 
-/** 冶炼厂清单表格：支持 lookup 自动填充与行内编辑。 */
-export function SmelterListTable({
+/** 冶炼厂清单表格：支持 lookup 自动填充、行内编辑与外部选择。 */
+export const SmelterListTable = memo(function SmelterListTable({
   templateType,
   versionId,
   versionDef,
@@ -933,8 +932,8 @@ export function SmelterListTable({
 
   const emptyLocale = {
     emptyText: (
-      <Flex vertical align="center" gap={16} style={{ padding: '32px 0' }}>
-        <Typography.Text type="secondary" style={{ fontSize: 14 }}>
+      <Flex vertical align="center" gap={16} className="py-8">
+        <Typography.Text type="secondary" className="text-sm">
           {t('tables.noData')}
         </Typography.Text>
         <Flex align="center" gap={8}>
@@ -1041,4 +1040,4 @@ export function SmelterListTable({
       />
     </Card>
   )
-}
+})

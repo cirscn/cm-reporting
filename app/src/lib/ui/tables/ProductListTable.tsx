@@ -1,9 +1,8 @@
 /**
  * @file ui/tables/ProductListTable.tsx
- * @description 模块实现。
+ * @description 产品清单表格：支持增删行、行内编辑、外部选择与批量操作。
  */
 
-// 说明：模块实现
 import { PlusOutlined, DeleteOutlined, CloseOutlined } from '@ant-design/icons'
 import type { ProductListConfig, TemplateType, TemplateVersionDef } from '@core/registry/types'
 import type { ProductRow } from '@core/types/tableRows'
@@ -18,7 +17,7 @@ import { Button, Card, Flex, Modal, Table, Input, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
 import type { ChangeEvent, ReactNode } from 'react'
-import { useState } from 'react'
+import { memo, useState } from 'react'
 
 interface ProductListTableProps {
   templateType: TemplateType
@@ -47,8 +46,8 @@ const INPUT_FIELDS = [
 
 type InputField = (typeof INPUT_FIELDS)[number]
 
-/** 产品清单表格：支持增删行与行内编辑。 */
-export function ProductListTable({
+/** 产品清单表格：支持增删行、行内编辑与外部选择。 */
+export const ProductListTable = memo(function ProductListTable({
   templateType,
   versionId,
   versionDef,
@@ -320,8 +319,8 @@ export function ProductListTable({
 
   const emptyLocale = {
     emptyText: (
-      <Flex vertical align="center" gap={16} style={{ padding: '32px 0' }}>
-        <Typography.Text type="secondary" style={{ fontSize: 14 }}>
+      <Flex vertical align="center" gap={16} className="py-8">
+        <Typography.Text type="secondary" className="text-sm">
           {t('tables.noData')}
         </Typography.Text>
         <Flex align="center" gap={8}>
@@ -424,4 +423,4 @@ export function ProductListTable({
       />
     </Card>
   )
-}
+})

@@ -308,9 +308,128 @@ export interface FormData {
   productList: ProductRow[]
 }
 
+// ---------------------------------------------------------------------------
+// buildFormSchema 的 superRefine 拆分
+// ---------------------------------------------------------------------------
+
 /**
- * 导出函数：buildFormSchema。
+ * superRefine 回调的 data 参数类型：Zod 推断出 Record<string, unknown> 而非精确类型；
+ * 提取函数使用该 alias 避免与 FormData 接口冲突。
  */
+type SuperRefineData = {
+  selectedMinerals: string[]
+  customMinerals: string[]
+  mineralsScope: Array<{ id: string; mineral: string; reason: string }>
+}
+
+/** 校验 dynamic-dropdown 模式下的矿产选择（EMRT/AMRT）。 */
+function validateDynamicDropdownMinerals(
+  data: SuperRefineData,
+  ctx: z.RefinementCtx,
+  versionDef: TemplateVersionDef
+) {
+  if (versionDef.mineralScope.mode !== 'dynamic-dropdown') return
+
+  const maxCount = versionDef.mineralScope.maxCount
+  if (maxCount && data.selectedMinerals.length > maxCount) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['selectedMinerals'],
+      message: ERROR_KEYS.minerals.tooManySelected,
+    })
+  }
+  if (data.selectedMinerals.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['selectedMinerals'],
+      message: ERROR_KEYS.minerals.selectAtLeastOne,
+    })
+  }
+  if (versionDef.templateType !== 'amrt') return
+
+  const otherSelected = data.selectedMinerals.includes('other')
+  const otherNames = data.customMinerals.map((v) => v.trim()).filter(Boolean)
+  const baseCount = data.selectedMinerals.filter((k) => k !== 'other').length
+  if (maxCount && baseCount + otherNames.length > maxCount) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['selectedMinerals'],
+      message: ERROR_KEYS.minerals.tooManySelected,
+    })
+  }
+  if (otherSelected && otherNames.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['customMinerals', 0],
+      message: ERROR_KEYS.minerals.otherRequired,
+    })
+  }
+  if (!otherSelected && otherNames.length > 0) {
+    otherNames.forEach((_, index) => {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['customMinerals', index],
+        message: ERROR_KEYS.minerals.otherNotAllowed,
+      })
+    })
+  }
+}
+
+/** 校验 free-text 模式下的矿产输入（CRT 等）。 */
+function validateFreeTextMinerals(
+  data: SuperRefineData,
+  ctx: z.RefinementCtx,
+  versionDef: TemplateVersionDef
+) {
+  if (versionDef.mineralScope.mode !== 'free-text') return
+
+  const maxCount = versionDef.mineralScope.maxCount ?? data.customMinerals.length
+  const hasAny = data.customMinerals.some((v) => v.trim())
+  if (!hasAny) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['customMinerals'],
+      message: ERROR_KEYS.minerals.enterAtLeastOne,
+    })
+  }
+  if (maxCount !== undefined && data.customMinerals.length > maxCount) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['customMinerals'],
+      message: ERROR_KEYS.minerals.tooMany,
+    })
+  }
+}
+
+/** 校验 AMRT 的 mineralsScope 行（mineral 和 reason 必须成对填写）。 */
+function validateAmrtMineralsScopeRows(
+  data: SuperRefineData,
+  ctx: z.RefinementCtx,
+  versionDef: TemplateVersionDef
+) {
+  if (versionDef.templateType !== 'amrt') return
+
+  data.mineralsScope.forEach((row, index) => {
+    const mineral = row.mineral?.trim()
+    const reason = row.reason?.trim()
+    if (mineral && !reason) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['mineralsScope', index, 'reason'],
+        message: ERROR_KEYS.required,
+      })
+    }
+    if (!mineral && reason) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['mineralsScope', index, 'mineral'],
+        message: ERROR_KEYS.required,
+      })
+    }
+  })
+}
+
+/** 构建完整表单的 Zod schema（含跨字段校验）。 */
 export function buildFormSchema(versionDef: TemplateVersionDef): z.ZodType<FormData, FormData> {
   const mineRowSchema = buildMineRowSchema(versionDef) ?? z.object({})
   const mineralsScopeRowSchema = z.object({
@@ -332,93 +451,9 @@ export function buildFormSchema(versionDef: TemplateVersionDef): z.ZodType<FormD
       productList: z.array(buildProductRowSchema(versionDef)),
     })
     .superRefine((data, ctx) => {
-      if (versionDef.mineralScope.mode === 'dynamic-dropdown') {
-        const maxCount = versionDef.mineralScope.maxCount
-        if (maxCount && data.selectedMinerals.length > maxCount) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ['selectedMinerals'],
-            message: ERROR_KEYS.minerals.tooManySelected,
-          })
-        }
-        if (data.selectedMinerals.length === 0) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ['selectedMinerals'],
-            message: ERROR_KEYS.minerals.selectAtLeastOne,
-          })
-        }
-        if (versionDef.templateType === 'amrt') {
-          const otherSelected = data.selectedMinerals.includes('other')
-          const otherNames = data.customMinerals
-            .map((value) => value.trim())
-            .filter(Boolean)
-          const baseCount = data.selectedMinerals.filter((key) => key !== 'other').length
-          if (maxCount && baseCount + otherNames.length > maxCount) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: ['selectedMinerals'],
-              message: ERROR_KEYS.minerals.tooManySelected,
-            })
-          }
-          if (otherSelected && otherNames.length === 0) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: ['customMinerals', 0],
-              message: ERROR_KEYS.minerals.otherRequired,
-            })
-          }
-          if (!otherSelected && otherNames.length > 0) {
-            otherNames.forEach((_, index) => {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: ['customMinerals', index],
-                message: ERROR_KEYS.minerals.otherNotAllowed,
-              })
-            })
-          }
-        }
-      }
-
-      if (versionDef.mineralScope.mode === 'free-text') {
-        const maxCount = versionDef.mineralScope.maxCount ?? data.customMinerals.length
-        const hasAny = data.customMinerals.some((value) => value.trim())
-        if (!hasAny) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ['customMinerals'],
-            message: ERROR_KEYS.minerals.enterAtLeastOne,
-          })
-        }
-        if (maxCount !== undefined && data.customMinerals.length > maxCount) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ['customMinerals'],
-            message: ERROR_KEYS.minerals.tooMany,
-          })
-        }
-      }
-
-      if (versionDef.templateType === 'amrt') {
-        data.mineralsScope.forEach((row, index) => {
-          const mineral = row.mineral?.trim()
-          const reason = row.reason?.trim()
-          if (mineral && !reason) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: ['mineralsScope', index, 'reason'],
-              message: ERROR_KEYS.required,
-            })
-          }
-          if (!mineral && reason) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: ['mineralsScope', index, 'mineral'],
-              message: ERROR_KEYS.required,
-            })
-          }
-        })
-      }
+      validateDynamicDropdownMinerals(data, ctx, versionDef)
+      validateFreeTextMinerals(data, ctx, versionDef)
+      validateAmrtMineralsScopeRows(data, ctx, versionDef)
     })
 
   return schema as unknown as z.ZodType<FormData, FormData>

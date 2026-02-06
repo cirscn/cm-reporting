@@ -1,11 +1,10 @@
 /**
  * @file core/transform/index.ts
- * @description 模块导出入口。
+ * @description 数据转换工具集：日期格式、冶炼厂 lookup 标准化、DV 选项映射。
  */
 
-// 说明：模块导出入口
 // ---------------------------------------------------------------------------
-// Date transformations
+// 日期转换
 // ---------------------------------------------------------------------------
 
 const MONTH_NAMES = [
@@ -23,9 +22,7 @@ const MONTH_NAMES = [
   'Dec',
 ]
 
-/**
- * Convert ISO date (YYYY-MM-DD) to display format (DD-MMM-YYYY)
- */
+/** 将 ISO 日期（YYYY-MM-DD）转为 Excel 展示格式（DD-MMM-YYYY）。 */
 export function toDisplayDate(isoDate: string): string {
   if (!isoDate) return ''
   const [year, month, day] = isoDate.split('-')
@@ -35,9 +32,7 @@ export function toDisplayDate(isoDate: string): string {
   return `${day}-${MONTH_NAMES[monthIndex]}-${year}`
 }
 
-/**
- * Convert display date (DD-MMM-YYYY) to ISO format (YYYY-MM-DD)
- */
+/** 将 Excel 展示日期（DD-MMM-YYYY）转为 ISO 格式（YYYY-MM-DD）。 */
 export function toIsoDate(displayDate: string): string {
   if (!displayDate) return ''
   const parts = displayDate.split('-')
@@ -52,7 +47,7 @@ export function toIsoDate(displayDate: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Smelter lookup special values (case-insensitive normalization)
+// 冶炼厂 lookup 特殊值（大小写无关标准化）
 // ---------------------------------------------------------------------------
 
 const SMELTER_NOT_LISTED_VARIANTS = [
@@ -67,9 +62,7 @@ const SMELTER_NOT_IDENTIFIED_VARIANTS = [
   'Smelter Not Yet Identified',
 ]
 
-/**
- * Normalize smelter lookup value to canonical form
- */
+/** 将冶炼厂 lookup 值标准化为规范形式。 */
 export function normalizeSmelterLookup(value: string): string {
   const lower = value.toLowerCase().trim()
 
@@ -84,18 +77,14 @@ export function normalizeSmelterLookup(value: string): string {
   return value
 }
 
-/**
- * Check if value is "Smelter not listed"
- */
+/** 判断是否为"Smelter not listed"。 */
 export function isSmelterNotListed(value: string): boolean {
   return SMELTER_NOT_LISTED_VARIANTS.some(
     (v) => v.toLowerCase() === value.toLowerCase().trim()
   )
 }
 
-/**
- * Check if value is "Smelter not yet identified"
- */
+/** 判断是否为"Smelter not yet identified"。 */
 export function isSmelterNotIdentified(value: string): boolean {
   return SMELTER_NOT_IDENTIFIED_VARIANTS.some(
     (v) => v.toLowerCase() === value.toLowerCase().trim()
@@ -103,7 +92,7 @@ export function isSmelterNotIdentified(value: string): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// DV option value transformations
+// DV 选项值映射（internal ↔ display）
 // ---------------------------------------------------------------------------
 
 /**
@@ -114,9 +103,7 @@ export interface OptionTransform {
   internalValue: string
 }
 
-/**
- * Create a lookup map from internal values to display values
- */
+/** 创建 内部值 → 展示值 的映射 Map。 */
 export function createDisplayValueMap(options: OptionTransform[]): Map<string, string> {
   const map = new Map<string, string>()
   for (const opt of options) {
@@ -125,9 +112,7 @@ export function createDisplayValueMap(options: OptionTransform[]): Map<string, s
   return map
 }
 
-/**
- * Create a lookup map from display values to internal values
- */
+/** 创建 展示值 → 内部值 的映射 Map。 */
 export function createInternalValueMap(options: OptionTransform[]): Map<string, string> {
   const map = new Map<string, string>()
   for (const opt of options) {

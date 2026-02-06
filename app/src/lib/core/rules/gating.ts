@@ -1,22 +1,36 @@
 /**
  * @file core/rules/gating.ts
- * @description 模块实现。
+ * @description 问卷门控（gating）逻辑：根据 Q1/Q2 的回答决定后续问题是否展示。
  */
 
-// 说明：模块实现
 import type { GatingCondition, TemplateVersionDef } from '@core/registry/types'
 
 // ---------------------------------------------------------------------------
-// Question answers type
+// 问题回答类型
 // ---------------------------------------------------------------------------
 
-/**
- * 导出类型：QuestionAnswers。
- */
+/** 问题回答集合：perMineral 时为嵌套 Record，否则为 string。 */
 export type QuestionAnswers = Record<string, Record<string, string> | string>
 
 // ---------------------------------------------------------------------------
-// Evaluate a single gating condition
+// 辅助函数：统一读取指定问题、指定矿种的回答值
+// ---------------------------------------------------------------------------
+
+/**
+ * 从回答集合中读取指定问题的值。
+ * - perMineral 时读取 `answers[key][mineral]`
+ * - 非 perMineral 时读取 `answers[key]`（string）
+ * - 无法匹配时返回空字符串
+ */
+function getAnswer(answers: QuestionAnswers, key: string, mineral?: string): string {
+  const entry = answers[key]
+  if (typeof entry === 'object' && mineral) return entry[mineral] ?? ''
+  if (typeof entry === 'string') return entry
+  return ''
+}
+
+// ---------------------------------------------------------------------------
+// 评估单个门控条件
 // ---------------------------------------------------------------------------
 
 function evaluateCondition(
@@ -28,81 +42,38 @@ function evaluateCondition(
     case 'always':
       return true
 
-    case 'q1-not-no': {
-      // CMRT: Q1 ≠ No
-      const q1 = answers['Q1']
-      if (typeof q1 === 'object' && mineral) {
-        return q1[mineral] !== 'No'
-      }
-      if (typeof q1 === 'string') {
-        return q1 !== 'No'
-      }
-      return true // Not answered yet
-    }
+    case 'q1-not-no':
+      // CMRT：Q1 ≠ No（未回答视为"尚未否定"，返回 true）
+      return getAnswer(answers, 'Q1', mineral) !== 'No'
 
-    case 'q1-yes': {
-      // CMRT: Q1 = Yes
-      const q1 = answers['Q1']
-      if (typeof q1 === 'object' && mineral) {
-        return q1[mineral] === 'Yes'
-      }
-      if (typeof q1 === 'string') {
-        return q1 === 'Yes'
-      }
-      return false
-    }
+    case 'q1-yes':
+      // CMRT：Q1 = Yes
+      return getAnswer(answers, 'Q1', mineral) === 'Yes'
 
-    case 'q1q2-not-no': {
-      // CMRT: Q1 ≠ No AND Q2 ≠ No
-      const q1 = answers['Q1']
-      const q2 = answers['Q2']
-      if (typeof q1 === 'object' && typeof q2 === 'object' && mineral) {
-        return q1[mineral] !== 'No' && q2[mineral] !== 'No'
-      }
-      if (typeof q1 === 'string' && typeof q2 === 'string') {
-        return q1 !== 'No' && q2 !== 'No'
-      }
-      return true
-    }
+    case 'q1q2-not-no':
+      // CMRT：Q1 ≠ No 且 Q2 ≠ No
+      return (
+        getAnswer(answers, 'Q1', mineral) !== 'No' &&
+        getAnswer(answers, 'Q2', mineral) !== 'No'
+      )
 
-    case 'q1q2-yes': {
-      // CMRT: Q1 = Yes AND Q2 = Yes
-      const q1 = answers['Q1']
-      const q2 = answers['Q2']
-      if (typeof q1 === 'object' && typeof q2 === 'object' && mineral) {
-        return q1[mineral] === 'Yes' && q2[mineral] === 'Yes'
-      }
-      if (typeof q1 === 'string' && typeof q2 === 'string') {
-        return q1 === 'Yes' && q2 === 'Yes'
-      }
-      return false
-    }
+    case 'q1q2-yes':
+      // CMRT：Q1 = Yes 且 Q2 = Yes
+      return (
+        getAnswer(answers, 'Q1', mineral) === 'Yes' &&
+        getAnswer(answers, 'Q2', mineral) === 'Yes'
+      )
 
-    case 'q1-not-negatives': {
-      // CRT/EMRT: Q1 not in negatives
-      const q1 = answers['Q1']
-      if (typeof q1 === 'object' && mineral) {
-        return !condition.negatives.includes(q1[mineral] || '')
-      }
-      if (typeof q1 === 'string') {
-        return !condition.negatives.includes(q1)
-      }
-      return true
-    }
+    case 'q1-not-negatives':
+      // CRT/EMRT：Q1 不在否定选项列表中
+      return !condition.negatives.includes(getAnswer(answers, 'Q1', mineral))
 
-    case 'q1-not-negatives-and-q2-not-negatives': {
-      // EMRT: Q1 not in negatives AND Q2 not in negatives
-      const q1 = answers['Q1']
-      const q2 = answers['Q2']
-      if (typeof q1 === 'object' && typeof q2 === 'object' && mineral) {
-        const q1Val = q1[mineral] || ''
-        const q2Val = q2[mineral] || ''
-        return (
-          !condition.q1Negatives.includes(q1Val) && !condition.q2Negatives.includes(q2Val)
-        )
-      }
-      return true
-    }
+    case 'q1-not-negatives-and-q2-not-negatives':
+      // EMRT：Q1 不在否定列表 且 Q2 不在否定列表
+      return (
+        !condition.q1Negatives.includes(getAnswer(answers, 'Q1', mineral)) &&
+        !condition.q2Negatives.includes(getAnswer(answers, 'Q2', mineral))
+      )
 
     default:
       return true
@@ -113,23 +84,19 @@ function evaluateCondition(
 // Gating results
 // ---------------------------------------------------------------------------
 
-/**
- * 导出接口类型：GatingResult。
- */
+/** 门控计算结果：控制各区块是否展示/必填。 */
 export interface GatingResult {
-  /** Q2 is shown for this mineral */
+  /** Q2 对该矿种是否展示。 */
   q2Enabled: boolean
-  /** Q3+ are shown for this mineral */
+  /** Q3+ 对该矿种是否展示。 */
   laterQuestionsEnabled: boolean
-  /** Company questions are shown */
+  /** 公司问题区块是否展示。 */
   companyQuestionsEnabled: boolean
-  /** Smelter list is required */
+  /** 冶炼厂列表是否必填。 */
   smelterListRequired: boolean
 }
 
-/**
- * Calculate gating for a specific mineral
- */
+/** 计算指定矿种的门控结果。 */
 export function calculateGating(
   versionDef: TemplateVersionDef,
   answers: QuestionAnswers,
@@ -151,9 +118,7 @@ export function calculateGating(
   }
 }
 
-/**
- * Calculate gating for all minerals (returns map)
- */
+/** 计算所有矿种的门控结果（返回 Map）。 */
 export function calculateAllGating(
   versionDef: TemplateVersionDef,
   answers: QuestionAnswers,

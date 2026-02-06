@@ -443,9 +443,134 @@ function writeAmrtQuestions(
   return next
 }
 
-/**
- * 将 snapshot 写入模板并导出 .xlsx（严格保留模板行为）。
- */
+// ---------------------------------------------------------------------------
+// 单元格写入辅助：根据是否为公式单元格选择覆盖策略
+// ---------------------------------------------------------------------------
+
+/** 智能写入：有公式时根据 allowOverwrite 决定是否覆盖，否则直接写入。 */
+function writeSmart(
+  baseXml: string,
+  cellRef: string,
+  value: string,
+  allowOverwriteFormula: boolean
+): string {
+  if (!value) return baseXml
+  if (isFormulaCell(baseXml, cellRef)) {
+    return allowOverwriteFormula
+      ? writeCellInlineStrOverwriteFormula(baseXml, cellRef, value)
+      : baseXml
+  }
+  return writeCellInlineStr(baseXml, cellRef, value)
+}
+
+// ---------------------------------------------------------------------------
+// 各 sheet 写入函数
+// ---------------------------------------------------------------------------
+
+/** 写入 Smelter List sheet（每行根据是否有 smelterId 决定覆盖策略）。 */
+function writeSmelterListSheet(
+  sheetXml: string,
+  versionDef: TemplateVersionDef,
+  rows: Array<Record<string, string | undefined>>,
+  toMineralLabel: (key: string) => string
+): string {
+  let next = sheetXml
+  rows.forEach((row, index) => {
+    const r = 5 + index
+    const smelterId = (row.smelterId ?? '').trim()
+    const hasId = Boolean(smelterId)
+    const allow = !hasId
+
+    // 优先"方案 A"：写入 Smelter ID（A 列），让模板公式自动填充
+    if (versionDef.smelterList.hasIdColumn && hasId) {
+      next = writeCellInlineStr(next, cell('A', r), smelterId)
+    }
+
+    // 无 ID 时模拟用户输入：覆盖公式单元格
+    const metal = row.metal?.trim()
+    if (metal) next = writeSmart(next, cell('B', r), toMineralLabel(metal), allow)
+
+    const lookup = row.smelterLookup?.trim()
+    if (versionDef.smelterList.hasLookup && lookup) {
+      next = writeSmart(next, cell('C', r), normalizeSmelterLookup(lookup), allow)
+    }
+
+    // 逐列写入（公式/输入共存列）
+    const fieldColMap: Array<[string, string]> = [
+      ['smelterName', 'D'], ['smelterCountry', 'E'], ['smelterIdentification', 'F'],
+      ['sourceId', 'G'], ['smelterStreet', 'H'], ['smelterCity', 'I'],
+      ['smelterState', 'J'], ['smelterContactName', 'K'], ['smelterContactEmail', 'L'],
+      ['proposedNextSteps', 'M'], ['mineName', 'N'], ['mineCountry', 'O'],
+      ['recycledScrap', 'P'], ['comments', 'Q'],
+    ]
+    for (const [key, col] of fieldColMap) {
+      const v = row[key]?.trim()
+      if (v) next = writeSmart(next, cell(col, r), v, allow)
+    }
+
+    // Combined 列（仅部分模板版本有）
+    if (versionDef.smelterList.hasCombinedColumn) {
+      const combinedMetal = row.combinedMetal?.trim()
+      if (combinedMetal) next = writeSmart(next, cell('R', r), toMineralLabel(combinedMetal), allow)
+      const combinedSmelter = row.combinedSmelter?.trim()
+      if (combinedSmelter) next = writeSmart(next, cell('S', r), combinedSmelter, allow)
+    }
+  })
+  return next
+}
+
+/** 写入 Mine List sheet。 */
+function writeMineListSheet(
+  sheetXml: string,
+  rows: Array<Record<string, string | undefined>>,
+  toMineralLabel: (key: string) => string
+): string {
+  const colByKey: Record<string, string> = {
+    metal: 'A', smelterName: 'B', mineName: 'C', mineId: 'D',
+    mineIdSource: 'E', mineCountry: 'F', mineStreet: 'G', mineCity: 'H',
+    mineProvince: 'I', mineContactName: 'J', mineContactEmail: 'K',
+    proposedNextSteps: 'L', comments: 'M',
+  }
+  return writeListSheetRows(sheetXml, 5, rows, colByKey, (k, v) => k === 'metal' ? toMineralLabel(v) : v)
+}
+
+/** 写入 Product List sheet。 */
+function writeProductListSheet(
+  sheetXml: string,
+  rows: Array<Record<string, string | undefined>>,
+  hasRequesterColumns: boolean
+): string {
+  const colByKey: Record<string, string> = hasRequesterColumns
+    ? { productNumber: 'B', productName: 'C', requesterNumber: 'D', requesterName: 'E', comments: 'F' }
+    : { productNumber: 'B', productName: 'C', comments: 'D' }
+  return writeListSheetRows(sheetXml, 6, rows, colByKey)
+}
+
+/** 写入 Minerals Scope sheet（AMRT 专用）。 */
+function writeMineralsScopeSheet(
+  sheetXml: string,
+  snapshot: ReportSnapshotV1,
+  toMineralLabel: (key: string) => string
+): string {
+  const resolveMineral = (key: string) => {
+    if (key.startsWith('other-')) {
+      const index = Number(key.slice('other-'.length))
+      return snapshot.data.customMinerals?.[index]?.trim() ?? ''
+    }
+    return toMineralLabel(key)
+  }
+  const rows = (snapshot.data.mineralsScope ?? []).map((r) => ({
+    mineral: resolveMineral(r.mineral),
+    reason: r.reason,
+  }))
+  return writeListSheetRows(sheetXml, 8, rows, { mineral: 'B', reason: 'C' })
+}
+
+// ---------------------------------------------------------------------------
+// 导出主入口
+// ---------------------------------------------------------------------------
+
+/** 将 snapshot 写入模板并导出 .xlsx（严格保留模板行为）。 */
 export async function exportToExcel({ templateXlsx, snapshot }: ExportExcelInput): Promise<Blob> {
   const versionDef = getVersionDef(snapshot.templateType, snapshot.versionId)
   const anchors = getExcelDeclarationAnchors(snapshot.templateType, snapshot.versionId)
@@ -488,179 +613,31 @@ export async function exportToExcel({ templateXlsx, snapshot }: ExportExcelInput
   const toMineralLabel = (key: string) =>
     amrtOptionMap?.get(key) ?? humanizeMineralKey(key) ?? key
 
-  // Smelter List
+  // ── Smelter List sheet ──
   if (snapshot.data.smelterList?.length) {
-    const smelterXml = getSheetXml(ctx, 'Smelter List')
-    let next = smelterXml
-
-    const writeSmart = (
-      baseXml: string,
-      cellRef: string,
-      value: string,
-      allowOverwriteFormula: boolean
-    ) => {
-      if (!value) return baseXml
-      if (isFormulaCell(baseXml, cellRef)) {
-        return allowOverwriteFormula
-          ? writeCellInlineStrOverwriteFormula(baseXml, cellRef, value)
-          : baseXml // keep template formula
-      }
-      return writeCellInlineStr(baseXml, cellRef, value)
-    }
-
-    const rows = snapshot.data.smelterList as Array<Record<string, string | undefined>>
-    rows.forEach((row, index) => {
-      const r = 5 + index
-
-      const smelterId = (row.smelterId ?? '').trim()
-      const hasId = Boolean(smelterId)
-      const allowOverwriteFormula = !hasId
-
-      // Prefer the template's "Option A": write Smelter ID in column A and let formulas auto-fill.
-      if (versionDef.smelterList.hasIdColumn && hasId) {
-        next = writeCellInlineStr(next, cell('A', r), smelterId)
-      }
-
-      // If we don't have an ID, mimic user input by overwriting formula cells in the input columns.
-      // This is required for cases like "Smelter not listed" where template expects B/C/D/E/... to be entered.
-      const metal = row.metal?.trim()
-      if (metal) next = writeSmart(next, cell('B', r), toMineralLabel(metal), allowOverwriteFormula)
-
-      const lookup = row.smelterLookup?.trim()
-      if (versionDef.smelterList.hasLookup && lookup) {
-        next = writeSmart(next, cell('C', r), normalizeSmelterLookup(lookup), allowOverwriteFormula)
-      }
-
-      const smelterCountry = row.smelterCountry?.trim()
-      if (smelterCountry) next = writeSmart(next, cell('E', r), smelterCountry, allowOverwriteFormula)
-
-      const smelterIdentification = row.smelterIdentification?.trim()
-      if (smelterIdentification) {
-        next = writeSmart(next, cell('F', r), smelterIdentification, allowOverwriteFormula)
-      }
-
-      const sourceId = row.sourceId?.trim()
-      if (sourceId) next = writeSmart(next, cell('G', r), sourceId, allowOverwriteFormula)
-
-      const smelterStreet = row.smelterStreet?.trim()
-      if (smelterStreet) next = writeSmart(next, cell('H', r), smelterStreet, allowOverwriteFormula)
-
-      const smelterCity = row.smelterCity?.trim()
-      if (smelterCity) next = writeSmart(next, cell('I', r), smelterCity, allowOverwriteFormula)
-
-      const smelterState = row.smelterState?.trim()
-      if (smelterState) next = writeSmart(next, cell('J', r), smelterState, allowOverwriteFormula)
-
-      const combinedMetal = row.combinedMetal?.trim()
-      if (versionDef.smelterList.hasCombinedColumn && combinedMetal) {
-        next = writeSmart(next, cell('R', r), toMineralLabel(combinedMetal), allowOverwriteFormula)
-      }
-      const combinedSmelter = row.combinedSmelter?.trim()
-      if (versionDef.smelterList.hasCombinedColumn && combinedSmelter) {
-        next = writeSmart(next, cell('S', r), combinedSmelter, allowOverwriteFormula)
-      }
-
-      // Columns that are plain input cells in templates across versions.
-      const smelterName = row.smelterName?.trim()
-      if (smelterName) next = writeSmart(next, cell('D', r), smelterName, allowOverwriteFormula)
-
-      const smelterContactName = row.smelterContactName?.trim()
-      if (smelterContactName) next = writeSmart(next, cell('K', r), smelterContactName, allowOverwriteFormula)
-
-      const smelterContactEmail = row.smelterContactEmail?.trim()
-      if (smelterContactEmail) next = writeSmart(next, cell('L', r), smelterContactEmail, allowOverwriteFormula)
-
-      const proposedNextSteps = row.proposedNextSteps?.trim()
-      if (proposedNextSteps) next = writeSmart(next, cell('M', r), proposedNextSteps, allowOverwriteFormula)
-
-      const mineName = row.mineName?.trim()
-      if (mineName) next = writeSmart(next, cell('N', r), mineName, allowOverwriteFormula)
-
-      const mineCountry = row.mineCountry?.trim()
-      if (mineCountry) next = writeSmart(next, cell('O', r), mineCountry, allowOverwriteFormula)
-
-      const recycledScrap = row.recycledScrap?.trim()
-      if (recycledScrap) next = writeSmart(next, cell('P', r), recycledScrap, allowOverwriteFormula)
-
-      const comments = row.comments?.trim()
-      if (comments) next = writeSmart(next, cell('Q', r), comments, allowOverwriteFormula)
-    })
-
-    setSheetXml(ctx, 'Smelter List', next)
+    const xml = getSheetXml(ctx, 'Smelter List')
+    const patched = writeSmelterListSheet(xml, versionDef, snapshot.data.smelterList as Array<Record<string, string | undefined>>, toMineralLabel)
+    setSheetXml(ctx, 'Smelter List', patched)
   }
 
-  // Mine List (if exists in template)
+  // ── Mine List sheet ──
   if (snapshot.data.mineList?.length && ctx.sheetPathByName.has('Mine List')) {
-    const mineXml = getSheetXml(ctx, 'Mine List')
-    const colByKey: Record<string, string> = {
-      metal: 'A',
-      smelterName: 'B',
-      mineName: 'C',
-      mineId: 'D',
-      mineIdSource: 'E',
-      mineCountry: 'F',
-      mineStreet: 'G',
-      mineCity: 'H',
-      mineProvince: 'I',
-      mineContactName: 'J',
-      mineContactEmail: 'K',
-      proposedNextSteps: 'L',
-      comments: 'M',
-    }
-    const patched = writeListSheetRows(
-      mineXml,
-      5,
-      snapshot.data.mineList as Array<Record<string, string | undefined>>,
-      colByKey,
-      (k, v) => {
-        if (k !== 'metal') return v
-        return toMineralLabel(v)
-      }
-    )
+    const xml = getSheetXml(ctx, 'Mine List')
+    const patched = writeMineListSheet(xml, snapshot.data.mineList as Array<Record<string, string | undefined>>, toMineralLabel)
     setSheetXml(ctx, 'Mine List', patched)
   }
 
-  // Product List
+  // ── Product List sheet ──
   if (snapshot.data.productList?.length) {
-    const productXml = getSheetXml(ctx, 'Product List')
-    const colByKey: Record<string, string> = versionDef.productList.hasRequesterColumns
-      ? {
-          productNumber: 'B',
-          productName: 'C',
-          requesterNumber: 'D',
-          requesterName: 'E',
-          comments: 'F',
-        }
-      : {
-          productNumber: 'B',
-          productName: 'C',
-          comments: 'D',
-        }
-    const patched = writeListSheetRows(
-      productXml,
-      6,
-      snapshot.data.productList as Array<Record<string, string | undefined>>,
-      colByKey
-    )
+    const xml = getSheetXml(ctx, 'Product List')
+    const patched = writeProductListSheet(xml, snapshot.data.productList as Array<Record<string, string | undefined>>, versionDef.productList.hasRequesterColumns)
     setSheetXml(ctx, 'Product List', patched)
   }
 
-  // Minerals Scope (AMRT)
+  // ── Minerals Scope sheet（AMRT）──
   if (snapshot.templateType === 'amrt' && snapshot.data.mineralsScope?.length && ctx.sheetPathByName.has('Minerals Scope')) {
-    const msXml = getSheetXml(ctx, 'Minerals Scope')
-    const resolveMineral = (key: string) => {
-      if (key.startsWith('other-')) {
-        const index = Number(key.slice('other-'.length))
-        const label = snapshot.data.customMinerals?.[index]?.trim()
-        return label ?? ''
-      }
-      return toMineralLabel(key)
-    }
-    const rows = (snapshot.data.mineralsScope ?? []).map((r) => ({
-      mineral: resolveMineral(r.mineral),
-      reason: r.reason,
-    }))
-    const patched = writeListSheetRows(msXml, 8, rows, { mineral: 'B', reason: 'C' })
+    const xml = getSheetXml(ctx, 'Minerals Scope')
+    const patched = writeMineralsScopeSheet(xml, snapshot, toMineralLabel)
     setSheetXml(ctx, 'Minerals Scope', patched)
   }
 
