@@ -1,0 +1,4 @@
+interface:
+  display_name: "CM Reporting Integration"
+  short_description: "Integrate cm-reporting in host React apps"
+  default_prompt: "Use $cm-reporting-integration to integrate cm-reporting with template loading, snapshot persistence, and Excel export in my app."
