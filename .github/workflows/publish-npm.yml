@@ -87,6 +87,5 @@ jobs:
           fi
           npm publish \
             --access public \
-            --provenance \
             --registry https://registry.npmjs.org \
             --tag "$NPM_TAG"
