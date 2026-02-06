@@ -32,3 +32,5 @@ pnpm sg:scan
 - 合并 `Version Packages` PR 后由流水线执行发布；正常情况下不再手动打 tag 发布。
 - 保留 `.github/workflows/publish-npm.yml` 作为应急兜底流程（手动/标签触发），默认不作为主流程。
 - 触发发布前仍需满足 `app` 强制校验：`pnpm lint`、`pnpm exec tsc -b --pretty false`、`pnpm test`、`pnpm sg:scan`。
+
+- 开发 PR 若涉及 `app/**` 变更，必须提交 changeset 文件（`app/.changeset/*.md`，`README.md` 除外）；否则 CI 直接失败。
