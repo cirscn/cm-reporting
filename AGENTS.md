@@ -26,7 +26,7 @@ pnpm sg:scan
 
 ## 自动发布流程（Changesets）
 
-- 默认发版路径：`main` 分支触发 `.github/workflows/release.yml`，按 changeset **直发 npm**（不再创建 `Version Packages` PR）。
+- 默认发版路径：`main` 分支触发 `.github/workflows/release.yml`，按 changeset **直发 npm**（不再创建 `Version Packages` PR）；同时支持 `workflow_dispatch` 手动触发。
 - 日常功能开发 PR 必须包含 changeset 文件（在 `app` 目录执行 `pnpm changeset` 生成）。
 - 版本号由 Changesets 自动维护，禁止手工修改 `app/package.json` 的 `version`（紧急修复场景除外，且需在 PR 描述说明原因）。
 - 发布流程会在 `main` 自动执行 `changeset version`、提交版本变更回 `main`、随后执行 `changeset publish`。
