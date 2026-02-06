@@ -10,7 +10,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
   id-token: write
 
 concurrency:
@@ -30,6 +29,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -68,25 +70,37 @@ jobs:
       - name: Build library
         run: pnpm build:lib
 
-      - name: Link root .changeset for action compatibility
+      - name: Version packages and push
+        id: version
         run: |
-          rm -rf ../.changeset
-          ln -s app/.changeset ../.changeset
+          CHANGESET_COUNT=$(find .changeset -maxdepth 1 -type f -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')
+          if [ "$CHANGESET_COUNT" = "0" ]; then
+            echo "No unreleased changesets found."
+            echo "published=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
-      - name: Create release PR or publish
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          cwd: app
-          commit: 'chore(release): version packages'
-          title: 'chore(release): version packages'
-          version: pnpm version-packages
-          publish: pnpm release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          pnpm version-packages
+
+          if git diff --quiet; then
+            echo "No version diff after changeset version."
+            echo "published=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore(release): version packages [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          echo "published=true" >> "$GITHUB_OUTPUT"
+
+      - name: Publish to npm
+        if: steps.version.outputs.published == 'true'
+        run: pnpm release
 
       - name: Sync next dist-tag to latest
-        if: steps.changesets.outputs.published == 'true' && env.NPM_TOKEN != ''
+        if: steps.version.outputs.published == 'true' && env.NPM_TOKEN != ''
         env:
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
         run: |
@@ -95,5 +109,5 @@ jobs:
           npm dist-tag add "${PACKAGE_NAME}@${PACKAGE_VERSION}" next --registry https://registry.npmjs.org
 
       - name: Skip next dist-tag sync (missing NPM_TOKEN)
-        if: steps.changesets.outputs.published == 'true' && env.NPM_TOKEN == ''
+        if: steps.version.outputs.published == 'true' && env.NPM_TOKEN == ''
         run: echo "::notice title=dist-tag skipped::NPM_TOKEN is not configured; next tag was not updated."
