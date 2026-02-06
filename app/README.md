@@ -104,4 +104,7 @@ export function App() {
 
 ## License
 
-MIT
+PolyForm-Noncommercial-1.0.0
+
+- 禁止商业用途（Noncommercial only）。
+- 如需商业使用，请联系版权所有者获取单独商业授权。

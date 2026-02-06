@@ -141,4 +141,7 @@ All template validations passed.
 
 ## 许可证
 
-[MIT](LICENSE)
+[PolyForm-Noncommercial-1.0.0](LICENSE)
+
+- 禁止商业用途（Noncommercial only）。
+- 如需商业使用，请联系版权所有者获取单独商业授权。

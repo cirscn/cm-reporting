@@ -2,6 +2,7 @@
   "name": "cm-reporting",
   "version": "0.1.0",
   "description": "Conflict Minerals Reporting Template Components",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "packageManager": "pnpm@10.28.2",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -13,12 +14,11 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./styles.css": "./dist/styles.css",
-    "./templates/*": "./templates/*"
+    "./styles.css": "./dist/cm-reporting.css",
+    "./templates/*": "./dist/templates/*"
   },
   "files": [
-    "dist",
-    "templates"
+    "dist"
   ],
   "sideEffects": [
     "**/*.css"
