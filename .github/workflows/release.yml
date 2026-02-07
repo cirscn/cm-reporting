@@ -83,7 +83,7 @@ jobs:
               git config user.name "github-actions[bot]"
               git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
               git add -A
-              git commit -m "chore(release): version packages [skip ci]"
+              git commit -m "发布：版本更新 [skip ci]"
               git push origin "HEAD:${GITHUB_REF_NAME}"
             fi
           else
