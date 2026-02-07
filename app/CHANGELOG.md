@@ -1,5 +1,11 @@
 # cm-reporting
 
+## 0.1.4
+
+### Patch Changes
+
+- 22ac063: 移除 Declaration 页面中的 EMRT 矿种删减人工校对提示条，并清理相关状态与 i18n 冗余实现。
+
 ## 0.1.3
 
 ### Patch Changes
