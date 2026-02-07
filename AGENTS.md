@@ -28,6 +28,9 @@ pnpm sg:scan
 
 - 默认发版路径：`main` 分支触发 `.github/workflows/release.yml`，按 changeset **直发 npm**（不再创建 `Version Packages` PR）；同时支持 `workflow_dispatch` 手动触发。
 - 日常功能开发 PR 必须包含 changeset 文件（在 `app` 目录执行 `pnpm changeset` 生成）。
+- 所有 changeset 文件中的说明正文必须使用中文编写，避免英文描述。
+- 所有 Git commit 提交信息（commit message）必须使用中文编写，避免英文描述。
+- 所有 Pull Request 标题必须使用中文编写，避免英文描述。
 - 版本号由 Changesets 自动维护，禁止手工修改 `app/package.json` 的 `version`（紧急修复场景除外，且需在 PR 描述说明原因）。
 - 发布流程会在 `main` 自动执行 `changeset version`、提交版本变更回 `main`、随后执行 `changeset publish`。
 - `release.yml` 使用 npm Trusted Publishing（OIDC）执行发布，npm 侧 Trusted Publisher 必须绑定仓库 `cirscn/cm-reporting`、workflow 文件名 `release.yml`、environment `npm-release`；`NPM_TOKEN` 仅用于可选的 `next` dist-tag 同步（建议在 GitHub Environment `npm-release` 配置 npm automation token，write 权限）。

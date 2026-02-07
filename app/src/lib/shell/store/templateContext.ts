@@ -13,11 +13,7 @@ import { useMemo } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 
 import { useTemplateStore } from './templateStoreContext'
-import type {
-  MineralReconcileNotice,
-  TemplateFormErrors,
-  TemplateFormState,
-} from './templateTypes'
+import type { TemplateFormErrors, TemplateFormState } from './templateTypes'
 
 // ---------------------------------------------------------------------------
 // 公开类型（保持向后兼容）
@@ -70,7 +66,6 @@ interface TemplateActionsValue {
   setFormData: (data: TemplateFormState) => void
   validateForm: () => Promise<boolean>
   resetForm: () => void
-  clearMineralReconcileNotice: () => void
 }
 
 // ---------------------------------------------------------------------------
@@ -102,7 +97,6 @@ const selectLists = (s: TemplateListsSlice): TemplateListsSlice => ({
 const selectErrors = (s: { errors: TemplateFormErrors }): TemplateFormErrors => s.errors
 
 const selectIntegrations = (s: { integrations?: import('@lib/public/integrations').CMReportingIntegrations }) => s.integrations
-const selectMineralReconcileNotice = (s: { mineralReconcileNotice: MineralReconcileNotice | null }) => s.mineralReconcileNotice
 
 /**
  * Actions selector：虽然 zustand store 中 action 引用在 store 生命周期内不变，
@@ -124,7 +118,6 @@ const selectActions = (s: TemplateActionsValue): TemplateActionsValue => ({
   setFormData: s.setFormData,
   validateForm: s.validateForm,
   resetForm: s.resetForm,
-  clearMineralReconcileNotice: s.clearMineralReconcileNotice,
 })
 
 // ---------------------------------------------------------------------------
@@ -153,9 +146,4 @@ export function useTemplateActions(): TemplateActionsValue {
 /** 读取对外 integrations（宿主扩展点）。 */
 export function useTemplateIntegrations() {
   return useTemplateStore(selectIntegrations)
-}
-
-/** 读取矿种删除后的人工校对提示。 */
-export function useMineralReconcileNotice() {
-  return useTemplateStore(selectMineralReconcileNotice)
 }

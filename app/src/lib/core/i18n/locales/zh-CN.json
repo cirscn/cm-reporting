@@ -131,8 +131,6 @@
     "authorizerName": "不可填 \"same\" 等占位。",
     "authorizationDate": "格式: DD-MMM-YYYY (如 01-Jan-2026)",
     "smelterNotYetIdentifiedCountry": "尚未识别：国家保持为空即可。",
-    "emrtMineralDeleteReconcileTitle": "矿种已移除，请人工校对受影响答案。",
-    "emrtMineralDeleteReconcileDesc": "已移除：{{minerals}}。请核对 Q1-Q7、公司问题 C，以及 Smelter/Mine 列表行是否仍一一对应。",
     "mineralsMaxCount": "最多选择 {{max}} 种矿产",
     "mineralsMaxCountReached": "已达到矿产选择上限"
   },
@@ -178,7 +176,6 @@
     "submit": "提交",
     "close": "关闭",
     "setAllTo": "全部设为",
-    "markChecked": "已完成校对",
     "sameAsContact": "同联系人",
     "batchDelete": "批量删除",
     "cancelSelection": "取消选择"
