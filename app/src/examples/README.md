@@ -26,11 +26,6 @@
   - **RMI legacy JSON**：通过 `cirsGpmLegacyAdapter.toInternal()` 导入；会生成 `legacyCtx` 以支持后续精确回写（roundtrip）。
   - **ReportSnapshotV1**：通过 `parseSnapshot()` 导入；不包含 legacy 的“历史字段类型/缺失细节”，因此无法做 byte-level roundtrip。
 
-- 关于公司信息“完成日期”（`authorizationDate`）：
-  - 推荐输入 `YYYY-MM-DD`（如 `2026-02-09`）。
-  - Snapshot 导入/回填运行时兼容秒级与毫秒级时间戳（number/数字字符串），会自动归一化为 `YYYY-MM-DD`。
-  - 非法日期字符串不会自动修正，仍按现有校验规则报错。
-
 - 导出（Examples 约定）：
   - `ExamplesApp` 始终导出 **RMI legacy schema**：
     - 若导入来源是 legacy JSON：使用 `cirsGpmLegacyAdapter.toExternal(snapshot, legacyCtx)` 精确回写。

@@ -25,7 +25,6 @@ Apply these rules in every solution:
 - Import `cm-reporting/styles.css` exactly once in host runtime.
 - Provide official template `.xlsx` as `ArrayBuffer` when calling Excel export APIs.
 - Treat Snapshot as full-state contract (`schemaVersion/templateType/versionId/data`).
-- `companyInfo.authorizationDate` 推荐传 `YYYY-MM-DD`；运行时兼容秒/毫秒时间戳（number/数字字符串），并会归一化为 `YYYY-MM-DD`。
 - Return integrations callback result in `{ items: [...] } | null | undefined` shape only.
 - Respect package license (`PolyForm-Noncommercial-1.0.0`) in usage recommendations.
 - For `readOnly` behavior, treat it as **view-only contract** (not just disabled inputs):

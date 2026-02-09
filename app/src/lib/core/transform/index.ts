@@ -22,13 +22,6 @@ const MONTH_NAMES = [
   'Dec',
 ]
 
-const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
-const INTEGER_PATTERN = /^-?\d+$/
-const TIMESTAMP_SECONDS_DIGITS_MIN = 9
-const TIMESTAMP_SECONDS_DIGITS_MAX = 10
-const TIMESTAMP_MILLISECONDS_DIGITS_MIN = 11
-const TIMESTAMP_MILLISECONDS_DIGITS_MAX = 13
-
 /** 将 ISO 日期（YYYY-MM-DD）转为 Excel 展示格式（DD-MMM-YYYY）。 */
 export function toDisplayDate(isoDate: string): string {
   if (!isoDate) return ''
@@ -51,68 +44,6 @@ export function toIsoDate(displayDate: string): string {
   if (monthIndex === -1) return displayDate
   const month = String(monthIndex + 1).padStart(2, '0')
   return `${year}-${month}-${day?.padStart(2, '0')}`
-}
-
-function epochMsToIsoDate(epochMs: number): string | null {
-  if (!Number.isFinite(epochMs)) return null
-  const date = new Date(epochMs)
-  if (Number.isNaN(date.getTime())) return null
-  const year = date.getUTCFullYear()
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
-  const day = String(date.getUTCDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
-
-function countTimestampDigits(raw: number, rawText?: string): number {
-  if (rawText) {
-    const unsigned = rawText.replace(/^[+-]/, '')
-    const withoutLeadingZeros = unsigned.replace(/^0+(?=\d)/, '')
-    return withoutLeadingZeros.length > 0 ? withoutLeadingZeros.length : 1
-  }
-  const absInt = Math.trunc(Math.abs(raw))
-  if (absInt === 0) return 1
-  return String(absInt).length
-}
-
-function normalizeNumericTimestamp(raw: number, rawText?: string): string | null {
-  if (!Number.isInteger(raw)) return null
-  const digits = countTimestampDigits(raw, rawText)
-  if (digits >= TIMESTAMP_MILLISECONDS_DIGITS_MIN && digits <= TIMESTAMP_MILLISECONDS_DIGITS_MAX) {
-    return epochMsToIsoDate(raw)
-  }
-  if (digits >= TIMESTAMP_SECONDS_DIGITS_MIN && digits <= TIMESTAMP_SECONDS_DIGITS_MAX) {
-    return epochMsToIsoDate(raw * 1000)
-  }
-  return null
-}
-
-/**
- * 将完成日期输入归一化为内部存储格式（YYYY-MM-DD）。
- *
- * 兼容输入：
- * - YYYY-MM-DD
- * - 秒级时间戳
- * - 毫秒级时间戳
- */
-export function normalizeAuthorizationDateInput(value: unknown): string {
-  if (value === null || value === undefined) return ''
-
-  if (typeof value === 'number') {
-    if (!Number.isFinite(value)) return String(value)
-    return normalizeNumericTimestamp(value) ?? String(value)
-  }
-
-  if (typeof value === 'string') {
-    const trimmed = value.trim()
-    if (!trimmed) return ''
-    if (ISO_DATE_PATTERN.test(trimmed)) return trimmed
-    if (!INTEGER_PATTERN.test(trimmed)) return trimmed
-    const num = Number(trimmed)
-    if (!Number.isFinite(num)) return trimmed
-    return normalizeNumericTimestamp(num, trimmed) ?? trimmed
-  }
-
-  return String(value)
 }
 
 // ---------------------------------------------------------------------------

@@ -6,7 +6,6 @@
 import type { Locale } from '@core/i18n'
 import type { TemplateType } from '@core/registry/types'
 import type { FormData } from '@core/schema'
-import { normalizeAuthorizationDateInput } from '@core/transform'
 import { z } from 'zod/v4'
 
 export const REPORT_SNAPSHOT_SCHEMA_VERSION = 1 as const
@@ -22,20 +21,6 @@ export interface ReportSnapshotV1 {
 
 const templateTypeSchema = z.enum(['cmrt', 'emrt', 'crt', 'amrt'])
 const localeSchema = z.enum(['en-US', 'zh-CN'])
-
-const companyInfoInputSchema = z
-  .record(z.string(), z.union([z.string(), z.number()]))
-  .superRefine((companyInfo, ctx) => {
-    for (const [key, value] of Object.entries(companyInfo)) {
-      if (key === 'authorizationDate') continue
-      if (typeof value === 'string') continue
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: [key],
-        message: '公司信息字段必须为字符串',
-      })
-    }
-  })
 
 const mineralsScopeRowSchema = z.object({ id: z.string(), mineral: z.string(), reason: z.string() })
 
@@ -90,13 +75,13 @@ const productRowSchema = z.object({
 }).catchall(z.string().optional())
 
 // 注意：这里做“结构级”校验（顶层 keys/类型），不做“按模板版本”细粒度校验。
-const snapshotV1Schema = z.object({
+const snapshotV1Schema: z.ZodType<ReportSnapshotV1> = z.object({
   schemaVersion: z.literal(REPORT_SNAPSHOT_SCHEMA_VERSION),
   templateType: templateTypeSchema,
   versionId: z.string().min(1),
   locale: localeSchema.optional(),
   data: z.object({
-    companyInfo: companyInfoInputSchema,
+    companyInfo: z.record(z.string(), z.string()),
     selectedMinerals: z.array(z.string()),
     customMinerals: z.array(z.string()),
     questions: z.record(z.string(), z.union([z.string(), z.record(z.string(), z.string())])),
@@ -110,23 +95,7 @@ const snapshotV1Schema = z.object({
 })
 
 export function parseSnapshot(input: unknown): ReportSnapshotV1 {
-  const snapshot = snapshotV1Schema.parse(input)
-  const companyInfo: Record<string, string> = {}
-  for (const [key, rawValue] of Object.entries(snapshot.data.companyInfo)) {
-    if (key === 'authorizationDate') {
-      companyInfo[key] = normalizeAuthorizationDateInput(rawValue)
-      continue
-    }
-    companyInfo[key] = typeof rawValue === 'string' ? rawValue : String(rawValue)
-  }
-
-  return {
-    ...snapshot,
-    data: {
-      ...snapshot.data,
-      companyInfo,
-    },
-  }
+  return snapshotV1Schema.parse(input)
 }
 
 export function stringifySnapshot(snapshot: ReportSnapshotV1): string {

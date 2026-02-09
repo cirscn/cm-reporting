@@ -231,9 +231,6 @@ interface ReportSnapshotV1 {
 }
 ```
 
-> `companyInfo.authorizationDate` 的内部标准格式为 `YYYY-MM-DD`。  
-> 运行时导入（如 `parseSnapshot` / `setSnapshot` 回填）额外兼容时间戳输入（秒级或毫秒级，number/数字字符串），并会自动归一化为 `YYYY-MM-DD`。
-
 ### 导出 JSON
 
 ```tsx
@@ -258,22 +255,6 @@ const snapshot = parseSnapshot(JSON.parse(jsonString))
 // 回填到组件
 ref.current?.setSnapshot(snapshot)
 ```
-
-完成日期字段示例：
-
-```json
-{
-  "data": {
-    "companyInfo": {
-      "authorizationDate": "2026-02-09"
-    }
-  }
-}
-```
-
-- 推荐传 `YYYY-MM-DD`。
-- 运行时兼容秒/毫秒时间戳（如 `1770595200` / `1770595200000`），内部会归一化为 `YYYY-MM-DD`。
-- 非法日期（如 `2026/02/09`）不会被自动修正，仍由现有校验提示错误。
 
 ### 初始化（编辑旧报告）
 
