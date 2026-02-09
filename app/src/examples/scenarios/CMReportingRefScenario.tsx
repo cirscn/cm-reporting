@@ -24,12 +24,17 @@ function downloadJson(filename: string, jsonText: string) {
 export function CMReportingRefScenario() {
   const reportingRef = useRef<CMReportingRef | null>(null)
   const [locale, setLocale] = useState<Locale>('zh-CN')
+  const [readOnly, setReadOnly] = useState(false)
 
   const initialSnapshot = useMemo<ReportSnapshotV1 | undefined>(() => {
     // 示例：宿主可从本地存储/接口加载 snapshot 并作为 initialSnapshot 传入。
     // 这里保持 undefined，避免影响运行时行为。
     return undefined
   }, [])
+
+  const readOnlyHint = readOnly
+    ? '只读已开启：checker/必填提示/上下页与新增删除等编辑入口将隐藏。'
+    : '可编辑模式：支持输入、导航与表格增删改。'
 
   return (
     <Flex vertical gap={12} style={{ padding: 16 }}>
@@ -70,7 +75,11 @@ export function CMReportingRefScenario() {
         <Button onClick={() => setLocale((v) => (v === 'zh-CN' ? 'en-US' : 'zh-CN'))}>
           切换语言（当前：{locale}）
         </Button>
+        <Button onClick={() => setReadOnly((value) => !value)}>
+          切换只读（当前：{readOnly ? '是' : '否'}）
+        </Button>
       </Flex>
+      <Typography.Text type="secondary">{readOnlyHint}</Typography.Text>
 
       <div style={{ border: '1px solid var(--ant-color-border)', borderRadius: 8, overflow: 'hidden' }}>
         <CMReporting
@@ -78,10 +87,10 @@ export function CMReportingRefScenario() {
           templateType="emrt"
           versionId="2.1"
           locale={locale}
+          readOnly={readOnly}
           initialSnapshot={initialSnapshot}
         />
       </div>
     </Flex>
   )
 }
-

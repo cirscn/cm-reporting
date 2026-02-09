@@ -11,7 +11,8 @@ import { useT } from '@ui/i18n/useT'
 import { AppLayout } from '@ui/layout/AppLayout'
 import { RequiredHintBanner } from '@ui/layout/RequiredHintBanner'
 import { useCreation, useMemoizedFn } from 'ahooks'
-import type { ReactNode } from 'react'
+import { ConfigProvider } from 'antd'
+import { useEffect, type ReactNode } from 'react'
 
 import { PageActions } from './PageActions'
 
@@ -19,6 +20,7 @@ import { PageActions } from './PageActions'
 export interface TemplateShellProps {
   templateType: TemplateType
   versionId: string
+  readOnly?: boolean
   pageKey: PageKey
   onNavigatePage: (pageKey: PageKey) => void
   renderPage: (pageKey: PageKey) => ReactNode
@@ -38,6 +40,7 @@ function isPageKey(value: string, availableKeys: PageKey[]): value is PageKey {
 export function TemplateShell({
   templateType,
   versionId,
+  readOnly = false,
   pageKey,
   onNavigatePage,
   renderPage,
@@ -46,9 +49,15 @@ export function TemplateShell({
   children,
 }: TemplateShellProps) {
   return (
-    <TemplateProvider templateType={templateType} versionId={versionId} integrations={integrations}>
+    <TemplateProvider
+      templateType={templateType}
+      versionId={versionId}
+      integrations={integrations}
+      readOnly={readOnly}
+    >
       {children}
       <TemplateScaffold
+        readOnly={readOnly}
         pageKey={pageKey}
         onNavigatePage={onNavigatePage}
         renderPage={renderPage}
@@ -60,6 +69,7 @@ export function TemplateShell({
 
 /** TemplateScaffold Props。 */
 interface TemplateScaffoldProps {
+  readOnly?: boolean
   pageKey: PageKey
   onNavigatePage: (pageKey: PageKey) => void
   renderPage: (pageKey: PageKey) => ReactNode
@@ -68,18 +78,41 @@ interface TemplateScaffoldProps {
 
 /** 模板页面骨架：负责 tabs/versions 计算与布局。 */
 function TemplateScaffold({
+  readOnly = false,
   pageKey,
   onNavigatePage,
   renderPage,
   maxContentWidth,
 }: TemplateScaffoldProps) {
+  const { componentDisabled: parentComponentDisabled } = ConfigProvider.useConfig()
   const { meta } = useTemplateState()
   const { versionDef } = meta
   const { t, locale, i18n } = useT()
   const { checkerErrors, checkerSummary } = useTemplateDerived()
+  const effectiveDisabled = Boolean(parentComponentDisabled || readOnly)
+  const requestNavigatePage = useMemoizedFn((nextPageKey: PageKey) => {
+    onNavigatePage(nextPageKey)
+  })
 
   /** 工作流页面集合（用于 stepper 与上下页）。 */
-  const workflowPages = useCreation(() => getWorkflowPages(versionDef), [versionDef])
+  const workflowPages = useCreation(() => {
+    const pages = getWorkflowPages(versionDef)
+    if (!readOnly) return pages
+    return pages.filter((page) => page.key !== 'checker')
+  }, [versionDef, readOnly])
+
+  const fallbackPageKey = useCreation(() => {
+    if (!readOnly || pageKey !== 'checker') return undefined
+    return workflowPages[0]?.key
+  }, [readOnly, pageKey, workflowPages])
+
+  const resolvedPageKey = fallbackPageKey ?? pageKey
+
+  useEffect(() => {
+    if (!fallbackPageKey) return
+    if (fallbackPageKey === pageKey) return
+    requestNavigatePage(fallbackPageKey)
+  }, [fallbackPageKey, pageKey, requestNavigatePage])
 
   /** 获取每个页面的进度（合并多个 section 的进度）。 */
   const getPageProgress = (pageKey: string) => {
@@ -121,35 +154,42 @@ function TemplateScaffold({
 
   /** 切换 step 时仅允许工作流页面。 */
   const handleStepChange = useMemoizedFn((key: string) => {
-    if (isPageKey(key, workflowPageKeys)) onNavigatePage(key)
+    if (isPageKey(key, workflowPageKeys)) requestNavigatePage(key)
   })
   const handleGoToChecker = useMemoizedFn(() => {
-    onNavigatePage('checker')
+    if (readOnly) return
+    requestNavigatePage('checker')
   })
 
   return (
     <AppLayout
       steps={workflowSteps}
-      currentStepKey={pageKey}
+      currentStepKey={resolvedPageKey}
       onStepChange={handleStepChange}
       maxContentWidth={maxContentWidth}
       bottomSlot={
-        <PageActions
-          currentPageKey={pageKey}
-          onNavigatePage={onNavigatePage}
-          pageOrder={workflowPages}
-          checkerErrors={checkerErrors}
-          checkerSummary={checkerSummary}
-        />
+        readOnly
+          ? undefined
+          : (
+            <PageActions
+              currentPageKey={resolvedPageKey}
+              onNavigatePage={requestNavigatePage}
+              pageOrder={workflowPages}
+              checkerErrors={checkerErrors}
+              checkerSummary={checkerSummary}
+            />
+          )
       }
     >
-      {pageKey !== 'checker' && (
+      {!readOnly && resolvedPageKey !== 'checker' && (
         <RequiredHintBanner
           errorCount={checkerErrors.length}
           onGoToChecker={handleGoToChecker}
         />
       )}
-      {renderPage(pageKey)}
+      <ConfigProvider componentDisabled={effectiveDisabled}>
+        {renderPage(resolvedPageKey)}
+      </ConfigProvider>
     </AppLayout>
   )
 }

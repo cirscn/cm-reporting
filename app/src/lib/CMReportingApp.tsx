@@ -29,6 +29,8 @@ export interface CMReportingAppProps {
   templateType: TemplateType
   /** 版本 ID */
   versionId: string
+  /** 全局只读模式：启用后禁用页面内所有编辑控件。 */
+  readOnly?: boolean
   /** 当前页面（受控模式） */
   pageKey?: PageKey
   /** 页面导航回调（受控模式） */
@@ -50,6 +52,7 @@ const DEFAULT_PAGE: PageKey = 'declaration'
 export function CMReportingApp({
   templateType,
   versionId,
+  readOnly = false,
   pageKey: controlledPageKey,
   onNavigatePage,
   maxContentWidth,
@@ -135,6 +138,7 @@ export function CMReportingApp({
       <TemplateShell
         templateType={templateType}
         versionId={versionId}
+        readOnly={readOnly}
         pageKey={pageKey}
         onNavigatePage={handleNavigatePage}
         renderPage={renderPage}

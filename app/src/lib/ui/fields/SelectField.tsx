@@ -6,7 +6,7 @@
 import type { ErrorKey } from '@core/validation/errorKeys'
 import { useT } from '@ui/i18n/useT'
 import { useMemoizedFn } from 'ahooks'
-import { Form, Select } from 'antd'
+import { ConfigProvider, Form, Select } from 'antd'
 
 import { resolveErrorMessage } from './error'
 
@@ -50,6 +50,8 @@ export function SelectField({
   style,
 }: SelectFieldProps) {
   const { t } = useT()
+  const { componentDisabled } = ConfigProvider.useConfig()
+  const isFieldDisabled = disabled || componentDisabled
 
   const errorText = resolveErrorMessage(t, error)
   const validateStatus = errorText ? 'error' : undefined
@@ -61,7 +63,7 @@ export function SelectField({
 
   // 键盘快捷键：Y/N/U 快速选择 Yes/No/Unknown
   const handleKeyDown = useMemoizedFn((e: React.KeyboardEvent) => {
-    if (disabled) return
+    if (isFieldDisabled) return
     const key = e.key.toLowerCase()
     // 只处理 Y/N/U 快捷键
     if (key !== 'y' && key !== 'n' && key !== 'u') return
@@ -78,7 +80,7 @@ export function SelectField({
   const normalizedValue = value === '' ? undefined : value
 
   // 必填字段的黄色背景样式
-  const selectClassName = required && !value ? 'field-required-empty' : undefined
+  const selectClassName = required && !isFieldDisabled && !value ? 'field-required-empty' : undefined
 
   return (
     <Form.Item
@@ -97,7 +99,7 @@ export function SelectField({
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder={resolvedPlaceholder}
-        disabled={disabled}
+        disabled={isFieldDisabled}
         options={options}
         allowClear={allowClear}
         className={selectClassName}

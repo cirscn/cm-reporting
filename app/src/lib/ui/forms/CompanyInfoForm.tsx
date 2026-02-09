@@ -10,7 +10,7 @@ import type { ErrorKey } from '@core/validation/errorKeys'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n'
 import { useCreation, useMemoizedFn } from 'ahooks'
-import { Button, Card, Col, Flex, Row, Tag, Typography } from 'antd'
+import { Button, Card, Col, ConfigProvider, Flex, Row, Tag, Typography } from 'antd'
 import { groupBy, sumBy } from 'lodash-es'
 
 import { DateField, SelectField, TextField } from '../fields'
@@ -95,6 +95,7 @@ export function CompanyInfoForm({
   dateFormatHint,
 }: CompanyInfoFormProps) {
   const { t } = useT()
+  const { componentDisabled } = ConfigProvider.useConfig()
 
   const showPrompts =
     versionDef.templateType !== 'cmrt' ||
@@ -282,7 +283,7 @@ export function CompanyInfoForm({
               <Typography.Text strong className="text-gray-600 text-sm">
                 {t('sections.authorizer')}
               </Typography.Text>
-              {contactFields.length > 0 && (
+              {contactFields.length > 0 && !componentDisabled && (
                 <Button
                   type="link"
                   size="small"

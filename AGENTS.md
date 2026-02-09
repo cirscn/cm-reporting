@@ -23,6 +23,7 @@ pnpm sg:scan
 - 禁止保留“无意义的兼容/过渡代码”（例如：旧接口的兼容包装、重复适配、无调用的兼容转换、过渡期标记）；需要变更时直接全量改动并删除旧接口。
 - PRD 与 Excel 冲突时，以 Excel 为准，需同步更新文档与 `app/src` 实现。
 - 当修改 `app/src/lib` 下的**公开 API**（组件 Props/Ref、导出函数/类型、integrations 接口、snapshot 结构、Excel 导出接口、legacy adapter 接口）时，必须同步更新 `app/src/lib/README.md` 中对应章节，确保文档与代码一致。
+- 当修改 `app/src/lib` 下对外可感知的集成行为（含 `readOnly` 交互、受控路由、禁用策略）时，除 `app/src/lib/README.md` 外，必须同步更新 `skills/cm-reporting-integration/SKILL.md` 与 `app/src/examples/README.md`（必要时同步对应 scenario 注释/文案），避免技能文档与示例滞后。
 
 ## 自动发布流程（Changesets）
 

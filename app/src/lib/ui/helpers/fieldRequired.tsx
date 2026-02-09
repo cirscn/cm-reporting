@@ -16,9 +16,10 @@ import type { ReactNode } from 'react'
  *
  * @param required - 是否必填（false 时直接返回 node，无包裹）
  * @param node - 需要被包裹的内容
+ * @param disabled - 当前字段是否禁用（禁用时不加必填高亮）
  * @returns 包裹后的 JSX 或原始 node
  */
-export function wrapRequired(required: boolean, node: ReactNode): ReactNode {
-  if (!required) return node
+export function wrapRequired(required: boolean, node: ReactNode, disabled = false): ReactNode {
+  if (!required || disabled) return node
   return <div className="field-required">{node}</div>
 }

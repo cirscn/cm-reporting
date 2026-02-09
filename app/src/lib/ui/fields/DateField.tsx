@@ -6,7 +6,7 @@
 import type { ErrorKey } from '@core/validation/errorKeys'
 import { useT } from '@ui/i18n/useT'
 import { useMemoizedFn } from 'ahooks'
-import { DatePicker, Form } from 'antd'
+import { ConfigProvider, DatePicker, Form } from 'antd'
 import dayjs from 'dayjs'
 
 import { resolveErrorMessage } from './error'
@@ -53,6 +53,8 @@ export function DateField({
   style,
 }: DateFieldProps) {
   const { t } = useT()
+  const { componentDisabled } = ConfigProvider.useConfig()
+  const isFieldDisabled = disabled || componentDisabled
 
   const errorText = resolveErrorMessage(t, error)
   const validateStatus = errorText ? 'error' : undefined
@@ -72,7 +74,7 @@ export function DateField({
   })
 
   // 必填字段的黄色背景样式
-  const pickerClassName = required && !value ? 'field-required-empty' : undefined
+  const pickerClassName = required && !isFieldDisabled && !value ? 'field-required-empty' : undefined
 
   return (
     <Form.Item
@@ -90,7 +92,7 @@ export function DateField({
         value={dayjsValue}
         onChange={handleChange}
         placeholder={displayPlaceholder}
-        disabled={disabled}
+        disabled={isFieldDisabled}
         disabledDate={disabledDate}
         format={DISPLAY_FORMAT}
         className={pickerClassName}

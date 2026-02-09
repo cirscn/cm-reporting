@@ -15,7 +15,7 @@ import { wrapRequired } from '@ui/helpers/fieldRequired'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useBoolean, useCreation, useLatest, useMemoizedFn } from 'ahooks'
-import { Button, Card, Flex, Modal, Table, Input, Tag, Typography } from 'antd'
+import { Button, Card, ConfigProvider, Flex, Modal, Table, Input, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
 import type { ChangeEvent } from 'react'
@@ -59,6 +59,7 @@ export const ProductListTable = memo(function ProductListTable({
   integration,
 }: ProductListTableProps) {
   const { t, locale } = useT()
+  const { componentDisabled } = ConfigProvider.useConfig()
   /** 批量选择状态（受控）。 */
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const [externalPicking, { setTrue: startPicking, setFalse: stopPicking }] = useBoolean(false)
@@ -74,6 +75,7 @@ export const ProductListTable = memo(function ProductListTable({
   // wrapRequired 已提取到 @ui/helpers/fieldRequired
   /** 添加空行（保持字段结构完整）。 */
   const handleAddRow = useMemoizedFn(() => {
+    if (componentDisabled) return
     const newRow: ProductRow = {
       id: `product-${Date.now()}`,
       productNumber: '',
@@ -107,7 +109,7 @@ export const ProductListTable = memo(function ProductListTable({
   const getCurrentRowsSnapshot = useMemoizedFn(() => rowsRef.current.map((row) => ({ ...row })))
 
   const handleExternalPick = useMemoizedFn(async () => {
-    if (!integration || externalPicking) return
+    if (componentDisabled || !integration || externalPicking) return
     const currentRows = getCurrentRowsSnapshot()
     const ctx: ProductPickContext = {
       templateType,
@@ -136,6 +138,7 @@ export const ProductListTable = memo(function ProductListTable({
 
   /** 删除指定行（基于缓存索引定位）。 */
   const handleRemoveRow = useMemoizedFn((id: string) => {
+    if (componentDisabled) return
     const index = rowIndexMap.get(id)
     if (index === undefined) return
     const next = rows.slice()
@@ -145,6 +148,7 @@ export const ProductListTable = memo(function ProductListTable({
 
   /** 更新单元格（值不变则不触发更新）。 */
   const handleCellChange = useMemoizedFn((id: string, field: keyof ProductRow, value: string) => {
+    if (componentDisabled) return
     const index = rowIndexMap.get(id)
     if (index === undefined) return
     const row = rows[index]
@@ -183,6 +187,7 @@ export const ProductListTable = memo(function ProductListTable({
 
   /** 批量删除处理 */
   const handleBatchDelete = useMemoizedFn(() => {
+    if (componentDisabled) return
     if (validSelectedRowKeys.length === 0) return
     Modal.confirm({
       title: t('confirm.batchDelete'),
@@ -200,6 +205,7 @@ export const ProductListTable = memo(function ProductListTable({
 
   /** 取消选择 */
   const handleCancelSelection = useMemoizedFn(() => {
+    if (componentDisabled) return
     setSelectedRowKeys([])
   })
 
@@ -208,6 +214,8 @@ export const ProductListTable = memo(function ProductListTable({
     selectedRowKeys: validSelectedRowKeys,
     onChange: (keys) => setSelectedRowKeys(keys as string[]),
   }
+
+  const showEditableActions = !componentDisabled
 
   const columns = useCreation<ColumnsType<ProductRow>>(() => {
     const base: ColumnsType<ProductRow> = [
@@ -225,6 +233,7 @@ export const ProductListTable = memo(function ProductListTable({
               onChange={getInputHandler(`${record.id}:productNumber`)}
               placeholder={t('productPlaceholders.productNumber')}
             />,
+            componentDisabled,
           ),
       },
       {
@@ -288,23 +297,34 @@ export const ProductListTable = memo(function ProductListTable({
       ),
     })
 
-    base.push({
-      title: '',
-      key: 'actions',
-      width: 60,
-      fixed: 'right',
-      render: (_: unknown, record: ProductRow) => (
-        <Button
-          type="text"
-          danger
-          icon={<DeleteOutlined />}
-          onClick={getRemoveHandler(record.id)}
-        />
-      ),
-    })
+    if (showEditableActions) {
+      base.push({
+        title: '',
+        key: 'actions',
+        width: 60,
+        fixed: 'right',
+        render: (_: unknown, record: ProductRow) => (
+          <Button
+            type="text"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={getRemoveHandler(record.id)}
+          />
+        ),
+      })
+    }
 
     return base
-  }, [config, getInputHandler, getRemoveHandler, required, showRequesterColumns, t, wrapRequired])
+  }, [
+    config,
+    componentDisabled,
+    getInputHandler,
+    getRemoveHandler,
+    required,
+    showRequesterColumns,
+    showEditableActions,
+    t,
+  ])
 
   const emptyLocale = {
     emptyText: (
@@ -313,18 +333,17 @@ export const ProductListTable = memo(function ProductListTable({
           {t('tables.noData')}
         </Typography.Text>
         <Flex align="center" gap={8}>
-          {showAddRow && (
+          {showEditableActions && showAddRow && (
             <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
               {t('actions.addRow')}
             </Button>
           )}
-          {showExternalPick && (
+          {showEditableActions && showExternalPick && (
             <Button
               type={showAddRow ? 'default' : 'primary'}
               icon={<PlusOutlined />}
               onClick={handleExternalPick}
               loading={showLoadingIndicator && externalPicking}
-              disabled={externalPicking}
             >
               {externalPickLabel}
             </Button>
@@ -346,25 +365,24 @@ export const ProductListTable = memo(function ProductListTable({
               <Tag color="blue">{t('badges.recordCount', { count: rows.length })}</Tag>
             </Flex>
             <Flex align="center" gap={8}>
-              {showAddRow && (
+              {showEditableActions && showAddRow && (
                 <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
                   {t('actions.addRow')}
                 </Button>
               )}
-              {showExternalPick && (
+              {showEditableActions && showExternalPick && (
                 <Button
                   type={showAddRow ? 'default' : 'primary'}
                   icon={<PlusOutlined />}
                   onClick={handleExternalPick}
                   loading={showLoadingIndicator && externalPicking}
-                  disabled={externalPicking}
                 >
                   {externalPickLabel}
                 </Button>
               )}
             </Flex>
           </Flex>
-          {validSelectedRowKeys.length > 0 && (
+          {showEditableActions && validSelectedRowKeys.length > 0 && (
             <Flex
               align="center"
               gap={12}
@@ -403,7 +421,7 @@ export const ProductListTable = memo(function ProductListTable({
         columns={columns}
         dataSource={rows}
         rowKey="id"
-        rowSelection={rowSelection}
+        rowSelection={showEditableActions ? rowSelection : undefined}
         pagination={false}
         scroll={{ x: 'max-content', y: rows.length > 20 ? 600 : undefined }}
         virtual={rows.length > 50}

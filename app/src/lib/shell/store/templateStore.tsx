@@ -51,6 +51,7 @@ export interface TemplateStoreState {
   templateType: TemplateType
   versionId: string
   versionDef: TemplateVersionDef
+  readOnly: boolean
   integrations?: CMReportingIntegrations
 
   // ── 表单数据（即 TemplateFormState 的展开） ──
@@ -236,6 +237,7 @@ function getFormData(s: TemplateStoreState): TemplateFormState {
 function createTemplateStore(
   templateType: TemplateType,
   versionId: string,
+  readOnly: boolean,
   integrations?: CMReportingIntegrations
 ) {
   const versionDef = getVersionDef(templateType, versionId)
@@ -343,6 +345,7 @@ function createTemplateStore(
       templateType,
       versionId,
       versionDef,
+      readOnly,
       integrations,
 
       // ── 表单数据 ──
@@ -356,11 +359,13 @@ function createTemplateStore(
       // 每个 action 仅调用一次 set()，校验通过 scheduleValidation 延迟到微任务。
 
       setCompanyInfoField: (key, value) => {
+        if (get().readOnly) return
         set((s) => { s.companyInfo[key] = value; s.isDirty = true })
         scheduleValidation(set, get)
       },
 
       setSelectedMinerals: (minerals) => {
+        if (get().readOnly) return
         set((s) => {
           s.selectedMinerals = minerals
           s.isDirty = true
@@ -369,11 +374,13 @@ function createTemplateStore(
       },
 
       setCustomMinerals: (minerals) => {
+        if (get().readOnly) return
         set({ customMinerals: minerals, isDirty: true })
         scheduleValidation(set, get)
       },
 
       setQuestionValue: (questionKey, mineralKey, value) => {
+        if (get().readOnly) return
         set((s) => {
           // ── 1. 写入回答值 ──
           const def = questionDefsByKey.get(questionKey)
@@ -388,6 +395,7 @@ function createTemplateStore(
       },
 
       setQuestionComment: (questionKey, mineralKey, value) => {
+        if (get().readOnly) return
         set((s) => {
           const def = questionDefsByKey.get(questionKey)
           if (!def) return
@@ -398,6 +406,7 @@ function createTemplateStore(
       },
 
       setCompanyQuestionValue: (key, value, mineralKey?) => {
+        if (get().readOnly) return
         set((s) => {
           writeNestedField(s.companyQuestions, key, value, mineralKey)
           s.isDirty = true
@@ -406,21 +415,25 @@ function createTemplateStore(
       },
 
       setMineralsScope: (rows) => {
+        if (get().readOnly) return
         set({ mineralsScope: rows, isDirty: true })
         scheduleValidation(set, get)
       },
 
       setSmelterList: (rows) => {
+        if (get().readOnly) return
         set({ smelterList: rows, isDirty: true })
         scheduleValidation(set, get)
       },
 
       setMineList: (rows) => {
+        if (get().readOnly) return
         set({ mineList: rows, isDirty: true })
         scheduleValidation(set, get)
       },
 
       setProductList: (rows) => {
+        if (get().readOnly) return
         set({ productList: rows, isDirty: true })
         scheduleValidation(set, get)
       },
@@ -460,6 +473,7 @@ function createTemplateStore(
 interface TemplateProviderProps {
   templateType: TemplateType
   versionId: string
+  readOnly?: boolean
   integrations?: CMReportingIntegrations
   children: ReactNode
 }
@@ -474,6 +488,7 @@ interface TemplateProviderProps {
 export function TemplateProvider({
   templateType,
   versionId,
+  readOnly = false,
   integrations,
   children,
 }: TemplateProviderProps) {
@@ -483,17 +498,17 @@ export function TemplateProvider({
   // React 会在 setState 后立即重新渲染本组件，子组件不会看到过期 store。
   const [prevKey, setPrevKey] = useState(currentKey)
   const [store, setStore] = useState(() =>
-    createTemplateStore(templateType, versionId, integrations)
+    createTemplateStore(templateType, versionId, readOnly, integrations)
   )
   if (currentKey !== prevKey) {
     setPrevKey(currentKey)
-    setStore(createTemplateStore(templateType, versionId, integrations))
+    setStore(createTemplateStore(templateType, versionId, readOnly, integrations))
   }
 
-  // integrations 变更时仅更新引用（不重建 store）
+  // integrations/readOnly 变更时仅更新引用（不重建 store）
   useEffect(() => {
-    store.setState({ integrations })
-  }, [store, integrations])
+    store.setState({ integrations, readOnly })
+  }, [store, integrations, readOnly])
 
   // 离开页面前提示（isDirty）
   useEffect(() => {

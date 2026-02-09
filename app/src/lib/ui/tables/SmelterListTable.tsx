@@ -28,6 +28,7 @@ import {
   AutoComplete,
   Button,
   Card,
+  ConfigProvider,
   Flex,
   Modal,
   Table,
@@ -100,6 +101,7 @@ export const SmelterListTable = memo(function SmelterListTable({
   integration,
 }: SmelterListTableProps) {
   const { t, locale } = useT()
+  const { componentDisabled } = ConfigProvider.useConfig()
   /** 批量选择状态（受控）。 */
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const [externalPicking, { setTrue: startPicking, setFalse: stopPicking }] = useBoolean(false)
@@ -138,6 +140,7 @@ export const SmelterListTable = memo(function SmelterListTable({
   // wrapRequired 已提取到 @ui/helpers/fieldRequired
   /** 添加空行（保持字段结构完整）。 */
   const handleAddRow = useMemoizedFn(() => {
+    if (componentDisabled) return
     const newRow: SmelterRow = {
       id: `smelter-${Date.now()}`,
       metal: '',
@@ -204,7 +207,7 @@ export const SmelterListTable = memo(function SmelterListTable({
   )
 
   const handleExternalPick = useMemoizedFn(async () => {
-    if (!integration || !integration.onPickSmelters || externalPicking) return
+    if (componentDisabled || !integration || !integration.onPickSmelters || externalPicking) return
     const currentRows = getCurrentRowsSnapshot()
     const ctx: SmelterPickContext = {
       templateType,
@@ -264,7 +267,7 @@ export const SmelterListTable = memo(function SmelterListTable({
   })
 
   const handleExternalPickForRow = useMemoizedFn(async (id: string) => {
-    if (!integration?.onPickSmelterForRow || rowPickingId) return
+    if (componentDisabled || !integration?.onPickSmelterForRow || rowPickingId) return
     const currentRows = rowsRef.current
     const row = currentRows.find((r) => r.id === id)
     if (!row || !row.metal) return
@@ -297,6 +300,7 @@ export const SmelterListTable = memo(function SmelterListTable({
 
   /** 删除指定行（基于缓存索引定位）。 */
   const handleRemoveRow = useMemoizedFn((id: string) => {
+    if (componentDisabled) return
     const index = rowIndexMap.get(id)
     if (index === undefined) return
     const next = rows.slice()
@@ -383,6 +387,7 @@ export const SmelterListTable = memo(function SmelterListTable({
    * - 其它字段 → 直接更新
    */
   const handleCellChange = useMemoizedFn((id: string, field: keyof SmelterRow, value: string) => {
+    if (componentDisabled) return
     const index = rowIndexMap.get(id)
     if (index === undefined) return
     const row = rows[index]
@@ -445,6 +450,7 @@ export const SmelterListTable = memo(function SmelterListTable({
 
   /** 批量删除处理 */
   const handleBatchDelete = useMemoizedFn(() => {
+    if (componentDisabled) return
     if (validSelectedRowKeys.length === 0) return
     Modal.confirm({
       title: t('confirm.batchDelete'),
@@ -462,6 +468,7 @@ export const SmelterListTable = memo(function SmelterListTable({
 
   /** 取消选择 */
   const handleCancelSelection = useMemoizedFn(() => {
+    if (componentDisabled) return
     setSelectedRowKeys([])
   })
 
@@ -470,6 +477,8 @@ export const SmelterListTable = memo(function SmelterListTable({
     selectedRowKeys: validSelectedRowKeys,
     onChange: (keys) => setSelectedRowKeys(keys as string[]),
   }
+
+  const showEditableActions = !componentDisabled
 
   const metalOptions = useCreation(
     () =>
@@ -526,6 +535,7 @@ export const SmelterListTable = memo(function SmelterListTable({
             placeholder={t('placeholders.select')}
             className="w-full"
           />,
+          componentDisabled,
         ),
     })
 
@@ -552,28 +562,34 @@ export const SmelterListTable = memo(function SmelterListTable({
                     <Typography.Text ellipsis style={{ maxWidth: 150 }}>
                       {record.smelterLookup}
                     </Typography.Text>
-                    <Button
-                      type="link"
-                      size="small"
-                      onClick={() => handleExternalPickForRow(record.id)}
-                      disabled={!record.metal || rowPickingId === record.id}
-                      loading={showLoadingIndicator && rowPickingId === record.id}
-                    >
-                      {t('actions.edit')}
-                    </Button>
+                    {showEditableActions && (
+                      <Button
+                        type="link"
+                        size="small"
+                        onClick={() => handleExternalPickForRow(record.id)}
+                        disabled={!record.metal || rowPickingId === record.id}
+                        loading={showLoadingIndicator && rowPickingId === record.id}
+                      >
+                        {t('actions.edit')}
+                      </Button>
+                    )}
                   </>
                 ) : (
-                  <Button
-                    type="link"
-                    size="small"
-                    onClick={() => handleExternalPickForRow(record.id)}
-                    disabled={!record.metal || rowPickingId === record.id}
-                    loading={showLoadingIndicator && rowPickingId === record.id}
-                  >
-                    {t('actions.chooseSmelter')}
-                  </Button>
+                  showEditableActions
+                    ? (
+                      <Button
+                        type="link"
+                        size="small"
+                        onClick={() => handleExternalPickForRow(record.id)}
+                        disabled={!record.metal || rowPickingId === record.id}
+                        loading={showLoadingIndicator && rowPickingId === record.id}
+                      >
+                        {t('actions.chooseSmelter')}
+                      </Button>
+                    )
+                    : <Typography.Text type="secondary">-</Typography.Text>
                 )}
-                {smelterLookupMode === 'hybrid' && (
+                {showEditableActions && smelterLookupMode === 'hybrid' && (
                   <Typography.Text type="secondary" style={{ fontSize: 12 }}>
                     {t('actions.pickExternal')}
                   </Typography.Text>
@@ -611,6 +627,7 @@ export const SmelterListTable = memo(function SmelterListTable({
                 )}
               </Flex>
             ),
+            componentDisabled,
           ),
       })
     }
@@ -660,6 +677,7 @@ export const SmelterListTable = memo(function SmelterListTable({
               placeholder={placeholder}
               disabled={useExternalLookup && fromLookup}
             />,
+            componentDisabled,
           )
         },
       })
@@ -698,6 +716,7 @@ export const SmelterListTable = memo(function SmelterListTable({
                 </Typography.Text>
               )}
             </Flex>,
+            componentDisabled,
           )
         },
       },
@@ -903,24 +922,27 @@ export const SmelterListTable = memo(function SmelterListTable({
     }
 
     // Actions column
-    columns.push({
-      title: '',
-      key: 'actions',
-      width: 60,
-      fixed: 'right',
-      render: (_: unknown, record: SmelterRow) => (
-        <Button
-          type="text"
-          danger
-          icon={<DeleteOutlined />}
-          onClick={getRemoveHandler(record.id)}
-        />
-      ),
-    })
+    if (showEditableActions) {
+      columns.push({
+        title: '',
+        key: 'actions',
+        width: 60,
+        fixed: 'right',
+        render: (_: unknown, record: SmelterRow) => (
+          <Button
+            type="text"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={getRemoveHandler(record.id)}
+          />
+        ),
+      })
+    }
 
     return columns
   }, [
     config,
+    componentDisabled,
     countryOptions,
     handleCellChange,
     handleExternalPickForRow,
@@ -930,6 +952,7 @@ export const SmelterListTable = memo(function SmelterListTable({
     notListedRequiresNameCountry,
     rowPickingId,
     showLoadingIndicator,
+    showEditableActions,
     smelterLookupMeta,
     smelterLookupMode,
     t,
@@ -946,18 +969,17 @@ export const SmelterListTable = memo(function SmelterListTable({
           {t('tables.noData')}
         </Typography.Text>
         <Flex align="center" gap={8}>
-          {showAddRow && (
+          {showEditableActions && showAddRow && (
             <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
               {t('actions.addRow')}
             </Button>
           )}
-          {showExternalPick && (
+          {showEditableActions && showExternalPick && (
             <Button
               type={showAddRow ? 'default' : 'primary'}
               icon={<PlusOutlined />}
               onClick={handleExternalPick}
               loading={showLoadingIndicator && externalPicking}
-              disabled={externalPicking}
             >
               {externalPickLabel}
             </Button>
@@ -981,25 +1003,24 @@ export const SmelterListTable = memo(function SmelterListTable({
               <Tag color="blue">{t('badges.recordCount', { count: rows.length })}</Tag>
             </Flex>
             <Flex align="center" gap={8}>
-              {showAddRow && (
+              {showEditableActions && showAddRow && (
                 <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
                   {t('actions.addRow')}
                 </Button>
               )}
-              {showExternalPick && (
+              {showEditableActions && showExternalPick && (
                 <Button
                   type={showAddRow ? 'default' : 'primary'}
                   icon={<PlusOutlined />}
                   onClick={handleExternalPick}
                   loading={showLoadingIndicator && externalPicking}
-                  disabled={externalPicking}
                 >
                   {externalPickLabel}
                 </Button>
               )}
             </Flex>
           </Flex>
-          {validSelectedRowKeys.length > 0 && (
+          {showEditableActions && validSelectedRowKeys.length > 0 && (
             <Flex
               align="center"
               gap={12}
@@ -1040,7 +1061,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         dataSource={rows}
         rowKey="id"
         rowClassName={rowClassName ? (record, index) => rowClassName(record, index) : undefined}
-        rowSelection={rowSelection}
+        rowSelection={showEditableActions ? rowSelection : undefined}
         pagination={false}
         scroll={{ x: 'max-content', y: rows.length > 20 ? 600 : undefined }}
         virtual={rows.length > 50}

@@ -10,7 +10,7 @@ import type { ErrorKey } from '@core/validation/errorKeys'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useCreation, useMemoizedFn } from 'ahooks'
-import { Card, Flex, Input, Select, Tag, Typography } from 'antd'
+import { Card, ConfigProvider, Flex, Input, Select, Tag, Typography } from 'antd'
 
 interface QuestionMatrixFormProps {
   versionDef: TemplateVersionDef
@@ -62,6 +62,7 @@ export function QuestionMatrixForm({
   errors = {},
 }: QuestionMatrixFormProps) {
   const { t } = useT()
+  const { componentDisabled } = ConfigProvider.useConfig()
   const { questions, mineralScope } = versionDef
   const rawMinerals = mineralsOverride ?? mineralScope.minerals
 
@@ -217,6 +218,7 @@ export function QuestionMatrixForm({
             getCommentHandler={getCommentHandler}
             onBatchSet={handleBatchSet}
             t={t}
+            readOnly={componentDisabled}
           />
         ))}
       </Flex>
@@ -240,6 +242,7 @@ function QuestionRow({
   getCommentHandler,
   onBatchSet,
   t,
+  readOnly,
 }: {
   question: QuestionDef
   minerals: Array<MineralDef & { label?: string }>
@@ -265,6 +268,7 @@ function QuestionRow({
   ) => ((value: string) => void) | undefined
   onBatchSet: (questionKey: string, value: string) => void
   t: (key: I18nKey) => string
+  readOnly: boolean
 }) {
   // 判断整行是否禁用
   let rowDisabled = question.key !== 'Q1'
@@ -305,7 +309,7 @@ function QuestionRow({
           <Typography.Text strong style={{ fontSize: 14, flex: 1 }}>
             {t(question.labelKey)}
           </Typography.Text>
-          {showBatchFill && commonOptions.length > 0 && !rowDisabled && (
+          {showBatchFill && commonOptions.length > 0 && !rowDisabled && !readOnly && (
             <Select
               placeholder={t('actions.setAllTo')}
               options={commonOptions}
@@ -322,7 +326,7 @@ function QuestionRow({
         <Flex vertical gap={8}>
           {minerals.map((mineral) => {
             const gating = gatingByMineral?.get(mineral.key)
-            const isDisabled = getQuestionDisabled(question.key, gating)
+            const isDisabled = readOnly || getQuestionDisabled(question.key, gating)
             const currentValue = getQuestionValue(
               values,
               question.key,
@@ -338,6 +342,8 @@ function QuestionRow({
             const error = getQuestionError(errors, question.key, mineral.key, question.perMineral)
             void error // Suppress unused variable warning - error display not yet implemented
             const required = requiredByQuestion?.get(question.key)?.get(mineral.key) === true
+            const selectClassName =
+              !isDisabled && required && !currentValue ? 'field-required-empty' : undefined
             const cellHandler = getCellHandler(question.key, mineral.key, question.perMineral)
             const commentHandler = getCommentHandler(question.key, mineral.key, question.perMineral)
             const options = getOptions(question.key, mineral.key, question.perMineral)
@@ -361,7 +367,7 @@ function QuestionRow({
                     placeholder={t('placeholders.select')}
                     disabled={isDisabled}
                     allowClear
-                    className={!isDisabled && required && !currentValue ? 'field-required-empty' : undefined}
+                    className={selectClassName}
                     data-field-path={
                       question.perMineral
                         ? `questions.${question.key}.${mineral.key}`

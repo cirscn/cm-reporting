@@ -6,7 +6,7 @@
 import type { ErrorKey } from '@core/validation/errorKeys'
 import { useT } from '@ui/i18n/useT'
 import { useMemoizedFn } from 'ahooks'
-import { Form, InputNumber } from 'antd'
+import { ConfigProvider, Form, InputNumber } from 'antd'
 
 import { resolveErrorMessage } from './error'
 
@@ -51,6 +51,8 @@ export function InputNumberField({
   style,
 }: InputNumberFieldProps) {
   const { t } = useT()
+  const { componentDisabled } = ConfigProvider.useConfig()
+  const isFieldDisabled = disabled || componentDisabled
   const errorText = resolveErrorMessage(t, error)
   const validateStatus = errorText ? 'error' : undefined
 
@@ -63,7 +65,7 @@ export function InputNumberField({
   const normalizedValue = value ?? undefined
 
   // 必填字段的黄色背景样式
-  const inputClassName = required && normalizedValue === undefined ? 'field-required-empty' : undefined
+  const inputClassName = required && !isFieldDisabled && normalizedValue === undefined ? 'field-required-empty' : undefined
 
   return (
     <Form.Item
@@ -81,7 +83,7 @@ export function InputNumberField({
         value={normalizedValue}
         onChange={handleChange}
         placeholder={resolvedPlaceholder}
-        disabled={disabled}
+        disabled={isFieldDisabled}
         min={min}
         max={max}
         step={step}

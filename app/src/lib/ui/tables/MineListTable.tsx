@@ -11,7 +11,7 @@ import { wrapRequired } from '@ui/helpers/fieldRequired'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useCreation, useMemoizedFn } from 'ahooks'
-import { AutoComplete, Button, Card, Flex, Table, Select, Input, Tag, Typography } from 'antd'
+import { AutoComplete, Button, Card, ConfigProvider, Flex, Table, Select, Input, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { ChangeEvent } from 'react'
 
@@ -52,6 +52,7 @@ export function MineListTable({
   smelterOptionsByMetal = {},
 }: MineListTableProps) {
   const { t } = useT()
+  const { componentDisabled } = ConfigProvider.useConfig()
   /** 行索引缓存：避免频繁全表 map/filter。 */
   const rowIndexMap = useCreation(
     () => new Map(rows.map((row, index) => [row.id, index])),
@@ -61,6 +62,7 @@ export function MineListTable({
   // wrapRequired 已提取到 @ui/helpers/fieldRequired
   /** 添加空行（保持字段结构完整）。 */
   const handleAddRow = useMemoizedFn(() => {
+    if (componentDisabled) return
     const newRow: MineRow = {
       id: `mine-${Date.now()}`,
       metal: '',
@@ -83,6 +85,7 @@ export function MineListTable({
 
   /** 删除指定行（基于缓存索引定位）。 */
   const handleRemoveRow = useMemoizedFn((id: string) => {
+    if (componentDisabled) return
     const index = rowIndexMap.get(id)
     if (index === undefined) return
     const next = rows.slice()
@@ -92,6 +95,7 @@ export function MineListTable({
 
   /** 更新单元格（值不变则不触发更新）。 */
   const handleCellChange = useMemoizedFn((id: string, field: keyof MineRow, value: string) => {
+    if (componentDisabled) return
     const index = rowIndexMap.get(id)
     if (index === undefined) return
     const row = rows[index]
@@ -162,7 +166,8 @@ export function MineListTable({
             options={metalOptions}
             placeholder={t('placeholders.select')}
             className="w-full"
-          />
+          />,
+          componentDisabled,
         )
       ),
     },
@@ -187,7 +192,8 @@ export function MineListTable({
                 showSearch
                 filterOption={filterOptionByLabel}
                 className="w-full"
-              />
+              />,
+              componentDisabled,
             )
           : wrapRequired(
               required,
@@ -199,7 +205,8 @@ export function MineListTable({
                 allowClear
                 filterOption={filterOptionByLabel}
                 className="w-full"
-              />
+              />,
+              componentDisabled,
             )
       },
     },
@@ -215,7 +222,8 @@ export function MineListTable({
             value={value || undefined}
             onChange={getInputHandler(`${record.id}:mineName`)}
             placeholder={t('placeholders.mineName')}
-          />
+          />,
+          componentDisabled,
         )
       ),
     },
@@ -261,7 +269,8 @@ export function MineListTable({
             showSearch
             filterOption={filterOptionByLabel}
             className="w-full"
-          />
+          />,
+          componentDisabled,
         )
       ),
     },
@@ -356,20 +365,27 @@ export function MineListTable({
         />
       ),
     },
-    {
-      title: '',
-      key: 'actions',
-      width: 60,
-      render: (_: unknown, record: MineRow) => (
-        <Button
-          type="text"
-          danger
-          icon={<DeleteOutlined />}
-          onClick={getRemoveHandler(record.id)}
-        />
-      ),
-    },
+    ...(
+      componentDisabled
+        ? []
+        : [
+            {
+              title: '',
+              key: 'actions',
+              width: 60,
+              render: (_: unknown, record: MineRow) => (
+                <Button
+                  type="text"
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={getRemoveHandler(record.id)}
+                />
+              ),
+            } satisfies ColumnsType<MineRow>[number],
+          ]
+    ),
   ], [
+    componentDisabled,
     config.smelterNameMode,
     countryOptions,
     filterOptionByLabel,
@@ -393,9 +409,11 @@ export function MineListTable({
             </Typography.Title>
             <Tag color="blue">{t('badges.recordCount', { count: rows.length })}</Tag>
           </Flex>
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
-            {t('actions.addRow')}
-          </Button>
+          {!componentDisabled && (
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
+              {t('actions.addRow')}
+            </Button>
+          )}
         </Flex>
       }
     >

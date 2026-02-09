@@ -14,7 +14,7 @@ import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { LAYOUT } from '@ui/theme/spacing'
 import { useCreation, useMemoizedFn } from 'ahooks'
-import { Button, Flex, Input, Select, Table, Tag, Typography } from 'antd'
+import { Button, ConfigProvider, Flex, Input, Select, Table, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { ChangeEvent } from 'react'
 
@@ -41,6 +41,7 @@ export function MineralsScopeReasonsForm({
   errors = {},
 }: MineralsScopeReasonsFormProps) {
   const { t } = useT()
+  const { componentDisabled } = ConfigProvider.useConfig()
 
   const mineralOptions = useCreation(
     () => {
@@ -132,9 +133,11 @@ export function MineralsScopeReasonsForm({
               onChange={getSelectHandler(record.id)}
               options={mineralOptions}
               placeholder={t('placeholders.select')}
+              disabled={componentDisabled}
               className="w-full"
               status={error ? 'error' : undefined}
             />,
+            componentDisabled,
           )
         },
       },
@@ -153,8 +156,10 @@ export function MineralsScopeReasonsForm({
               value={value || undefined}
               onChange={getInputHandler(record.id)}
               placeholder={t('placeholders.mineralsScopeReason')}
+              disabled={componentDisabled}
               status={error ? 'error' : undefined}
             />,
+            componentDisabled,
           )
         },
       },
@@ -163,16 +168,29 @@ export function MineralsScopeReasonsForm({
         key: 'actions',
         width: 60,
         render: (_: unknown, record: MineralsScopeRow) => (
-          <Button
-            type="text"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleRemoveRow(record.id)}
-          />
+          componentDisabled
+            ? null
+            : (
+              <Button
+                type="text"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={() => handleRemoveRow(record.id)}
+              />
+            )
         ),
       },
     ],
-    [t, mineralOptions, errors, rowIndexMap, getSelectHandler, getInputHandler, handleRemoveRow]
+    [
+      t,
+      mineralOptions,
+      errors,
+      rowIndexMap,
+      getSelectHandler,
+      getInputHandler,
+      handleRemoveRow,
+      componentDisabled,
+    ]
   )
 
   return (
@@ -184,9 +202,11 @@ export function MineralsScopeReasonsForm({
             {t('badges.recordCount', { count: rows.length })}
           </Tag>
         </Flex>
-        <Button type="primary" onClick={handleAddRow}>
-          {t('actions.addRow')}
-        </Button>
+        {!componentDisabled && (
+          <Button type="primary" onClick={handleAddRow}>
+            {t('actions.addRow')}
+          </Button>
+        )}
       </Flex>
       <Table
         columns={columns}

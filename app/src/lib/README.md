@@ -96,6 +96,7 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 | `onLocaleChange` | `(locale: Locale) => void` | - | 语言变化回调 |
 | `theme` | `object` | - | Ant Design 主题 token 覆盖 |
 | `cssVariables` | `object` | - | CSS 变量覆盖 |
+| `readOnly` | `boolean` | - | 全局只读模式（默认 `false`）。启用后进入“仅浏览”态：禁用输入并拦截用户编辑相关 store action，同时隐藏 checker 页/必填横幅/上下页操作与新增删除等编辑入口。 |
 | `maxContentWidth` | `number` | - | 内容区最大宽度（不设则撑满父容器） |
 | `integrations` | `CMReportingIntegrations` | - | 外部选择/回写扩展点 |
 | `initialSnapshot` | `ReportSnapshotV1` | - | 初始快照（用于"编辑旧报告"） |
@@ -131,6 +132,7 @@ import { CMReportingApp } from '@lib/CMReportingApp'
 | `pageKey` | `PageKey` | - | 当前页面（受控模式） |
 | `onNavigatePage` | `(pageKey: PageKey) => void` | - | 页面导航回调（受控模式） |
 | `maxContentWidth` | `number` | - | 内容区最大宽度 |
+| `readOnly` | `boolean` | - | 全局只读模式（默认 `false`）。只读下会自动隐藏 checker 页并回退到可浏览页；若在受控 `pageKey` 模式下发生回退，会通过 `onNavigatePage` 同步父级状态。 |
 | `integrations` | `CMReportingIntegrations` | - | 外部选择/回写扩展点 |
 | `children` | `ReactNode` | - | 内部插入点（用于 snapshot 绑定等） |
 

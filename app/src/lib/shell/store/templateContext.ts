@@ -42,6 +42,7 @@ interface TemplateMetaSlice {
   templateType: import('@core/registry/types').TemplateType
   versionId: string
   versionDef: import('@core/registry/types').TemplateVersionDef
+  readOnly: boolean
 }
 
 /** 模板完整读取视图（静态信息 + 表单主体 + 列表）。 */
@@ -72,10 +73,16 @@ interface TemplateActionsValue {
 // Selectors（提升到模块顶层避免每次渲染创建新引用）
 // ---------------------------------------------------------------------------
 
-const selectMeta = (s: { templateType: TemplateMetaSlice['templateType']; versionId: string; versionDef: TemplateMetaSlice['versionDef'] }): TemplateMetaSlice => ({
+const selectMeta = (s: {
+  templateType: TemplateMetaSlice['templateType']
+  versionId: string
+  versionDef: TemplateMetaSlice['versionDef']
+  readOnly: boolean
+}): TemplateMetaSlice => ({
   templateType: s.templateType,
   versionId: s.versionId,
   versionDef: s.versionDef,
+  readOnly: s.readOnly,
 })
 
 const selectForm = (s: TemplateFormSlice): TemplateFormSlice => ({

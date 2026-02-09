@@ -33,6 +33,8 @@ export interface CMReportingProps {
   onLocaleChange?: (locale: Locale) => void
   theme?: CMReportingProviderProps['theme']
   cssVariables?: CMReportingProviderProps['cssVariables']
+  /** 全局只读模式：启用后禁用页面内所有编辑控件。 */
+  readOnly?: boolean
   maxContentWidth?: number
   /** 宿主扩展点：外部选择/回写列表等。 */
   integrations?: CMReportingIntegrations
@@ -129,6 +131,7 @@ export const CMReporting = forwardRef<CMReportingRef, CMReportingProps>(function
     onLocaleChange,
     theme,
     cssVariables,
+    readOnly = false,
     maxContentWidth,
     integrations,
     initialSnapshot,
@@ -155,6 +158,7 @@ export const CMReporting = forwardRef<CMReportingRef, CMReportingProps>(function
       <CMReportingApp
         templateType={templateType}
         versionId={versionId}
+        readOnly={readOnly}
         maxContentWidth={maxContentWidth}
         integrations={integrations}
       >

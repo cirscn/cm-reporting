@@ -74,6 +74,7 @@ export function App() {
 | `onLocaleChange` | `(locale: Locale) => void` | - | 语言变化回调 |
 | `theme` | `object` | - | Ant Design 主题 token 覆盖 |
 | `cssVariables` | `object` | - | CSS 变量覆盖 |
+| `readOnly` | `boolean` | - | 全局只读模式（默认 `false`）。启用后进入“仅浏览”态：禁用输入并隐藏 checker/必填横幅/上下页动作及新增删除等编辑入口。 |
 | `maxContentWidth` | `number` | - | 内容区最大宽度（不设则撑满父容器） |
 | `integrations` | `CMReportingIntegrations` | - | 外部选择/回写扩展点，见 [Integrations](#integrations) |
 | `initialSnapshot` | `ReportSnapshotV1` | - | 初始快照（用于编辑旧报告） |

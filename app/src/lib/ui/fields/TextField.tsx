@@ -6,7 +6,7 @@
 import type { ErrorKey } from '@core/validation/errorKeys'
 import { useT } from '@ui/i18n/useT'
 import { useMemoizedFn } from 'ahooks'
-import { Form, Input } from 'antd'
+import { ConfigProvider, Form, Input } from 'antd'
 import type { ChangeEvent } from 'react'
 
 import { resolveErrorMessage } from './error'
@@ -52,6 +52,8 @@ export function TextField({
   spellCheck,
 }: TextFieldProps) {
   const { t } = useT()
+  const { componentDisabled } = ConfigProvider.useConfig()
+  const isFieldDisabled = disabled || componentDisabled
 
   const resolvedPlaceholder = placeholder ?? t('placeholders.input')
 
@@ -65,7 +67,7 @@ export function TextField({
   const validateStatus = errorText ? 'error' : undefined
 
   // 必填字段的黄色背景样式
-  const inputClassName = required && !value?.trim() ? 'field-required-empty' : undefined
+  const inputClassName = required && !isFieldDisabled && !value?.trim() ? 'field-required-empty' : undefined
 
   return (
     <Form.Item
@@ -84,7 +86,7 @@ export function TextField({
           value={value || undefined}
           onChange={handleChange}
           placeholder={resolvedPlaceholder}
-          disabled={disabled}
+          disabled={isFieldDisabled}
           rows={rows}
           className={inputClassName}
           autoComplete={autoComplete}
@@ -95,7 +97,7 @@ export function TextField({
           value={value || undefined}
           onChange={handleChange}
           placeholder={resolvedPlaceholder}
-          disabled={disabled}
+          disabled={isFieldDisabled}
           className={inputClassName}
           autoComplete={autoComplete}
           spellCheck={spellCheck}

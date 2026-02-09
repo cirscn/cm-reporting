@@ -6,7 +6,7 @@
 import type { ErrorKey } from '@core/validation/errorKeys'
 import { useT } from '@ui/i18n/useT'
 import { useMemoizedFn } from 'ahooks'
-import { AutoComplete, Form } from 'antd'
+import { AutoComplete, ConfigProvider, Form } from 'antd'
 
 import { resolveErrorMessage } from './error'
 
@@ -54,6 +54,8 @@ export function AutoCompleteField({
   style,
 }: AutoCompleteFieldProps) {
   const { t } = useT()
+  const { componentDisabled } = ConfigProvider.useConfig()
+  const isFieldDisabled = disabled || componentDisabled
   const errorText = resolveErrorMessage(t, error)
   const validateStatus = errorText ? 'error' : undefined
 
@@ -66,7 +68,7 @@ export function AutoCompleteField({
   const normalizedValue = value === '' ? undefined : value
 
   // 必填字段的黄色背景样式
-  const inputClassName = required && !value ? 'field-required-empty' : undefined
+  const inputClassName = required && !isFieldDisabled && !value ? 'field-required-empty' : undefined
 
   return (
     <Form.Item
@@ -84,7 +86,7 @@ export function AutoCompleteField({
         value={normalizedValue}
         onChange={handleChange}
         placeholder={resolvedPlaceholder}
-        disabled={disabled}
+        disabled={isFieldDisabled}
         options={options}
         allowClear={allowClear}
         size={size}

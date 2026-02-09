@@ -9,7 +9,7 @@ import type { ErrorKey } from '@core/validation/errorKeys'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n'
 import { useCreation, useMemoizedFn } from 'ahooks'
-import { Card, Checkbox, Col, Input, Row, Select, Tag, Tooltip, Typography, Flex } from 'antd'
+import { Card, Checkbox, Col, ConfigProvider, Input, Row, Select, Tag, Tooltip, Typography, Flex } from 'antd'
 
 import { resolveErrorMessage } from '../fields/error'
 
@@ -39,6 +39,7 @@ export function MineralScopeForm({
   onCustomMineralsChange,
 }: MineralScopeFormProps) {
   const { t, locale, i18n } = useT()
+  const { componentDisabled } = ConfigProvider.useConfig()
   const { mineralScope } = versionDef
   const isZh = locale.startsWith('zh')
   const isRequired = mineralScope.mode !== 'fixed'
@@ -166,6 +167,26 @@ export function MineralScopeForm({
           <Row gutter={[10, 10]}>
             {mineralScope.minerals.map((mineral) => {
               const isSelected = selectedMinerals.includes(mineral.key)
+              if (componentDisabled) {
+                return (
+                  <Col key={mineral.key} xs={12} sm={8} md={6}>
+                    <div
+                      className={[
+                        'rounded-md border px-3 py-1.5 select-none',
+                        isSelected ? 'border-blue-400 bg-blue-50' : 'border-gray-200 bg-white',
+                      ].join(' ')}
+                    >
+                      <Typography.Text
+                        strong={isSelected}
+                        type={isSelected ? undefined : 'secondary'}
+                        className="text-sm"
+                      >
+                        {getMineralLabel(mineral)}
+                      </Typography.Text>
+                    </div>
+                  </Col>
+                )
+              }
               const isDisabled =
                 !isSelected &&
                 mineralScope.maxCount !== undefined &&
@@ -226,6 +247,7 @@ export function MineralScopeForm({
                       value={customMinerals[index] || undefined}
                       onChange={getCustomInputHandler(index)}
                       placeholder={t('placeholders.customMineral', { index: index + 1 })}
+                      disabled={componentDisabled}
                       status={customErrors[index] ? 'error' : undefined}
                     />
                   </Col>
@@ -263,6 +285,7 @@ export function MineralScopeForm({
                   value={customMinerals[index] || undefined}
                   onChange={getCustomInputHandler(index)}
                   placeholder={t('placeholders.customMineral', { index: index + 1 })}
+                  disabled={componentDisabled}
                   status={customErrors[index] ? 'error' : undefined}
                 />
               </Col>

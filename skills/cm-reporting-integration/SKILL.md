@@ -27,6 +27,13 @@ Apply these rules in every solution:
 - Treat Snapshot as full-state contract (`schemaVersion/templateType/versionId/data`).
 - Return integrations callback result in `{ items: [...] } | null | undefined` shape only.
 - Respect package license (`PolyForm-Noncommercial-1.0.0`) in usage recommendations.
+- For `readOnly` behavior, treat it as **view-only contract** (not just disabled inputs):
+  - hide checker page and checker entry in workflow;
+  - hide global required/error hint banner and bottom prev/next actions;
+  - hide table/form editing affordances (add/delete/batch/external pick/edit links), not merely `disabled`;
+  - suppress required yellow highlight when fields are disabled/read-only.
+- In controlled routing mode, if readOnly flow remaps page (e.g. `checker` fallback), always sync parent state via navigation callback to avoid route/UI drift.
+- Never override host-level `ConfigProvider` disabled state with local false. Effective disabled rule must be `parentDisabled || readOnly`.
 
 ## Standard Delivery Workflow
 
@@ -51,6 +58,7 @@ When producing integration code or guidance, always include:
 - Snapshot save + restore behavior definition.
 - Excel export data flow (template source → ArrayBuffer → Blob download).
 - Failure fallback behavior (cancel flow, null return, retry boundaries).
+- Explicit readOnly behavior matrix (what is hidden vs what remains visible).
 
 ## Anti-Patterns to Avoid
 
