@@ -8,23 +8,8 @@ import { useT } from '@ui/i18n/useT'
 import { useMemoizedFn } from 'ahooks'
 import { ConfigProvider, DatePicker, Form } from 'antd'
 import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-import localeData from 'dayjs/plugin/localeData'
-import weekday from 'dayjs/plugin/weekday'
-import weekOfYear from 'dayjs/plugin/weekOfYear'
-import weekYear from 'dayjs/plugin/weekYear'
 
 import { resolveErrorMessage } from './error'
-
-/**
- * 兼容宿主与库内可能存在的 dayjs 多实例场景：
- * 确保本模块创建的 dayjs 实例具备 rc-picker 所需的周相关能力。
- */
-dayjs.extend(customParseFormat)
-dayjs.extend(localeData)
-dayjs.extend(weekOfYear)
-dayjs.extend(weekYear)
-dayjs.extend(weekday)
 
 /** UI 展示格式。 */
 const DISPLAY_FORMAT = 'DD-MMM-YYYY'
