@@ -127,6 +127,45 @@ Validating templates...
 All template validations passed.
 ```
 
+## Skills 使用说明
+
+本仓库内置 `cm-reporting-integration` skill，用于指导宿主 React 应用集成 `cm-reporting`，覆盖依赖安装、模板投递、组件接线、Snapshot 导入导出、Excel 导出、集成回调及 legacy adapter 流程。
+
+### Skill 位置
+
+- `skills/cm-reporting-integration/SKILL.md`
+
+### 何时使用
+
+- 需要从零接入 `cm-reporting` 到业务系统时
+- 需要确认公开 API / 回调契约时
+- 需要排查运行时、导出、恢复失败问题时
+- 需要查询模板版本与文件路径映射时
+
+### 使用方式
+
+1. 在对话中明确提出集成诉求，并提及 `cm-reporting-integration`。
+2. 按需查阅以下参考文档（无需一次性全部加载）：
+   - `skills/cm-reporting-integration/references/integration-snippets.md`
+   - `skills/cm-reporting-integration/references/contracts.md`
+   - `skills/cm-reporting-integration/references/template-matrix.md`
+   - `skills/cm-reporting-integration/references/troubleshooting.md`
+3. 查询模板导出路径时，可运行：
+
+```bash
+node skills/cm-reporting-integration/scripts/resolve-template-path.mjs cmrt 6.5
+```
+
+输出示例：`cm-reporting/templates/CMRT/RMI_CMRT_6.5.xlsx`
+
+### 集成约束（摘要）
+
+- `templateType` 与 `versionId` 在渲染、恢复、导出全链路必须严格匹配
+- 宿主运行时仅导入一次 `cm-reporting/styles.css`
+- Excel 导出需传入官方模板 `.xlsx` 的 `ArrayBuffer`
+- `Snapshot` 需按完整状态契约处理：`schemaVersion/templateType/versionId/data`
+- 集成回调返回值需为 `{ items: [...] } | null | undefined`
+
 ## 文档
 
 - [架构概述](docs/architecture/00-overview.md)

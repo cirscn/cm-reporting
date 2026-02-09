@@ -15,6 +15,7 @@ import type { TemplateType, TemplateVersionDef } from '@core/registry/types'
 import { calculateGating } from '@core/rules/gating'
 import { buildFormSchema } from '@core/schema'
 import { createEmptyFormData } from '@core/template/formDefaults'
+import { normalizeAuthorizationDateInput } from '@core/transform'
 import type { MineRow, MineralsScopeRow, ProductRow, SmelterRow } from '@core/types/tableRows'
 import type { ErrorKey } from '@core/validation/errorKeys'
 import type { CMReportingIntegrations } from '@lib/public/integrations'
@@ -125,6 +126,16 @@ function writeQuestionField(
     writeNestedField(target, questionKey, value, mineralKey)
   } else {
     target[questionKey] = value
+  }
+}
+
+function normalizeFormData(data: TemplateFormState): TemplateFormState {
+  return {
+    ...data,
+    companyInfo: {
+      ...data.companyInfo,
+      authorizationDate: normalizeAuthorizationDateInput(data.companyInfo.authorizationDate),
+    },
   }
 }
 
@@ -439,7 +450,7 @@ function createTemplateStore(
       },
 
       setFormData: (data) => {
-        set({ ...data, isDirty: false })
+        set({ ...normalizeFormData(data), isDirty: false })
         scheduleValidation(set, get)
       },
 
