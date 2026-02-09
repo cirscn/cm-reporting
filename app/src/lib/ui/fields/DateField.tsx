@@ -9,12 +9,12 @@ import { useMemoizedFn } from 'ahooks'
 import { ConfigProvider, DatePicker, Form } from 'antd'
 import dayjs from 'dayjs'
 
+import {
+  DATE_FIELD_DISPLAY_FORMAT,
+  DATE_FIELD_STORAGE_FORMAT,
+  resolveDateFieldValue,
+} from './dateFieldValue'
 import { resolveErrorMessage } from './error'
-
-/** UI 展示格式。 */
-const DISPLAY_FORMAT = 'DD-MMM-YYYY'
-/** 存储格式。 */
-const STORAGE_FORMAT = 'YYYY-MM-DD'
 
 interface DateFieldProps {
   value?: string // ISO format: YYYY-MM-DD
@@ -58,12 +58,12 @@ export function DateField({
 
   const errorText = resolveErrorMessage(t, error)
   const validateStatus = errorText ? 'error' : undefined
-  const dayjsValue = value ? dayjs(value) : undefined
+  const dayjsValue = resolveDateFieldValue(value)
   const displayHint = hint ?? formatHint
   const displayPlaceholder = placeholder ?? formatHint ?? t('placeholders.date')
 
   const handleChange = useMemoizedFn((date: dayjs.Dayjs | null) => {
-    onChange?.(date ? date.format(STORAGE_FORMAT) : '')
+    onChange?.(date ? date.format(DATE_FIELD_STORAGE_FORMAT) : '')
   })
 
   const disabledDate = useMemoizedFn((current: dayjs.Dayjs) => {
@@ -94,7 +94,7 @@ export function DateField({
         placeholder={displayPlaceholder}
         disabled={isFieldDisabled}
         disabledDate={disabledDate}
-        format={DISPLAY_FORMAT}
+        format={DATE_FIELD_DISPLAY_FORMAT}
         className={pickerClassName}
         style={{ width: '100%' }}
       />
