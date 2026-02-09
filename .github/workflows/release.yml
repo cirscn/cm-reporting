@@ -84,7 +84,29 @@ jobs:
               git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
               git add -A
               git commit -m "发布：版本更新 [skip ci]"
-              git push origin "HEAD:${GITHUB_REF_NAME}"
+
+              PUSH_OK=false
+              for ATTEMPT in 1 2 3 4 5; do
+                if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+                  PUSH_OK=true
+                  break
+                fi
+
+                echo "第 ${ATTEMPT} 次推送失败，尝试同步远端后重试..."
+                git fetch origin "${GITHUB_REF_NAME}"
+                if ! git rebase "origin/${GITHUB_REF_NAME}"; then
+                  git rebase --abort || true
+                  echo "::error title=版本提交推送失败::无法完成 rebase，请检查 main 分支是否有冲突提交。"
+                  exit 1
+                fi
+
+                sleep $((ATTEMPT * 3))
+              done
+
+              if [ "$PUSH_OK" != "true" ]; then
+                echo "::error title=版本提交推送失败::连续重试后仍无法推送到 GitHub，请稍后重试 workflow。"
+                exit 1
+              fi
             fi
           else
             echo "No unreleased changesets found."
