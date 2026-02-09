@@ -60,6 +60,8 @@ function App() {
 }
 ```
 
+`cm-reporting/styles.css` 为已编译的纯 CSS 产物，宿主项目无需（也不应）对该文件再次执行 Tailwind 编译。
+
 ## 支持的模板
 
 | 模板 | 版本 | 说明 |
