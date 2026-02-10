@@ -71,6 +71,12 @@ const blob = await ref.current?.exportExcel({ templateXlsx })
 
 // 触发全量校验
 const isValid = await ref.current?.validate()
+
+// 保存草稿（不校验）
+const draft = ref.current?.saveDraft()
+
+// 提交（内部校验，失败返回 null 并跳转 checker）
+const submitted = await ref.current?.submit()
 ```
 
 ---
@@ -96,7 +102,8 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 | `onLocaleChange` | `(locale: Locale) => void` | - | 语言变化回调 |
 | `theme` | `object` | - | Ant Design 主题 token 覆盖 |
 | `cssVariables` | `object` | - | CSS 变量覆盖 |
-| `readOnly` | `boolean` | - | 全局只读模式（默认 `false`）。启用后进入“仅浏览”态：禁用输入并拦截用户编辑相关 store action，同时隐藏 checker 页/必填横幅/上下页操作与新增删除等编辑入口。 |
+| `readOnly` | `boolean` | - | 全局只读模式（默认 `false`）。启用后进入“仅浏览”态：禁用输入并拦截用户编辑相关 store action，同时隐藏 checker 页、必填横幅、上下页操作与新增删除等编辑入口。 |
+| `showPageActions` | `boolean` | - | 是否显示底部翻页操作（默认 `true`）。默认仅包含上一页/下一页，不包含内置提交按钮。 |
 | `maxContentWidth` | `number` | - | 内容区最大宽度（不设则撑满父容器） |
 | `integrations` | `CMReportingIntegrations` | - | 外部选择/回写扩展点 |
 | `initialSnapshot` | `ReportSnapshotV1` | - | 初始快照（用于"编辑旧报告"） |
@@ -109,6 +116,8 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 |------|--------|------|
 | `getSnapshot()` | `ReportSnapshotV1` | 获取当前全量快照 |
 | `setSnapshot(snapshot)` | `void` | 回填快照（templateType/versionId 必须匹配） |
+| `saveDraft()` | `ReportSnapshotV1` | 保存草稿（不校验必填），返回当前快照。 |
+| `submit()` | `Promise<ReportSnapshotV1 | null>` | 执行内部校验；失败返回 `null` 并自动跳转 checker，成功返回快照。 |
 | `exportJson()` | `string` | 导出快照 JSON 字符串 |
 | `exportExcel(input)` | `Promise<Blob>` | 导出 Excel（需传入模板 xlsx ArrayBuffer） |
 | `validate()` | `Promise<boolean>` | 触发全量校验 |
@@ -131,6 +140,7 @@ import { CMReportingApp } from '@lib/CMReportingApp'
 | `versionId` | `string` | ✅ | 模板版本号 |
 | `pageKey` | `PageKey` | - | 当前页面（受控模式） |
 | `onNavigatePage` | `(pageKey: PageKey) => void` | - | 页面导航回调（受控模式） |
+| `showPageActions` | `boolean` | - | 是否显示底部翻页操作（默认 `true`）。传 `false` 可由宿主完全接管保存/提交流程。 |
 | `maxContentWidth` | `number` | - | 内容区最大宽度 |
 | `readOnly` | `boolean` | - | 全局只读模式（默认 `false`）。只读下会自动隐藏 checker 页并回退到可浏览页；若在受控 `pageKey` 模式下发生回退，会通过 `onNavigatePage` 同步父级状态。 |
 | `integrations` | `CMReportingIntegrations` | - | 外部选择/回写扩展点 |
@@ -156,6 +166,8 @@ import type { CMReportingApi } from '@lib/index'
 | `snapshot` | `ReportSnapshotV1` | 当前快照（响应式，随表单变化自动更新） |
 | `getSnapshot()` | `ReportSnapshotV1` | 获取当前快照 |
 | `setSnapshot(snapshot)` | `void` | 回填快照 |
+| `saveDraft()` | `ReportSnapshotV1` | 保存草稿（不校验必填），返回当前快照。 |
+| `submit()` | `Promise<ReportSnapshotV1 | null>` | 执行内部校验；失败返回 `null` 并自动跳转 checker，成功返回快照。 |
 | `exportJson()` | `string` | 导出 JSON 字符串 |
 | `exportExcel(input)` | `Promise<Blob>` | 导出 Excel |
 | `validate()` | `Promise<boolean>` | 触发全量校验 |

@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file lib/CMReportingApp.readOnly.test.tsx
- * @description CMReportingApp readOnly 参数透传测试。
+ * @description CMReportingApp readOnly 与底部操作参数透传测试。
  */
 
 import type { ReactNode } from 'react'
@@ -16,7 +16,11 @@ vi.mock('@shell/navigation/NavigationContext', () => ({
 }))
 
 vi.mock('@shell/pages/TemplateShell', () => ({
-  TemplateShell: (props: { children?: ReactNode; readOnly?: boolean }) => {
+  TemplateShell: (props: {
+    children?: ReactNode
+    readOnly?: boolean
+    showPageActions?: boolean
+  }) => {
     mockTemplateShell(props)
     return <>{props.children}</>
   },
@@ -35,9 +39,7 @@ describe('CMReportingApp readOnly', () => {
   test('forwards readOnly=true to TemplateShell', () => {
     mockTemplateShell.mockClear()
 
-    renderToStaticMarkup(
-      <CMReportingApp templateType="cmrt" versionId="6.5" readOnly />
-    )
+    renderToStaticMarkup(<CMReportingApp templateType="cmrt" versionId="6.5" readOnly />)
 
     expect(mockTemplateShell).toHaveBeenCalled()
     const props = mockTemplateShell.mock.calls[0]?.[0]
@@ -47,12 +49,32 @@ describe('CMReportingApp readOnly', () => {
   test('defaults readOnly to false', () => {
     mockTemplateShell.mockClear()
 
-    renderToStaticMarkup(
-      <CMReportingApp templateType="cmrt" versionId="6.5" />
-    )
+    renderToStaticMarkup(<CMReportingApp templateType="cmrt" versionId="6.5" />)
 
     expect(mockTemplateShell).toHaveBeenCalled()
     const props = mockTemplateShell.mock.calls[0]?.[0]
     expect(props?.readOnly).toBe(false)
+  })
+
+  test('forwards showPageActions=false to TemplateShell', () => {
+    mockTemplateShell.mockClear()
+
+    renderToStaticMarkup(
+      <CMReportingApp templateType="cmrt" versionId="6.5" showPageActions={false} />,
+    )
+
+    expect(mockTemplateShell).toHaveBeenCalled()
+    const props = mockTemplateShell.mock.calls[0]?.[0]
+    expect(props?.showPageActions).toBe(false)
+  })
+
+  test('defaults showPageActions to true', () => {
+    mockTemplateShell.mockClear()
+
+    renderToStaticMarkup(<CMReportingApp templateType="cmrt" versionId="6.5" />)
+
+    expect(mockTemplateShell).toHaveBeenCalled()
+    const props = mockTemplateShell.mock.calls[0]?.[0]
+    expect(props?.showPageActions).toBe(true)
   })
 })

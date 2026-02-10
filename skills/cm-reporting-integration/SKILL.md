@@ -77,3 +77,17 @@ Load only what the request needs:
 - `references/contracts.md`: public API and callback contract tables.
 - `references/template-matrix.md`: complete template/version/file mapping.
 - `references/troubleshooting.md`: symptom-to-action playbook.
+
+## 宿主外置保存/提交（新增集成约定）
+
+当业务希望在弹窗或页面外层接管流程时，推荐使用以下模式：
+
+- 默认底部仅保留翻页；如需完全由宿主控制，传 `showPageActions={false}` 隐藏底部翻页区。
+- 使用 `CMReportingRef.saveDraft()` 执行“暂存”动作：
+  - 不触发必填校验；
+  - 直接返回 `ReportSnapshotV1` 给宿主落库。
+- 使用 `CMReportingRef.submit()` 执行“提交”动作：
+  - 先走库内 `validate`；
+  - 失败返回 `null`，并自动跳转 checker 页面；
+  - 成功返回 `ReportSnapshotV1`，由宿主决定后续 API 提交。
+- `useCMReporting()` 提供同等能力（`saveDraft/submit`），适合函数式集成场景。

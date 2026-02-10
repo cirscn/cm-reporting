@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lib/CMReportingApp.tsx
  * @description 主入口组件，接收 templateType、versionId 等 props。
  */
@@ -29,17 +29,19 @@ export interface CMReportingAppProps {
   templateType: TemplateType
   /** 版本 ID */
   versionId: string
-  /** 全局只读模式：启用后禁用页面内所有编辑控件。 */
+  /** 全局只读模式 */
   readOnly?: boolean
+  /** 是否显示底部翻页操作（默认 true） */
+  showPageActions?: boolean
   /** 当前页面（受控模式） */
   pageKey?: PageKey
   /** 页面导航回调（受控模式） */
   onNavigatePage?: (pageKey: PageKey) => void
   /** 内容区域最大宽度（可选，不设置则填充父容器） */
   maxContentWidth?: number
-  /** 宿主扩展点：外部选择/回写列表等。 */
+  /** 宿主扩展点：外部选择/回写列表等 */
   integrations?: CMReportingIntegrations
-  /** 插入点：用于对外门面组件做 snapshot/export 绑定（不作为 public API 承诺）。 */
+  /** 插入点：用于对外门面组件做 snapshot/export 绑定（不作为 public API 承诺） */
   children?: ReactNode
 }
 
@@ -53,28 +55,29 @@ export function CMReportingApp({
   templateType,
   versionId,
   readOnly = false,
+  showPageActions = true,
   pageKey: controlledPageKey,
   onNavigatePage,
   maxContentWidth,
   integrations,
   children,
 }: CMReportingAppProps) {
-  // 内部页面状态（非受控模式）
   const [internalPageKey, setInternalPageKey] = useState<PageKey>(DEFAULT_PAGE)
   const [searchParams, setSearchParams] = useState(new URLSearchParams())
 
-  // 使用受控或非受控模式
   const pageKey = controlledPageKey ?? internalPageKey
-  const handleNavigatePage = useCallback((nextPage: PageKey) => {
-    if (onNavigatePage) {
-      onNavigatePage(nextPage)
-    } else {
-      setInternalPageKey(nextPage)
-    }
-    setSearchParams(new URLSearchParams())
-  }, [onNavigatePage])
+  const handleNavigatePage = useCallback(
+    (nextPage: PageKey) => {
+      if (onNavigatePage) {
+        onNavigatePage(nextPage)
+      } else {
+        setInternalPageKey(nextPage)
+      }
+      setSearchParams(new URLSearchParams())
+    },
+    [onNavigatePage],
+  )
 
-  // 构建导航上下文
   const navigationValue = useMemo(() => {
     return {
       state: {
@@ -98,40 +101,42 @@ export function CMReportingApp({
     }
   }, [pageKey, searchParams, templateType, versionId, handleNavigatePage])
 
-  // 渲染页面内容
-  const renderPage = useCallback((page: PageKey) => {
-    switch (page) {
-      case 'revision':
-        return <RevisionPage />
-      case 'instructions':
-        return <DocPage titleKey="tabs.instructions" section="instructions" />
-      case 'definitions':
-        return <DocPage titleKey="tabs.definitions" section="definitions" />
-      case 'declaration':
-        return <DeclarationPage />
-      case 'minerals-scope':
-        return <MineralsScopePage />
-      case 'smelter-list':
-        return <SmelterListPage />
-      case 'checker':
-        return (
-          <CheckerPage
-            onNavigateToField={(targetPage, fieldPath) => {
-              handleNavigatePage(targetPage)
-              setSearchParams(new URLSearchParams({ focus: fieldPath }))
-            }}
-          />
-        )
-      case 'mine-list':
-        return <MineListPage />
-      case 'product-list':
-        return <ProductListPage />
-      case 'smelter-lookup':
-        return <DocPage titleKey="tabs.smelterLookup" section="smelterLookup" />
-      default:
-        return <DeclarationPage />
-    }
-  }, [handleNavigatePage])
+  const renderPage = useCallback(
+    (page: PageKey) => {
+      switch (page) {
+        case 'revision':
+          return <RevisionPage />
+        case 'instructions':
+          return <DocPage titleKey="tabs.instructions" section="instructions" />
+        case 'definitions':
+          return <DocPage titleKey="tabs.definitions" section="definitions" />
+        case 'declaration':
+          return <DeclarationPage />
+        case 'minerals-scope':
+          return <MineralsScopePage />
+        case 'smelter-list':
+          return <SmelterListPage />
+        case 'checker':
+          return (
+            <CheckerPage
+              onNavigateToField={(targetPage, fieldPath) => {
+                handleNavigatePage(targetPage)
+                setSearchParams(new URLSearchParams({ focus: fieldPath }))
+              }}
+            />
+          )
+        case 'mine-list':
+          return <MineListPage />
+        case 'product-list':
+          return <ProductListPage />
+        case 'smelter-lookup':
+          return <DocPage titleKey="tabs.smelterLookup" section="smelterLookup" />
+        default:
+          return <DeclarationPage />
+      }
+    },
+    [handleNavigatePage],
+  )
 
   return (
     <NavigationProvider value={navigationValue}>
@@ -139,6 +144,7 @@ export function CMReportingApp({
         templateType={templateType}
         versionId={versionId}
         readOnly={readOnly}
+        showPageActions={showPageActions}
         pageKey={pageKey}
         onNavigatePage={handleNavigatePage}
         renderPage={renderPage}

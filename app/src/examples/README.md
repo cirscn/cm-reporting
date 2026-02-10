@@ -1,23 +1,30 @@
-## Examples 能力边界说明
+﻿## Examples 能力边界说明
 
-本目录用于验证 `@lib` 的对外能力与边界，不作为生产 UI 的“最佳实践示例”承诺。
+本目录用于验证 `@lib` 的对外能力与边界，不作为生产 UI 的“最佳实践承诺”。
 
 ### 场景索引
 
-- 运行入口（可直接在本项目启动时看到）：`app/src/examples/ExamplesApp.tsx`
+- 运行入口（可直接在本项目启动后看到）：`app/src/examples/ExamplesApp.tsx`
 - 推荐门面组件（`CMReporting` + ref）：`app/src/examples/scenarios/CMReportingRefScenario.tsx`
 - legacy transform（roundtrip vs loose）：`app/src/examples/scenarios/LegacyTransformScenario.tsx`
 - 自定义行样式（`rowClassName`）：`app/src/examples/scenarios/SmelterRowClassNameScenario.tsx`
 
 启动后可通过页面顶部的 `Examples` 场景选择器切换不同场景。
 
+### 外置保存/提交示例
+
+- `CMReportingRefScenario` 已演示外置保存/提交按钮：
+  - `saveDraft()`：不校验必填，直接返回当前 Snapshot；
+  - `submit()`：执行内部校验，失败返回 `null` 且自动跳转到 checker，成功返回 Snapshot。
+- 示例中通过 `showPageActions={false}` 隐藏库内底部翻页，完全由宿主弹窗/按钮接管流程。
+
 ### 全局只读演示
 
-- `CMReportingRefScenario` 已包含 `readOnly` 开关按钮。
+- `CMReportingRefScenario` 包含 `readOnly` 开关按钮。
 - 打开 `readOnly` 后，组件进入“仅浏览”态：
   - 输入、选择、表格编辑不可变更；
   - `checker` 页与必填提示横幅不显示；
-  - 底部上一页/下一页操作区不显示；
+  - 底部翻页区不显示；
   - 新增/删除/批量删除/外部选择等编辑入口不显示（而非仅 disabled）。
 
 ### JSON 导入/导出

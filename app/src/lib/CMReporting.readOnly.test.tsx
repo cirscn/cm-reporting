@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file lib/CMReporting.readOnly.test.tsx
- * @description CMReporting readOnly 参数透传测试。
+ * @description CMReporting readOnly 与底部操作参数透传测试。
  */
 
 import type { ReactNode } from 'react'
@@ -20,7 +20,11 @@ vi.mock('./providers/CMReportingProvider', () => ({
 }))
 
 vi.mock('./CMReportingApp', () => ({
-  CMReportingApp: (props: { children?: ReactNode; readOnly?: boolean }) => {
+  CMReportingApp: (props: {
+    children?: ReactNode
+    readOnly?: boolean
+    showPageActions?: boolean
+  }) => {
     mockApp(props)
     return <>{props.children}</>
   },
@@ -50,14 +54,16 @@ vi.mock('./shell/store', () => ({
   }),
 }))
 
+vi.mock('./shell/navigation/useNavigation', () => ({
+  useOptionalNavigation: () => null,
+}))
+
 describe('CMReporting readOnly', () => {
   test('forwards readOnly=true to CMReportingApp', () => {
     mockProvider.mockClear()
     mockApp.mockClear()
 
-    renderToStaticMarkup(
-      <CMReporting templateType="cmrt" versionId="6.5" readOnly />
-    )
+    renderToStaticMarkup(<CMReporting templateType="cmrt" versionId="6.5" readOnly />)
 
     expect(mockApp).toHaveBeenCalled()
     const appProps = mockApp.mock.calls[0]?.[0]
@@ -68,12 +74,34 @@ describe('CMReporting readOnly', () => {
     mockProvider.mockClear()
     mockApp.mockClear()
 
-    renderToStaticMarkup(
-      <CMReporting templateType="cmrt" versionId="6.5" />
-    )
+    renderToStaticMarkup(<CMReporting templateType="cmrt" versionId="6.5" />)
 
     expect(mockApp).toHaveBeenCalled()
     const appProps = mockApp.mock.calls[0]?.[0]
     expect(appProps?.readOnly).toBe(false)
+  })
+
+  test('forwards showPageActions=false to CMReportingApp', () => {
+    mockProvider.mockClear()
+    mockApp.mockClear()
+
+    renderToStaticMarkup(
+      <CMReporting templateType="cmrt" versionId="6.5" showPageActions={false} />,
+    )
+
+    expect(mockApp).toHaveBeenCalled()
+    const appProps = mockApp.mock.calls[0]?.[0]
+    expect(appProps?.showPageActions).toBe(false)
+  })
+
+  test('defaults showPageActions to true', () => {
+    mockProvider.mockClear()
+    mockApp.mockClear()
+
+    renderToStaticMarkup(<CMReporting templateType="cmrt" versionId="6.5" />)
+
+    expect(mockApp).toHaveBeenCalled()
+    const appProps = mockApp.mock.calls[0]?.[0]
+    expect(appProps?.showPageActions).toBe(true)
   })
 })

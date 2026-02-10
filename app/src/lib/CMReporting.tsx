@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file CMReporting.tsx
  * @description 对外唯一推荐的开箱即用入口组件（UI + JSON/Excel 导出契约）。
  */
@@ -16,11 +16,15 @@ import { exportToExcel } from './public/excel'
 import type { CMReportingIntegrations } from './public/integrations'
 import type { ReportSnapshotV1 } from './public/snapshot'
 import { stringifySnapshot } from './public/snapshot'
+import { submitReport } from './public/submit'
+import { useOptionalNavigation } from './shell/navigation/useNavigation'
 import { useTemplateActions, useTemplateState } from './shell/store'
 
 export interface CMReportingRef {
   getSnapshot: () => ReportSnapshotV1
   setSnapshot: (snapshot: ReportSnapshotV1) => void
+  saveDraft: () => ReportSnapshotV1
+  submit: () => Promise<ReportSnapshotV1 | null>
   exportJson: () => string
   exportExcel: (input: Omit<ExportExcelInput, 'snapshot'>) => Promise<Blob>
   validate: () => Promise<boolean>
@@ -35,6 +39,8 @@ export interface CMReportingProps {
   cssVariables?: CMReportingProviderProps['cssVariables']
   /** 全局只读模式：启用后禁用页面内所有编辑控件。 */
   readOnly?: boolean
+  /** 是否显示底部翻页操作（默认 true）。 */
+  showPageActions?: boolean
   maxContentWidth?: number
   /** 宿主扩展点：外部选择/回写列表等。 */
   integrations?: CMReportingIntegrations
@@ -63,6 +69,7 @@ function SnapshotController({
 }) {
   const { meta, form, lists } = useTemplateState()
   const { setFormData, validateForm } = useTemplateActions()
+  const navigation = useOptionalNavigation()
   const importedSnapshotRef = useRef<ReportSnapshotV1 | null>(null)
   const hydratedRef = useRef<boolean>(!initialSnapshot)
 
@@ -79,7 +86,6 @@ function SnapshotController({
     }
   }, [meta.templateType, meta.versionId, form, lists, locale])
 
-  // 在首帧绘制前完成 “编辑旧报告” 的快照导入，避免宿主在 useLayoutEffect 里读取 ref 时拿到旧数据。
   useLayoutEffect(() => {
     if (!initialSnapshot) {
       hydratedRef.current = true
@@ -107,11 +113,20 @@ function SnapshotController({
         }
         setFormData(next.data)
       },
+      saveDraft: () => snapshot,
+      submit: () =>
+        submitReport({
+          templateType,
+          versionId,
+          validate: validateForm,
+          getSnapshot: () => snapshot,
+          navigation,
+        }),
       exportJson: () => stringifySnapshot(snapshot),
       exportExcel: async (input) => exportToExcel({ ...input, snapshot }),
       validate: () => validateForm(),
     }),
-    [snapshot, setFormData, validateForm, templateType, versionId]
+    [navigation, setFormData, snapshot, templateType, validateForm, versionId],
   )
 
   return null
@@ -132,13 +147,14 @@ export const CMReporting = forwardRef<CMReportingRef, CMReportingProps>(function
     theme,
     cssVariables,
     readOnly = false,
+    showPageActions = true,
     maxContentWidth,
     integrations,
     initialSnapshot,
     onSnapshotChange,
     fallback,
   },
-  ref
+  ref,
 ) {
   if (
     initialSnapshot &&
@@ -159,6 +175,7 @@ export const CMReporting = forwardRef<CMReportingRef, CMReportingProps>(function
         templateType={templateType}
         versionId={versionId}
         readOnly={readOnly}
+        showPageActions={showPageActions}
         maxContentWidth={maxContentWidth}
         integrations={integrations}
       >

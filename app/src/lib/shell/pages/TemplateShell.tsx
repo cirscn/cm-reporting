@@ -21,6 +21,7 @@ export interface TemplateShellProps {
   templateType: TemplateType
   versionId: string
   readOnly?: boolean
+  showPageActions?: boolean
   pageKey: PageKey
   onNavigatePage: (pageKey: PageKey) => void
   renderPage: (pageKey: PageKey) => ReactNode
@@ -41,6 +42,7 @@ export function TemplateShell({
   templateType,
   versionId,
   readOnly = false,
+  showPageActions = true,
   pageKey,
   onNavigatePage,
   renderPage,
@@ -58,6 +60,7 @@ export function TemplateShell({
       {children}
       <TemplateScaffold
         readOnly={readOnly}
+        showPageActions={showPageActions}
         pageKey={pageKey}
         onNavigatePage={onNavigatePage}
         renderPage={renderPage}
@@ -70,6 +73,7 @@ export function TemplateShell({
 /** TemplateScaffold Props。 */
 interface TemplateScaffoldProps {
   readOnly?: boolean
+  showPageActions?: boolean
   pageKey: PageKey
   onNavigatePage: (pageKey: PageKey) => void
   renderPage: (pageKey: PageKey) => ReactNode
@@ -79,6 +83,7 @@ interface TemplateScaffoldProps {
 /** 模板页面骨架：负责 tabs/versions 计算与布局。 */
 function TemplateScaffold({
   readOnly = false,
+  showPageActions = true,
   pageKey,
   onNavigatePage,
   renderPage,
@@ -168,15 +173,13 @@ function TemplateScaffold({
       onStepChange={handleStepChange}
       maxContentWidth={maxContentWidth}
       bottomSlot={
-        readOnly
+        readOnly || !showPageActions
           ? undefined
           : (
             <PageActions
               currentPageKey={resolvedPageKey}
               onNavigatePage={requestNavigatePage}
               pageOrder={workflowPages}
-              checkerErrors={checkerErrors}
-              checkerSummary={checkerSummary}
             />
           )
       }

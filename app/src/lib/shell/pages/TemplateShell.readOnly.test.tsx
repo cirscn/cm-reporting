@@ -1,6 +1,6 @@
-/**
+﻿/**
  * @file shell/pages/TemplateShell.readOnly.test.tsx
- * @description TemplateShell 只读模式页面行为测试。
+ * @description TemplateShell 只读与底部操作开关行为测试。
  */
 
 import { getVersionDef } from '@core/registry'
@@ -183,6 +183,23 @@ describe('TemplateShell readOnly', () => {
     expect(appLayoutProps.steps?.some((step) => step.key === 'checker')).toBe(true)
     expect(mockRequiredHintBanner).toHaveBeenCalled()
     expect(mockInnerConfigProvider).toHaveBeenCalledWith(false)
+    expect(mockPageActions).toHaveBeenCalled()
+  })
+
+  test('hides bottom page actions when showPageActions=false', () => {
+    renderToStaticMarkup(
+      <TemplateShell
+        templateType="cmrt"
+        versionId="6.5"
+        readOnly={false}
+        showPageActions={false}
+        pageKey="declaration"
+        onNavigatePage={() => undefined}
+        renderPage={() => <div>content</div>}
+      />,
+    )
+
+    expect(mockPageActions).not.toHaveBeenCalled()
   })
 
   test('preserves parent componentDisabled=true when readOnly=false', () => {
