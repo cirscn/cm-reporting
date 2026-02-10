@@ -1,5 +1,14 @@
 # cm-reporting
 
+## 0.3.2
+
+### Patch Changes
+
+- c9b5a13: 调整 EMRT 的矿产申报范围默认行为：
+  - EMRT 初始化空表单时默认选中当前版本全部矿种（含 dynamic-dropdown 版本）。
+  - 在非只读模式下保留矿种范围可编辑能力，用户可继续按业务修改勾选。
+  - 新增回归测试，确保 EMRT 默认全选与 AMRT 默认不预选行为长期稳定。
+
 ## 0.3.1
 
 ### Patch Changes
