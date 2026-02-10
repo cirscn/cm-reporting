@@ -128,6 +128,12 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 - 当用户保留历史 `smelterList` 行，但后续将 `Q1/Q2` 改为否定导致该矿种不再要求冶炼厂时，不会再对 `smelterLookup` 产生错误或进度扣减。
 - 该规则用于确保 checker 错误数与完成度一致，避免“错误为 0 但完成度下降”的状态偏差。
 
+**EMRT 申报范围默认值说明：**
+
+- EMRT 在初始化空表单时默认选中当前版本全部矿种（含 `dynamic-dropdown` 版本）。
+- 在非只读模式（`readOnly=false`）下，用户可在 Declaration 页继续调整矿种选择。
+- 在只读模式（`readOnly=true`）下，矿种范围仅展示当前值，不提供编辑交互。
+
 ---
 
 ### CMReportingApp（底层组件）

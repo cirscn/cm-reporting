@@ -81,7 +81,9 @@ export function createEmptyFormData(versionDef: TemplateVersionDef): FormData {
 
   // ── 矿种选择 & 自定义矿种名 ──
   const allMinerals = versionDef.mineralScope.minerals.map((m) => m.key)
-  const selectedMinerals = versionDef.mineralScope.mode === 'fixed' ? allMinerals : []
+  const shouldSelectAllMinerals =
+    versionDef.mineralScope.mode === 'fixed' || versionDef.templateType === 'emrt'
+  const selectedMinerals = shouldSelectAllMinerals ? allMinerals : []
   const customMinerals =
     versionDef.mineralScope.mode === 'free-text'
       ? allMinerals.map((mineral, index) => {
