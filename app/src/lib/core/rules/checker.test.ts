@@ -353,6 +353,126 @@ describe('runChecker', () => {
     ).toBe(false)
   })
 
+  it('requires EMRT minerals scope selection in checker', () => {
+    const emrt = getVersionDef('emrt', '2.1')
+    const formState: FormStateForRequired = {
+      scopeType: 'A',
+      selectedMinerals: [],
+      questionAnswers: {
+        Q1: {},
+        Q2: {},
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(emrt),
+      questions: {
+        Q1: {},
+        Q2: {},
+      },
+    })
+
+    const errors = runChecker(emrt, formState, formData)
+
+    expect(
+      errors.some(
+        (error) =>
+          error.fieldPath === 'mineralsScope.selection' &&
+          error.messageKey === ERROR_KEYS.checker.requiredField
+      )
+    ).toBe(true)
+  })
+
+  it('requires AMRT minerals scope selection in checker', () => {
+    const amrt = getVersionDef('amrt', '1.3')
+    const formState: FormStateForRequired = {
+      scopeType: 'A',
+      selectedMinerals: [],
+      questionAnswers: {
+        Q1: {},
+        Q2: {},
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(amrt),
+      questions: {
+        Q1: {},
+        Q2: {},
+      },
+    })
+
+    const errors = runChecker(amrt, formState, formData)
+
+    expect(
+      errors.some(
+        (error) =>
+          error.fieldPath === 'mineralsScope.selection' &&
+          error.messageKey === ERROR_KEYS.checker.requiredField
+      )
+    ).toBe(true)
+  })
+
+  it('requires EMRT smelter lookup when metal is selected', () => {
+    const emrt = getVersionDef('emrt', '2.1')
+    const mineralKey = 'cobalt'
+    const formState: FormStateForRequired = {
+      scopeType: 'A',
+      selectedMinerals: [mineralKey],
+      questionAnswers: {
+        Q1: { [mineralKey]: 'Yes' },
+        Q2: { [mineralKey]: 'Yes' },
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(emrt),
+      questions: {
+        Q1: { [mineralKey]: 'Yes' },
+        Q2: { [mineralKey]: 'Yes' },
+      },
+      smelterList: [{ metal: mineralKey, smelterLookup: '' }],
+    })
+
+    const errors = runChecker(emrt, formState, formData)
+
+    expect(
+      errors.some(
+        (error) =>
+          error.fieldPath === 'smelterList.0.smelterLookup' &&
+          error.messageKey === ERROR_KEYS.checker.requiredField
+      )
+    ).toBe(true)
+  })
+
+  it('requires AMRT smelter lookup when metal is selected', () => {
+    const amrt = getVersionDef('amrt', '1.3')
+    const mineralKey = 'aluminum'
+    const formState: FormStateForRequired = {
+      scopeType: 'A',
+      selectedMinerals: [mineralKey],
+      questionAnswers: {
+        Q1: { [mineralKey]: 'Yes' },
+        Q2: { [mineralKey]: '' },
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(amrt),
+      questions: {
+        Q1: { [mineralKey]: 'Yes' },
+        Q2: { [mineralKey]: '' },
+      },
+      smelterList: [{ metal: mineralKey, smelterLookup: '' }],
+    })
+
+    const errors = runChecker(amrt, formState, formData)
+
+    expect(
+      errors.some(
+        (error) =>
+          error.fieldPath === 'smelterList.0.smelterLookup' &&
+          error.messageKey === ERROR_KEYS.checker.requiredField
+      )
+    ).toBe(true)
+  })
+
   it.todo('requires mine list row fields when mine list rules are enabled')
   it.todo('requires smelter list row fields when smelter list row-level rules are enabled')
 })

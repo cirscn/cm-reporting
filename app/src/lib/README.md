@@ -122,6 +122,12 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 | `exportExcel(input)` | `Promise<Blob>` | 导出 Excel（需传入模板 xlsx ArrayBuffer） |
 | `validate()` | `Promise<boolean>` | 触发全量校验 |
 
+**Checker 门控一致性说明（EMRT/AMRT）：**
+
+- `Smelter List` 相关的 checker 校验与进度统计共用同一门控：仅当矿种处于“需要填写冶炼厂”状态时生效。
+- 当用户保留历史 `smelterList` 行，但后续将 `Q1/Q2` 改为否定导致该矿种不再要求冶炼厂时，不会再对 `smelterLookup` 产生错误或进度扣减。
+- 该规则用于确保 checker 错误数与完成度一致，避免“错误为 0 但完成度下降”的状态偏差。
+
 ---
 
 ### CMReportingApp（底层组件）

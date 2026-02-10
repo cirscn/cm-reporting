@@ -114,6 +114,19 @@ export function buildCheckerSummary(
     )
   }
 
+  // Minerals scope selection required for dynamic-dropdown templates (EMRT/AMRT)
+  const requiresMineralsScopeSelection =
+    (versionDef.templateType === 'emrt' || versionDef.templateType === 'amrt') &&
+    versionDef.mineralScope.mode === 'dynamic-dropdown'
+  if (requiresMineralsScopeSelection) {
+    totalRequired += 1
+    const selectedMinerals = formState.selectedMinerals ?? []
+    if (selectedMinerals.length > 0) {
+      completedRequired += 1
+      addPassed('mineralsScope.selection', t('tabs.mineralsScope'), declarationLabel)
+    }
+  }
+
   // Questions
   let questionsRequired = 0
   let questionsCompleted = 0
@@ -251,6 +264,7 @@ export function buildCheckerSummary(
     activeMinerals,
     gatingByMineral,
   })
+  const smelterRulesEnabled = requiredMinerals.length > 0
   let smelterRequired = 0
   let smelterCompleted = 0
   requiredMinerals.forEach((mineralKey) => {
@@ -270,8 +284,34 @@ export function buildCheckerSummary(
       )
     }
   })
+  if (
+    smelterRulesEnabled &&
+    versionDef.smelterList.hasLookup &&
+    (versionDef.templateType === 'emrt' || versionDef.templateType === 'amrt')
+  ) {
+    smelterList.forEach((row, index) => {
+      const metal = row.metal || ''
+      if (!metal.trim()) return
+      totalRequired += 1
+      smelterRequired += 1
+      const lookup = row.smelterLookup || ''
+      if (lookup.trim()) {
+        completedRequired += 1
+        smelterCompleted += 1
+        addPassed(
+          `smelterList.${index}.smelterLookup`,
+          t('tables.smelterName'),
+          smelterLabel
+        )
+      }
+    })
+  }
   // Smelter not listed -> name/country required (when enabled)
-  if (versionDef.smelterList.hasLookup && versionDef.smelterList.notListedRequireNameCountry) {
+  if (
+    smelterRulesEnabled &&
+    versionDef.smelterList.hasLookup &&
+    versionDef.smelterList.notListedRequireNameCountry
+  ) {
     smelterList.forEach((row, index) => {
       if (!isSmelterNotListed(row.smelterLookup || '')) return
       totalRequired += 1

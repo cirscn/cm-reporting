@@ -47,3 +47,9 @@
 
 - `SmelterListIntegration.rowClassName(record, index)` 由宿主决定 className，库不内置任何“标红”等表现。
 - Examples 里的 `.smelter-row-unlisted` 仅用于演示宿主自定义样式与规则。
+
+### Checker 门控一致性（EMRT/AMRT）
+
+- `Smelter List` 的 checker 错误与完成度统计使用同一门控条件。
+- 当 `Q1/Q2` 调整后使冶炼厂不再必填时，历史残留的 `smelterList` 行不会继续拉低 checker 完成度。
+- 因此在该场景下，期望表现是：`checker` 错误数与顶部完成度状态保持一致。

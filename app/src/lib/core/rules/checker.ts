@@ -71,6 +71,9 @@ export function runChecker(
   // Check company info required fields
   checkCompanyInfo(versionDef, formState, formData, errors)
 
+  // Check minerals scope selection for templates with dynamic scope
+  checkMineralsScopeSelection(versionDef, formState, errors)
+
   // Check questions
   checkQuestions(versionDef, formState, formData, errors)
 
@@ -192,6 +195,25 @@ function checkQuestions(
       }
     }
   }
+}
+
+function checkMineralsScopeSelection(
+  versionDef: TemplateVersionDef,
+  formState: FormStateForRequired,
+  errors: CheckerError[]
+) {
+  if (versionDef.templateType !== 'emrt' && versionDef.templateType !== 'amrt') return
+  if (versionDef.mineralScope.mode !== 'dynamic-dropdown') return
+  const selectedMinerals = formState.selectedMinerals ?? []
+  if (selectedMinerals.length > 0) return
+
+  pushError(
+    errors,
+    'R',
+    ERROR_KEYS.checker.requiredField,
+    'mineralsScope.selection',
+    'tabs.mineralsScope'
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -381,6 +403,23 @@ function checkSmelterList(
   }
 
   if (!versionDef.smelterList.hasLookup) return
+
+  if (versionDef.templateType === 'emrt' || versionDef.templateType === 'amrt') {
+    rows.forEach((row, index) => {
+      const metal = row.metal || ''
+      if (!metal.trim()) return
+      const lookup = row.smelterLookup || ''
+      if (lookup.trim()) return
+      pushError(
+        errors,
+        'R',
+        ERROR_KEYS.checker.requiredField,
+        `smelterList.${index}.smelterLookup`,
+        'tables.smelterName'
+      )
+    })
+  }
+
   if (!versionDef.smelterList.notListedRequireNameCountry) return
 
   rows.forEach((row, index) => {

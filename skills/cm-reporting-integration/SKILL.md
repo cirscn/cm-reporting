@@ -35,6 +35,7 @@ Apply these rules in every solution:
   - suppress required yellow highlight when fields are disabled/read-only.
 - In controlled routing mode, if readOnly flow remaps page (e.g. `checker` fallback), always sync parent state via navigation callback to avoid route/UI drift.
 - Never override host-level `ConfigProvider` disabled state with local false. Effective disabled rule must be `parentDisabled || readOnly`.
+- For `EMRT/AMRT` checker behavior, keep checker errors and progress summary under the same gating: when smelter requirement is disabled by Q1/Q2, do not count `smelterLookup` required progress from historical rows.
 
 ## Standard Delivery Workflow
 
