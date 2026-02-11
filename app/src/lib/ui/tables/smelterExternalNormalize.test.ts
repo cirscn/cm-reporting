@@ -60,6 +60,12 @@ describe('resolveExternalSmelterRowId', () => {
     expect(resolveExternalSmelterRowId({ id: ' SM-001 ' }, 'smelter-new-1')).toBe('SM-001')
   })
 
+  test('宿主未回写 id 但回写 smelterId 时，也覆盖当前行 id', () => {
+    expect(resolveExternalSmelterRowId({ smelterId: ' CID003469 ' }, 'smelter-new-1')).toBe(
+      'CID003469',
+    )
+  })
+
   test('宿主未回写 id 时保留当前行 id', () => {
     expect(resolveExternalSmelterRowId({}, 'smelter-new-1')).toBe('smelter-new-1')
     expect(resolveExternalSmelterRowId({ id: '   ' }, 'smelter-new-1')).toBe('smelter-new-1')

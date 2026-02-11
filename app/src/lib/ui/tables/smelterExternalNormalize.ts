@@ -37,11 +37,14 @@ export function isTemporarySmelterRowId(id: string): boolean {
  * 解析外部回写后的行 ID：优先使用宿主回写的 id（去空格），否则保留当前行 ID。
  */
 export function resolveExternalSmelterRowId(
-  partial: Pick<Partial<SmelterRow>, 'id'>,
+  partial: Pick<Partial<SmelterRow>, 'smelterId' | 'id'>,
   currentRowId: string,
 ): string {
   const externalId = typeof partial.id === 'string' ? partial.id.trim() : ''
-  return externalId || currentRowId
+  if (externalId) return externalId
+  const resolvedSmelterId = resolveExternalSmelterId(partial)
+  if (resolvedSmelterId) return resolvedSmelterId
+  return currentRowId
 }
 
 /**
