@@ -14,6 +14,7 @@ import type {
 import { isSmelterNotIdentified, isSmelterNotListed, normalizeSmelterLookup } from '@core/transform'
 import type { SmelterRow } from '@core/types/tableRows'
 import type {
+  SmelterExternalPickItem,
   SmelterListIntegration,
   SmelterRowPickContext,
   SmelterLookupMode,
@@ -43,7 +44,7 @@ import { memo, useState } from 'react'
 import {
   buildNewSmelterRowId,
   hasDuplicateSmelterSelectionForMetal,
-  hasExternalSmelterIdInput,
+  hasExternalSmelterNumberInput,
   resolveExternalSmelterId,
   resolveExternalSmelterRowId,
   shouldDisableSmelterFieldsAfterExternalPick,
@@ -179,7 +180,7 @@ export const SmelterListTable = memo(function SmelterListTable({
   const getCurrentRowsSnapshot = useMemoizedFn(() => rowsRef.current.map((r) => ({ ...r })))
 
   const applyExternalPickToRow = useMemoizedFn(
-    (row: SmelterRow, partial: Partial<SmelterRow>): SmelterRow => {
+    (row: SmelterRow, partial: SmelterExternalPickItem): SmelterRow => {
       const merged: SmelterRow = {
         ...row,
         ...(partial as Record<string, string | undefined>),
@@ -189,7 +190,7 @@ export const SmelterListTable = memo(function SmelterListTable({
       const resolvedSmelterId = resolveExternalSmelterId(partial)
       if (resolvedSmelterId) {
         merged.smelterId = resolvedSmelterId
-      } else if (hasExternalSmelterIdInput(partial)) {
+      } else if (hasExternalSmelterNumberInput(partial)) {
         merged.smelterId = ''
       } else {
         const normalizedMergedSmelterId =

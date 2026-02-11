@@ -362,7 +362,7 @@ import type { CMReportingIntegrations } from '@lib/index'
       lookupMode: 'external',
       onPickSmelterForRow: async (ctx) => {
         // ctx 包含当前行信息（rowId, metal, row 等）
-        // 返回 { items: [partial] } 或 null（取消）
+        // 返回 { items: [{ id, smelterNumber, ...partial }] } 或 null（取消）
       },
     },
   }}
@@ -416,14 +416,17 @@ return null
 
 **外部回写 ID 映射规则：**
 
-- 当宿主回写项同时存在 `smelterId` 与 `id` 时，优先使用 `smelterId`。
-- 当 `smelterId` 为空且 `id` 存在时，库会自动将 `id` 赋值到 `smelterId`。
+- 行 `id` 与冶炼厂识别号码（`smelterId` 列）语义严格分离：
+  - `id` 仅表示宿主数据主键（用于行 ID）；
+  - 冶炼厂识别号码仅由宿主回写 `smelterNumber` 映射到 `smelterId` 列。
 - 点击“新增一行”时，库会先生成临时行 ID（格式：`smelter-new-<timestamp>`）。
-- 宿主回写了 `id` 后，库会使用该 `id` 覆盖临时行 ID；若未回写 `id` 但回写了 `smelterId`，则使用 `smelterId` 覆盖。
-- 同一个 `metal` 下禁止重复选择同一冶炼厂（按 `smelterId` 去重；若缺失则按回写 `id` 去重）。
+- 宿主回写了 `id` 后，库会使用该 `id` 覆盖临时行 ID；未回写 `id` 时保留临时行 ID。
+- 同一个 `metal` 下禁止重复选择同一冶炼厂（按回写 `id` 去重）。
 - 行内外部选择成功后（且非 `Smelter not listed / not yet identified`），`smelterId`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state` 字段会锁定为不可编辑。
 - 上述规则适用于 `onPickSmelterForRow`（行内）。
-- `saveDraft()` / `submit()` 返回的 Snapshot 中会按该规则回传 `data.smelterList[*].smelterId`。
+- `saveDraft()` / `submit()` 返回的 Snapshot 中会按该规则回传：
+  - `data.smelterList[*].id`（宿主数据主键）
+  - `data.smelterList[*].smelterId`（来自 `smelterNumber`）
 
 **行内选择上下文 (`SmelterRowPickContext`)：**
 
@@ -438,6 +441,11 @@ interface SmelterRowPickContext {
   rowId: string              // 当前行 ID
   row: Readonly<SmelterRow>  // 当前行完整数据
   metal: string              // 当前行的 metal
+}
+
+type SmelterExternalPickItem = Partial<SmelterRow> & {
+  id?: string            // 宿主数据主键（用于覆盖行 id）
+  smelterNumber?: string // 冶炼厂识别号码（映射到 smelterId 列）
 }
 ```
 

@@ -7,16 +7,19 @@ import type { SmelterRow } from '@core/types/tableRows'
 
 const NEW_SMELTER_ROW_ID_PREFIX = 'smelter-new-'
 
+type ExternalSmelterIdFields = Pick<Partial<SmelterRow>, 'id'> & {
+  smelterId?: string
+  smelterNumber?: string
+}
+
 /**
- * 解析外部回写的冶炼厂 ID：smelterId 优先，id 兜底。
+ * 解析外部回写的冶炼厂识别号码：仅识别 smelterNumber。
  */
 export function resolveExternalSmelterId(
-  partial: Pick<Partial<SmelterRow>, 'smelterId' | 'id'>,
+  partial: ExternalSmelterIdFields,
 ): string {
-  const smelterId = typeof partial.smelterId === 'string' ? partial.smelterId.trim() : ''
-  if (smelterId) return smelterId
-  const externalId = typeof partial.id === 'string' ? partial.id.trim() : ''
-  if (externalId) return externalId
+  const smelterNumber = typeof partial.smelterNumber === 'string' ? partial.smelterNumber.trim() : ''
+  if (smelterNumber) return smelterNumber
   return ''
 }
 
@@ -34,29 +37,24 @@ export function isTemporarySmelterRowId(id: string): boolean {
 }
 
 /**
- * 解析外部回写后的行 ID：优先使用宿主回写的 id（去空格），否则保留当前行 ID。
+ * 解析外部回写后的行 ID：仅使用宿主回写的 id（去空格），否则保留当前行 ID。
  */
 export function resolveExternalSmelterRowId(
-  partial: Pick<Partial<SmelterRow>, 'smelterId' | 'id'>,
+  partial: ExternalSmelterIdFields,
   currentRowId: string,
 ): string {
   const externalId = typeof partial.id === 'string' ? partial.id.trim() : ''
   if (externalId) return externalId
-  const resolvedSmelterId = resolveExternalSmelterId(partial)
-  if (resolvedSmelterId) return resolvedSmelterId
   return currentRowId
 }
 
 /**
  * 解析“同一金属下冶炼厂去重”所用的唯一键：
- * - 优先使用 smelterId
- * - 若 smelterId 为空，且行 id 不是临时值，则使用行 id
+ * - 仅使用行 id
  */
 export function resolveSmelterSelectionKey(
-  row: Pick<SmelterRow, 'id' | 'smelterId'>,
+  row: Pick<SmelterRow, 'id'>,
 ): string {
-  const normalizedSmelterId = typeof row.smelterId === 'string' ? row.smelterId.trim() : ''
-  if (normalizedSmelterId) return normalizedSmelterId
   const normalizedRowId = typeof row.id === 'string' ? row.id.trim() : ''
   if (!normalizedRowId || isTemporarySmelterRowId(normalizedRowId)) return ''
   return normalizedRowId
@@ -66,9 +64,9 @@ export function resolveSmelterSelectionKey(
  * 判断当前修改是否会造成“同一 metal 下重复选择同一冶炼厂”。
  */
 export function hasDuplicateSmelterSelectionForMetal(params: {
-  currentRows: ReadonlyArray<Pick<SmelterRow, 'id' | 'metal' | 'smelterId'>>
+  currentRows: ReadonlyArray<Pick<SmelterRow, 'id' | 'metal'>>
   currentRowId: string
-  nextRow: Pick<SmelterRow, 'id' | 'metal' | 'smelterId'>
+  nextRow: Pick<SmelterRow, 'id' | 'metal'>
 }): boolean {
   const nextMetal = params.nextRow.metal.trim()
   if (!nextMetal) return false
@@ -103,8 +101,8 @@ export function shouldDisableSmelterFieldsAfterExternalPick(params: {
 /**
  * 判断本次外部回写是否携带了可用于更新 smelterId 的原始字段。
  */
-export function hasExternalSmelterIdInput(
-  partial: Pick<Partial<SmelterRow>, 'smelterId' | 'id'>,
+export function hasExternalSmelterNumberInput(
+  partial: ExternalSmelterIdFields,
 ): boolean {
-  return typeof partial.smelterId === 'string' || typeof partial.id === 'string'
+  return typeof partial.smelterNumber === 'string'
 }

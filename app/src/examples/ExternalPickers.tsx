@@ -18,6 +18,7 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 const { Text } = Typography
 
 type ResolveFn<T> = (value: T) => void
+type ExampleSmelterPickItem = Partial<SmelterRow> & { smelterNumber?: string }
 
 function stripKey<T extends { key: string }>(row: T): Omit<T, 'key'> {
   const { key, ...rest } = row
@@ -36,6 +37,7 @@ function buildSmelterCandidatesByMetal({
     smelterLookup: name,
     smelterName: name,
     smelterCountry: record.country,
+    smelterNumber: record.smelterId,
     smelterIdentification: record.smelterId,
     sourceId: record.sourceId,
     smelterStreet: record.street,
@@ -93,9 +95,9 @@ export function useExampleExternalPickers() {
   const [productCandidates, setProductCandidates] = useState<
     Array<Partial<ProductRow> & { key: string }>
   >([])
-  const [smelterCandidates, setSmelterCandidates] = useState<
-    Array<Partial<SmelterRow> & { key: string }>
-  >([])
+  const [smelterCandidates, setSmelterCandidates] = useState<Array<ExampleSmelterPickItem & { key: string }>>(
+    [],
+  )
 
   const [smelterOpen, setSmelterOpen] = useState(false)
   const [productOpen, setProductOpen] = useState(false)
@@ -115,10 +117,10 @@ export function useExampleExternalPickers() {
     versionId: string
     rowsCount: number
   } | null>(null)
-  const smelterResolveRef = useRef<ResolveFn<ExternalPickResult<Partial<SmelterRow>>> | null>(null)
+  const smelterResolveRef = useRef<ResolveFn<ExternalPickResult<ExampleSmelterPickItem>> | null>(null)
   const productResolveRef = useRef<ResolveFn<ExternalPickResult<Partial<ProductRow>>> | null>(null)
 
-  const finalizeSmelter = useMemoizedFn((result: ExternalPickResult<Partial<SmelterRow>>) => {
+  const finalizeSmelter = useMemoizedFn((result: ExternalPickResult<ExampleSmelterPickItem>) => {
     smelterResolveRef.current?.(result)
     smelterResolveRef.current = null
     setSmelterCtxInfo(null)
@@ -150,7 +152,7 @@ export function useExampleExternalPickers() {
         currentLookup: ctx.row.smelterLookup ?? '',
       })
       setSmelterOpen(true)
-      return new Promise<ExternalPickResult<Partial<SmelterRow>>>((resolve) => {
+      return new Promise<ExternalPickResult<ExampleSmelterPickItem>>((resolve) => {
         smelterResolveRef.current = resolve
       })
     },
@@ -180,15 +182,15 @@ export function useExampleExternalPickers() {
     Boolean(row.requesterNumber || row.requesterName),
   )
 
-  const smelterColumns = useMemo<ColumnsType<Partial<SmelterRow> & { key: string }>>(
+  const smelterColumns = useMemo<ColumnsType<ExampleSmelterPickItem & { key: string }>>(
     () => [
       { title: 'Metal', dataIndex: 'metal', key: 'metal', width: 120 },
       { title: 'Smelter', dataIndex: 'smelterName', key: 'smelterName' },
       { title: 'Country', dataIndex: 'smelterCountry', key: 'smelterCountry', width: 160 },
       {
         title: 'Smelter ID',
-        dataIndex: 'smelterIdentification',
-        key: 'smelterIdentification',
+        dataIndex: 'smelterNumber',
+        key: 'smelterNumber',
         width: 140,
       },
       { title: 'Source', dataIndex: 'sourceId', key: 'sourceId', width: 120 },
@@ -210,7 +212,7 @@ export function useExampleExternalPickers() {
     return cols
   }, [includeProductRequesterColumns])
 
-  const smelterSelection: TableRowSelection<Partial<SmelterRow> & { key: string }> = useMemo(
+  const smelterSelection: TableRowSelection<ExampleSmelterPickItem & { key: string }> = useMemo(
     () => ({
       type: 'radio',
       selectedRowKeys: selectedSmelterKeys,

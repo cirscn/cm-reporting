@@ -15,6 +15,15 @@ import type { ProductRow, SmelterRow } from '@core/types/tableRows'
 /** 外部选择器返回结果：null/undefined 表示取消；items 表示确认选择。 */
 export type ExternalPickResult<T> = { items: T[] } | null | undefined
 
+/**
+ * 冶炼厂行内外部选择回写项：
+ * - id：宿主数据主键（用于覆盖行 id）
+ * - smelterNumber：冶炼厂识别号码（映射到 smelterId 列）
+ */
+export type SmelterExternalPickItem = Partial<SmelterRow> & {
+  smelterNumber?: string
+}
+
 export type ExternalAddMode = 'append-empty-row' | 'external-only' | 'both'
 export type SmelterLookupMode = 'internal' | 'external' | 'hybrid'
 
@@ -54,7 +63,7 @@ export interface SmelterListIntegration {
    */
   onPickSmelterForRow?: (
     ctx: SmelterRowPickContext
-  ) => Promise<ExternalPickResult<Partial<SmelterRow>>>
+  ) => Promise<ExternalPickResult<SmelterExternalPickItem>>
   /** 冶炼厂名称/选择入口交互模式：默认 'internal'（用户手填）。 */
   lookupMode?: SmelterLookupMode
 }

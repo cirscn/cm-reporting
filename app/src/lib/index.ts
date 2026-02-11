@@ -33,6 +33,7 @@ export type {
   CMReportingIntegrations,
   ExternalAddMode,
   ExternalPickResult,
+  SmelterExternalPickItem,
   SmelterLookupMode,
   SmelterRowPickContext,
   ProductListIntegration,

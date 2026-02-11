@@ -17,9 +17,9 @@
   - `saveDraft()`：不校验必填，直接返回当前 Snapshot；
   - `submit()`：执行内部校验，失败返回 `null` 且自动跳转到 checker，成功返回 Snapshot。
 - 示例中通过 `showPageActions={false}` 隐藏库内底部翻页，完全由宿主弹窗/按钮接管流程。
-- 若宿主通过 `SmelterList` 外部选择仅回写了 `id`（未回写 `smelterId`），库会自动将该 `id` 映射到 `smelterId`，并在 `saveDraft()/submit()` 的 Snapshot 中回传。
-- 冶炼厂新增行会先使用临时 ID（`smelter-new-<timestamp>`），当宿主外部选择回写 `id` 后会覆盖该临时 ID；若仅回写 `smelterId`，也会用 `smelterId` 覆盖。
-- 同一个 `metal` 下不能重复选择同一冶炼厂（优先按 `smelterId` 判重，缺失时按回写 `id` 判重）。
+- `id` 与冶炼厂识别号码语义分离：`id` 仅作为行主键；识别号码由 `smelterNumber` 映射到 `smelterId` 列。
+- 冶炼厂新增行会先使用临时 ID（`smelter-new-<timestamp>`），当宿主外部选择回写 `id` 后覆盖临时 ID；若未回写 `id` 则保留临时 ID。
+- 同一个 `metal` 下不能重复选择同一冶炼厂（按回写 `id` 判重）。
 - 行内外部选择成功后（非 `Smelter not listed / not yet identified`），`smelterId`、`国家`、`冶炼厂识别`、`识别号来源`、`街道`、`城市`、`州/省` 会自动锁定为不可编辑。
 
 ### 全局只读演示

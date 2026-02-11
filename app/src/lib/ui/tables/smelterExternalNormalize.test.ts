@@ -8,7 +8,7 @@ import { describe, expect, test } from 'vitest'
 import {
   buildNewSmelterRowId,
   hasDuplicateSmelterSelectionForMetal,
-  hasExternalSmelterIdInput,
+  hasExternalSmelterNumberInput,
   isTemporarySmelterRowId,
   resolveExternalSmelterId,
   resolveExternalSmelterRowId,
@@ -17,30 +17,27 @@ import {
 } from './smelterExternalNormalize'
 
 describe('resolveExternalSmelterId', () => {
-  test('优先使用 smelterId', () => {
-    expect(resolveExternalSmelterId({ smelterId: 'SM-001', id: 'CID-001' })).toBe('SM-001')
+  test('仅使用 smelterNumber', () => {
+    expect(resolveExternalSmelterId({ smelterNumber: 'CID-001' })).toBe('CID-001')
+    expect(resolveExternalSmelterId({ smelterNumber: ' CID-002 ' })).toBe('CID-002')
   })
 
-  test('smelterId 为空时使用 id 兜底', () => {
-    expect(resolveExternalSmelterId({ smelterId: '   ', id: 'CID-002' })).toBe('CID-002')
-  })
-
-  test('两者都为空时返回空字符串', () => {
-    expect(resolveExternalSmelterId({ smelterId: '  ', id: '  ' })).toBe('')
+  test('未传 smelterNumber 或为空时返回空字符串', () => {
+    expect(resolveExternalSmelterId({ smelterId: 'SM-001', id: 'ROW-001' })).toBe('')
+    expect(resolveExternalSmelterId({ smelterNumber: '  ' })).toBe('')
     expect(resolveExternalSmelterId({})).toBe('')
   })
 })
 
-describe('hasExternalSmelterIdInput', () => {
-  test('显式传 smelterId 或 id 时返回 true', () => {
-    expect(hasExternalSmelterIdInput({ smelterId: '' })).toBe(true)
-    expect(hasExternalSmelterIdInput({ id: '' })).toBe(true)
-    expect(hasExternalSmelterIdInput({ smelterId: 'SM-001' })).toBe(true)
-    expect(hasExternalSmelterIdInput({ id: 'CID-001' })).toBe(true)
+describe('hasExternalSmelterNumberInput', () => {
+  test('显式传 smelterNumber 时返回 true', () => {
+    expect(hasExternalSmelterNumberInput({ smelterNumber: '' })).toBe(true)
+    expect(hasExternalSmelterNumberInput({ smelterNumber: 'CID-001' })).toBe(true)
   })
 
-  test('未传 smelterId 与 id 时返回 false', () => {
-    expect(hasExternalSmelterIdInput({})).toBe(false)
+  test('未传 smelterNumber 时返回 false', () => {
+    expect(hasExternalSmelterNumberInput({ smelterId: 'SM-001', id: 'ROW-001' })).toBe(false)
+    expect(hasExternalSmelterNumberInput({})).toBe(false)
   })
 })
 
@@ -61,9 +58,9 @@ describe('resolveExternalSmelterRowId', () => {
     expect(resolveExternalSmelterRowId({ id: ' SM-001 ' }, 'smelter-new-1')).toBe('SM-001')
   })
 
-  test('宿主未回写 id 但回写 smelterId 时，也覆盖当前行 id', () => {
-    expect(resolveExternalSmelterRowId({ smelterId: ' CID003469 ' }, 'smelter-new-1')).toBe(
-      'CID003469',
+  test('宿主未回写 id 时保留当前行 id（即使回写了 smelterNumber）', () => {
+    expect(resolveExternalSmelterRowId({ smelterNumber: ' CID003469 ' }, 'smelter-new-1')).toBe(
+      'smelter-new-1',
     )
   })
 
@@ -74,52 +71,48 @@ describe('resolveExternalSmelterRowId', () => {
 })
 
 describe('resolveSmelterSelectionKey', () => {
-  test('优先使用 smelterId', () => {
-    expect(resolveSmelterSelectionKey({ id: 'ROW-1', smelterId: ' SM-001 ' })).toBe('SM-001')
+  test('仅使用非临时 row id', () => {
+    expect(resolveSmelterSelectionKey({ id: 'ROW-2' })).toBe('ROW-2')
   })
 
-  test('smelterId 为空时，使用非临时 row id', () => {
-    expect(resolveSmelterSelectionKey({ id: 'ROW-2', smelterId: ' ' })).toBe('ROW-2')
-  })
-
-  test('临时 row id 且 smelterId 为空时，不产生判重键', () => {
-    expect(resolveSmelterSelectionKey({ id: 'smelter-new-2', smelterId: '' })).toBe('')
+  test('临时 row id 时，不产生判重键', () => {
+    expect(resolveSmelterSelectionKey({ id: 'smelter-new-2' })).toBe('')
   })
 })
 
 describe('hasDuplicateSmelterSelectionForMetal', () => {
-  test('同一 metal + 同一 smelterId 判定为重复', () => {
+  test('同一 metal + 同一 row id 判定为重复', () => {
     expect(
       hasDuplicateSmelterSelectionForMetal({
         currentRows: [
-          { id: 'ROW-1', metal: 'gold', smelterId: 'SM-001' },
-          { id: 'ROW-2', metal: 'tin', smelterId: 'SM-001' },
+          { id: 'ROW-1', metal: 'gold' },
+          { id: 'ROW-2', metal: 'tin' },
         ],
         currentRowId: 'ROW-2',
-        nextRow: { id: 'ROW-2', metal: 'gold', smelterId: 'SM-001' },
+        nextRow: { id: 'ROW-1', metal: 'gold' },
       }),
     ).toBe(true)
   })
 
-  test('不同 metal 即使 smelterId 相同也不重复', () => {
+  test('不同 metal 即使 row id 相同也不重复', () => {
     expect(
       hasDuplicateSmelterSelectionForMetal({
-        currentRows: [{ id: 'ROW-1', metal: 'gold', smelterId: 'SM-001' }],
+        currentRows: [{ id: 'ROW-1', metal: 'gold' }],
         currentRowId: 'ROW-2',
-        nextRow: { id: 'ROW-2', metal: 'tin', smelterId: 'SM-001' },
+        nextRow: { id: 'ROW-1', metal: 'tin' },
       }),
     ).toBe(false)
   })
 
-  test('smelterId 缺失时按回写 id 判重（临时 id 不参与）', () => {
+  test('按回写 id 判重（临时 id 不参与）', () => {
     expect(
       hasDuplicateSmelterSelectionForMetal({
         currentRows: [
-          { id: 'SM-EXT-1', metal: 'gold', smelterId: '' },
-          { id: 'smelter-new-3', metal: 'gold', smelterId: '' },
+          { id: 'SM-EXT-1', metal: 'gold' },
+          { id: 'smelter-new-3', metal: 'gold' },
         ],
         currentRowId: 'ROW-2',
-        nextRow: { id: 'SM-EXT-1', metal: 'gold', smelterId: '' },
+        nextRow: { id: 'SM-EXT-1', metal: 'gold' },
       }),
     ).toBe(true)
   })
@@ -127,9 +120,9 @@ describe('hasDuplicateSmelterSelectionForMetal', () => {
   test('缺少 metal 或判重键时不判重', () => {
     expect(
       hasDuplicateSmelterSelectionForMetal({
-        currentRows: [{ id: 'ROW-1', metal: 'gold', smelterId: 'SM-001' }],
+        currentRows: [{ id: 'ROW-1', metal: 'gold' }],
         currentRowId: 'ROW-2',
-        nextRow: { id: 'smelter-new-4', metal: '', smelterId: '' },
+        nextRow: { id: 'smelter-new-4', metal: '' },
       }),
     ).toBe(false)
   })
