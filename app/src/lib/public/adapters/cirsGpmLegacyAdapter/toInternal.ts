@@ -319,6 +319,7 @@ export function cirsGpmLegacyToInternal(input: unknown): { snapshot: ReportSnaps
       smelterLookup: lookup,
       smelterName: name,
       smelterCountry: country,
+      smelterNumber: legacyNumber || legacyId || undefined,
       smelterId: legacyNumber || legacyId || undefined,
       smelterIdentification: legacyNumber || legacyId || undefined,
       sourceId: legacyIdentification || undefined,

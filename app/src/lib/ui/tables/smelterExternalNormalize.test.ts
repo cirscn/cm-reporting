@@ -10,22 +10,22 @@ import {
   hasDuplicateSmelterSelectionForMetal,
   hasExternalSmelterNumberInput,
   isTemporarySmelterRowId,
-  resolveExternalSmelterId,
+  resolveExternalSmelterNumber,
   resolveExternalSmelterRowId,
   resolveSmelterSelectionKey,
   shouldDisableSmelterFieldsAfterExternalPick,
 } from './smelterExternalNormalize'
 
-describe('resolveExternalSmelterId', () => {
+describe('resolveExternalSmelterNumber', () => {
   test('仅使用 smelterNumber', () => {
-    expect(resolveExternalSmelterId({ smelterNumber: 'CID-001' })).toBe('CID-001')
-    expect(resolveExternalSmelterId({ smelterNumber: ' CID-002 ' })).toBe('CID-002')
+    expect(resolveExternalSmelterNumber({ smelterNumber: 'CID-001' })).toBe('CID-001')
+    expect(resolveExternalSmelterNumber({ smelterNumber: ' CID-002 ' })).toBe('CID-002')
   })
 
   test('未传 smelterNumber 或为空时返回空字符串', () => {
-    expect(resolveExternalSmelterId({ smelterId: 'SM-001', id: 'ROW-001' })).toBe('')
-    expect(resolveExternalSmelterId({ smelterNumber: '  ' })).toBe('')
-    expect(resolveExternalSmelterId({})).toBe('')
+    expect(resolveExternalSmelterNumber({ smelterId: 'SM-001', id: 'ROW-001' })).toBe('')
+    expect(resolveExternalSmelterNumber({ smelterNumber: '  ' })).toBe('')
+    expect(resolveExternalSmelterNumber({})).toBe('')
   })
 })
 

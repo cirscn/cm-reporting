@@ -414,19 +414,21 @@ return null
 | `rowClassName` | `(record, index) => string` | - | 自定义行 className（由宿主提供 CSS） |
 | `onPickSmelterForRow` | `(ctx) => Promise<ExternalPickResult>` | - | 行内外部选择（点击“新增一行”后，选择 metal，再为当前行选择冶炼厂） |
 
-**外部回写 ID 映射规则：**
+**外部回写字段规则：**
 
-- 行 `id` 与冶炼厂识别号码（`smelterId` 列）语义严格分离：
-  - `id` 仅表示宿主数据主键（用于行 ID）；
-  - 冶炼厂识别号码仅由宿主回写 `smelterNumber` 映射到 `smelterId` 列。
+- 行 `id` 与冶炼厂识别号码（`smelterNumber` 列）语义严格分离：
+  - `id` 仅表示宿主数据主键（用于行 ID 与去重判定）；
+  - `smelterNumber` 仅用于展示；
+  - `smelterId` 为内部兼容字段，不参与展示与业务判定。
 - 点击“新增一行”时，库会先生成临时行 ID（格式：`smelter-new-<timestamp>`）。
-- 宿主回写了 `id` 后，库会使用该 `id` 覆盖临时行 ID；未回写 `id` 时保留临时行 ID。
+- 宿主回写了 `id` 后，库会使用该 `id` 覆盖临时行 ID；未回写 `id` 时本次回写无效并提示错误。
 - 同一个 `metal` 下禁止重复选择同一冶炼厂（按回写 `id` 去重）。
-- 行内外部选择成功后（且非 `Smelter not listed / not yet identified`），`smelterId`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state` 字段会锁定为不可编辑。
+- 行内外部选择成功后（且非 `Smelter not listed / not yet identified`），`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state` 字段会锁定为不可编辑。
 - 上述规则适用于 `onPickSmelterForRow`（行内）。
 - `saveDraft()` / `submit()` 返回的 Snapshot 中会按该规则回传：
   - `data.smelterList[*].id`（宿主数据主键）
-  - `data.smelterList[*].smelterId`（来自 `smelterNumber`）
+  - `data.smelterList[*].smelterNumber`（展示号）
+  - `data.smelterList[*].smelterId`（内部兼容字段）
 
 **行内选择上下文 (`SmelterRowPickContext`)：**
 
@@ -444,8 +446,8 @@ interface SmelterRowPickContext {
 }
 
 type SmelterExternalPickItem = Partial<SmelterRow> & {
-  id?: string            // 宿主数据主键（用于覆盖行 id）
-  smelterNumber?: string // 冶炼厂识别号码（映射到 smelterId 列）
+  id: string             // 宿主数据主键（external/hybrid 模式下必须提供）
+  smelterNumber?: string // 冶炼厂识别号码（仅用于展示列）
 }
 ```
 

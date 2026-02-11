@@ -82,6 +82,7 @@
     "authorizerPhone": "+86 xxx xxxx xxxx",
     "authorizationDate": "DD-MMM-YYYY",
     "smelterIdInput": "例如：CID001105",
+    "smelterNumberInput": "例如：CID001105",
     "smelterLookup": "搜索冶炼厂…",
     "smelterName": "冶炼厂名称",
     "smelterNameRequired": "必填：冶炼厂名称",
@@ -139,6 +140,7 @@
     "smelterLookup": "冶炼厂查询",
     "smelterName": "冶炼厂名称",
     "smelterId": "冶炼厂识别号码输入列",
+    "smelterNumber": "冶炼厂识别号码",
     "smelterIdentification": "冶炼厂识别",
     "sourceId": "识别号来源",
     "country": "国家",
@@ -1196,6 +1198,7 @@
     },
     "externalPickFailedTitle": "外部选择失败",
     "externalPickFailedContent": "外部选择器未能成功返回数据，请重试。",
+    "externalPickMissingIdContent": "外部选择返回缺少必填 id，无法回写当前行。",
     "duplicateSmelterSelectionTitle": "冶炼厂重复选择",
     "duplicateSmelterSelectionContent": "同一个金属下不能重复选择同一个冶炼厂，请改选其他冶炼厂。"
   }

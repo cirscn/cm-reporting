@@ -16,7 +16,7 @@ function cellSnippet(xml: string, cellRef: string, len = 300): string {
 }
 
 describe('excel export - Smelter List', () => {
-  test('does not overwrite formula cells when smelterId is provided (CMRT 6.5)', async () => {
+  test('does not overwrite formula cells when stable row id + smelterNumber are provided (CMRT 6.5)', async () => {
     const templatePath = path.resolve(process.cwd(), 'templates/CMRT/RMI_CMRT_6.5.xlsx')
     const buf = fs.readFileSync(templatePath)
 
@@ -35,7 +35,8 @@ describe('excel export - Smelter List', () => {
         mineralsScope: [],
         smelterList: [
           {
-            smelterId: 'CID000000',
+            id: 'SM-0001',
+            smelterNumber: 'CID000000',
             smelterContactName: 'Bob',
           },
         ] as unknown as ReportSnapshotV1['data']['smelterList'],

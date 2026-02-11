@@ -15,6 +15,10 @@ export interface SmelterRow {
   smelterCountry: string
   combinedMetal?: string
   combinedSmelter?: string
+  smelterNumber?: string
+  /**
+   * 兼容字段：仅用于内部兼容承载，不参与任何业务判定或展示。
+   */
   smelterId?: string
   smelterIdentification?: string
   sourceId?: string

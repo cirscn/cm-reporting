@@ -45,7 +45,7 @@ import {
   buildNewSmelterRowId,
   hasDuplicateSmelterSelectionForMetal,
   hasExternalSmelterNumberInput,
-  resolveExternalSmelterId,
+  resolveExternalSmelterNumber,
   resolveExternalSmelterRowId,
   shouldDisableSmelterFieldsAfterExternalPick,
 } from './smelterExternalNormalize'
@@ -69,7 +69,7 @@ interface SmelterListTableProps {
 }
 
 const INPUT_FIELDS = [
-  'smelterId',
+  'smelterNumber',
   'smelterName',
   'smelterIdentification',
   'sourceId',
@@ -156,7 +156,7 @@ export const SmelterListTable = memo(function SmelterListTable({
       smelterCountry: '',
       combinedMetal: '',
       combinedSmelter: '',
-      smelterId: '',
+      smelterNumber: '',
       smelterIdentification: '',
       sourceId: '',
       smelterStreet: '',
@@ -181,22 +181,26 @@ export const SmelterListTable = memo(function SmelterListTable({
 
   const applyExternalPickToRow = useMemoizedFn(
     (row: SmelterRow, partial: SmelterExternalPickItem): SmelterRow => {
+      const resolvedRowId = resolveExternalSmelterRowId(partial, row.id)
+      if (!resolvedRowId.trim()) {
+        return row
+      }
       const merged: SmelterRow = {
         ...row,
         ...(partial as Record<string, string | undefined>),
-        id: resolveExternalSmelterRowId(partial, row.id),
+        id: resolvedRowId,
         metal: row.metal,
       }
-      const resolvedSmelterId = resolveExternalSmelterId(partial)
-      if (resolvedSmelterId) {
-        merged.smelterId = resolvedSmelterId
+      const resolvedSmelterNumber = resolveExternalSmelterNumber(partial)
+      if (resolvedSmelterNumber) {
+        merged.smelterNumber = resolvedSmelterNumber
       } else if (hasExternalSmelterNumberInput(partial)) {
-        merged.smelterId = ''
+        merged.smelterNumber = ''
       } else {
-        const normalizedMergedSmelterId =
-          typeof merged.smelterId === 'string' ? merged.smelterId.trim() : ''
-        if (normalizedMergedSmelterId !== merged.smelterId) {
-          merged.smelterId = normalizedMergedSmelterId
+        const normalizedMergedSmelterNumber =
+          typeof merged.smelterNumber === 'string' ? merged.smelterNumber.trim() : ''
+        if (normalizedMergedSmelterNumber !== merged.smelterNumber) {
+          merged.smelterNumber = normalizedMergedSmelterNumber
         }
       }
       if (!merged.smelterLookup) return merged
@@ -244,6 +248,14 @@ export const SmelterListTable = memo(function SmelterListTable({
       const result = await integration.onPickSmelterForRow(ctx)
       const picked = result?.items?.[0]
       if (!picked) return
+      const pickedRowId = typeof picked.id === 'string' ? picked.id.trim() : ''
+      if (!pickedRowId) {
+        Modal.error({
+          title: t('errors.externalPickFailedTitle'),
+          content: t('errors.externalPickMissingIdContent'),
+        })
+        return
+      }
       const nextRow = applyExternalPickToRow(row, picked)
       if (
         hasDuplicateSmelterSelectionForMetal({
@@ -300,7 +312,7 @@ export const SmelterListTable = memo(function SmelterListTable({
     if (isSmelterNotListed(normalizedValue)) {
       return {
         ...next,
-        smelterId: '',
+        smelterNumber: '',
         smelterName: '',
         smelterCountry: '',
         smelterIdentification: '',
@@ -316,7 +328,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         ...next,
         smelterName: 'Unknown',
         smelterCountry: country,
-        smelterId: 'Unknown',
+        smelterNumber: 'Unknown',
         smelterIdentification: 'Unknown',
         sourceId: '',
         smelterStreet: '',
@@ -338,7 +350,7 @@ export const SmelterListTable = memo(function SmelterListTable({
     return {
       ...next,
       smelterName: normalizedValue,
-      smelterId: record.smelterId,
+      smelterNumber: record.smelterId,
       smelterIdentification: record.smelterId,
       sourceId: record.sourceId,
       smelterCountry: record.country,
@@ -374,6 +386,7 @@ export const SmelterListTable = memo(function SmelterListTable({
           metal: value,
           smelterName: row.smelterName || 'Unknown',
           smelterCountry: country,
+          smelterNumber: row.smelterNumber || 'Unknown',
           smelterIdentification: row.smelterIdentification || 'Unknown',
         }
       }
@@ -483,7 +496,7 @@ export const SmelterListTable = memo(function SmelterListTable({
 
   // ---------------------------------------------------------------------------
   // 列定义（约 430 行）
-  // 按业务逻辑顺序构建：metal → smelterLookup/smelterName → smelterId →
+  // 按业务逻辑顺序构建：metal → smelterLookup/smelterName → smelterNumber →
   // country → identification → sourceId → 地址字段 → recycledScrap → comments → 操作
   // 每列的 render 函数负责行内编辑（Input/Select/AutoComplete）和必填标记。
   // ---------------------------------------------------------------------------
@@ -603,12 +616,12 @@ export const SmelterListTable = memo(function SmelterListTable({
       })
     }
 
-    // Smelter ID input column (if configured) - keep after metal + lookup/name
+    // Smelter Number input column (if configured) - keep after metal + lookup/name
     if (config.hasIdColumn) {
       columns.push({
-        title: t('tables.smelterId'),
-        dataIndex: 'smelterId',
-        key: 'smelterId',
+        title: t('tables.smelterNumber'),
+        dataIndex: 'smelterNumber',
+        key: 'smelterNumber',
         width: 180,
         fixed: 'left',
         render: (value: string, record: SmelterRow) => {
@@ -625,8 +638,8 @@ export const SmelterListTable = memo(function SmelterListTable({
           return (
             <Input
               value={value || undefined}
-              onChange={getInputHandler(`${record.id}:smelterId`)}
-              placeholder={t('placeholders.smelterIdInput')}
+              onChange={getInputHandler(`${record.id}:smelterNumber`)}
+              placeholder={t('placeholders.smelterNumberInput')}
               className="font-mono text-xs"
               disabled={disableAfterExternalPick}
             />

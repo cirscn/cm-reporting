@@ -47,6 +47,7 @@ const smelterRowSchema = z.object({
   smelterCountry: z.string(),
   combinedMetal: z.string().optional(),
   combinedSmelter: z.string().optional(),
+  smelterNumber: z.string().optional(),
   smelterId: z.string().optional(),
   smelterIdentification: z.string().optional(),
   sourceId: z.string().optional(),

@@ -467,7 +467,7 @@ function writeSmart(
 // 各 sheet 写入函数
 // ---------------------------------------------------------------------------
 
-/** 写入 Smelter List sheet（每行根据是否有 smelterId 决定覆盖策略）。 */
+/** 写入 Smelter List sheet（每行根据是否有稳定 row.id 决定覆盖策略）。 */
 function writeSmelterListSheet(
   sheetXml: string,
   versionDef: TemplateVersionDef,
@@ -477,22 +477,25 @@ function writeSmelterListSheet(
   let next = sheetXml
   rows.forEach((row, index) => {
     const r = 5 + index
-    const smelterId = (row.smelterId ?? '').trim()
-    const hasId = Boolean(smelterId)
-    const allow = !hasId
+    const rowId = (row.id ?? '').trim()
+    const hasStableRowId = Boolean(rowId && !rowId.startsWith('smelter-new-'))
 
-    // 优先"方案 A"：写入 Smelter ID（A 列），让模板公式自动填充
-    if (versionDef.smelterList.hasIdColumn && hasId) {
-      next = writeCellInlineStr(next, cell('A', r), smelterId)
+    const smelterNumber = (row.smelterNumber ?? '').trim()
+
+    const allowOverwriteFormula = !hasStableRowId
+
+    // 优先“主键行”：写入识别号展示列（A 列），让模板公式自动填充
+    if (versionDef.smelterList.hasIdColumn && hasStableRowId && smelterNumber) {
+      next = writeCellInlineStr(next, cell('A', r), smelterNumber)
     }
 
-    // 无 ID 时模拟用户输入：覆盖公式单元格
+    // 无稳定主键时模拟用户输入：覆盖公式单元格
     const metal = row.metal?.trim()
-    if (metal) next = writeSmart(next, cell('B', r), toMineralLabel(metal), allow)
+    if (metal) next = writeSmart(next, cell('B', r), toMineralLabel(metal), allowOverwriteFormula)
 
     const lookup = row.smelterLookup?.trim()
     if (versionDef.smelterList.hasLookup && lookup) {
-      next = writeSmart(next, cell('C', r), normalizeSmelterLookup(lookup), allow)
+      next = writeSmart(next, cell('C', r), normalizeSmelterLookup(lookup), allowOverwriteFormula)
     }
 
     // 逐列写入（公式/输入共存列）
@@ -505,15 +508,17 @@ function writeSmelterListSheet(
     ]
     for (const [key, col] of fieldColMap) {
       const v = row[key]?.trim()
-      if (v) next = writeSmart(next, cell(col, r), v, allow)
+      if (v) next = writeSmart(next, cell(col, r), v, allowOverwriteFormula)
     }
 
     // Combined 列（仅部分模板版本有）
     if (versionDef.smelterList.hasCombinedColumn) {
       const combinedMetal = row.combinedMetal?.trim()
-      if (combinedMetal) next = writeSmart(next, cell('R', r), toMineralLabel(combinedMetal), allow)
+      if (combinedMetal) {
+        next = writeSmart(next, cell('R', r), toMineralLabel(combinedMetal), allowOverwriteFormula)
+      }
       const combinedSmelter = row.combinedSmelter?.trim()
-      if (combinedSmelter) next = writeSmart(next, cell('S', r), combinedSmelter, allow)
+      if (combinedSmelter) next = writeSmart(next, cell('S', r), combinedSmelter, allowOverwriteFormula)
     }
   })
   return next

@@ -15,7 +15,7 @@ type ExternalSmelterIdFields = Pick<Partial<SmelterRow>, 'id'> & {
 /**
  * 解析外部回写的冶炼厂识别号码：仅识别 smelterNumber。
  */
-export function resolveExternalSmelterId(
+export function resolveExternalSmelterNumber(
   partial: ExternalSmelterIdFields,
 ): string {
   const smelterNumber = typeof partial.smelterNumber === 'string' ? partial.smelterNumber.trim() : ''
@@ -99,7 +99,7 @@ export function shouldDisableSmelterFieldsAfterExternalPick(params: {
 }
 
 /**
- * 判断本次外部回写是否携带了可用于更新 smelterId 的原始字段。
+ * 判断本次外部回写是否携带了可用于更新 smelterNumber 的原始字段。
  */
 export function hasExternalSmelterNumberInput(
   partial: ExternalSmelterIdFields,

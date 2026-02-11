@@ -231,6 +231,7 @@ export function buildSmelterRowSchema(versionDef: TemplateVersionDef) {
   }
 
   if (versionDef.smelterList.hasIdColumn) {
+    shape.smelterNumber = z.string().optional()
     shape.smelterId = z.string().optional()
   }
 

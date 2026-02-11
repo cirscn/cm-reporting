@@ -8,6 +8,7 @@ import type { ProductRow, SmelterRow } from '@lib/index'
 import type {
   ExternalPickResult,
   ProductPickContext,
+  SmelterExternalPickItem,
   SmelterRowPickContext,
 } from '@lib/public/integrations'
 import { useMemoizedFn } from 'ahooks'
@@ -18,21 +19,24 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 const { Text } = Typography
 
 type ResolveFn<T> = (value: T) => void
-type ExampleSmelterPickItem = Partial<SmelterRow> & { smelterNumber?: string }
+type ExampleSmelterPickItem = SmelterExternalPickItem & Omit<Partial<SmelterRow>, 'id'>
 
-function stripKey<T extends { key: string }>(row: T): Omit<T, 'key'> {
+function stripKey<T extends { key: string }>(row: T): Omit<T, 'key'> & { id: string } {
   const { key, ...rest } = row
   void key
-  return rest
+  return rest as Omit<T, 'key'> & { id: string }
 }
 
 function buildSmelterCandidatesByMetal({
   metal,
 }: {
   metal: string
-}): Array<Partial<SmelterRow> & { key: string }> {
-  const lookupItems = Object.entries(SMELTER_LOOKUP_DATA).map(([name, record]) => ({
+}): Array<ExampleSmelterPickItem & { key: string }> {
+  const lookupItems: Array<ExampleSmelterPickItem & { key: string }> = Object.entries(
+    SMELTER_LOOKUP_DATA,
+  ).map(([name, record]) => ({
     key: name,
+    id: `demo-${record.smelterId}`,
     metal,
     smelterLookup: name,
     smelterName: name,
@@ -47,9 +51,10 @@ function buildSmelterCandidatesByMetal({
     comments: '[examples] picked from external (with extra field preserved)',
   }))
 
-  const notListed: Array<Partial<SmelterRow> & { key: string }> = [
+  const notListed: Array<ExampleSmelterPickItem & { key: string }> = [
     {
       key: 'demo-not-listed',
+      id: 'demo-not-listed-id',
       metal,
       smelterLookup: SMELTER_LOOKUP_META.notListed,
       smelterName: 'Examples Custom Smelter',
@@ -188,7 +193,7 @@ export function useExampleExternalPickers() {
       { title: 'Smelter', dataIndex: 'smelterName', key: 'smelterName' },
       { title: 'Country', dataIndex: 'smelterCountry', key: 'smelterCountry', width: 160 },
       {
-        title: 'Smelter ID',
+        title: 'Smelter Number',
         dataIndex: 'smelterNumber',
         key: 'smelterNumber',
         width: 140,

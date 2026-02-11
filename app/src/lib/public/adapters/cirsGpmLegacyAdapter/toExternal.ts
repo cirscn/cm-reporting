@@ -435,12 +435,12 @@ function patchSmelters(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpmLeg
         }
       }
       write('smelterCountry', row.smelterCountry)
-      const rowSmelterId = row.smelterId ?? ''
+      const rowSmelterNumber = row.smelterNumber ?? ''
       const rowSmelterIdentification = row.smelterIdentification ?? ''
-      const idChanged = rowSmelterId !== derivedId
+      const numberChanged = rowSmelterNumber !== derivedId
       const identificationChanged = rowSmelterIdentification !== derivedIdentification
-      if (idChanged || identificationChanged) {
-        const nextNumber = idChanged ? rowSmelterId : rowSmelterIdentification
+      if (numberChanged || identificationChanged) {
+        const nextNumber = numberChanged ? rowSmelterNumber : rowSmelterIdentification
         const idTargetField = originalNumber ? 'smelterNumber' : (originalLegacyId ? 'smelterId' : 'smelterNumber')
         write(idTargetField, nextNumber)
       }
@@ -477,7 +477,7 @@ function patchSmelters(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpmLeg
       }
     }
     if (!isEmpty(row.smelterCountry)) created.smelterCountry = row.smelterCountry
-    const nextNumber = row.smelterIdentification || row.smelterId
+    const nextNumber = row.smelterNumber || row.smelterIdentification
     if (!isEmpty(nextNumber)) created.smelterNumber = nextNumber
     if (!isEmpty(row.sourceId)) created.smelterIdentification = row.sourceId
     const legacyRecycled = toLegacyYesNoUnknown(row.recycledScrap ?? '')

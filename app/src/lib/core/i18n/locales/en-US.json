@@ -82,6 +82,7 @@
     "authorizerPhone": "+86 xxx xxxx xxxx",
     "authorizationDate": "DD-MMM-YYYY",
     "smelterIdInput": "e.g. CID001105",
+    "smelterNumberInput": "e.g. CID001105",
     "smelterLookup": "Search smelter…",
     "smelterName": "Smelter name",
     "smelterNameRequired": "Required: Smelter name",
@@ -139,6 +140,7 @@
     "smelterLookup": "Smelter Look-up",
     "smelterName": "Smelter Name",
     "smelterId": "Smelter Identification Number Input Column",
+    "smelterNumber": "Smelter Number",
     "smelterIdentification": "Smelter Identification",
     "sourceId": "Source ID",
     "country": "Country",
@@ -1196,6 +1198,7 @@
     },
     "externalPickFailedTitle": "External selection failed",
     "externalPickFailedContent": "The external picker did not return data successfully. Please try again.",
+    "externalPickMissingIdContent": "The external picker result is missing required id and cannot be applied.",
     "duplicateSmelterSelectionTitle": "Duplicate smelter selection",
     "duplicateSmelterSelectionContent": "The same smelter cannot be selected twice under the same metal. Please choose another one."
   }
