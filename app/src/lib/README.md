@@ -418,6 +418,9 @@ return null
 
 - 当宿主回写项同时存在 `smelterId` 与 `id` 时，优先使用 `smelterId`。
 - 当 `smelterId` 为空且 `id` 存在时，库会自动将 `id` 赋值到 `smelterId`。
+- 点击“新增一行”时，库会先生成临时行 ID（格式：`smelter-new-<timestamp>`）。
+- 宿主回写了 `id` 后，库会使用该 `id` 覆盖临时行 ID。
+- 同一个 `metal` 下禁止重复选择同一冶炼厂（按 `smelterId` 去重；若缺失则按回写 `id` 去重）。
 - 上述规则适用于 `onPickSmelterForRow`（行内）。
 - `saveDraft()` / `submit()` 返回的 Snapshot 中会按该规则回传 `data.smelterList[*].smelterId`。
 

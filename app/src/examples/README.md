@@ -18,6 +18,8 @@
   - `submit()`：执行内部校验，失败返回 `null` 且自动跳转到 checker，成功返回 Snapshot。
 - 示例中通过 `showPageActions={false}` 隐藏库内底部翻页，完全由宿主弹窗/按钮接管流程。
 - 若宿主通过 `SmelterList` 外部选择仅回写了 `id`（未回写 `smelterId`），库会自动将该 `id` 映射到 `smelterId`，并在 `saveDraft()/submit()` 的 Snapshot 中回传。
+- 冶炼厂新增行会先使用临时 ID（`smelter-new-<timestamp>`），当宿主外部选择回写 `id` 后会覆盖该临时 ID。
+- 同一个 `metal` 下不能重复选择同一冶炼厂（优先按 `smelterId` 判重，缺失时按回写 `id` 判重）。
 
 ### 全局只读演示
 

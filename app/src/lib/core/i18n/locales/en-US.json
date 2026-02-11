@@ -1195,6 +1195,8 @@
       "invalid": "Invalid email address"
     },
     "externalPickFailedTitle": "External selection failed",
-    "externalPickFailedContent": "The external picker did not return data successfully. Please try again."
+    "externalPickFailedContent": "The external picker did not return data successfully. Please try again.",
+    "duplicateSmelterSelectionTitle": "Duplicate smelter selection",
+    "duplicateSmelterSelectionContent": "The same smelter cannot be selected twice under the same metal. Please choose another one."
   }
 }

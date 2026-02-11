@@ -5,6 +5,8 @@
 
 import type { SmelterRow } from '@core/types/tableRows'
 
+const NEW_SMELTER_ROW_ID_PREFIX = 'smelter-new-'
+
 /**
  * 解析外部回写的冶炼厂 ID：smelterId 优先，id 兜底。
  */
@@ -16,6 +18,63 @@ export function resolveExternalSmelterId(
   const externalId = typeof partial.id === 'string' ? partial.id.trim() : ''
   if (externalId) return externalId
   return ''
+}
+
+/**
+ * 新增空行时生成临时行 ID。
+ * 说明：宿主完成冶炼厂选择后，可由宿主回写的 id 覆盖该临时值。
+ */
+export function buildNewSmelterRowId(now: number = Date.now()): string {
+  return `${NEW_SMELTER_ROW_ID_PREFIX}${now}`
+}
+
+/** 判断是否为“新增空行”的临时 ID。 */
+export function isTemporarySmelterRowId(id: string): boolean {
+  return id.startsWith(NEW_SMELTER_ROW_ID_PREFIX)
+}
+
+/**
+ * 解析外部回写后的行 ID：优先使用宿主回写的 id（去空格），否则保留当前行 ID。
+ */
+export function resolveExternalSmelterRowId(
+  partial: Pick<Partial<SmelterRow>, 'id'>,
+  currentRowId: string,
+): string {
+  const externalId = typeof partial.id === 'string' ? partial.id.trim() : ''
+  return externalId || currentRowId
+}
+
+/**
+ * 解析“同一金属下冶炼厂去重”所用的唯一键：
+ * - 优先使用 smelterId
+ * - 若 smelterId 为空，且行 id 不是临时值，则使用行 id
+ */
+export function resolveSmelterSelectionKey(
+  row: Pick<SmelterRow, 'id' | 'smelterId'>,
+): string {
+  const normalizedSmelterId = typeof row.smelterId === 'string' ? row.smelterId.trim() : ''
+  if (normalizedSmelterId) return normalizedSmelterId
+  const normalizedRowId = typeof row.id === 'string' ? row.id.trim() : ''
+  if (!normalizedRowId || isTemporarySmelterRowId(normalizedRowId)) return ''
+  return normalizedRowId
+}
+
+/**
+ * 判断当前修改是否会造成“同一 metal 下重复选择同一冶炼厂”。
+ */
+export function hasDuplicateSmelterSelectionForMetal(params: {
+  currentRows: ReadonlyArray<Pick<SmelterRow, 'id' | 'metal' | 'smelterId'>>
+  currentRowId: string
+  nextRow: Pick<SmelterRow, 'id' | 'metal' | 'smelterId'>
+}): boolean {
+  const nextMetal = params.nextRow.metal.trim()
+  if (!nextMetal) return false
+  const nextSelectionKey = resolveSmelterSelectionKey(params.nextRow)
+  if (!nextSelectionKey) return false
+  return params.currentRows.some((row) => {
+    if (row.id === params.currentRowId) return false
+    return row.metal.trim() === nextMetal && resolveSmelterSelectionKey(row) === nextSelectionKey
+  })
 }
 
 /**

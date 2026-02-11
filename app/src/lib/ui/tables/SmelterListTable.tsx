@@ -40,7 +40,13 @@ import type { TableRowSelection } from 'antd/es/table/interface'
 import type { ChangeEvent } from 'react'
 import { memo, useState } from 'react'
 
-import { hasExternalSmelterIdInput, resolveExternalSmelterId } from './smelterExternalNormalize'
+import {
+  buildNewSmelterRowId,
+  hasDuplicateSmelterSelectionForMetal,
+  hasExternalSmelterIdInput,
+  resolveExternalSmelterId,
+  resolveExternalSmelterRowId,
+} from './smelterExternalNormalize'
 
 interface SmelterListTableProps {
   templateType: TemplateType
@@ -141,7 +147,7 @@ export const SmelterListTable = memo(function SmelterListTable({
   const handleAddRow = useMemoizedFn(() => {
     if (componentDisabled) return
     const newRow: SmelterRow = {
-      id: `smelter-${Date.now()}`,
+      id: buildNewSmelterRowId(),
       metal: '',
       smelterLookup: '',
       smelterName: '',
@@ -176,7 +182,7 @@ export const SmelterListTable = memo(function SmelterListTable({
       const merged: SmelterRow = {
         ...row,
         ...(partial as Record<string, string | undefined>),
-        id: row.id,
+        id: resolveExternalSmelterRowId(partial, row.id),
         metal: row.metal,
       }
       const resolvedSmelterId = resolveExternalSmelterId(partial)
@@ -236,7 +242,21 @@ export const SmelterListTable = memo(function SmelterListTable({
       const result = await integration.onPickSmelterForRow(ctx)
       const picked = result?.items?.[0]
       if (!picked) return
-      updateRowById(id, applyExternalPickToRow(row, picked))
+      const nextRow = applyExternalPickToRow(row, picked)
+      if (
+        hasDuplicateSmelterSelectionForMetal({
+          currentRows,
+          currentRowId: id,
+          nextRow,
+        })
+      ) {
+        Modal.warning({
+          title: t('errors.duplicateSmelterSelectionTitle'),
+          content: t('errors.duplicateSmelterSelectionContent'),
+        })
+        return
+      }
+      updateRowById(id, nextRow)
     } catch {
       Modal.error({
         title: t('errors.externalPickFailedTitle'),

@@ -1195,6 +1195,8 @@
       "invalid": "邮箱格式无效"
     },
     "externalPickFailedTitle": "外部选择失败",
-    "externalPickFailedContent": "外部选择器未能成功返回数据，请重试。"
+    "externalPickFailedContent": "外部选择器未能成功返回数据，请重试。",
+    "duplicateSmelterSelectionTitle": "冶炼厂重复选择",
+    "duplicateSmelterSelectionContent": "同一个金属下不能重复选择同一个冶炼厂，请改选其他冶炼厂。"
   }
 }

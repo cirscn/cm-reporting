@@ -28,6 +28,8 @@ Apply these rules in every solution:
 - `companyInfo.authorizationDate` 推荐传 `YYYY-MM-DD`；运行时兼容秒/毫秒时间戳（number/数字字符串），并会归一化为 `YYYY-MM-DD`。
 - Return integrations callback result in `{ items: [...] } | null | undefined` shape only.
 - 对 `SmelterList` 外部回写结果，若条目存在 `smelterId` 与 `id`，按 `smelterId` 优先；若 `smelterId` 为空且 `id` 存在，自动将 `id` 作为 `smelterId` 回传。
+- `SmelterList` 新增行应先生成临时 ID（`smelter-new-<timestamp>`）；宿主外部选择回写 `id` 后，覆盖该临时 ID。
+- `SmelterList` 行内外部选择需保证同一个 `metal` 下冶炼厂唯一，不允许重复选择同一 `smelterId`（若 `smelterId` 缺失则按回写 `id` 判重）。
 - `SmelterList` 外部选择入口为“行内模式”：仅保留“新增一行”后在行内触发外部选择，不提供顶部批量“从外部选择”入口。
 - Respect package license (`PolyForm-Noncommercial-1.0.0`) in usage recommendations.
 - For `readOnly` behavior, treat it as **view-only contract** (not just disabled inputs):
