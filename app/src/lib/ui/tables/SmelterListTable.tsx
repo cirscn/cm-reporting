@@ -42,6 +42,8 @@ import type { TableRowSelection } from 'antd/es/table/interface'
 import type { ChangeEvent } from 'react'
 import { memo, useState } from 'react'
 
+import { hasExternalSmelterIdInput, resolveExternalSmelterId } from './smelterExternalNormalize'
+
 interface SmelterListTableProps {
   templateType: TemplateType
   versionId: string
@@ -189,7 +191,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         smelterCountry: partial.smelterCountry ?? '',
         combinedMetal: partial.combinedMetal ?? '',
         combinedSmelter: partial.combinedSmelter ?? '',
-        smelterId: partial.smelterId ?? '',
+        smelterId: resolveExternalSmelterId(partial),
         smelterIdentification: partial.smelterIdentification ?? '',
         sourceId: partial.sourceId ?? '',
         smelterStreet: partial.smelterStreet ?? '',
@@ -241,6 +243,18 @@ export const SmelterListTable = memo(function SmelterListTable({
         ...(partial as Record<string, string | undefined>),
         id: row.id,
         metal: row.metal,
+      }
+      const resolvedSmelterId = resolveExternalSmelterId(partial)
+      if (resolvedSmelterId) {
+        merged.smelterId = resolvedSmelterId
+      } else if (hasExternalSmelterIdInput(partial)) {
+        merged.smelterId = ''
+      } else {
+        const normalizedMergedSmelterId =
+          typeof merged.smelterId === 'string' ? merged.smelterId.trim() : ''
+        if (normalizedMergedSmelterId !== merged.smelterId) {
+          merged.smelterId = normalizedMergedSmelterId
+        }
       }
       if (!merged.smelterLookup) return merged
       if (!smelterLookupMeta) return merged

@@ -418,6 +418,13 @@ return null
 | `onPickSmelters` | `(ctx) => Promise<ExternalPickResult>` | - | 批量外部选择 |
 | `onPickSmelterForRow` | `(ctx) => Promise<ExternalPickResult>` | - | 行内外部选择（选择 metal 后为当前行选择冶炼厂） |
 
+**外部回写 ID 映射规则：**
+
+- 当宿主回写项同时存在 `smelterId` 与 `id` 时，优先使用 `smelterId`。
+- 当 `smelterId` 为空且 `id` 存在时，库会自动将 `id` 赋值到 `smelterId`。
+- 上述规则同时适用于 `onPickSmelters`（批量）与 `onPickSmelterForRow`（行内）。
+- `saveDraft()` / `submit()` 返回的 Snapshot 中会按该规则回传 `data.smelterList[*].smelterId`。
+
 **行内选择上下文 (`SmelterRowPickContext`)：**
 
 ```ts

@@ -17,6 +17,7 @@
   - `saveDraft()`：不校验必填，直接返回当前 Snapshot；
   - `submit()`：执行内部校验，失败返回 `null` 且自动跳转到 checker，成功返回 Snapshot。
 - 示例中通过 `showPageActions={false}` 隐藏库内底部翻页，完全由宿主弹窗/按钮接管流程。
+- 若宿主通过 `SmelterList` 外部选择仅回写了 `id`（未回写 `smelterId`），库会自动将该 `id` 映射到 `smelterId`，并在 `saveDraft()/submit()` 的 Snapshot 中回传。
 
 ### 全局只读演示
 
