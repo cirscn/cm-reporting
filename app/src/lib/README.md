@@ -210,7 +210,6 @@ import type {
   ProductListIntegration,
   ProductPickContext,
   SmelterListIntegration,
-  SmelterPickContext,
   SmelterRowPickContext,
   ExternalPickResult,
   ExternalAddMode,
@@ -410,25 +409,28 @@ return null
 
 | 字段 | 类型 | 默认 | 说明 |
 |------|------|------|------|
-| `addMode` | `ExternalAddMode` | `'append-empty-row'` | 新增行为模式 |
-| `label` | `string` | `'从外部选择'` | 外部选择按钮文案 |
 | `showLoadingIndicator` | `boolean` | `false` | 外部选择时展示 loading |
 | `lookupMode` | `SmelterLookupMode` | `'internal'` | 冶炼厂名称交互模式：`'internal'`（手填）/ `'external'`（外部选择）/ `'hybrid'`（两者结合） |
 | `rowClassName` | `(record, index) => string` | - | 自定义行 className（由宿主提供 CSS） |
-| `onPickSmelters` | `(ctx) => Promise<ExternalPickResult>` | - | 批量外部选择 |
-| `onPickSmelterForRow` | `(ctx) => Promise<ExternalPickResult>` | - | 行内外部选择（选择 metal 后为当前行选择冶炼厂） |
+| `onPickSmelterForRow` | `(ctx) => Promise<ExternalPickResult>` | - | 行内外部选择（点击“新增一行”后，选择 metal，再为当前行选择冶炼厂） |
 
 **外部回写 ID 映射规则：**
 
 - 当宿主回写项同时存在 `smelterId` 与 `id` 时，优先使用 `smelterId`。
 - 当 `smelterId` 为空且 `id` 存在时，库会自动将 `id` 赋值到 `smelterId`。
-- 上述规则同时适用于 `onPickSmelters`（批量）与 `onPickSmelterForRow`（行内）。
+- 上述规则适用于 `onPickSmelterForRow`（行内）。
 - `saveDraft()` / `submit()` 返回的 Snapshot 中会按该规则回传 `data.smelterList[*].smelterId`。
 
 **行内选择上下文 (`SmelterRowPickContext`)：**
 
 ```ts
-interface SmelterRowPickContext extends SmelterPickContext {
+interface SmelterRowPickContext {
+  templateType: TemplateType     // 当前模板
+  versionId: string              // 当前版本
+  locale: Locale                 // 当前语言
+  versionDef: TemplateVersionDef // 版本定义
+  config: SmelterListConfig      // 列表配置
+  currentRows: ReadonlyArray<SmelterRow> // 当前已有行数据
   rowId: string              // 当前行 ID
   row: Readonly<SmelterRow>  // 当前行完整数据
   metal: string              // 当前行的 metal

@@ -18,7 +18,7 @@ export type ExternalPickResult<T> = { items: T[] } | null | undefined
 export type ExternalAddMode = 'append-empty-row' | 'external-only' | 'both'
 export type SmelterLookupMode = 'internal' | 'external' | 'hybrid'
 
-export interface SmelterPickContext {
+interface SmelterExternalContextBase {
   templateType: TemplateType
   versionId: string
   locale: Locale
@@ -27,7 +27,7 @@ export interface SmelterPickContext {
   currentRows: ReadonlyArray<SmelterRow>
 }
 
-export interface SmelterRowPickContext extends SmelterPickContext {
+export interface SmelterRowPickContext extends SmelterExternalContextBase {
   rowId: string
   row: Readonly<SmelterRow>
   metal: string
@@ -43,16 +43,10 @@ export interface ProductPickContext {
 }
 
 export interface SmelterListIntegration {
-  /** 新增行为模式：默认 'append-empty-row'（保持现状）。 */
-  addMode?: ExternalAddMode
-  /** 外部选择按钮文案（默认 '从外部选择'）。 */
-  label?: string
   /** 是否在触发外部选择时展示按钮 loading（默认 false）。 */
   showLoadingIndicator?: boolean
   /** 表格行样式：返回 className，交由宿主自行提供 CSS（不内置任何表现）。 */
   rowClassName?: (record: SmelterRow, index: number) => string
-  /** 宿主接管外部选择并返回要回写的行数据。 */
-  onPickSmelters?: (ctx: SmelterPickContext) => Promise<ExternalPickResult<Partial<SmelterRow>>>
   /**
    * 行内外部选择：先在表格中选择 metal，再为当前行选择冶炼厂并回写。
    * - 返回 null/undefined 表示取消

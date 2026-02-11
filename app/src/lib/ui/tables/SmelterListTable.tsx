@@ -1,6 +1,6 @@
 /**
  * @file ui/tables/SmelterListTable.tsx
- * @description 冶炼厂清单表格：支持 lookup 自动填充、行内编辑、外部选择与批量操作。
+ * @description 冶炼厂清单表格：支持 lookup 自动填充、行内编辑与行内外部选择。
  */
 
 import { PlusOutlined, DeleteOutlined, CloseOutlined } from '@ant-design/icons'
@@ -14,16 +14,14 @@ import type {
 import { isSmelterNotIdentified, isSmelterNotListed, normalizeSmelterLookup } from '@core/transform'
 import type { SmelterRow } from '@core/types/tableRows'
 import type {
-  ExternalAddMode,
   SmelterListIntegration,
-  SmelterPickContext,
   SmelterRowPickContext,
   SmelterLookupMode,
 } from '@lib/public/integrations'
 import { wrapRequired } from '@ui/helpers/fieldRequired'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
-import { useBoolean, useCreation, useLatest, useMemoizedFn } from 'ahooks'
+import { useCreation, useLatest, useMemoizedFn } from 'ahooks'
 import {
   AutoComplete,
   Button,
@@ -87,7 +85,7 @@ const SELECT_FIELDS = [
   'combinedMetal',
 ] as const
 
-/** 冶炼厂清单表格：支持 lookup 自动填充、行内编辑与外部选择。 */
+/** 冶炼厂清单表格：支持 lookup 自动填充、行内编辑与行内外部选择。 */
 export const SmelterListTable = memo(function SmelterListTable({
   templateType,
   versionId,
@@ -106,7 +104,6 @@ export const SmelterListTable = memo(function SmelterListTable({
   const { componentDisabled } = ConfigProvider.useConfig()
   /** 批量选择状态（受控）。 */
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
-  const [externalPicking, { setTrue: startPicking, setFalse: stopPicking }] = useBoolean(false)
   const rowsRef = useLatest(rows)
   const [rowPickingId, setRowPickingId] = useState<string | null>(null)
   const validSelectedRowKeys = useCreation(() => {
@@ -168,73 +165,11 @@ export const SmelterListTable = memo(function SmelterListTable({
     onChange([...rows, newRow])
   })
 
-  const integrationAddMode: ExternalAddMode = integration?.addMode ?? 'append-empty-row'
-  const showExternalPick =
-    Boolean(integration?.onPickSmelters) && integrationAddMode !== 'append-empty-row'
-  const showAddRow = integrationAddMode !== 'external-only'
-  const externalPickLabel = integration?.label ?? t('actions.pickExternal')
   const showLoadingIndicator = integration?.showLoadingIndicator ?? false
   const smelterLookupMode: SmelterLookupMode = integration?.lookupMode ?? 'internal'
   const useExternalLookup = smelterLookupMode === 'external' || smelterLookupMode === 'hybrid'
 
   const getCurrentRowsSnapshot = useMemoizedFn(() => rowsRef.current.map((r) => ({ ...r })))
-
-  const normalizeExternalSmelterRow = useMemoizedFn(
-    (partial: Partial<SmelterRow>, seq: number): SmelterRow => {
-      const idBase = `smelter-${Date.now()}-${seq}`
-      return {
-        ...(partial as Record<string, string | undefined>),
-        id: typeof partial.id === 'string' && partial.id.trim() ? partial.id : idBase,
-        metal: partial.metal ?? '',
-        smelterLookup: partial.smelterLookup ?? '',
-        smelterName: partial.smelterName ?? '',
-        smelterCountry: partial.smelterCountry ?? '',
-        combinedMetal: partial.combinedMetal ?? '',
-        combinedSmelter: partial.combinedSmelter ?? '',
-        smelterId: resolveExternalSmelterId(partial),
-        smelterIdentification: partial.smelterIdentification ?? '',
-        sourceId: partial.sourceId ?? '',
-        smelterStreet: partial.smelterStreet ?? '',
-        smelterCity: partial.smelterCity ?? '',
-        smelterState: partial.smelterState ?? '',
-        smelterContactName: partial.smelterContactName ?? '',
-        smelterContactEmail: partial.smelterContactEmail ?? '',
-        proposedNextSteps: partial.proposedNextSteps ?? '',
-        mineName: partial.mineName ?? '',
-        mineCountry: partial.mineCountry ?? '',
-        recycledScrap: partial.recycledScrap ?? '',
-        comments: partial.comments ?? '',
-      }
-    },
-  )
-
-  const handleExternalPick = useMemoizedFn(async () => {
-    if (componentDisabled || !integration || !integration.onPickSmelters || externalPicking) return
-    const currentRows = getCurrentRowsSnapshot()
-    const ctx: SmelterPickContext = {
-      templateType,
-      versionId,
-      locale,
-      versionDef,
-      config,
-      currentRows,
-    }
-    startPicking()
-    try {
-      const result = await integration.onPickSmelters(ctx)
-      const items = result?.items ?? []
-      if (items.length === 0) return
-      const normalized = items.map((item, index) => normalizeExternalSmelterRow(item, index))
-      onChange([...rowsRef.current, ...normalized])
-    } catch {
-      Modal.error({
-        title: t('errors.externalPickFailedTitle'),
-        content: t('errors.externalPickFailedContent'),
-      })
-    } finally {
-      stopPicking()
-    }
-  })
 
   const applyExternalPickToRow = useMemoizedFn(
     (row: SmelterRow, partial: Partial<SmelterRow>): SmelterRow => {
@@ -983,19 +918,9 @@ export const SmelterListTable = memo(function SmelterListTable({
           {t('tables.noData')}
         </Typography.Text>
         <Flex align="center" gap={8}>
-          {showEditableActions && showAddRow && (
+          {showEditableActions && (
             <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
               {t('actions.addRow')}
-            </Button>
-          )}
-          {showEditableActions && showExternalPick && (
-            <Button
-              type={showAddRow ? 'default' : 'primary'}
-              icon={<PlusOutlined />}
-              onClick={handleExternalPick}
-              loading={showLoadingIndicator && externalPicking}
-            >
-              {externalPickLabel}
             </Button>
           )}
         </Flex>
@@ -1017,19 +942,9 @@ export const SmelterListTable = memo(function SmelterListTable({
               <Tag color="blue">{t('badges.recordCount', { count: rows.length })}</Tag>
             </Flex>
             <Flex align="center" gap={8}>
-              {showEditableActions && showAddRow && (
+              {showEditableActions && (
                 <Button type="primary" icon={<PlusOutlined />} onClick={handleAddRow}>
                   {t('actions.addRow')}
-                </Button>
-              )}
-              {showEditableActions && showExternalPick && (
-                <Button
-                  type={showAddRow ? 'default' : 'primary'}
-                  icon={<PlusOutlined />}
-                  onClick={handleExternalPick}
-                  loading={showLoadingIndicator && externalPicking}
-                >
-                  {externalPickLabel}
                 </Button>
               )}
             </Flex>

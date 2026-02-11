@@ -8,7 +8,6 @@ import type { ProductRow, SmelterRow } from '@lib/index'
 import type {
   ExternalPickResult,
   ProductPickContext,
-  SmelterPickContext,
   SmelterRowPickContext,
 } from '@lib/public/integrations'
 import { useMemoizedFn } from 'ahooks'
@@ -104,7 +103,7 @@ export function useExampleExternalPickers() {
   const [selectedProductKeys, setSelectedProductKeys] = useState<string[]>([])
 
   const [smelterCtxInfo, setSmelterCtxInfo] = useState<{
-    templateType: SmelterPickContext['templateType']
+    templateType: SmelterRowPickContext['templateType']
     versionId: string
     rowsCount: number
     rowId: string

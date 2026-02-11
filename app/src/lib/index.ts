@@ -38,7 +38,6 @@ export type {
   ProductListIntegration,
   ProductPickContext,
   SmelterListIntegration,
-  SmelterPickContext,
 } from './public/integrations'
 
 // Excel 导出（基于模板赋值后导出）
