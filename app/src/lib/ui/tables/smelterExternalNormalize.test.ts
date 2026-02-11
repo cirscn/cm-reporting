@@ -13,6 +13,7 @@ import {
   resolveExternalSmelterId,
   resolveExternalSmelterRowId,
   resolveSmelterSelectionKey,
+  shouldDisableSmelterFieldsAfterExternalPick,
 } from './smelterExternalNormalize'
 
 describe('resolveExternalSmelterId', () => {
@@ -129,6 +130,77 @@ describe('hasDuplicateSmelterSelectionForMetal', () => {
         currentRows: [{ id: 'ROW-1', metal: 'gold', smelterId: 'SM-001' }],
         currentRowId: 'ROW-2',
         nextRow: { id: 'smelter-new-4', metal: '', smelterId: '' },
+      }),
+    ).toBe(false)
+  })
+})
+
+describe('shouldDisableSmelterFieldsAfterExternalPick', () => {
+  test('非 external lookup 模式不锁定', () => {
+    expect(
+      shouldDisableSmelterFieldsAfterExternalPick({
+        useExternalLookup: false,
+        row: { id: 'CID-1', smelterLookup: 'Smelter A' },
+        fromLookup: true,
+        notListed: false,
+        notYetIdentified: false,
+      }),
+    ).toBe(false)
+  })
+
+  test('not listed / not yet identified 不锁定', () => {
+    expect(
+      shouldDisableSmelterFieldsAfterExternalPick({
+        useExternalLookup: true,
+        row: { id: 'CID-1', smelterLookup: 'Smelter not listed' },
+        fromLookup: false,
+        notListed: true,
+        notYetIdentified: false,
+      }),
+    ).toBe(false)
+    expect(
+      shouldDisableSmelterFieldsAfterExternalPick({
+        useExternalLookup: true,
+        row: { id: 'CID-1', smelterLookup: 'Smelter not yet identified' },
+        fromLookup: false,
+        notListed: false,
+        notYetIdentified: true,
+      }),
+    ).toBe(false)
+  })
+
+  test('外部选择且来自 lookup 数据时锁定', () => {
+    expect(
+      shouldDisableSmelterFieldsAfterExternalPick({
+        useExternalLookup: true,
+        row: { id: 'smelter-new-1', smelterLookup: 'Smelter A' },
+        fromLookup: true,
+        notListed: false,
+        notYetIdentified: false,
+      }),
+    ).toBe(true)
+  })
+
+  test('外部选择后行 id 已被宿主覆盖时也锁定', () => {
+    expect(
+      shouldDisableSmelterFieldsAfterExternalPick({
+        useExternalLookup: true,
+        row: { id: 'CID003469', smelterLookup: 'Fairsky Industrial Co., Limited' },
+        fromLookup: false,
+        notListed: false,
+        notYetIdentified: false,
+      }),
+    ).toBe(true)
+  })
+
+  test('临时行 id 且未识别为 lookup 时不锁定', () => {
+    expect(
+      shouldDisableSmelterFieldsAfterExternalPick({
+        useExternalLookup: true,
+        row: { id: 'smelter-new-2', smelterLookup: 'Smelter A' },
+        fromLookup: false,
+        notListed: false,
+        notYetIdentified: false,
       }),
     ).toBe(false)
   })

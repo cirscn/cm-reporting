@@ -81,6 +81,26 @@ export function hasDuplicateSmelterSelectionForMetal(params: {
 }
 
 /**
+ * 判断外部选择后的冶炼厂基础信息字段是否应锁定。
+ */
+export function shouldDisableSmelterFieldsAfterExternalPick(params: {
+  useExternalLookup: boolean
+  row: Pick<SmelterRow, 'id' | 'smelterLookup'>
+  fromLookup: boolean
+  notListed: boolean
+  notYetIdentified: boolean
+}): boolean {
+  if (!params.useExternalLookup) return false
+  if (params.notListed || params.notYetIdentified) return false
+  const normalizedLookup = params.row.smelterLookup.trim()
+  if (!normalizedLookup) return false
+  if (params.fromLookup) return true
+  const normalizedRowId = params.row.id.trim()
+  if (!normalizedRowId) return false
+  return !isTemporarySmelterRowId(normalizedRowId)
+}
+
+/**
  * 判断本次外部回写是否携带了可用于更新 smelterId 的原始字段。
  */
 export function hasExternalSmelterIdInput(
