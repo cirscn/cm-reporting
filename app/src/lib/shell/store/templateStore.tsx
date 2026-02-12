@@ -12,6 +12,7 @@
 
 import { getVersionDef } from '@core/registry'
 import type { TemplateType, TemplateVersionDef } from '@core/registry/types'
+import { runChecker } from '@core/rules/checker'
 import { calculateGating } from '@core/rules/gating'
 import { buildFormSchema } from '@core/schema'
 import { createEmptyFormData } from '@core/template/formDefaults'
@@ -25,6 +26,7 @@ import { useEffect, useState } from 'react'
 import { createStore } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
+import { buildDataInput, buildRuleInput } from './ruleContext'
 import { TemplateStoreContext } from './templateStoreContext'
 import type { TemplateFormErrors, TemplateFormState } from './templateTypes'
 
@@ -258,7 +260,7 @@ function createTemplateStore(
   const questionDefsByKey = new Map(versionDef.questions.map((q) => [q.key, q]))
   const questionKeyOrder = versionDef.questions.map((q) => q.key)
 
-  /** 同步运行 zod 全量校验（用于 validateForm 等需要立即获取结果的场景）。 */
+  /** 同步运行 zod 全量校验（用于字段级错误映射与基础结构校验）。 */
   function runValidationSync(state: TemplateStoreState): TemplateFormErrors {
     const result = schema.safeParse(getFormData(state))
     if (result.success) return EMPTY_ERRORS
@@ -457,13 +459,18 @@ function createTemplateStore(
       /** 同步全量校验（用于导出前确认），不走 scheduleValidation。 */
       validateForm: async () => {
         const state = get()
-        const result = schema.safeParse(getFormData(state))
-        if (result.success) {
-          set({ errors: EMPTY_ERRORS })
-          return true
+        const formData = getFormData(state)
+        const schemaResult = schema.safeParse(formData)
+
+        if (!schemaResult.success) {
+          set({ errors: mapZodErrors(schemaResult.error.issues) })
+          return false
         }
-        set({ errors: mapZodErrors(result.error.issues) })
-        return false
+
+        // zod 通过后继续执行 checker 业务规则，submit/validate 双重门控保持一致。
+        set({ errors: EMPTY_ERRORS })
+        const checkerErrors = runChecker(versionDef, buildRuleInput(formData), buildDataInput(formData))
+        return checkerErrors.length === 0
       },
 
       resetForm: () => {

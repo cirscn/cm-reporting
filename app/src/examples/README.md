@@ -15,7 +15,7 @@
 
 - `CMReportingRefScenario` 已演示外置保存/提交按钮：
   - `saveDraft()`：不校验必填，直接返回当前 Snapshot；
-  - `submit()`：执行内部校验，失败返回 `null` 且自动跳转到 checker，成功返回 Snapshot。
+  - `submit()`：执行内部全量校验（`zod + checker`），失败返回 `null` 且自动跳转到 checker，成功返回 Snapshot。
 - 示例中通过 `showPageActions={false}` 隐藏库内底部翻页，完全由宿主弹窗/按钮接管流程。
 - `id` 与冶炼厂识别号码语义分离：`id` 仅作为行主键与去重依据；识别号码使用 `smelterNumber` 展示（`smelterId` 仅内部兼容）。
 - 冶炼厂新增行会先使用临时 ID（`smelter-new-<timestamp>`），当宿主外部选择回写 `id` 后覆盖临时 ID；若未回写 `id` 则本次回写无效并提示错误。

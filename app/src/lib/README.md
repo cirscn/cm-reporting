@@ -75,7 +75,7 @@ const isValid = await ref.current?.validate()
 // 保存草稿（不校验）
 const draft = ref.current?.saveDraft()
 
-// 提交（内部校验，失败返回 null 并跳转 checker）
+// 提交（内部全量校验：zod + checker，失败返回 null 并跳转 checker）
 const submitted = await ref.current?.submit()
 ```
 
@@ -117,10 +117,15 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 | `getSnapshot()` | `ReportSnapshotV1` | 获取当前全量快照 |
 | `setSnapshot(snapshot)` | `void` | 回填快照（templateType/versionId 必须匹配） |
 | `saveDraft()` | `ReportSnapshotV1` | 保存草稿（不校验必填），返回当前快照。 |
-| `submit()` | `Promise<ReportSnapshotV1 | null>` | 执行内部校验；失败返回 `null` 并自动跳转 checker，成功返回快照。 |
+| `submit()` | `Promise<ReportSnapshotV1 | null>` | 执行内部全量校验（`zod + checker`）；失败返回 `null` 并自动跳转 checker，成功返回快照。 |
 | `exportJson()` | `string` | 导出快照 JSON 字符串 |
 | `exportExcel(input)` | `Promise<Blob>` | 导出 Excel（需传入模板 xlsx ArrayBuffer） |
-| `validate()` | `Promise<boolean>` | 触发全量校验 |
+| `validate()` | `Promise<boolean>` | 触发全量校验（`zod + checker`） |
+
+**提交/校验一致性说明：**
+
+- `submit()` 与 `validate()` 使用同一套全量校验门控（`zod + checker`）。
+- 当 checker 仍有“必填未完成”项时，`submit()` 一定返回 `null`，不会出现“checker 提示未完成但仍提交成功”的状态分叉。
 
 **Checker 门控一致性说明（EMRT/AMRT）：**
 
@@ -179,10 +184,10 @@ import type { CMReportingApi } from '@lib/index'
 | `getSnapshot()` | `ReportSnapshotV1` | 获取当前快照 |
 | `setSnapshot(snapshot)` | `void` | 回填快照 |
 | `saveDraft()` | `ReportSnapshotV1` | 保存草稿（不校验必填），返回当前快照。 |
-| `submit()` | `Promise<ReportSnapshotV1 | null>` | 执行内部校验；失败返回 `null` 并自动跳转 checker，成功返回快照。 |
+| `submit()` | `Promise<ReportSnapshotV1 | null>` | 执行内部全量校验（`zod + checker`）；失败返回 `null` 并自动跳转 checker，成功返回快照。 |
 | `exportJson()` | `string` | 导出 JSON 字符串 |
 | `exportExcel(input)` | `Promise<Blob>` | 导出 Excel |
-| `validate()` | `Promise<boolean>` | 触发全量校验 |
+| `validate()` | `Promise<boolean>` | 触发全量校验（`zod + checker`） |
 
 ---
 

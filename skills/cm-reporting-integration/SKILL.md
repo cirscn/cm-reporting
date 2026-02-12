@@ -95,7 +95,8 @@ Load only what the request needs:
   - 不触发必填校验；
   - 直接返回 `ReportSnapshotV1` 给宿主落库。
 - 使用 `CMReportingRef.submit()` 执行“提交”动作：
-  - 先走库内 `validate`；
+  - 先走库内 `validate`（全量门控：`zod + checker`）；
   - 失败返回 `null`，并自动跳转 checker 页面；
   - 成功返回 `ReportSnapshotV1`，由宿主决定后续 API 提交。
+- `CMReportingRef.validate()` 与 `submit()` 共享同一套全量门控（`zod + checker`），不应再将其视为“仅结构校验”。
 - `useCMReporting()` 提供同等能力（`saveDraft/submit`），适合函数式集成场景。
