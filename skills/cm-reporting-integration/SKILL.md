@@ -37,6 +37,7 @@ Apply these rules in every solution:
   - hide checker page and checker entry in workflow;
   - hide global required/error hint banner and bottom prev/next actions;
   - hide table/form editing affordances (add/delete/batch/external pick/edit links), not merely `disabled`;
+  - when table cells use explicit `disabled` conditions (for example SmelterList base fields), always merge global disabled state as `componentDisabled || localDisabled`;
   - suppress required yellow highlight when fields are disabled/read-only.
 - In controlled routing mode, if readOnly flow remaps page (e.g. `checker` fallback), always sync parent state via navigation callback to avoid route/UI drift.
 - Never override host-level `ConfigProvider` disabled state with local false. Effective disabled rule must be `parentDisabled || readOnly`.

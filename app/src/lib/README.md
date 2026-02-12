@@ -424,6 +424,7 @@ return null
 - 宿主回写了 `id` 后，库会使用该 `id` 覆盖临时行 ID；未回写 `id` 时本次回写无效并提示错误。
 - 同一个 `metal` 下禁止重复选择同一冶炼厂（按回写 `id` 去重）。
 - 行内外部选择成功后（且非 `Smelter not listed / not yet identified`），`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state` 字段会锁定为不可编辑。
+- 当全局只读（`readOnly=true`）或父级 `ConfigProvider` 处于禁用态时，上述字段仍遵循 `parentDisabled || readOnly` 禁用规则，不会被局部锁定条件覆盖。
 - 上述规则适用于 `onPickSmelterForRow`（行内）。
 - `saveDraft()` / `submit()` 返回的 Snapshot 中会按该规则回传：
   - `data.smelterList[*].id`（宿主数据主键）

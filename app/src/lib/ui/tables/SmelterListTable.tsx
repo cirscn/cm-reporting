@@ -641,7 +641,7 @@ export const SmelterListTable = memo(function SmelterListTable({
               onChange={getInputHandler(`${record.id}:smelterNumber`)}
               placeholder={t('placeholders.smelterNumberInput')}
               className="font-mono text-xs"
-              disabled={disableAfterExternalPick}
+              disabled={componentDisabled || disableAfterExternalPick}
             />
           )
         },
@@ -678,7 +678,7 @@ export const SmelterListTable = memo(function SmelterListTable({
               value={value || undefined}
               onChange={getInputHandler(`${record.id}:smelterName`)}
               placeholder={placeholder}
-              disabled={disableAfterExternalPick}
+              disabled={componentDisabled || disableAfterExternalPick}
             />,
             componentDisabled,
           )
@@ -718,7 +718,7 @@ export const SmelterListTable = memo(function SmelterListTable({
                 showSearch
                 filterOption={filterOptionByLabel}
                 className="w-full"
-                disabled={disableAfterExternalPick}
+                disabled={componentDisabled || disableAfterExternalPick}
               />
               {showHint && (
                 <Typography.Text type="secondary" style={{ fontSize: 12 }}>
@@ -740,7 +740,7 @@ export const SmelterListTable = memo(function SmelterListTable({
             value={value || undefined}
             onChange={getInputHandler(`${record.id}:smelterIdentification`)}
             placeholder={t('placeholders.smelterIdentification')}
-            disabled={shouldDisableSmelterFieldsAfterExternalPick({
+            disabled={componentDisabled || shouldDisableSmelterFieldsAfterExternalPick({
               useExternalLookup,
               row: record,
               fromLookup: isFromLookup(record.smelterLookup),
@@ -760,7 +760,7 @@ export const SmelterListTable = memo(function SmelterListTable({
             value={value || undefined}
             onChange={getInputHandler(`${record.id}:sourceId`)}
             placeholder={t('placeholders.smelterSourceId')}
-            disabled={shouldDisableSmelterFieldsAfterExternalPick({
+            disabled={componentDisabled || shouldDisableSmelterFieldsAfterExternalPick({
               useExternalLookup,
               row: record,
               fromLookup: isFromLookup(record.smelterLookup),
@@ -780,7 +780,7 @@ export const SmelterListTable = memo(function SmelterListTable({
             value={value || undefined}
             onChange={getInputHandler(`${record.id}:smelterStreet`)}
             placeholder={t('placeholders.smelterStreet')}
-            disabled={shouldDisableSmelterFieldsAfterExternalPick({
+            disabled={componentDisabled || shouldDisableSmelterFieldsAfterExternalPick({
               useExternalLookup,
               row: record,
               fromLookup: isFromLookup(record.smelterLookup),
@@ -800,7 +800,7 @@ export const SmelterListTable = memo(function SmelterListTable({
             value={value || undefined}
             onChange={getInputHandler(`${record.id}:smelterCity`)}
             placeholder={t('placeholders.smelterCity')}
-            disabled={shouldDisableSmelterFieldsAfterExternalPick({
+            disabled={componentDisabled || shouldDisableSmelterFieldsAfterExternalPick({
               useExternalLookup,
               row: record,
               fromLookup: isFromLookup(record.smelterLookup),
@@ -820,7 +820,7 @@ export const SmelterListTable = memo(function SmelterListTable({
             value={value || undefined}
             onChange={getInputHandler(`${record.id}:smelterState`)}
             placeholder={t('placeholders.smelterState')}
-            disabled={shouldDisableSmelterFieldsAfterExternalPick({
+            disabled={componentDisabled || shouldDisableSmelterFieldsAfterExternalPick({
               useExternalLookup,
               row: record,
               fromLookup: isFromLookup(record.smelterLookup),
