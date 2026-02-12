@@ -16,6 +16,7 @@ import { runChecker } from '@core/rules/checker'
 import { calculateGating } from '@core/rules/gating'
 import { buildFormSchema } from '@core/schema'
 import { createEmptyFormData } from '@core/template/formDefaults'
+import { getActiveMineralKeys } from '@core/template/minerals'
 import { normalizeAuthorizationDateInput } from '@core/transform'
 import type { MineRow, MineralsScopeRow, ProductRow, SmelterRow } from '@core/types/tableRows'
 import type { ErrorKey } from '@core/validation/errorKeys'
@@ -352,6 +353,110 @@ function createTemplateStore(
     }
   }
 
+  /**
+   * 申报范围取消矿种时的级联清理：
+   * - 清空该矿种在所有按矿种问题/备注中的值
+   * - 清空该矿种在按矿种公司问题/备注中的值
+   * - 删除该矿种的 Smelter/Mine 列表行
+   */
+  function applyRemovedMineralsCascade(
+    s: TemplateStoreState,
+    removedMinerals: string[],
+  ) {
+    const removedSet = new Set(
+      removedMinerals
+        .map((mineral) => mineral.trim())
+        .filter(Boolean),
+    )
+    if (removedSet.size === 0) return
+
+    versionDef.questions.forEach((question) => {
+      if (!question.perMineral) return
+      const questionValues = s.questions[question.key]
+      if (typeof questionValues === 'object') {
+        removedSet.forEach((mineral) => {
+          questionValues[mineral] = ''
+        })
+      }
+      const commentValues = s.questionComments[question.key]
+      if (typeof commentValues === 'object') {
+        removedSet.forEach((mineral) => {
+          commentValues[mineral] = ''
+        })
+      }
+    })
+
+    versionDef.companyQuestions.forEach((question) => {
+      if (!question.perMineral) return
+      const questionValues = s.companyQuestions[question.key]
+      if (typeof questionValues === 'object') {
+        removedSet.forEach((mineral) => {
+          questionValues[mineral] = ''
+        })
+      }
+      if (!question.hasCommentField) return
+      const commentKey = `${question.key}_comment`
+      const commentValues = s.companyQuestions[commentKey]
+      if (typeof commentValues === 'object') {
+        removedSet.forEach((mineral) => {
+          commentValues[mineral] = ''
+        })
+      }
+    })
+
+    s.smelterList = s.smelterList.filter((row) => {
+      const metal = typeof row.metal === 'string' ? row.metal.trim() : ''
+      return !removedSet.has(metal)
+    })
+    s.mineList = s.mineList.filter((row) => {
+      const metal = typeof row.metal === 'string' ? row.metal.trim() : ''
+      return !removedSet.has(metal)
+    })
+  }
+
+  /** 计算从“上一状态”到“下一状态”失活的矿种键（含 other-* 派生键）。 */
+  function resolveRemovedMinerals(params: {
+    prevSelectedMinerals: string[]
+    nextSelectedMinerals: string[]
+    prevCustomMinerals: string[]
+    nextCustomMinerals: string[]
+  }): string[] {
+    const {
+      prevSelectedMinerals,
+      nextSelectedMinerals,
+      prevCustomMinerals,
+      nextCustomMinerals,
+    } = params
+
+    if (versionDef.mineralScope.mode !== 'dynamic-dropdown') {
+      const nextSet = new Set(
+        nextSelectedMinerals
+          .map((mineral) => mineral.trim())
+          .filter(Boolean),
+      )
+      return prevSelectedMinerals.filter(
+        (mineral) => mineral.trim() && !nextSet.has(mineral.trim()),
+      )
+    }
+
+    const previousActive = new Set(
+      getActiveMineralKeys(
+        versionDef,
+        prevSelectedMinerals,
+        prevCustomMinerals,
+      ),
+    )
+    const nextActive = new Set(
+      getActiveMineralKeys(
+        versionDef,
+        nextSelectedMinerals,
+        nextCustomMinerals,
+      ),
+    )
+
+    return Array.from(previousActive).filter((mineral) => !nextActive.has(mineral))
+  }
+
   return createStore<TemplateStoreState>()(
     immer((set, get) => ({
       // ── 静态元信息 ──
@@ -380,7 +485,15 @@ function createTemplateStore(
       setSelectedMinerals: (minerals) => {
         if (get().readOnly) return
         set((s) => {
+          const removedMinerals = resolveRemovedMinerals({
+            prevSelectedMinerals: s.selectedMinerals,
+            nextSelectedMinerals: minerals,
+            prevCustomMinerals: s.customMinerals,
+            nextCustomMinerals: s.customMinerals,
+          })
+
           s.selectedMinerals = minerals
+          applyRemovedMineralsCascade(s, removedMinerals)
           s.isDirty = true
         })
         scheduleValidation(set, get)
@@ -388,7 +501,18 @@ function createTemplateStore(
 
       setCustomMinerals: (minerals) => {
         if (get().readOnly) return
-        set({ customMinerals: minerals, isDirty: true })
+        set((s) => {
+          const removedMinerals = resolveRemovedMinerals({
+            prevSelectedMinerals: s.selectedMinerals,
+            nextSelectedMinerals: s.selectedMinerals,
+            prevCustomMinerals: s.customMinerals,
+            nextCustomMinerals: minerals,
+          })
+
+          s.customMinerals = minerals
+          applyRemovedMineralsCascade(s, removedMinerals)
+          s.isDirty = true
+        })
         scheduleValidation(set, get)
       },
 

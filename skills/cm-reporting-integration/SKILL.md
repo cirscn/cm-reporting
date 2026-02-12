@@ -43,6 +43,8 @@ Apply these rules in every solution:
 - Never override host-level `ConfigProvider` disabled state with local false. Effective disabled rule must be `parentDisabled || readOnly`.
 - For `EMRT/AMRT` checker behavior, keep checker errors and progress summary under the same gating: when smelter requirement is disabled by Q1/Q2, do not count `smelterLookup` required progress from historical rows.
 - For `EMRT`, default selection should include all declared minerals on empty initialization; when `readOnly=false`, users can still edit the declaration scope selections.
+- 对 `dynamic-dropdown` 范围模板（`EMRT` 2.x / `AMRT` 1.3），当取消某个矿种时，应预期库会自动执行级联清理：清空该矿种的按矿种题目/备注答案，并删除关联的 `Smelter List` / `Mine List` 行数据。
+- 当 `other` 保持勾选但某个自定义矿种名称被清空时，库会按槽位清理对应 `other-*` 的按矿种答案与关联列表行。
 
 ## Standard Delivery Workflow
 

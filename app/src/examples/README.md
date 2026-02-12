@@ -42,6 +42,8 @@
 - EMRT 默认会选中当前版本全部矿种（包括 `dynamic-dropdown` 版本）。
 - 在非只读模式下，用户仍可在 Declaration 页面修改矿种勾选。
 - 在只读模式下，矿种范围仅展示，不可编辑。
+- 在 `dynamic-dropdown` 模式（EMRT 2.x / AMRT 1.3）中，取消某矿种会自动清空该矿种在按矿种题目/备注中的值，并删除该矿种在 `Smelter List` / `Mine List` 的行数据。
+- 在 `dynamic-dropdown` 模式下，若 `other` 仍勾选但某个自定义矿种名称被清空，也会同步清理对应 `other-*` 的按矿种题目/备注与 `Smelter List` / `Mine List` 行数据。
 
 ### JSON 导入/导出
 
