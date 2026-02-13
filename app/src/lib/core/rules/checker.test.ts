@@ -256,6 +256,69 @@ describe('runChecker', () => {
     ).toBe(true)
   })
 
+  it('does not require comment for CMRT company question E when selecting other format', () => {
+    const formState: FormStateForRequired = {
+      scopeType: 'A',
+      questionAnswers: {
+        Q1: buildMineralAnswerMap(cmrt, 'Yes'),
+        Q2: buildMineralAnswerMap(cmrt, 'Yes'),
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(cmrt),
+      questions: {
+        Q1: buildMineralAnswerMap(cmrt, 'Yes'),
+        Q2: buildMineralAnswerMap(cmrt, 'Yes'),
+      },
+      companyQuestions: {
+        E: 'Yes, using other format (describe)',
+      },
+    })
+
+    const errors = runChecker(cmrt, formState, formData)
+
+    expect(
+      errors.some(
+        (error) =>
+          error.fieldPath === 'companyQuestions.E_comment' &&
+          error.messageKey === ERROR_KEYS.checker.requiredCompanyQuestionComment
+      )
+    ).toBe(false)
+  })
+
+  it('requires comment for EMRT company question E when selecting other format', () => {
+    const emrt = getVersionDef('emrt', '2.1')
+    const mineralKey = 'cobalt'
+    const formState: FormStateForRequired = {
+      scopeType: 'A',
+      selectedMinerals: [mineralKey],
+      questionAnswers: {
+        Q1: { [mineralKey]: 'Yes' },
+        Q2: { [mineralKey]: 'Yes' },
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(emrt),
+      questions: {
+        Q1: { [mineralKey]: 'Yes' },
+        Q2: { [mineralKey]: 'Yes' },
+      },
+      companyQuestions: {
+        E: 'Yes, Using Other Format (Describe)',
+      },
+    })
+
+    const errors = runChecker(emrt, formState, formData)
+
+    expect(
+      errors.some(
+        (error) =>
+          error.fieldPath === 'companyQuestions.E_comment' &&
+          error.messageKey === ERROR_KEYS.checker.requiredCompanyQuestionComment
+      )
+    ).toBe(true)
+  })
+
   it('does not require EMRT Q2 when Q1 is a negative value', () => {
     const emrt = getVersionDef('emrt', '2.1')
     const mineralKey = 'cobalt'

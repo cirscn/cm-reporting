@@ -162,7 +162,6 @@ const CMRT_COMPANY_QUESTIONS: CompanyQuestionDef[] = [
     options: YES_IPC1755_OTHER_NO,
     hasCommentField: true,
     commentLabelKey: 'companyQuestions.cmrt.e_comment',
-    commentRequiredWhen: ['Yes, using other format (describe)'],
   },
   {
     key: 'F',

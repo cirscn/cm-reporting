@@ -294,7 +294,7 @@ flowchart LR
 | **B** | 贵公司的负责任矿产采购政策是否公开发布于贵公司网页上？（备注 - 如果是，请在注释字段中注明 URL。） | Yes / No                                                                                | Yes 时注释填 URL                |
 | **C** | 您是否要求您的直接供应商从其尽职调查实践已被被独立第三方审核机构验证过的冶炼厂采购 3TG？       | Yes / No                                                                                |                                 |
 | **D** | 贵公司是否已实施负责任矿产采购的尽职调查措施？                                         | Yes / No                                                                                |                                 |
-| **E** | 贵公司是否开展了相关供应商的冲突矿产调查？                                             | Yes, in conformance with IPC1755 (e.g., CMRT) / Yes, using other format (describe) / No | "using other format" 时注释必填 |
+| **E** | 贵公司是否开展了相关供应商的冲突矿产调查？                                             | Yes, in conformance with IPC1755 (e.g., CMRT) / Yes, using other format (describe) / No | "using other format" 时注释选填 |
 | **F** | 贵公司是否根据公司期望来审查供应商提交的尽职调查信息？                                 | Yes / No                                                                                |                                 |
 | **G** | 贵公司的验证程序是否包括纠正措施管理？                                                 | Yes / No                                                                                |                                 |
 | **H** | 贵公司是否需要提交年度冲突矿产披露？                                                   | Yes, with the SEC / Yes, with the EU / Yes, with the SEC and the EU / No                |                                 |
@@ -374,7 +374,7 @@ flowchart TD
 
     subgraph 公司层面联动
         BYes[B=Yes] --> URLReq[注释填 URL]
-        EOther[E=Using other format] --> EComment[注释必填]
+        EOther[E=Using other format] --> EComment[注释选填]
     end
 
     subgraph Smelter联动
@@ -391,7 +391,6 @@ flowchart TD
 | R003   | Q1≠No                         | Q2 必填；且 Q1≠No 且 Q2≠No 时，Q3-Q8 必填 | 错误     |
 | R004   | 任一金属 Q1/Q2 ≠No            | A-H 必填                                  | 错误     |
 | R005   | B=Yes                         | The URL in the comment field              | 错误     |
-| R006   | E=Using other format          | 注释必填                                  | 错误     |
 | R007   | 冶炼厂查找=Smelter not listed | 冶炼厂名称+国家必填（仅 6.01/6.1）        | 错误     |
 | R008   | Q1≠No 且 Q2≠No                | Smelter List 需包含对应金属记录           | 错误     |
 | R011   | 联系人/授权人邮箱             | 必须包含 `@`                              | 错误     |
@@ -591,7 +590,7 @@ Step 1/4 - Declaration → Smelter → Product → Checker
 | ------------------ | -------------------------------- |
 | 公司信息           | 公司名称、联系人、授权人等必填项 |
 | 问题矩阵 (Q1-Q8)   | R003 相关错误                    |
-| 公司层面问题 (A-H) | R004、R005、R006 相关错误        |
+| 公司层面问题 (A-H) | R004、R005 相关错误             |
 | 冶炼厂清单         | R007、R008 相关错误              |
 | 产品清单           | R001 相关错误                    |
 
