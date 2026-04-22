@@ -1,5 +1,31 @@
 # cm-reporting
 
+## 0.7.0
+
+### Minor Changes
+
+- 3bfe3bc: 补齐 CMRT 6.6 与 EMRT 2.11 模板版本接入。
+
+  同步将 CMRT 6.6 的 Product List 升级为带请求方两列的新版表头规则，并更新对外文档说明。
+
+### Patch Changes
+
+- 3bfe3bc: 让冶炼厂与矿厂列表表头按各调查类型和版本对应的 RMI Excel 模板对齐，并统一冶炼厂表头的必填标识展示。
+  - 覆盖 `CMRT / CRT / EMRT / AMRT` 的冶炼厂表头顺序和文案差异。
+  - 覆盖带 `Mine List` 工作表的 `AMRT` 与 `EMRT 2.x` 矿厂表头文案。
+  - 隐藏当前 UI 中不需要展示的 `Standard Smelter Name`、`Country Code`、`State / Province Code` 三列。
+  - 去掉冶炼厂表头里硬写的 `(*)`，改成和其他页面一致的红色必填星号。
+  - 保持底层 Snapshot 和后端字段不变，只调整前端表头显示。
+  - 当 `Declaration Scope = Product` 时，强制 `Product List` 至少有一行数据。
+  - `Product List` 中的 `回复方的产品编号` 始终必填；若模板开启请求方列，则 `请求方的产品编号` 也必填。
+  - 将产品列表中的请求方文案统一为“请求方的产品编号 / 请求方的产品名称”，但后端字段仍保持 `requesterNumber / requesterName`。
+
+- 3bfe3bc: 修复步骤条圆点、标题文字和进度标签的垂直对齐问题，避免标题视觉上偏上。
+- 3bfe3bc: 调整工作流顶部步骤条布局：
+  - 将“申报 / 冶炼厂 / 矿场列表 / 产品列表 / 校验”步骤条固定在组件顶部，滚动长内容时不再随内容一起移出视口。
+  - 收紧组件内部滚动区域，让中间内容区单独滚动，避免头部步骤条影响表单阅读与切换。
+  - 同步更新库 README、examples 说明和集成 skill，明确宿主容器需要提供可计算高度。
+
 ## 0.6.4
 
 ### Patch Changes
