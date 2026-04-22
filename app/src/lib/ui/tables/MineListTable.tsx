@@ -15,6 +15,8 @@ import { AutoComplete, Button, Card, ConfigProvider, Flex, Table, Select, Input,
 import type { ColumnsType } from 'antd/es/table'
 import type { ChangeEvent } from 'react'
 
+import { getMineHeaderProfile } from './mineHeaderProfile'
+
 interface MineListTableProps {
   config: MineListConfig
   availableMetals: Array<MineralDef & { label?: string }>
@@ -51,7 +53,7 @@ export function MineListTable({
   smelterOptions = [],
   smelterOptionsByMetal = {},
 }: MineListTableProps) {
-  const { t } = useT()
+  const { t, locale } = useT()
   const { componentDisabled } = ConfigProvider.useConfig()
   /** 行索引缓存：避免频繁全表 map/filter。 */
   const rowIndexMap = useCreation(
@@ -150,10 +152,14 @@ export function MineListTable({
   const filterOptionByLabel = useMemoizedFn((input: string, option?: { label?: string }) =>
     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
   )
+  const headerProfile = useCreation(
+    () => getMineHeaderProfile({ locale, t }),
+    [locale, t],
+  )
 
   const columns = useCreation<ColumnsType<MineRow>>(() => [
     {
-      title: t('tables.metal'),
+      title: headerProfile.labels.metal,
       dataIndex: 'metal',
       key: 'metal',
       width: 150,
@@ -172,7 +178,7 @@ export function MineListTable({
       ),
     },
     {
-      title: t('tables.mineSmelterName'),
+      title: headerProfile.labels.smelterName,
       dataIndex: 'smelterName',
       key: 'smelterName',
       width: 220,
@@ -211,7 +217,7 @@ export function MineListTable({
       },
     },
     {
-      title: t('tables.mineName'),
+      title: headerProfile.labels.mineName,
       dataIndex: 'mineName',
       key: 'mineName',
       width: 180,
@@ -228,7 +234,7 @@ export function MineListTable({
       ),
     },
     {
-      title: t('tables.mineId'),
+      title: headerProfile.labels.mineId,
       dataIndex: 'mineId',
       key: 'mineId',
       width: 160,
@@ -241,7 +247,7 @@ export function MineListTable({
       ),
     },
     {
-      title: t('tables.mineSourceId'),
+      title: headerProfile.labels.mineIdSource,
       dataIndex: 'mineIdSource',
       key: 'mineIdSource',
       width: 180,
@@ -254,7 +260,7 @@ export function MineListTable({
       ),
     },
     {
-      title: t('tables.country'),
+      title: headerProfile.labels.mineCountry,
       dataIndex: 'mineCountry',
       key: 'mineCountry',
       width: 160,
@@ -275,7 +281,7 @@ export function MineListTable({
       ),
     },
     {
-      title: t('tables.street'),
+      title: headerProfile.labels.mineStreet,
       dataIndex: 'mineStreet',
       key: 'mineStreet',
       width: 200,
@@ -288,7 +294,7 @@ export function MineListTable({
       ),
     },
     {
-      title: t('tables.city'),
+      title: headerProfile.labels.mineCity,
       dataIndex: 'mineCity',
       key: 'mineCity',
       width: 160,
@@ -301,7 +307,7 @@ export function MineListTable({
       ),
     },
     {
-      title: t('tables.stateProvince'),
+      title: headerProfile.labels.mineProvince,
       dataIndex: 'mineProvince',
       key: 'mineProvince',
       width: 170,
@@ -314,7 +320,7 @@ export function MineListTable({
       ),
     },
     {
-      title: t('tables.contactName'),
+      title: headerProfile.labels.mineContactName,
       dataIndex: 'mineContactName',
       key: 'mineContactName',
       width: 180,
@@ -327,7 +333,7 @@ export function MineListTable({
       ),
     },
     {
-      title: t('tables.contactEmail'),
+      title: headerProfile.labels.mineContactEmail,
       dataIndex: 'mineContactEmail',
       key: 'mineContactEmail',
       width: 200,
@@ -340,7 +346,7 @@ export function MineListTable({
       ),
     },
     {
-      title: t('tables.proposedNextSteps'),
+      title: headerProfile.labels.proposedNextSteps,
       dataIndex: 'proposedNextSteps',
       key: 'proposedNextSteps',
       width: 200,
@@ -353,7 +359,7 @@ export function MineListTable({
       ),
     },
     {
-      title: t('tables.comments'),
+      title: headerProfile.labels.comments,
       dataIndex: 'comments',
       key: 'comments',
       width: 180,
@@ -392,6 +398,7 @@ export function MineListTable({
     getInputHandler,
     getRemoveHandler,
     getSelectHandler,
+    headerProfile,
     metalOptions,
     smelterOptions,
     t,

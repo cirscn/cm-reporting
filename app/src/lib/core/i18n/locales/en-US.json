@@ -121,8 +121,8 @@
   "productPlaceholders": {
     "productNumber": "PRD-xxxx-xxx",
     "productName": "Product name",
-    "requesterNumber": "Requester number",
-    "requesterName": "Requester name",
+    "requesterNumber": "Requester Product Number",
+    "requesterName": "Requester Product Name",
     "comments": "Comments"
   },
   "hints": {
@@ -164,8 +164,8 @@
     "mineralsScopeReasonPrt": "Reasons for inclusion on the PRT",
     "mineralsScopeReasonAmrt": "Reasons for inclusion on the AMRT",
     "comments": "Comments",
-    "requesterNumber": "Requester Number",
-    "requesterName": "Requester Name",
+    "requesterNumber": "Requester Product Number",
+    "requesterName": "Requester Product Name",
     "noData": "No data"
   },
   "actions": {

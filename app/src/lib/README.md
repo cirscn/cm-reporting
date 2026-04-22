@@ -47,7 +47,7 @@ function App() {
     <CMReporting
       ref={ref}
       templateType="cmrt"
-      versionId="6.5"
+      versionId="6.6"
       locale="zh-CN"
     />
   )
@@ -97,7 +97,7 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 | Prop | 类型 | 必须 | 说明 |
 |------|------|:----:|------|
 | `templateType` | `TemplateType` | ✅ | 模板类型：`'cmrt' \| 'emrt' \| 'crt' \| 'amrt'` |
-| `versionId` | `string` | ✅ | 模板版本号，如 `'6.5'`、`'2.1'` |
+| `versionId` | `string` | ✅ | 模板版本号，如 `'6.6'`、`'2.11'` |
 | `locale` | `Locale` | - | 语言：`'en-US' \| 'zh-CN'`，默认 `'en-US'` |
 | `onLocaleChange` | `(locale: Locale) => void` | - | 语言变化回调 |
 | `theme` | `object` | - | Ant Design 主题 token 覆盖 |
@@ -109,6 +109,11 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 | `initialSnapshot` | `ReportSnapshotV1` | - | 初始快照（用于"编辑旧报告"） |
 | `onSnapshotChange` | `(snapshot: ReportSnapshotV1) => void` | - | 任意字段变化时回调全量快照（建议宿主自行节流） |
 | `fallback` | `ReactNode` | - | 加载态内容（Suspense fallback） |
+
+**工作流布局说明：**
+
+- 顶部步骤条（如“申报 / 冶炼厂 / 矿场列表 / 产品列表 / 校验”）默认使用吸顶布局，长内容滚动时会固定在组件顶部。
+- 页面主体内容区单独滚动，不会把步骤条一起卷走；宿主若自行包裹容器，需要给外层提供可计算高度，避免整个页面跟着外层一起滚。
 
 **Ref API (`CMReportingRef`)：**
 
@@ -164,6 +169,11 @@ import { CMReportingApp } from '@lib/CMReportingApp'
 | `readOnly` | `boolean` | - | 全局只读模式（默认 `false`）。只读下会自动隐藏 checker 页并回退到可浏览页；若在受控 `pageKey` 模式下发生回退，会通过 `onNavigatePage` 同步父级状态。 |
 | `integrations` | `CMReportingIntegrations` | - | 外部选择/回写扩展点 |
 | `children` | `ReactNode` | - | 内部插入点（用于 snapshot 绑定等） |
+
+**工作流布局说明：**
+
+- `CMReportingApp` 内置的工作流步骤条默认固定在组件顶部，适合长表单连续填写时始终看见当前步骤。
+- 中间内容区独立滚动；如果宿主把组件放进弹窗、抽屉或自定义容器，记得让该容器本身有明确高度。
 
 > **注意**：使用 `CMReportingApp` 时需自行包裹 `CMReportingProvider`（提供 i18n 与主题），并用 `useCMReporting` 或 `useTemplateActions` 进行数据操作。
 
@@ -410,6 +420,13 @@ return { items: [{ productNumber: 'P-001', productName: 'xxx' }] }
 return null
 ```
 
+**Product List 当前规则：**
+
+- 当 `Declaration Scope = Product`（内部值 `scopeType === 'B'`）时，`Product List` 必须至少有 1 行数据。
+- `回复方的产品编号`（字段 `productNumber`）始终按必填处理。
+- 当模板配置 `hasRequesterColumns=true`（如 `CMRT 6.6`、`EMRT 2.11`、`AMRT 1.3`）时，`请求方的产品编号`（字段 `requesterNumber`）也按必填处理。
+- “请求方的产品编号 / 请求方的产品名称”只是前端显示文案调整，对接字段仍分别是 `requesterNumber / requesterName`。
+
 ### SmelterList 外部选择
 
 **配置项 (`SmelterListIntegration`)：**
@@ -437,6 +454,21 @@ return null
   - `data.smelterList[*].id`（宿主数据主键）
   - `data.smelterList[*].smelterNumber`（展示号）
   - `data.smelterList[*].smelterId`（内部兼容字段）
+
+**Smelter List 表头与模板对齐规则：**
+
+- 冶炼厂列表表头现在按 `templateType + versionId` 与对应 RMI Excel 模板对齐，不再只用一套通用表头。
+- 当前覆盖范围是全部调查类型：`CMRT / CRT / EMRT / AMRT`，并保留版本差异。
+- UI 表头只调整“显示名称、显示顺序、显示/隐藏”，不改底层 Snapshot / 后端字段名。
+- 以下 3 个辅助列不再在 UI 冶炼厂列表中显示：`Standard Smelter Name`、`Country Code`、`State / Province Code`。
+- `smelterId` 仍是内部兼容字段，不作为当前冶炼厂列表推荐对外字段；识别号码请使用 `smelterNumber`。
+
+**Mine List 表头与模板对齐规则：**
+
+- `Mine List` 只在支持该工作表的模板中显示：当前是 `AMRT 1.1 / 1.2 / 1.3` 与 `EMRT 2.0 / 2.1`。
+- 这些版本的矿厂列表 UI 表头已按对应 RMI Excel 模板对齐。
+- 当前 UI 显示列仍只保留业务可编辑列，不显示模板里的辅助列：`Country Code`、`State / Province Code`。
+- UI 表头文案对齐模板，不代表底层字段名变化；例如“矿厂识别（例如《CID》）”对应的仍是 `mineId` 字段。
 
 **行内选择上下文 (`SmelterRowPickContext`)：**
 

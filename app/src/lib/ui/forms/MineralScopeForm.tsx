@@ -25,6 +25,7 @@ interface MineralScopeFormProps {
   }
   customMinerals?: string[]
   onCustomMineralsChange?: (minerals: string[]) => void
+  showTitle?: boolean
 }
 
 /**
@@ -37,6 +38,7 @@ export function MineralScopeForm({
   errors,
   customMinerals = [],
   onCustomMineralsChange,
+  showTitle = true,
 }: MineralScopeFormProps) {
   const { t, locale, i18n } = useT()
   const { componentDisabled } = ConfigProvider.useConfig()
@@ -141,8 +143,8 @@ export function MineralScopeForm({
 
   // 固定模式：仅展示矿种标签（只读）。
   if (mineralScope.mode === 'fixed') {
-    return (
-      <Card title={cardTitle}>
+      return (
+      <Card title={showTitle ? cardTitle : undefined}>
         <Row gutter={[10, 10]}>
           {mineralScope.minerals.map((mineral) => (
             <Col key={mineral.key} xs={8} sm={6} md={4}>
@@ -161,8 +163,8 @@ export function MineralScopeForm({
   // 动态模式：以多选框选择矿种。
   if (mineralScope.mode === 'dynamic-dropdown') {
     const otherSelected = selectedMinerals.includes('other')
-    return (
-      <Card title={cardTitle}>
+      return (
+      <Card title={showTitle ? cardTitle : undefined}>
         <Flex vertical gap={16}>
           <Row gutter={[10, 10]}>
             {mineralScope.minerals.map((mineral) => {
@@ -272,8 +274,8 @@ export function MineralScopeForm({
 
   // 自由输入模式（AMRT 1.1/1.2）：文本框填写自定义矿种。
   if (mineralScope.mode === 'free-text') {
-    return (
-      <Card title={cardTitle}>
+      return (
+      <Card title={showTitle ? cardTitle : undefined}>
         <Flex vertical gap={12}>
           <Typography.Text type="secondary" className="text-xs">
             {t('hints.mineralsMaxCount', { max: maxSlots })}

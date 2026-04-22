@@ -210,8 +210,18 @@ export function useExampleExternalPickers() {
     ]
     if (includeProductRequesterColumns) {
       cols.push(
-        { title: 'Requester #', dataIndex: 'requesterNumber', key: 'requesterNumber', width: 160 },
-        { title: 'Requester Name', dataIndex: 'requesterName', key: 'requesterName', width: 180 },
+        {
+          title: 'Requester Product #',
+          dataIndex: 'requesterNumber',
+          key: 'requesterNumber',
+          width: 160,
+        },
+        {
+          title: 'Requester Product Name',
+          dataIndex: 'requesterName',
+          key: 'requesterName',
+          width: 180,
+        },
       )
     }
     return cols

@@ -55,6 +55,17 @@ function getMineralLabelKey(mineralKey: string): I18nKey | null {
   return mineralLabelKeys[mineralKey] ?? null
 }
 
+function extractCompanyQuestionKey(fieldPath: string): string | null {
+  const parts = fieldPath.split('.')
+  if (parts[0] !== 'companyQuestions' || parts.length < 2) {
+    return null
+  }
+
+  const questionSegment = parts[1]
+  const questionKey = questionSegment.replace(/_comment$/, '')
+  return questionKey.length > 0 ? questionKey : null
+}
+
 interface CheckerPanelProps {
   versionDef: TemplateVersionDef
   errors: CheckerError[]
@@ -149,9 +160,25 @@ export function CheckerPanel({
                     const mineralKey = extractMineralKeyFromPath(error.fieldPath)
                     const mineralLabelKey = mineralKey ? getMineralLabelKey(mineralKey) : null
                     const mineralLabel = mineralLabelKey ? t(mineralLabelKey) : null
+                    const companyQuestionKey = extractCompanyQuestionKey(error.fieldPath)
+                    const companyQuestionLabelKey = companyQuestionKey
+                      ? (`companyQuestions.labels.${companyQuestionKey}` as I18nKey)
+                      : null
+                    const translatedCompanyQuestionLabel = companyQuestionLabelKey
+                      ? t(companyQuestionLabelKey)
+                      : null
+                    const companyQuestionLabel =
+                      companyQuestionKey && translatedCompanyQuestionLabel === companyQuestionLabelKey
+                        ? `问题 ${companyQuestionKey}`
+                        : translatedCompanyQuestionLabel
                     return (
                       <Flex key={errorKey} align="flex-start" justify="space-between" gap={12}>
                         <Flex align="baseline" gap={8} wrap>
+                          {companyQuestionLabel && (
+                            <Tag color="purple" className="shrink-0">
+                              {companyQuestionLabel}
+                            </Tag>
+                          )}
                           {mineralLabel && (
                             <Tag color="blue" className="shrink-0">
                               {mineralLabel}

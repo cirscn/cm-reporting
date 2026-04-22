@@ -87,7 +87,7 @@ export function AppLayout({
       {topBanner}
 
       {/* 主内容区域 */}
-      <Layout>
+      <Layout style={{ flex: 1, minHeight: 0 }}>
         {/* 侧边栏（仅在无步骤导航时显示） */}
         {showSidebar && (
           <Sidebar
@@ -100,8 +100,16 @@ export function AppLayout({
         )}
 
         {/* 内容区域 */}
-        <Layout style={{ padding: LAYOUT.pagePadding, display: 'flex', flexDirection: 'column' }}>
-          <Content style={{ flex: 1, overflow: 'auto' }}>
+        <Layout
+          style={{
+            padding: LAYOUT.pagePadding,
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0,
+            overflow: 'hidden',
+          }}
+        >
+          <Content style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
             <Flex
               vertical
               gap={LAYOUT.sectionGap}
@@ -116,14 +124,9 @@ export function AppLayout({
             <div
               className="sticky-bottom-nav"
               style={{
-                position: 'sticky',
-                bottom: 0,
-                zIndex: 10,
-                marginTop: LAYOUT.sectionGap,
                 maxWidth: maxContentWidth,
                 marginLeft: maxContentWidth ? 'auto' : undefined,
                 marginRight: maxContentWidth ? 'auto' : undefined,
-                width: '100%',
               }}
             >
               <Card>{bottomSlot}</Card>

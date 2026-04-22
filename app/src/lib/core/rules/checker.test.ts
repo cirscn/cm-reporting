@@ -256,6 +256,44 @@ describe('runChecker', () => {
     ).toBe(true)
   })
 
+  it('flags missing requester number when requester columns are enabled', () => {
+    const emrt = getVersionDef('emrt', '2.1')
+    const formState: FormStateForRequired = {
+      scopeType: 'B',
+      selectedMinerals: ['cobalt'],
+      questionAnswers: {
+        Q1: { cobalt: 'No' },
+        Q2: { cobalt: 'No' },
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(emrt),
+      questions: {
+        Q1: { cobalt: 'No' },
+        Q2: { cobalt: 'No' },
+      },
+      productList: [
+        {
+          id: 'row-1',
+          productNumber: 'RESP-001',
+          productName: 'Product A',
+          requesterNumber: '',
+          requesterName: 'Requester Product A',
+        },
+      ],
+    })
+
+    const errors = runChecker(emrt, formState, formData)
+
+    expect(
+      errors.some(
+        (error) =>
+          error.fieldPath === 'productList.0.requesterNumber' &&
+          error.messageKey === ERROR_KEYS.checker.requiredField
+      )
+    ).toBe(true)
+  })
+
   it('does not require comment for CMRT company question E when selecting other format', () => {
     const formState: FormStateForRequired = {
       scopeType: 'A',

@@ -14,6 +14,7 @@ import { cmrt_6_22 } from './versions/6.22'
 import { cmrt_6_31 } from './versions/6.31'
 import { cmrt_6_4 } from './versions/6.4'
 import { cmrt_6_5 } from './versions/6.5'
+import { cmrt_6_6 } from './versions/6.6'
 
 const CMRT_VERSION_OVERRIDES = {
   '6.01': cmrt_6_01,
@@ -22,6 +23,7 @@ const CMRT_VERSION_OVERRIDES = {
   '6.31': cmrt_6_31,
   '6.4': cmrt_6_4,
   '6.5': cmrt_6_5,
+  '6.6': cmrt_6_6,
 } satisfies Record<(typeof CMRT_VERSION_IDS)[number], CmrtVersionOverride>
 
 const CMRT_VERSION_MAP = createVersionMap(Object.values(CMRT_VERSION_OVERRIDES))

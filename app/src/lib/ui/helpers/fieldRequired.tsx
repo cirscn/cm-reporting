@@ -9,6 +9,7 @@
  * - MineralsScopeReasonsForm
  */
 
+import { Typography } from 'antd'
 import type { ReactNode } from 'react'
 
 /**
@@ -22,4 +23,20 @@ import type { ReactNode } from 'react'
 export function wrapRequired(required: boolean, node: ReactNode, disabled = false): ReactNode {
   if (!required || disabled) return node
   return <div className="field-required">{node}</div>
+}
+
+export function renderRequiredHeaderLabel(label: ReactNode, required: boolean): ReactNode {
+  if (!required) return label
+
+  return (
+    <span
+      className="field-required-label"
+      style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+    >
+      <span>{label}</span>
+      <Typography.Text type="danger" className="field-required-mark" aria-hidden="true">
+        *
+      </Typography.Text>
+    </span>
+  )
 }

@@ -15,6 +15,8 @@ import { compact } from 'lodash-es'
 
 import { SelectField, TextField } from '../fields'
 
+import { buildCompanyQuestionsRequiredHint } from './companyQuestionsRequiredHint'
+
 interface CompanyQuestionsFormProps {
   questions: CompanyQuestionDef[]
   questionDefs?: QuestionDef[]
@@ -25,6 +27,7 @@ interface CompanyQuestionsFormProps {
   gatingCondition?: GatingCondition
   requiredByQuestion?: Map<string, boolean>
   errors?: Record<string, Record<string, ErrorKey> | ErrorKey>
+  showTitle?: boolean
 }
 
 /**
@@ -40,6 +43,7 @@ export function CompanyQuestionsForm({
   gatingCondition,
   requiredByQuestion,
   errors = {},
+  showTitle = true,
 }: CompanyQuestionsFormProps) {
   const { t } = useT()
   const questionDefsSignature = useCreation(
@@ -156,12 +160,14 @@ export function CompanyQuestionsForm({
   return (
     <Card
       title={
-        <Flex wrap align="center" justify="space-between" gap={8}>
-          <Typography.Title level={5} style={{ margin: 0 }}>{t('sections.companyQuestions')}</Typography.Title>
-          <Tag color="blue">
-            {requiredHint}
-          </Tag>
-        </Flex>
+        showTitle ? (
+          <Flex wrap align="center" justify="space-between" gap={8}>
+            <Typography.Title level={5} style={{ margin: 0 }}>{t('sections.companyQuestions')}</Typography.Title>
+            <Tag color="blue">
+              {requiredHint}
+            </Tag>
+          </Flex>
+        ) : undefined
       }
     >
       <Flex vertical gap={0} data-optional={isOptional ? 'true' : 'false'}>
@@ -331,6 +337,11 @@ function renderPerMineralQuestionRow({
             <div key={mineral.key} className="company-question-mineral-row">
               <Typography.Text className="company-question-mineral-label">
                 {mineral.label ?? t(mineral.labelKey)}
+                {required ? (
+                  <Typography.Text type="danger" className="company-question-required-mark">
+                    *
+                  </Typography.Text>
+                ) : null}
               </Typography.Text>
               <div className="company-question-answer">
                 <SelectField
@@ -446,65 +457,3 @@ function getCompanyQuestionCommentError(
   return undefined
 }
 
-/**
- * 计算公司问题必填提示文案（跟随 Excel gating 条件）。
- */
-function buildCompanyQuestionsRequiredHint(
-  t: (key: I18nKey, options?: Record<string, unknown>) => string,
-  gatingCondition?: GatingCondition,
-  optionLabelsByQuestion?: Map<string, Map<string, string>>
-): string {
-  const condition = gatingCondition
-    ? resolveGatingConditionLabel(t, gatingCondition, optionLabelsByQuestion)
-    : t('conditions.always')
-  return t('badges.companyQuestionsRequired', { condition })
-}
-
-/**
- * 解析 gating 条件为可展示文案。
- */
-function resolveGatingConditionLabel(
-  t: (key: I18nKey, options?: Record<string, unknown>) => string,
-  condition: GatingCondition,
-  optionLabelsByQuestion?: Map<string, Map<string, string>>
-): string {
-  const resolveOptionLabel = (questionKey: 'Q1' | 'Q2', value: string) =>
-    optionLabelsByQuestion?.get(questionKey)?.get(value) ?? value
-  const formatLabels = (labels: string[]) => labels.filter(Boolean).join(' / ')
-
-  switch (condition.type) {
-    case 'always':
-      return t('conditions.always')
-    case 'q1-not-no':
-      return t('conditions.q1NotNo', { no: resolveOptionLabel('Q1', 'No') })
-    case 'q1-yes':
-      return t('conditions.q1Yes', { yes: resolveOptionLabel('Q1', 'Yes') })
-    case 'q1q2-not-no':
-      return t('conditions.q1q2NotNo', {
-        no: resolveOptionLabel('Q1', 'No'),
-        noQ2: resolveOptionLabel('Q2', 'No'),
-      })
-    case 'q1q2-yes':
-      return t('conditions.q1q2Yes', {
-        yes: resolveOptionLabel('Q1', 'Yes'),
-        yesQ2: resolveOptionLabel('Q2', 'Yes'),
-      })
-    case 'q1-not-negatives':
-      return t('conditions.q1NotNegatives', {
-        negatives: formatLabels(
-          condition.negatives.map((value) => resolveOptionLabel('Q1', value))
-        ),
-      })
-    case 'q1-not-negatives-and-q2-not-negatives':
-      return t('conditions.q1NotNegativesAndQ2NotNegatives', {
-        q1Negatives: formatLabels(
-          condition.q1Negatives.map((value) => resolveOptionLabel('Q1', value))
-        ),
-        q2Negatives: formatLabels(
-          condition.q2Negatives.map((value) => resolveOptionLabel('Q2', value))
-        ),
-      })
-    default:
-      return t('conditions.always')
-  }
-}

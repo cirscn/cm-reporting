@@ -15,6 +15,7 @@ import {
   resolveDateFieldValue,
 } from './dateFieldValue'
 import { resolveErrorMessage } from './error'
+import { buildFormItemLayout, type FieldFormLayout, type FieldFormLayoutOptions } from './formItemLayout'
 
 interface DateFieldProps {
   value?: string // ISO format: YYYY-MM-DD
@@ -31,6 +32,8 @@ interface DateFieldProps {
   fieldPath?: string
   className?: string
   style?: React.CSSProperties
+  formLayout?: FieldFormLayout
+  labelWidth?: FieldFormLayoutOptions['labelWidth']
 }
 
 /**
@@ -51,6 +54,8 @@ export function DateField({
   fieldPath,
   className,
   style,
+  formLayout,
+  labelWidth,
 }: DateFieldProps) {
   const { t } = useT()
   const { componentDisabled } = ConfigProvider.useConfig()
@@ -61,6 +66,7 @@ export function DateField({
   const dayjsValue = resolveDateFieldValue(value)
   const displayHint = hint ?? formatHint
   const displayPlaceholder = placeholder ?? formatHint ?? t('placeholders.date')
+  const formItemLayout = buildFormItemLayout({ formLayout, labelWidth })
 
   const handleChange = useMemoizedFn((date: dayjs.Dayjs | null) => {
     onChange?.(date ? date.format(DATE_FIELD_STORAGE_FORMAT) : '')
@@ -78,12 +84,12 @@ export function DateField({
 
   return (
     <Form.Item
+      {...formItemLayout}
       label={label}
       required={required}
       validateStatus={validateStatus}
       help={errorText}
       extra={displayHint}
-      layout="vertical"
       data-field-path={fieldPath}
       className={className}
       style={style}

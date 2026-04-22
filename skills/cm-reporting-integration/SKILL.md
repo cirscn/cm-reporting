@@ -32,6 +32,12 @@ Apply these rules in every solution:
 - `SmelterList` 行内外部选择需保证同一个 `metal` 下冶炼厂唯一，按回写 `id` 判重。
 - `SmelterList` 行内外部选择成功后（非 `Smelter not listed / not yet identified`），应锁定基础主数据字段不可编辑：`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state`。
 - `SmelterList` 外部选择入口为“行内模式”：仅保留“新增一行”后在行内触发外部选择，不提供顶部批量“从外部选择”入口。
+- `Smelter List` 表头必须按当前 `templateType + versionId` 对齐到对应 RMI Excel 模板，不能把所有调查类型强行共用一套表头。
+- `CMRT / CRT / EMRT / AMRT` 都要保留版本差异支持；只能调整 UI 列标题、顺序和显隐，不能借机改动 Snapshot / 后端字段语义。
+- 以下 3 个辅助列当前不在 UI 冶炼厂表格中展示：`Standard Smelter Name`、`Country Code`、`State / Province Code`。
+- `Mine List` 只对模板本身包含该工作表的版本生效：`AMRT` 全版本与 `EMRT` 2.x；`CMRT / CRT / EMRT 1.x` 不应伪造矿厂页。
+- `Mine List` 表头也必须对齐对应 RMI Excel 模板；当前 UI 不展示模板中的辅助列 `Country Code`、`State / Province Code`。
+- 矿厂表头文案变化不能改变数据契约，仍应回写到既有字段：例如矿厂识别走 `mineId`，矿厂识别来源走 `mineIdSource`。
 - Respect package license (`PolyForm-Noncommercial-1.0.0`) in usage recommendations.
 - For `readOnly` behavior, treat it as **view-only contract** (not just disabled inputs):
   - hide checker page and checker entry in workflow;
@@ -41,8 +47,12 @@ Apply these rules in every solution:
   - suppress required yellow highlight when fields are disabled/read-only.
 - In controlled routing mode, if readOnly flow remaps page (e.g. `checker` fallback), always sync parent state via navigation callback to avoid route/UI drift.
 - Never override host-level `ConfigProvider` disabled state with local false. Effective disabled rule must be `parentDisabled || readOnly`.
+- Treat the workflow step nav as a sticky header: keep `Declaration / Smelter List / Mine List / Product List / Checker` visible while the middle content area scrolls.
+- If host app renders `cm-reporting` inside a modal, drawer, split pane, or custom shell, ensure the container has a calculable height so the library can keep scroll inside the content area instead of the whole page.
 - For `EMRT/AMRT` checker behavior, keep checker errors and progress summary under the same gating: when smelter requirement is disabled by Q1/Q2, do not count `smelterLookup` required progress from historical rows.
 - For `EMRT`, default selection should include all declared minerals on empty initialization; when `readOnly=false`, users can still edit the declaration scope selections.
+- For `Product List`, when `Declaration Scope = Product` (`scopeType === 'B'`), the list itself is required; `productNumber` is always required, and `requesterNumber` becomes required only for versions with `hasRequesterColumns=true` (for example `CMRT 6.6`, `EMRT 2.11`, and `AMRT 1.3`).
+- Treat “请求方的产品编号 / 请求方的产品名称” as UI labels only; integration payload fields remain `requesterNumber / requesterName`.
 - 对 `dynamic-dropdown` 范围模板（`EMRT` 2.x / `AMRT` 1.3），当取消某个矿种时，应预期库会自动执行级联清理：清空该矿种的按矿种题目/备注答案，并删除关联的 `Smelter List` / `Mine List` 行数据。
 - 当 `other` 保持勾选但某个自定义矿种名称被清空时，库会按槽位清理对应 `other-*` 的按矿种答案与关联列表行。
 

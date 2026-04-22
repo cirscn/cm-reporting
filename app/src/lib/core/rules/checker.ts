@@ -328,6 +328,19 @@ function checkProductList(
         versionDef.productList.productNumberLabelKey
       )
     }
+
+    if (!versionDef.productList.hasRequesterColumns) return
+
+    const requesterNumber = row.requesterNumber || ''
+    if (!requesterNumber.trim()) {
+      pushError(
+        errors,
+        'R',
+        ERROR_KEYS.checker.requiredField,
+        `productList.${index}.requesterNumber`,
+        'tables.requesterNumber'
+      )
+    }
   })
 }
 

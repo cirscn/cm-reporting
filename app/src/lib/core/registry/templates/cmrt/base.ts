@@ -232,6 +232,7 @@ export interface CmrtVersionOverride {
   id: CmrtVersionId
   q6Options: QuestionOption[]
   productList: {
+    hasRequesterColumns?: boolean
     productNumberLabelKey: I18nKey
     productNameLabelKey: I18nKey
   }
@@ -277,7 +278,7 @@ export function buildCmrtVersionDef(override: CmrtVersionOverride): TemplateVers
     },
     mineList: { available: false },
     productList: {
-      hasRequesterColumns: false,
+      hasRequesterColumns: override.productList.hasRequesterColumns ?? false,
       productNumberLabelKey: override.productList.productNumberLabelKey,
       productNameLabelKey: override.productList.productNameLabelKey,
       commentLabelKey: 'productList.cmrt.comment',

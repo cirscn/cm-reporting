@@ -272,6 +272,51 @@ export const EXCEL_TEMPLATE_ANCHORS = {
       "amrtQ1Row": 25,
       "amrtQ2Row": 31,
       "amrtQ3Row": 37
+    },
+    "6.6": {
+      "questionHeaderRowByNumber": {
+        "1": 25,
+        "2": 31,
+        "3": 37,
+        "4": 43,
+        "5": 49,
+        "6": 55,
+        "7": 61,
+        "8": 67
+      },
+      "questionSpanByNumber": {
+        "1": 5,
+        "2": 5,
+        "3": 5,
+        "4": 5,
+        "5": 5,
+        "6": 5,
+        "7": 5,
+        "8": 7
+      },
+      "companyHeaderRowByKey": {
+        "A": 75,
+        "B": 77,
+        "C": 79,
+        "D": 81,
+        "E": 83,
+        "F": 85,
+        "G": 87,
+        "H": 89
+      },
+      "companySpanByKey": {
+        "A": 1,
+        "B": 1,
+        "C": 1,
+        "D": 1,
+        "E": 1,
+        "F": 1,
+        "G": 1,
+        "H": 21
+      },
+      "amrtQ1Row": 25,
+      "amrtQ2Row": 31,
+      "amrtQ3Row": 37
     }
   },
   "emrt": {
@@ -481,6 +526,47 @@ export const EXCEL_TEMPLATE_ANCHORS = {
       "amrtQ3Row": 53
     },
     "2.1": {
+      "questionHeaderRowByNumber": {
+        "1": 29,
+        "2": 41,
+        "3": 53,
+        "4": 65,
+        "5": 77,
+        "6": 89,
+        "7": 101
+      },
+      "questionSpanByNumber": {
+        "1": 11,
+        "2": 11,
+        "3": 11,
+        "4": 11,
+        "5": 11,
+        "6": 11,
+        "7": 13
+      },
+      "companyHeaderRowByKey": {
+        "A": 115,
+        "B": 117,
+        "C": 119,
+        "D": 131,
+        "E": 133,
+        "F": 135,
+        "G": 137
+      },
+      "companySpanByKey": {
+        "A": 1,
+        "B": 1,
+        "C": 11,
+        "D": 1,
+        "E": 1,
+        "F": 1,
+        "G": 50
+      },
+      "amrtQ1Row": 29,
+      "amrtQ2Row": 41,
+      "amrtQ3Row": 53
+    },
+    "2.11": {
       "questionHeaderRowByNumber": {
         "1": 29,
         "2": 41,

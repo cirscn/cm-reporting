@@ -22,6 +22,7 @@ interface QuestionMatrixFormProps {
   gatingByMineral?: Map<string, GatingResult>
   requiredByQuestion?: Map<string, Map<string, boolean>>
   errors?: Record<string, Record<string, ErrorKey> | ErrorKey>
+  headerMode?: 'card' | 'section'
 }
 
 type QuestionOptionItem = { value: string; label: string }
@@ -60,6 +61,7 @@ export function QuestionMatrixForm({
   gatingByMineral,
   requiredByQuestion,
   errors = {},
+  headerMode = 'card',
 }: QuestionMatrixFormProps) {
   const { t } = useT()
   const { componentDisabled } = ConfigProvider.useConfig()
@@ -184,44 +186,55 @@ export function QuestionMatrixForm({
     })
   })
 
+  const headerContent = (
+    <Flex wrap align="center" justify="space-between" gap={8}>
+      <div>
+        <Typography.Title level={5} style={{ margin: 0 }}>
+          {t('sections.questionMatrix')}
+        </Typography.Title>
+        <Typography.Text type="secondary">
+          {t('sections.questionMatrixHint')}
+        </Typography.Text>
+      </div>
+      <Tag color="blue">
+        {t('badges.questionRange', { from: 1, to: questions.length })}
+      </Tag>
+    </Flex>
+  )
+
+  const questionsContent = (
+    <Flex vertical gap={0}>
+      {questions.map((question) => (
+        <QuestionRow
+          key={question.key}
+          question={question}
+          minerals={minerals}
+          values={values}
+          commentValues={commentValues}
+          errors={errors}
+          gatingByMineral={gatingByMineral}
+          requiredByQuestion={requiredByQuestion}
+          getOptions={getOptions}
+          getCellHandler={getCellHandler}
+          getCommentHandler={getCommentHandler}
+          onBatchSet={handleBatchSet}
+          t={t}
+          readOnly={componentDisabled}
+        />
+      ))}
+    </Flex>
+  )
+
   return (
-    <Card
-      title={
-        <Flex wrap align="center" justify="space-between" gap={8}>
-          <div>
-            <Typography.Title level={5} style={{ margin: 0 }}>
-              {t('sections.questionMatrix')}
-            </Typography.Title>
-            <Typography.Text type="secondary">
-              {t('sections.questionMatrixHint')}
-            </Typography.Text>
-          </div>
-          <Tag color="blue">
-            {t('badges.questionRange', { from: 1, to: questions.length })}
-          </Tag>
+    <Card title={headerMode === 'card' ? headerContent : undefined}>
+      {headerMode === 'section' ? (
+        <Flex vertical gap={16}>
+          {headerContent}
+          {questionsContent}
         </Flex>
-      }
-    >
-      <Flex vertical gap={0}>
-        {questions.map((question) => (
-          <QuestionRow
-            key={question.key}
-            question={question}
-            minerals={minerals}
-            values={values}
-            commentValues={commentValues}
-            errors={errors}
-            gatingByMineral={gatingByMineral}
-            requiredByQuestion={requiredByQuestion}
-            getOptions={getOptions}
-            getCellHandler={getCellHandler}
-            getCommentHandler={getCommentHandler}
-            onBatchSet={handleBatchSet}
-            t={t}
-            readOnly={componentDisabled}
-          />
-        ))}
-      </Flex>
+      ) : (
+        questionsContent
+      )}
     </Card>
   )
 }

@@ -26,4 +26,15 @@ describe('registry versions', () => {
       })
     })
   })
+
+  it('supports CMRT 6.6 and EMRT 2.11 version definitions', () => {
+    const cmrtDefinition = getTemplateDefinition('cmrt')
+    const emrtDefinition = getTemplateDefinition('emrt')
+
+    expect(cmrtDefinition.versions.some((version) => version.id === '6.6')).toBe(true)
+    expect(emrtDefinition.versions.some((version) => version.id === '2.11')).toBe(true)
+
+    expect(getVersionDef('cmrt', '6.6').version.id).toBe('6.6')
+    expect(getVersionDef('emrt', '2.11').version.id).toBe('2.11')
+  })
 })

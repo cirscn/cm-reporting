@@ -7,6 +7,8 @@ import { CheckCircleOutlined } from '@ant-design/icons'
 import { useMemoizedFn } from 'ahooks'
 import { Steps, Tag } from 'antd'
 
+const STEP_NAV_Z_INDEX = 20
+
 export interface StepProgress {
   total: number
   completed: number
@@ -22,6 +24,25 @@ interface StepNavProps {
   steps: StepNavItem[]
   currentKey?: string
   onChange?: (key: string) => void
+}
+
+function renderStepTitle(step: StepNavItem, isComplete: boolean) {
+  const hasProgress = step.progress && step.progress.total > 0
+
+  return (
+    <span className="step-nav-title-content">
+      <span className="step-nav-title-label">{step.label}</span>
+      {hasProgress && (
+        <Tag
+          color={isComplete ? 'success' : 'default'}
+          className="text-xs ml-1"
+          style={{ margin: 0 }}
+        >
+          {step.progress!.completed}/{step.progress!.total}
+        </Tag>
+      )}
+    </span>
+  )
 }
 
 /**
@@ -40,25 +61,13 @@ export function StepNav({ steps, currentKey, onChange }: StepNavProps) {
   if (steps.length === 0) return null
 
   const items = steps.map((step, index) => {
-    const isComplete = step.progress && step.progress.completed === step.progress.total && step.progress.total > 0
-    const hasProgress = step.progress && step.progress.total > 0
+    const isComplete = Boolean(
+      step.progress && step.progress.completed === step.progress.total && step.progress.total > 0,
+    )
 
     return {
       key: step.key,
-      title: (
-        <span className="flex items-center gap-1.5">
-          <span>{step.label}</span>
-          {hasProgress && (
-            <Tag
-              color={isComplete ? 'success' : 'default'}
-              className="text-xs ml-1"
-              style={{ margin: 0 }}
-            >
-              {step.progress!.completed}/{step.progress!.total}
-            </Tag>
-          )}
-        </span>
-      ),
+      title: renderStepTitle(step, isComplete),
       // 完成的步骤显示勾选图标，其他使用默认数字
       icon: isComplete ? (
         <CheckCircleOutlined style={{ color: 'var(--ant-color-success)' }} />
@@ -75,7 +84,15 @@ export function StepNav({ steps, currentKey, onChange }: StepNavProps) {
   })
 
   return (
-    <div className="step-nav-container">
+    <div
+      className="step-nav-container"
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: STEP_NAV_Z_INDEX,
+        flexShrink: 0,
+      }}
+    >
       <div className="step-nav-inner">
         <Steps
           current={currentIndex >= 0 ? currentIndex : 0}

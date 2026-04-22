@@ -10,6 +10,7 @@ import { ConfigProvider, Form, Input } from 'antd'
 import type { ChangeEvent } from 'react'
 
 import { resolveErrorMessage } from './error'
+import { buildFormItemLayout, type FieldFormLayout, type FieldFormLayoutOptions } from './formItemLayout'
 
 interface TextFieldProps {
   value?: string
@@ -29,6 +30,8 @@ interface TextFieldProps {
   autoComplete?: string
   /** 是否启用拼写检查，邮箱等字段应设为 false */
   spellCheck?: boolean
+  formLayout?: FieldFormLayout
+  labelWidth?: FieldFormLayoutOptions['labelWidth']
 }
 
 /**
@@ -50,6 +53,8 @@ export function TextField({
   style,
   autoComplete,
   spellCheck,
+  formLayout,
+  labelWidth,
 }: TextFieldProps) {
   const { t } = useT()
   const { componentDisabled } = ConfigProvider.useConfig()
@@ -65,18 +70,19 @@ export function TextField({
 
   const errorText = resolveErrorMessage(t, error)
   const validateStatus = errorText ? 'error' : undefined
+  const formItemLayout = buildFormItemLayout({ formLayout, labelWidth })
 
   // 必填字段的黄色背景样式
   const inputClassName = required && !isFieldDisabled && !value?.trim() ? 'field-required-empty' : undefined
 
   return (
     <Form.Item
+      {...formItemLayout}
       label={label}
       required={required}
       validateStatus={validateStatus}
       help={errorText}
       extra={hint}
-      layout="vertical"
       data-field-path={fieldPath}
       className={className}
       style={style}

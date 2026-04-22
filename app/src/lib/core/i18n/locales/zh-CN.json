@@ -121,8 +121,8 @@
   "productPlaceholders": {
     "productNumber": "PRD-xxxx-xxx",
     "productName": "产品名称",
-    "requesterNumber": "回复方产品编号",
-    "requesterName": "回复方产品名称",
+    "requesterNumber": "请求方的产品编号",
+    "requesterName": "请求方的产品名称",
     "comments": "注释"
   },
   "hints": {
@@ -164,8 +164,8 @@
     "mineralsScopeReasonPrt": "纳入 PRT 的原因",
     "mineralsScopeReasonAmrt": "纳入 AMRT 的原因",
     "comments": "备注",
-    "requesterNumber": "请求方编号",
-    "requesterName": "请求方名称",
+    "requesterNumber": "请求方的产品编号",
+    "requesterName": "请求方的产品名称",
     "noData": "暂无数据"
   },
   "actions": {

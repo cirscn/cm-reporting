@@ -9,6 +9,7 @@ import { useMemoizedFn } from 'ahooks'
 import { ConfigProvider, Form, Select } from 'antd'
 
 import { resolveErrorMessage } from './error'
+import { buildFormItemLayout, type FieldFormLayout, type FieldFormLayoutOptions } from './formItemLayout'
 
 interface SelectOption {
   value: string
@@ -29,6 +30,8 @@ interface SelectFieldProps {
   fieldPath?: string
   className?: string
   style?: React.CSSProperties
+  formLayout?: FieldFormLayout
+  labelWidth?: FieldFormLayoutOptions['labelWidth']
 }
 
 /**
@@ -48,6 +51,8 @@ export function SelectField({
   fieldPath,
   className,
   style,
+  formLayout,
+  labelWidth,
 }: SelectFieldProps) {
   const { t } = useT()
   const { componentDisabled } = ConfigProvider.useConfig()
@@ -56,6 +61,7 @@ export function SelectField({
   const errorText = resolveErrorMessage(t, error)
   const validateStatus = errorText ? 'error' : undefined
   const resolvedPlaceholder = placeholder ?? t('placeholders.select')
+  const formItemLayout = buildFormItemLayout({ formLayout, labelWidth })
 
   const handleChange = useMemoizedFn((nextValue: string | undefined | null) => {
     onChange?.(nextValue ?? '')
@@ -84,12 +90,12 @@ export function SelectField({
 
   return (
     <Form.Item
+      {...formItemLayout}
       label={label}
       required={required}
       validateStatus={validateStatus}
       help={errorText}
       extra={hint}
-      layout="vertical"
       data-field-path={fieldPath}
       className={className}
       style={style}

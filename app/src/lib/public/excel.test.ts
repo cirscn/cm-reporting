@@ -69,4 +69,58 @@ describe('exportToExcel', () => {
     expect(readCellText(declXml, 'D32', ctx.sharedStrings)).toBe('Yes')
     expect(readCellText(declXml, 'G32', ctx.sharedStrings)).toBe('Note')
   })
+
+  test('writes requester columns into CMRT 6.6 product list', async () => {
+    const templatePath = path.resolve(
+      process.cwd(),
+      'templates/CMRT/RMI_CMRT_6.6.xlsx'
+    )
+    const buf = fs.readFileSync(templatePath)
+
+    const snapshot: ReportSnapshotV1 = {
+      schemaVersion: 1,
+      templateType: 'cmrt',
+      versionId: '6.6',
+      locale: 'en-US',
+      data: {
+        companyInfo: {
+          companyName: 'Acme Inc',
+          declarationScope: 'B',
+          authorizationDate: '2026-02-04',
+        },
+        selectedMinerals: [],
+        customMinerals: [],
+        questions: {},
+        questionComments: {},
+        companyQuestions: {},
+        mineralsScope: [],
+        smelterList: [],
+        mineList: [],
+        productList: [
+          {
+            id: 'product-1',
+            productNumber: 'RESP-001',
+            productName: 'Responder Product',
+            requesterNumber: 'REQ-001',
+            requesterName: 'Requester Product',
+            comments: 'Product note',
+          },
+        ],
+      },
+    }
+
+    const blob = await exportToExcel({
+      templateXlsx: buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength),
+      snapshot,
+    })
+    const out = new Uint8Array(await blob.arrayBuffer())
+    const ctx = await loadXlsxContext(out.buffer)
+    const productXml = getSheetXml(ctx, 'Product List')
+
+    expect(readCellText(productXml, 'B6', ctx.sharedStrings)).toBe('RESP-001')
+    expect(readCellText(productXml, 'C6', ctx.sharedStrings)).toBe('Responder Product')
+    expect(readCellText(productXml, 'D6', ctx.sharedStrings)).toBe('REQ-001')
+    expect(readCellText(productXml, 'E6', ctx.sharedStrings)).toBe('Requester Product')
+    expect(readCellText(productXml, 'F6', ctx.sharedStrings)).toBe('Product note')
+  })
 })

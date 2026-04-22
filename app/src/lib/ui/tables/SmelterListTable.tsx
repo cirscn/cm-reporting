@@ -19,7 +19,7 @@ import type {
   SmelterRowPickContext,
   SmelterLookupMode,
 } from '@lib/public/integrations'
-import { wrapRequired } from '@ui/helpers/fieldRequired'
+import { renderRequiredHeaderLabel, wrapRequired } from '@ui/helpers/fieldRequired'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useCreation, useLatest, useMemoizedFn } from 'ahooks'
@@ -49,6 +49,7 @@ import {
   resolveExternalSmelterRowId,
   shouldDisableSmelterFieldsAfterExternalPick,
 } from './smelterExternalNormalize'
+import { getSmelterHeaderProfile, type SmelterColumnId } from './smelterHeaderProfiles'
 
 interface SmelterListTableProps {
   templateType: TemplateType
@@ -92,6 +93,26 @@ const SELECT_FIELDS = [
   'recycledScrap',
   'combinedMetal',
 ] as const
+
+const SMELTER_COLUMN_KEY_BY_ID: Record<SmelterColumnId, string> = {
+  smelterNumberInput: 'smelterNumber',
+  metal: 'metal',
+  smelterLookup: 'smelterLookup',
+  smelterName: 'smelterName',
+  smelterCountry: 'smelterCountry',
+  smelterIdentification: 'smelterIdentification',
+  sourceId: 'sourceId',
+  smelterStreet: 'smelterStreet',
+  smelterCity: 'smelterCity',
+  smelterState: 'smelterState',
+  smelterContactName: 'smelterContactName',
+  smelterContactEmail: 'smelterContactEmail',
+  proposedNextSteps: 'proposedNextSteps',
+  mineName: 'mineName',
+  mineCountry: 'mineCountry',
+  recycledScrap: 'recycledScrap',
+  comments: 'comments',
+}
 
 /** 冶炼厂清单表格：支持 lookup 自动填充、行内编辑与行内外部选择。 */
 export const SmelterListTable = memo(function SmelterListTable({
@@ -493,6 +514,16 @@ export const SmelterListTable = memo(function SmelterListTable({
   const filterOptionByLabel = useMemoizedFn((input: string, option?: { label?: string }) =>
     (option?.label ?? '').toLowerCase().includes(input.toLowerCase()),
   )
+  const headerProfile = useCreation(
+    () => getSmelterHeaderProfile({ templateType, versionId, locale, t }),
+    [locale, t, templateType, versionId],
+  )
+  const resolveColumnTitle = useMemoizedFn((columnId: SmelterColumnId) =>
+    renderRequiredHeaderLabel(
+      headerProfile.labels[columnId],
+      headerProfile.required[columnId] === true,
+    ),
+  )
 
   // ---------------------------------------------------------------------------
   // 列定义（约 430 行）
@@ -504,7 +535,7 @@ export const SmelterListTable = memo(function SmelterListTable({
     const columns: ColumnsType<SmelterRow> = []
 
     columns.push({
-      title: t('tables.metal'),
+      title: resolveColumnTitle('metal'),
       dataIndex: 'metal',
       key: 'metal',
       width: 140,
@@ -525,7 +556,7 @@ export const SmelterListTable = memo(function SmelterListTable({
 
     if (config.hasLookup) {
       columns.push({
-        title: t('tables.smelterName'),
+        title: resolveColumnTitle('smelterLookup'),
         dataIndex: 'smelterLookup',
         key: 'smelterLookup',
         width: 220,
@@ -619,7 +650,7 @@ export const SmelterListTable = memo(function SmelterListTable({
     // Smelter Number input column (if configured) - keep after metal + lookup/name
     if (config.hasIdColumn) {
       columns.push({
-        title: t('tables.smelterNumber'),
+        title: resolveColumnTitle('smelterNumberInput'),
         dataIndex: 'smelterNumber',
         key: 'smelterNumber',
         width: 180,
@@ -648,47 +679,43 @@ export const SmelterListTable = memo(function SmelterListTable({
       })
     }
 
-    const hideSmelterNameColumn = Boolean(config.hasLookup)
-
-    if (!hideSmelterNameColumn) {
-      columns.push({
-        title: t('tables.smelterName'),
-        dataIndex: 'smelterName',
-        key: 'smelterName',
-        width: 200,
-        render: (value: string, record: SmelterRow) => {
-          const notListed = isNotListed(record.smelterLookup) && notListedRequiresNameCountry
-          const notYetIdentified = isNotYetIdentified(record.smelterLookup)
-          const fromLookup = isFromLookup(record.smelterLookup)
-          const disableAfterExternalPick = shouldDisableSmelterFieldsAfterExternalPick({
-            useExternalLookup,
-            row: record,
-            fromLookup,
-            notListed,
-            notYetIdentified,
-          })
-          const placeholder = notListed
-            ? t('placeholders.smelterNameRequired')
-            : notYetIdentified
-              ? t('placeholders.smelterNameOptional')
-              : t('placeholders.smelterName')
-          return wrapRequired(
-            notListed,
-            <Input
-              value={value || undefined}
-              onChange={getInputHandler(`${record.id}:smelterName`)}
-              placeholder={placeholder}
-              disabled={componentDisabled || disableAfterExternalPick}
-            />,
-            componentDisabled,
-          )
-        },
-      })
-    }
+    columns.push({
+      title: resolveColumnTitle('smelterName'),
+      dataIndex: 'smelterName',
+      key: 'smelterName',
+      width: 200,
+      render: (value: string, record: SmelterRow) => {
+        const notListed = isNotListed(record.smelterLookup) && notListedRequiresNameCountry
+        const notYetIdentified = isNotYetIdentified(record.smelterLookup)
+        const fromLookup = isFromLookup(record.smelterLookup)
+        const disableAfterExternalPick = shouldDisableSmelterFieldsAfterExternalPick({
+          useExternalLookup,
+          row: record,
+          fromLookup,
+          notListed,
+          notYetIdentified,
+        })
+        const placeholder = notListed
+          ? t('placeholders.smelterNameRequired')
+          : notYetIdentified
+            ? t('placeholders.smelterNameOptional')
+            : t('placeholders.smelterName')
+        return wrapRequired(
+          notListed,
+          <Input
+            value={value || undefined}
+            onChange={getInputHandler(`${record.id}:smelterName`)}
+            placeholder={placeholder}
+            disabled={componentDisabled || disableAfterExternalPick}
+          />,
+          componentDisabled,
+        )
+      },
+    })
 
     columns.push(
       {
-        title: t('tables.country'),
+        title: resolveColumnTitle('smelterCountry'),
         dataIndex: 'smelterCountry',
         key: 'smelterCountry',
         width: 180,
@@ -731,7 +758,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         },
       },
       {
-        title: t('tables.smelterIdentification'),
+        title: resolveColumnTitle('smelterIdentification'),
         dataIndex: 'smelterIdentification',
         key: 'smelterIdentification',
         width: 180,
@@ -751,7 +778,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         ),
       },
       {
-        title: t('tables.sourceId'),
+        title: resolveColumnTitle('sourceId'),
         dataIndex: 'sourceId',
         key: 'sourceId',
         width: 180,
@@ -771,7 +798,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         ),
       },
       {
-        title: t('tables.street'),
+        title: resolveColumnTitle('smelterStreet'),
         dataIndex: 'smelterStreet',
         key: 'smelterStreet',
         width: 200,
@@ -791,7 +818,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         ),
       },
       {
-        title: t('tables.city'),
+        title: resolveColumnTitle('smelterCity'),
         dataIndex: 'smelterCity',
         key: 'smelterCity',
         width: 160,
@@ -811,7 +838,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         ),
       },
       {
-        title: t('tables.stateProvince'),
+        title: resolveColumnTitle('smelterState'),
         dataIndex: 'smelterState',
         key: 'smelterState',
         width: 170,
@@ -831,7 +858,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         ),
       },
       {
-        title: t('tables.contactName'),
+        title: resolveColumnTitle('smelterContactName'),
         dataIndex: 'smelterContactName',
         key: 'smelterContactName',
         width: 180,
@@ -844,7 +871,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         ),
       },
       {
-        title: t('tables.contactEmail'),
+        title: resolveColumnTitle('smelterContactEmail'),
         dataIndex: 'smelterContactEmail',
         key: 'smelterContactEmail',
         width: 200,
@@ -857,7 +884,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         ),
       },
       {
-        title: t('tables.proposedNextSteps'),
+        title: resolveColumnTitle('proposedNextSteps'),
         dataIndex: 'proposedNextSteps',
         key: 'proposedNextSteps',
         width: 200,
@@ -870,7 +897,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         ),
       },
       {
-        title: t('tables.mineName'),
+        title: resolveColumnTitle('mineName'),
         dataIndex: 'mineName',
         key: 'mineName',
         width: 180,
@@ -883,7 +910,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         ),
       },
       {
-        title: t('tables.mineCountry'),
+        title: resolveColumnTitle('mineCountry'),
         dataIndex: 'mineCountry',
         key: 'mineCountry',
         width: 240,
@@ -899,7 +926,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         ),
       },
       {
-        title: t('tables.recycledScrap'),
+        title: resolveColumnTitle('recycledScrap'),
         dataIndex: 'recycledScrap',
         key: 'recycledScrap',
         width: 260,
@@ -914,7 +941,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         ),
       },
       {
-        title: t('tables.comments'),
+        title: resolveColumnTitle('comments'),
         dataIndex: 'comments',
         key: 'comments',
         width: 200,
@@ -961,9 +988,20 @@ export const SmelterListTable = memo(function SmelterListTable({
       )
     }
 
-    // Actions column
-    if (showEditableActions) {
-      columns.push({
+    const orderedColumns = headerProfile.columns
+      .map((columnId) => {
+        const columnKey = SMELTER_COLUMN_KEY_BY_ID[columnId]
+        return columns.find((column) => column.key === columnKey)
+      })
+      .filter((column): column is NonNullable<(typeof columns)[number]> => Boolean(column))
+
+    if (!showEditableActions) {
+      return orderedColumns
+    }
+
+    return [
+      ...orderedColumns,
+      {
         title: '',
         key: 'actions',
         width: 60,
@@ -976,11 +1014,10 @@ export const SmelterListTable = memo(function SmelterListTable({
             onClick={getRemoveHandler(record.id)}
           />
         ),
-      })
-    }
-
-    return columns
+      },
+    ]
   }, [
+    headerProfile,
     config,
     componentDisabled,
     countryOptions,
@@ -1000,6 +1037,7 @@ export const SmelterListTable = memo(function SmelterListTable({
     yesNoUnknownOptions,
     yesNoOptions,
     recycledScrapOptions,
+    resolveColumnTitle,
   ])
 
   const emptyLocale = {

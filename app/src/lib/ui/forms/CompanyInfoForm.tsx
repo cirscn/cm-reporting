@@ -24,6 +24,10 @@ interface CompanyInfoFormProps {
   errors?: Record<string, ErrorKey>
   requiredFields?: Map<string, boolean>
   dateFormatHint?: string
+  showTitle?: boolean
+  fieldLayout?: 'vertical' | 'horizontal'
+  fieldSpan?: number
+  labelWidth?: number
 }
 
 /** 声明范围选项。 */
@@ -83,6 +87,8 @@ const SPELLCHECK_DISABLED_KEYS = new Set([
   'companyAuthId',
 ])
 
+const DEFAULT_COMPANY_INFO_FIELD_SPAN = 12
+
 /**
  * CompanyInfoForm：公司信息表单组件。
  */
@@ -93,6 +99,10 @@ export function CompanyInfoForm({
   errors = {},
   requiredFields,
   dateFormatHint,
+  showTitle = true,
+  fieldLayout = 'vertical',
+  fieldSpan = DEFAULT_COMPANY_INFO_FIELD_SPAN,
+  labelWidth,
 }: CompanyInfoFormProps) {
   const { t } = useT()
   const { componentDisabled } = ConfigProvider.useConfig()
@@ -122,7 +132,7 @@ export function CompanyInfoForm({
     return t(key)
   }
 
-  const renderField = (field: FieldDef, span: number = 12) => {
+  const renderField = (field: FieldDef, span: number = fieldSpan) => {
     const value = values[field.key] || ''
     const error = errors[field.key]
     const isRequired = requiredFields?.get(field.key) ?? field.required === true
@@ -142,6 +152,8 @@ export function CompanyInfoForm({
             options={SCOPE_OPTIONS}
             placeholder={placeholder}
             fieldPath={`companyInfo.${field.key}`}
+            formLayout={fieldLayout}
+            labelWidth={labelWidth}
           />
         )
       }
@@ -160,6 +172,8 @@ export function CompanyInfoForm({
             placeholder={placeholder}
             formatHint={resolvedDateHint}
             fieldPath={`companyInfo.${field.key}`}
+            formLayout={fieldLayout}
+            labelWidth={labelWidth}
           />
         )
       }
@@ -177,6 +191,8 @@ export function CompanyInfoForm({
           fieldPath={`companyInfo.${field.key}`}
           autoComplete={AUTOCOMPLETE_KEYS[field.key]}
           spellCheck={SPELLCHECK_DISABLED_KEYS.has(field.key) ? false : undefined}
+          formLayout={fieldLayout}
+          labelWidth={labelWidth}
         />
       )
     })()
@@ -240,22 +256,31 @@ export function CompanyInfoForm({
   return (
     <Card
       title={
-        <Flex align="center" justify="space-between" style={{ width: '100%' }}>
-          <Title level={5} style={sectionHeaderStyle}>
-            {t('sections.companyInfo')}
-          </Title>
-          {requiredTotal > 0 && (
-            <Tag color="orange">
-              {t('badges.requiredCompleted', { done: requiredCompleted, total: requiredTotal })}
-            </Tag>
-          )}
-        </Flex>
+        showTitle ? (
+          <Flex align="center" justify="space-between" style={{ width: '100%' }}>
+            <Title level={5} style={sectionHeaderStyle}>
+              {t('sections.companyInfo')}
+            </Title>
+            {requiredTotal > 0 && (
+              <Tag color="orange">
+                {t('badges.requiredCompleted', { done: requiredCompleted, total: requiredTotal })}
+              </Tag>
+            )}
+          </Flex>
+        ) : undefined
       }
     >
       <Flex vertical gap={24}>
+        {!showTitle && companyFields.length > 0 && (
+          <div>
+            <Typography.Text strong className="text-gray-600 text-sm">
+              {t('sections.companyInfo')}
+            </Typography.Text>
+          </div>
+        )}
         {/* 公司基本信息 */}
         <Row gutter={[24, 0]}>
-          {companyFields.map((field) => renderField(field, 12))}
+          {companyFields.map((field) => renderField(field))}
         </Row>
 
         {/* 联系人信息 */}
@@ -267,7 +292,7 @@ export function CompanyInfoForm({
               </Typography.Text>
             </div>
             <Row gutter={[24, 0]}>
-              {contactFields.map((field) => renderField(field, 12))}
+              {contactFields.map((field) => renderField(field))}
             </Row>
           </>
         )}
@@ -296,7 +321,7 @@ export function CompanyInfoForm({
               )}
             </Flex>
             <Row gutter={[24, 0]}>
-              {authorizerFields.map((field) => renderField(field, 12))}
+              {authorizerFields.map((field) => renderField(field))}
             </Row>
           </>
         )}

@@ -112,5 +112,36 @@ describe('buildCheckerSummary', () => {
     expect(summary.sections.smelterList.total).toBe(2)
     expect(summary.sections.smelterList.completed).toBe(1)
   })
-})
 
+  it('counts requester number as required progress when requester columns are enabled', () => {
+    const emrt = getVersionDef('emrt', '2.1')
+    const formState: FormStateForRequired = {
+      scopeType: 'B',
+      selectedMinerals: ['cobalt'],
+      questionAnswers: {
+        Q1: { cobalt: 'No' },
+        Q2: { cobalt: 'No' },
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(emrt),
+      questions: {
+        Q1: { cobalt: 'No' },
+        Q2: { cobalt: 'No' },
+      },
+      productList: [
+        {
+          id: 'row-1',
+          productNumber: 'RESP-001',
+          productName: 'Product A',
+          requesterNumber: '',
+          requesterName: 'Requester Product A',
+        },
+      ],
+    })
+
+    const { summary } = buildCheckerSummary(emrt, formState, formData, t)
+    expect(summary.sections.productList.total).toBe(3)
+    expect(summary.sections.productList.completed).toBe(2)
+  })
+})

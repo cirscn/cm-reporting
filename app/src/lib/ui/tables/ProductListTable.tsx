@@ -11,7 +11,7 @@ import type {
   ProductListIntegration,
   ProductPickContext,
 } from '@lib/public/integrations'
-import { wrapRequired } from '@ui/helpers/fieldRequired'
+import { renderRequiredHeaderLabel, wrapRequired } from '@ui/helpers/fieldRequired'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useBoolean, useCreation, useLatest, useMemoizedFn } from 'ahooks'
@@ -220,7 +220,7 @@ export const ProductListTable = memo(function ProductListTable({
   const columns = useCreation<ColumnsType<ProductRow>>(() => {
     const base: ColumnsType<ProductRow> = [
       {
-        title: t(config.productNumberLabelKey),
+        title: renderRequiredHeaderLabel(t(config.productNumberLabelKey), required),
         dataIndex: 'productNumber',
         key: 'productNumber',
         width: 180,
@@ -255,17 +255,20 @@ export const ProductListTable = memo(function ProductListTable({
     if (enableRequesterColumns) {
       base.push(
         {
-          title: t('tables.requesterNumber'),
+          title: renderRequiredHeaderLabel(t('tables.requesterNumber'), required),
           dataIndex: 'requesterNumber',
           key: 'requesterNumber',
           width: 180,
-          render: (value: string, record: ProductRow) => (
-            <Input
-              value={value || undefined}
-              onChange={getInputHandler(`${record.id}:requesterNumber`)}
-              placeholder={t('productPlaceholders.requesterNumber')}
-            />
-          ),
+          render: (value: string, record: ProductRow) =>
+            wrapRequired(
+              required,
+              <Input
+                value={value || undefined}
+                onChange={getInputHandler(`${record.id}:requesterNumber`)}
+                placeholder={t('productPlaceholders.requesterNumber')}
+              />,
+              componentDisabled,
+            ),
         },
         {
           title: t('tables.requesterName'),
