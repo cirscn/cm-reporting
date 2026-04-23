@@ -104,6 +104,7 @@ vi.mock('@shell/store', () => ({
       questions: new Map(),
       companyQuestions: new Map([['CQ1', true]]),
     },
+    checkerErrors: derivedState.checkerErrors,
     viewModels: {
       declaration: {
         displayMinerals: [{ key: 'tin', labelKey: 'minerals.tin', label: 'Tin' }],
@@ -135,6 +136,17 @@ vi.mock('./useFieldFocus', () => ({
 
 const navigationState = vi.hoisted(() => ({
   searchParams: new URLSearchParams(),
+}))
+
+const derivedState = vi.hoisted(() => ({
+  checkerErrors: [
+    {
+      code: 'E001',
+      messageKey: 'checker.requiredField',
+      fieldPath: 'questions.Q1.tin',
+      severity: 'error' as const,
+    },
+  ],
 }))
 
 vi.mock('@shell/navigation/useNavigation', () => ({
@@ -169,6 +181,14 @@ vi.mock('@ui/forms/companyQuestionsRequiredHint', () => ({
 describe('DeclarationPage', () => {
   test('shows declaration step sections as multi-expand collapse panels with header tags and de-duplicated inner titles', () => {
     navigationState.searchParams = new URLSearchParams()
+    derivedState.checkerErrors = [
+      {
+        code: 'E001',
+        messageKey: 'checker.requiredField',
+        fieldPath: 'questions.Q1.tin',
+        severity: 'error',
+      },
+    ]
     collapseMock.mockClear()
     companyInfoFormMock.mockClear()
     mineralScopeFormMock.mockClear()
@@ -231,8 +251,39 @@ describe('DeclarationPage', () => {
     expect(companyQuestionsProps?.showTitle).toBe(false)
   })
 
+  test('shows required marker on company questions panel title when required validation fails', () => {
+    navigationState.searchParams = new URLSearchParams()
+    derivedState.checkerErrors = [
+      {
+        code: 'E002',
+        messageKey: 'checker.requiredField',
+        fieldPath: 'companyQuestions.CQ1',
+        severity: 'error',
+      },
+    ]
+    collapseMock.mockClear()
+
+    renderToStaticMarkup(<DeclarationPage />)
+
+    const collapseProps = collapseMock.mock.calls[0]?.[0] as {
+      items?: Array<{ key: string; label?: ReactNode }>
+    }
+    const companyQuestionsPanel = collapseProps.items?.find((item) => item.key === 'companyQuestions')
+    const companyQuestionsLabelHtml = renderToStaticMarkup(<>{companyQuestionsPanel?.label}</>)
+
+    expect(companyQuestionsLabelHtml).toContain('*')
+  })
+
   test('expands minerals scope panel when focus field is in declaration question matrix', () => {
     navigationState.searchParams = new URLSearchParams('focus=questions.Q1.tin')
+    derivedState.checkerErrors = [
+      {
+        code: 'E001',
+        messageKey: 'checker.requiredField',
+        fieldPath: 'questions.Q1.tin',
+        severity: 'error',
+      },
+    ]
     collapseMock.mockClear()
 
     renderToStaticMarkup(<DeclarationPage />)
@@ -246,6 +297,14 @@ describe('DeclarationPage', () => {
 
   test('expands company questions panel when focus field is in company questions', () => {
     navigationState.searchParams = new URLSearchParams('focus=companyQuestions.C.cobalt')
+    derivedState.checkerErrors = [
+      {
+        code: 'E002',
+        messageKey: 'checker.requiredField',
+        fieldPath: 'companyQuestions.CQ1',
+        severity: 'error',
+      },
+    ]
     collapseMock.mockClear()
 
     renderToStaticMarkup(<DeclarationPage />)

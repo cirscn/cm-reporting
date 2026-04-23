@@ -3,6 +3,8 @@
  * @description 第一页申报表单，按折叠面板组织公司信息、申报范围和公司层面问题。
  */
 
+import type { CheckerError } from '@core/rules/checker'
+import { ERROR_KEYS, type ErrorKey } from '@core/validation/errorKeys'
 import { useOptionalNavigation } from '@shell/navigation/useNavigation'
 import {
   useTemplateActions,
@@ -10,6 +12,7 @@ import {
   useTemplateErrors,
   useTemplateState,
 } from '@shell/store'
+import type { TemplateFormErrors } from '@shell/store/templateTypes'
 import { CompanyInfoForm } from '@ui/forms/CompanyInfoForm'
 import { CompanyQuestionsForm } from '@ui/forms/CompanyQuestionsForm'
 import { buildCompanyQuestionsRequiredHint } from '@ui/forms/companyQuestionsRequiredHint'
@@ -30,6 +33,17 @@ const DECLARATION_PANEL_KEYS = Object.freeze({
 
 const DEFAULT_ACTIVE_DECLARATION_PANELS = [DECLARATION_PANEL_KEYS.companyInfo]
 const DECLARATION_COMPANY_INFO_LABEL_WIDTH = 220
+const REQUIRED_CHECKER_ERROR_KEYS = new Set<ErrorKey>([
+  ERROR_KEYS.checker.requiredField,
+  ERROR_KEYS.checker.requiredCompanyQuestionComment,
+])
+const REQUIRED_FORM_ERROR_KEYS = new Set<ErrorKey>([
+  ERROR_KEYS.required,
+  ERROR_KEYS.companyQuestions.commentRequired,
+  ERROR_KEYS.minerals.selectAtLeastOne,
+  ERROR_KEYS.minerals.enterAtLeastOne,
+  ERROR_KEYS.minerals.otherRequired,
+])
 
 function getDeclarationPanelKeyForFieldPath(fieldPath: string | null) {
   if (!fieldPath) {
@@ -73,6 +87,45 @@ function buildPanelLabel(title: string, extra?: ReactNode, required?: boolean) {
   )
 }
 
+function isRequiredFormError(errorKey?: ErrorKey) {
+  return !!errorKey && REQUIRED_FORM_ERROR_KEYS.has(errorKey)
+}
+
+function hasRequiredNestedErrors(errors: Record<string, Record<string, ErrorKey> | ErrorKey>) {
+  return Object.values(errors).some((value) =>
+    typeof value === 'string'
+      ? isRequiredFormError(value)
+      : Object.values(value).some((entry) => isRequiredFormError(entry))
+  )
+}
+
+function hasRequiredCheckerErrorForPanel(checkerErrors: CheckerError[], panelKey: string) {
+  return checkerErrors.some(
+    (error) =>
+      REQUIRED_CHECKER_ERROR_KEYS.has(error.messageKey) &&
+      getDeclarationPanelKeyForFieldPath(error.fieldPath) === panelKey
+  )
+}
+
+function hasRequiredMineralsScopeErrors(
+  errors: TemplateFormErrors,
+  checkerErrors: CheckerError[]
+) {
+  const hasRowError = Object.values(errors.mineralsScopeRows ?? {}).some(
+    (row) => isRequiredFormError(row.mineral) || isRequiredFormError(row.reason)
+  )
+  const hasCustomMineralError = Object.values(errors.customMinerals ?? {}).some((errorKey) =>
+    isRequiredFormError(errorKey)
+  )
+
+  return (
+    isRequiredFormError(errors.mineralsScope) ||
+    hasCustomMineralError ||
+    hasRowError ||
+    hasRequiredCheckerErrorForPanel(checkerErrors, DECLARATION_PANEL_KEYS.mineralsScope)
+  )
+}
+
 function isCompanyInfoFieldRequired(
   field: { key: string; required?: boolean | 'conditional' },
   requiredFields: Map<string, boolean>
@@ -103,7 +156,7 @@ export function DeclarationPage() {
     setCompanyQuestionValue,
   } = useTemplateActions()
   const { t } = useT()
-  const { gatingByMineral, requiredFields, viewModels } = useTemplateDerived()
+  const { checkerErrors, gatingByMineral, requiredFields, viewModels } = useTemplateDerived()
   const { displayMinerals } = viewModels.declaration
   const focusFieldPath =
     navigation?.state.searchParams.get('focus') ??
@@ -134,7 +187,6 @@ export function DeclarationPage() {
       </Tag>
     ) : undefined
 
-  const mineralsScopeRequired = versionDef.mineralScope.mode !== 'fixed'
   const mineralsScopeExtra =
     versionDef.mineralScope.mode === 'dynamic-dropdown' && versionDef.mineralScope.maxCount ? (
       <Tag color="orange">
@@ -148,6 +200,10 @@ export function DeclarationPage() {
         {buildCompanyQuestionsRequiredHint(t, versionDef.gating.companyQuestionsGating)}
       </Tag>
     ) : undefined
+  const mineralsScopeTitleRequired = hasRequiredMineralsScopeErrors(errors, checkerErrors)
+  const companyQuestionsTitleRequired =
+    hasRequiredNestedErrors(errors.companyQuestions) ||
+    hasRequiredCheckerErrorForPanel(checkerErrors, DECLARATION_PANEL_KEYS.companyQuestions)
 
   const declarationPanels: Array<{ key: string; label: ReactNode; children: ReactNode }> = [
     {
@@ -170,7 +226,11 @@ export function DeclarationPage() {
     },
     {
       key: DECLARATION_PANEL_KEYS.mineralsScope,
-      label: buildPanelLabel(t('sections.mineralsScope'), mineralsScopeExtra, mineralsScopeRequired),
+      label: buildPanelLabel(
+        t('sections.mineralsScope'),
+        mineralsScopeExtra,
+        mineralsScopeTitleRequired
+      ),
       children: (
         <Flex vertical gap={LAYOUT.sectionGap}>
           <MineralScopeForm
@@ -206,7 +266,11 @@ export function DeclarationPage() {
   if (versionDef.companyQuestions.length > 0) {
     declarationPanels.push({
       key: DECLARATION_PANEL_KEYS.companyQuestions,
-      label: buildPanelLabel(t('sections.companyQuestions'), companyQuestionsExtra),
+      label: buildPanelLabel(
+        t('sections.companyQuestions'),
+        companyQuestionsExtra,
+        companyQuestionsTitleRequired
+      ),
       children: (
         <CompanyQuestionsForm
           questions={versionDef.companyQuestions}
