@@ -7,9 +7,29 @@ import type { SmelterRow } from '@core/types/tableRows'
 
 const NEW_SMELTER_ROW_ID_PREFIX = 'smelter-new-'
 
+type ExternalSmelterLookupFields = Pick<Partial<SmelterRow>, 'smelterLookup' | 'smelterName'>
+
 type ExternalSmelterIdFields = Pick<Partial<SmelterRow>, 'id'> & {
   smelterId?: string
   smelterNumber?: string
+}
+
+/**
+ * 解析外部回写后的冶炼厂查找显示值：
+ * - 优先使用 smelterLookup
+ * - 未回写时回退到 smelterName，保证查找列和 checker 使用同一来源
+ */
+export function resolveExternalSmelterLookup(
+  partial: ExternalSmelterLookupFields,
+): string {
+  const smelterLookup =
+    typeof partial.smelterLookup === 'string' ? partial.smelterLookup.trim() : ''
+  if (smelterLookup) return smelterLookup
+
+  const smelterName = typeof partial.smelterName === 'string' ? partial.smelterName.trim() : ''
+  if (smelterName) return smelterName
+
+  return ''
 }
 
 /**
@@ -18,26 +38,29 @@ type ExternalSmelterIdFields = Pick<Partial<SmelterRow>, 'id'> & {
 export function resolveExternalSmelterNumber(
   partial: ExternalSmelterIdFields,
 ): string {
-  const smelterNumber = typeof partial.smelterNumber === 'string' ? partial.smelterNumber.trim() : ''
+  const smelterNumber =
+    typeof partial.smelterNumber === 'string' ? partial.smelterNumber.trim() : ''
   if (smelterNumber) return smelterNumber
   return ''
 }
 
 /**
  * 新增空行时生成临时行 ID。
- * 说明：宿主完成冶炼厂选择后，可由宿主回写的 id 覆盖该临时值。
+ * 宿主完成冶炼厂选择后，可由宿主回写的 id 覆盖该临时值。
  */
 export function buildNewSmelterRowId(now: number = Date.now()): string {
   return `${NEW_SMELTER_ROW_ID_PREFIX}${now}`
 }
 
-/** 判断是否为“新增空行”的临时 ID。 */
+/**
+ * 判断是否为“新增空行”的临时 ID。
+ */
 export function isTemporarySmelterRowId(id: string): boolean {
   return id.startsWith(NEW_SMELTER_ROW_ID_PREFIX)
 }
 
 /**
- * 解析外部回写后的行 ID：仅使用宿主回写的 id（去空格），否则保留当前行 ID。
+ * 解析外部回写后的行 ID：仅使用宿主回写的 id，否则保留当前行 ID。
  */
 export function resolveExternalSmelterRowId(
   partial: ExternalSmelterIdFields,

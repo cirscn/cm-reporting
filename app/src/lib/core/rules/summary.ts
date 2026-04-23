@@ -300,7 +300,7 @@ export function buildCheckerSummary(
         smelterCompleted += 1
         addPassed(
           `smelterList.${index}.smelterLookup`,
-          t('tables.smelterName'),
+          t('tables.smelterLookup'),
           smelterLabel
         )
       }

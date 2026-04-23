@@ -33,6 +33,7 @@ Apply these rules in every solution:
 - `SmelterList` 新增行应先生成临时 ID（`smelter-new-<timestamp>`）；宿主外部选择回写 `id` 后覆盖该临时 ID，未回写 `id` 时本次回写无效并提示错误。
 - `SmelterList` 行内外部选择需保证同一个 `metal` 下冶炼厂唯一，按回写 `id` 判重。
 - `SmelterList` 行内外部选择成功后（非 `Smelter not listed / not yet identified`），应锁定基础主数据字段不可编辑：`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state`。
+- 宿主外部回写若只提供 `smelterName`、未提供 `smelterLookup`，库会自动把 `smelterName` 作为 `smelterLookup` 显示与校验来源；宿主如有独立查找值，仍优先回写 `smelterLookup`。
 - `SmelterList` 外部选择入口为“行内模式”：仅保留“新增一行”后在行内触发外部选择，不提供顶部批量“从外部选择”入口。
 - `Smelter List` 表头必须按当前 `templateType + versionId` 对齐到对应 RMI Excel 模板，不能把所有调查类型强行共用一套表头。
 - `CMRT / CRT / EMRT / AMRT` 都要保留版本差异支持；只能调整 UI 列标题、顺序和显隐，不能借机改动 Snapshot / 后端字段语义。

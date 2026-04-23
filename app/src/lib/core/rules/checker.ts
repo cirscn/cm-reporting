@@ -427,7 +427,7 @@ function checkSmelterList(
       'R',
       ERROR_KEYS.checker.requiredField,
       `smelterList.${index}.smelterLookup`,
-      'tables.smelterName'
+      'tables.smelterLookup'
     )
   })
 

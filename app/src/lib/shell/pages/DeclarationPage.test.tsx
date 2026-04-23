@@ -237,8 +237,10 @@ describe('DeclarationPage', () => {
     expect(companyInfoLabelHtml).toContain('*')
     expect(companyInfoLabelHtml).toContain('1/2')
     expect(scopeLabelHtml).toContain('sections.mineralsScope')
+    expect(scopeLabelHtml).toContain('*')
     expect(scopeLabelHtml).toContain('1/3')
     expect(companyQuestionsLabelHtml).toContain('sections.companyQuestions')
+    expect(companyQuestionsLabelHtml).toContain('*')
     expect(companyQuestionsLabelHtml).toContain('required:always')
     expect(scopePanelHtml).toContain('MineralScopeForm')
     expect(scopePanelHtml).toContain('QuestionMatrixForm')
@@ -251,16 +253,9 @@ describe('DeclarationPage', () => {
     expect(companyQuestionsProps?.showTitle).toBe(false)
   })
 
-  test('shows required marker on company questions panel title when required validation fails', () => {
+  test('keeps required markers on company questions panel title even when there is no current error', () => {
     navigationState.searchParams = new URLSearchParams()
-    derivedState.checkerErrors = [
-      {
-        code: 'E002',
-        messageKey: 'checker.requiredField',
-        fieldPath: 'companyQuestions.CQ1',
-        severity: 'error',
-      },
-    ]
+    derivedState.checkerErrors = []
     collapseMock.mockClear()
 
     renderToStaticMarkup(<DeclarationPage />)
