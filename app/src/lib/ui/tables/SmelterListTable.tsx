@@ -45,6 +45,7 @@ import {
   buildNewSmelterRowId,
   hasDuplicateSmelterSelectionForMetal,
   hasExternalSmelterNumberInput,
+  resolveExternalSmelterLookup,
   resolveExternalSmelterNumber,
   resolveExternalSmelterRowId,
   shouldDisableSmelterFieldsAfterExternalPick,
@@ -206,11 +207,16 @@ export const SmelterListTable = memo(function SmelterListTable({
       if (!resolvedRowId.trim()) {
         return row
       }
+      const resolvedLookup = resolveExternalSmelterLookup({
+        smelterLookup: partial.smelterLookup,
+        smelterName: partial.smelterName,
+      })
       const merged: SmelterRow = {
         ...row,
         ...(partial as Record<string, string | undefined>),
         id: resolvedRowId,
         metal: row.metal,
+        smelterLookup: resolvedLookup || row.smelterLookup,
       }
       const resolvedSmelterNumber = resolveExternalSmelterNumber(partial)
       if (resolvedSmelterNumber) {

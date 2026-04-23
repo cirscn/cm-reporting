@@ -563,13 +563,10 @@ describe('runChecker', () => {
 
     const errors = runChecker(cmrt, formState, formData)
 
-    expect(
-      errors.some(
-        (error) =>
-          error.fieldPath === 'smelterList.0.smelterLookup' &&
-          error.messageKey === ERROR_KEYS.checker.requiredField
-      )
-    ).toBe(true)
+    const lookupError = errors.find((error) => error.fieldPath === 'smelterList.0.smelterLookup')
+
+    expect(lookupError?.messageKey).toBe(ERROR_KEYS.checker.requiredField)
+    expect(lookupError?.fieldLabelKey).toBe('tables.smelterLookup')
   })
 
   it('requires AMRT smelter lookup when metal is selected', () => {
@@ -594,13 +591,10 @@ describe('runChecker', () => {
 
     const errors = runChecker(amrt, formState, formData)
 
-    expect(
-      errors.some(
-        (error) =>
-          error.fieldPath === 'smelterList.0.smelterLookup' &&
-          error.messageKey === ERROR_KEYS.checker.requiredField
-      )
-    ).toBe(true)
+    const lookupError = errors.find((error) => error.fieldPath === 'smelterList.0.smelterLookup')
+
+    expect(lookupError?.messageKey).toBe(ERROR_KEYS.checker.requiredField)
+    expect(lookupError?.fieldLabelKey).toBe('tables.smelterLookup')
   })
 
   it.todo('requires mine list row fields when mine list rules are enabled')

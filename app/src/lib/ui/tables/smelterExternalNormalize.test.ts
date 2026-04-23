@@ -10,11 +10,35 @@ import {
   hasDuplicateSmelterSelectionForMetal,
   hasExternalSmelterNumberInput,
   isTemporarySmelterRowId,
+  resolveExternalSmelterLookup,
   resolveExternalSmelterNumber,
   resolveExternalSmelterRowId,
   resolveSmelterSelectionKey,
   shouldDisableSmelterFieldsAfterExternalPick,
 } from './smelterExternalNormalize'
+
+describe('resolveExternalSmelterLookup', () => {
+  test('优先使用外部回写的 smelterLookup', () => {
+    expect(
+      resolveExternalSmelterLookup({
+        smelterLookup: ' Fairsky Industrial Co., Limited ',
+        smelterName: 'Another Name',
+      }),
+    ).toBe('Fairsky Industrial Co., Limited')
+  })
+
+  test('未回写 smelterLookup 时回退到 smelterName', () => {
+    expect(
+      resolveExternalSmelterLookup({
+        smelterName: ' Fairsky Industrial Co., Limited ',
+      }),
+    ).toBe('Fairsky Industrial Co., Limited')
+  })
+
+  test('两者都为空时返回空字符串', () => {
+    expect(resolveExternalSmelterLookup({ smelterLookup: '   ', smelterName: '' })).toBe('')
+  })
+})
 
 describe('resolveExternalSmelterNumber', () => {
   test('仅使用 smelterNumber', () => {
