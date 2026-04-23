@@ -132,11 +132,12 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 - `submit()` 与 `validate()` 使用同一套全量校验门控（`zod + checker`）。
 - 当 checker 仍有“必填未完成”项时，`submit()` 一定返回 `null`，不会出现“checker 提示未完成但仍提交成功”的状态分叉。
 
-**Checker 门控一致性说明（EMRT/AMRT）：**
+**Checker 一致性说明（Smelter List）：**
 
 - `Smelter List` 相关的 checker 校验与进度统计共用同一门控：仅当矿种处于“需要填写冶炼厂”状态时生效。
 - 当用户保留历史 `smelterList` 行，但后续将 `Q1/Q2` 改为否定导致该矿种不再要求冶炼厂时，不会再对 `smelterLookup` 产生错误或进度扣减。
 - 该规则用于确保 checker 错误数与完成度一致，避免“错误为 0 但完成度下降”的状态偏差。
+- 对所有带 `smelterLookup` 下拉的模板版本，只要某一行已经选择 `metal`，该行的 `smelterLookup` 就属于 checker 必填；未选择时会直接判定为未完成。
 
 **EMRT 申报范围默认值说明：**
 

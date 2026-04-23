@@ -417,21 +417,19 @@ function checkSmelterList(
 
   if (!versionDef.smelterList.hasLookup) return
 
-  if (versionDef.templateType === 'emrt' || versionDef.templateType === 'amrt') {
-    rows.forEach((row, index) => {
-      const metal = row.metal || ''
-      if (!metal.trim()) return
-      const lookup = row.smelterLookup || ''
-      if (lookup.trim()) return
-      pushError(
-        errors,
-        'R',
-        ERROR_KEYS.checker.requiredField,
-        `smelterList.${index}.smelterLookup`,
-        'tables.smelterName'
-      )
-    })
-  }
+  rows.forEach((row, index) => {
+    const metal = row.metal || ''
+    if (!metal.trim()) return
+    const lookup = row.smelterLookup || ''
+    if (lookup.trim()) return
+    pushError(
+      errors,
+      'R',
+      ERROR_KEYS.checker.requiredField,
+      `smelterList.${index}.smelterLookup`,
+      'tables.smelterName'
+    )
+  })
 
   if (!versionDef.smelterList.notListedRequireNameCountry) return
 

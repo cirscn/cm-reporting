@@ -543,6 +543,35 @@ describe('runChecker', () => {
     ).toBe(true)
   })
 
+  it('requires CMRT smelter lookup when metal is selected', () => {
+    const mineralKey = 'gold'
+    const formState: FormStateForRequired = {
+      scopeType: 'A',
+      questionAnswers: {
+        Q1: buildMineralAnswerMap(cmrt, 'Yes'),
+        Q2: buildMineralAnswerMap(cmrt, 'Yes'),
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(cmrt),
+      questions: {
+        Q1: buildMineralAnswerMap(cmrt, 'Yes'),
+        Q2: buildMineralAnswerMap(cmrt, 'Yes'),
+      },
+      smelterList: [{ metal: mineralKey, smelterLookup: '' }],
+    })
+
+    const errors = runChecker(cmrt, formState, formData)
+
+    expect(
+      errors.some(
+        (error) =>
+          error.fieldPath === 'smelterList.0.smelterLookup' &&
+          error.messageKey === ERROR_KEYS.checker.requiredField
+      )
+    ).toBe(true)
+  })
+
   it('requires AMRT smelter lookup when metal is selected', () => {
     const amrt = getVersionDef('amrt', '1.3')
     const mineralKey = 'aluminum'

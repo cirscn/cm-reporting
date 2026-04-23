@@ -25,6 +25,8 @@ Apply these rules in every solution:
 - Import `cm-reporting/styles.css` exactly once in host runtime.
 - Provide official template `.xlsx` as `ArrayBuffer` when calling Excel export APIs.
 - Treat Snapshot as full-state contract (`schemaVersion/templateType/versionId/data`).
+- Before calling `cirsGpmLegacyAdapter.toInternal(...)`, normalize only the known legacy nullable-array fields from `null` to `[]`: `cmtRangeQuestions`, `cmtCompanyQuestions`, `cmtSmelters`, `cmtParts`, `minList`, `amrtReasonList`.
+- Do not silently coerce unrelated wrong types in legacy payloads; keep non-contract violations visible.
 - `companyInfo.authorizationDate` 推荐传 `YYYY-MM-DD`；运行时兼容秒/毫秒时间戳（number/数字字符串），并会归一化为 `YYYY-MM-DD`。
 - Return integrations callback result in `{ items: [...] } | null | undefined` shape only.
 - 对 `SmelterList` 外部回写结果，`id` 与冶炼厂识别号码语义严格分离：`id` 仅用于行主键与去重判定；识别号码应由 `smelterNumber` 回写并仅用于展示（`smelterId` 仅内部兼容）。
@@ -50,6 +52,7 @@ Apply these rules in every solution:
 - Treat the workflow step nav as a sticky header: keep `Declaration / Smelter List / Mine List / Product List / Checker` visible while the middle content area scrolls.
 - If host app renders `cm-reporting` inside a modal, drawer, split pane, or custom shell, ensure the container has a calculable height so the library can keep scroll inside the content area instead of the whole page.
 - For `EMRT/AMRT` checker behavior, keep checker errors and progress summary under the same gating: when smelter requirement is disabled by Q1/Q2, do not count `smelterLookup` required progress from historical rows.
+- For any template version with `smelterLookup` dropdown support, once a `Smelter List` row has a selected `metal`, treat `smelterLookup` as checker-required; missing lookup must stay visible as an unfinished item instead of silently passing.
 - For `EMRT`, default selection should include all declared minerals on empty initialization; when `readOnly=false`, users can still edit the declaration scope selections.
 - For `Product List`, when `Declaration Scope = Product` (`scopeType === 'B'`), the list itself is required; `productNumber` is always required, and `requesterNumber` becomes required only for versions with `hasRequesterColumns=true` (for example `CMRT 6.6`, `EMRT 2.11`, and `AMRT 1.3`).
 - Treat “请求方的产品编号 / 请求方的产品名称” as UI labels only; integration payload fields remain `requesterNumber / requesterName`.
