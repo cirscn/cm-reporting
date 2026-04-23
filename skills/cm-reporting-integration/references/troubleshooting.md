@@ -138,3 +138,15 @@ Action:
 
 - Use `toExternal(snapshot, ctx)` for roundtrip fidelity.
 - Use `toExternalLoose(snapshot)` only for compatibility export.
+
+### Symptom: legacy adapter throws `expected: "array"` on fields like `cmtSmelters`
+
+Check:
+
+- Whether known legacy array fields are coming back as `null`.
+- Typical nullable-array fields: `cmtRangeQuestions`, `cmtCompanyQuestions`, `cmtSmelters`, `cmtParts`, `minList`, `amrtReasonList`.
+
+Action:
+
+- Before calling `cirsGpmLegacyAdapter.toInternal(...)`, normalize only those known nullable-array fields from `null` to `[]`.
+- Do not silently coerce unrelated wrong types such as objects or strings; surface those as contract violations.
