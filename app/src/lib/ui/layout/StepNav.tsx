@@ -96,7 +96,11 @@ export function StepNav({ steps, currentKey, purposeTip, onChange }: StepNavProp
       }}
     >
       <div className="step-nav-inner">
-        {hasPurposeTip && <div className="step-nav-purpose-tip">{purposeTip}</div>}
+        {hasPurposeTip && (
+          <Tag color="blue" className="step-nav-purpose-tip">
+            {purposeTip}
+          </Tag>
+        )}
         <Steps
           current={currentIndex >= 0 ? currentIndex : 0}
           items={items}

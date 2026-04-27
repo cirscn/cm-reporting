@@ -26,7 +26,19 @@ vi.mock('antd', () => ({
       ))}
     </div>
   ),
-  Tag: ({ children }: { children?: React.ReactNode }) => <span data-kind="tag">{children}</span>,
+  Tag: ({
+    children,
+    className,
+    color,
+  }: {
+    children?: React.ReactNode
+    className?: string
+    color?: string
+  }) => (
+    <span className={className} data-color={color} data-kind="tag">
+      {children}
+    </span>
+  ),
 }))
 
 describe('StepNav', () => {
@@ -72,7 +84,7 @@ describe('StepNav', () => {
     expect(html).toContain('step-nav-title-label')
   })
 
-  test('renders the version purpose tip above steps', () => {
+  test('renders the version purpose tip as an info tag above steps', () => {
     const html = renderToStaticMarkup(
       <StepNav
         currentKey="declaration"
@@ -82,6 +94,8 @@ describe('StepNav', () => {
     )
 
     expect(html).toContain('step-nav-purpose-tip')
+    expect(html).toContain('data-kind="tag"')
+    expect(html).toContain('data-color="blue"')
     expect(html).toContain('此报告的目的是收集在产品中所用锡、钽、钨、黄金等金属的采购信息。')
   })
 })
