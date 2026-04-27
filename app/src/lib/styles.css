@@ -287,6 +287,18 @@
   -webkit-text-fill-color: var(--ant-color-text) !important;
 }
 
+.cm-reporting-readonly .ant-input-disabled::placeholder,
+.cm-reporting-readonly .ant-input-number-disabled input::placeholder,
+.cm-reporting-readonly .ant-picker-disabled input::placeholder {
+  color: transparent !important;
+  opacity: 0 !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.cm-reporting-readonly .ant-select-disabled .ant-select-placeholder {
+  opacity: 0 !important;
+}
+
 /* --------------------------------------------------------------------------
    Keyframe 动画 - 无法内联
    -------------------------------------------------------------------------- */

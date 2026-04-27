@@ -185,6 +185,7 @@ function TemplateScaffold({
       onStepChange={handleStepChange}
       purposeTip={purposeTipKey ? t(purposeTipKey) : undefined}
       maxContentWidth={maxContentWidth}
+      className={readOnly ? 'cm-reporting-readonly' : undefined}
       bottomSlot={
         readOnly || !showPageActions
           ? undefined

@@ -144,6 +144,24 @@ describe('TemplateShell readOnly', () => {
     expect(mockInnerConfigProvider).toHaveBeenCalledWith(true)
   })
 
+  test('marks layout as read-only so placeholders can be hidden only in view mode', () => {
+    renderToStaticMarkup(
+      <TemplateShell
+        templateType="cmrt"
+        versionId="6.5"
+        readOnly
+        pageKey="declaration"
+        onNavigatePage={() => undefined}
+        renderPage={() => <div>content</div>}
+      />,
+    )
+
+    const appLayoutProps = mockAppLayout.mock.calls[0]?.[0] as {
+      className?: string
+    }
+    expect(appLayoutProps.className).toBe('cm-reporting-readonly')
+  })
+
   test('syncs controlled pageKey via onNavigatePage when readOnly checker is hidden', () => {
     const onNavigatePage = vi.fn()
 
