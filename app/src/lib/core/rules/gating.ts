@@ -29,6 +29,16 @@ function getAnswer(answers: QuestionAnswers, key: string, mineral?: string): str
   return ''
 }
 
+const CMRT_NEGATIVE_ANSWERS = ['No', 'Unknown', 'Not declaring']
+
+function hasAnswer(value: string): boolean {
+  return value.trim().length > 0
+}
+
+function isDisclosureAnswer(value: string, negativeAnswers: string[]): boolean {
+  return hasAnswer(value) && !negativeAnswers.includes(value)
+}
+
 // ---------------------------------------------------------------------------
 // 评估单个门控条件
 // ---------------------------------------------------------------------------
@@ -44,7 +54,7 @@ function evaluateCondition(
 
     case 'q1-not-no':
       // CMRT：Q1 ≠ No（未回答视为"尚未否定"，返回 true）
-      return getAnswer(answers, 'Q1', mineral) !== 'No'
+      return isDisclosureAnswer(getAnswer(answers, 'Q1', mineral), ['No'])
 
     case 'q1-yes':
       // CMRT：Q1 = Yes
@@ -53,8 +63,8 @@ function evaluateCondition(
     case 'q1q2-not-no':
       // CMRT：Q1 ≠ No 且 Q2 ≠ No
       return (
-        getAnswer(answers, 'Q1', mineral) !== 'No' &&
-        getAnswer(answers, 'Q2', mineral) !== 'No'
+        isDisclosureAnswer(getAnswer(answers, 'Q1', mineral), CMRT_NEGATIVE_ANSWERS) &&
+        isDisclosureAnswer(getAnswer(answers, 'Q2', mineral), CMRT_NEGATIVE_ANSWERS)
       )
 
     case 'q1q2-yes':
@@ -66,13 +76,13 @@ function evaluateCondition(
 
     case 'q1-not-negatives':
       // CRT/EMRT：Q1 不在否定选项列表中
-      return !condition.negatives.includes(getAnswer(answers, 'Q1', mineral))
+      return isDisclosureAnswer(getAnswer(answers, 'Q1', mineral), condition.negatives)
 
     case 'q1-not-negatives-and-q2-not-negatives':
       // EMRT：Q1 不在否定列表 且 Q2 不在否定列表
       return (
-        !condition.q1Negatives.includes(getAnswer(answers, 'Q1', mineral)) &&
-        !condition.q2Negatives.includes(getAnswer(answers, 'Q2', mineral))
+        isDisclosureAnswer(getAnswer(answers, 'Q1', mineral), condition.q1Negatives) &&
+        isDisclosureAnswer(getAnswer(answers, 'Q2', mineral), condition.q2Negatives)
       )
 
     default:

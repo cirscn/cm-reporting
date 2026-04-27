@@ -5,6 +5,7 @@
 
 import type { I18nKey } from '@core/i18n'
 import type { CompanyQuestionDef, GatingCondition, MineralDef, QuestionDef } from '@core/registry/types'
+import { isCompanyQuestionCommentRequired } from '@core/rules/companyQuestions'
 import type { GatingResult } from '@core/rules/gating'
 import type { ErrorKey } from '@core/validation/errorKeys'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
@@ -230,14 +231,11 @@ function renderCompanyQuestionRow({
   const commentKey = `${question.key}_comment`
   const selectHandler = getSelectHandler(question.key)
   const commentHandler = getCommentHandler(commentKey)
-  const commentRequiredWhen = question.commentRequiredWhen ?? []
   const mainValue = getCompanyQuestionValue(values, question.key, '', false)
   const commentError = getCompanyQuestionCommentError(errors, commentKey, '', false)
   const questionRequired = requiredByQuestion?.get(question.key) ?? !isOptional
   // 备注始终展示，但仅在命中特定选项时要求必填。
-  const shouldRequireComment =
-    question.hasCommentField && commentRequiredWhen.includes(mainValue || '')
-  const commentRequired = questionRequired && shouldRequireComment
+  const commentRequired = isCompanyQuestionCommentRequired(question, mainValue)
   const commentValue = getCompanyQuestionCommentValue(values, commentKey, '', false)
 
   return (
@@ -326,10 +324,7 @@ function renderPerMineralQuestionRow({
             mineral.key,
             true
           )
-          const commentRequiredWhen = question.commentRequiredWhen ?? []
-          const shouldRequireComment =
-            question.hasCommentField && commentRequiredWhen.includes(value || '')
-          const commentRequired = required && shouldRequireComment
+          const commentRequired = isCompanyQuestionCommentRequired(question, value)
           const perMineralCommentHandler = getPerMineralCommentHandler(
             `${commentKey}:${mineral.key}`
           )

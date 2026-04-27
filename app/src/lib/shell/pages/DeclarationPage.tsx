@@ -3,6 +3,7 @@
  * @description 第一页申报表单，按折叠面板组织公司信息、申报范围和公司层面问题。
  */
 
+import { hasRequiredCompanyQuestionComment } from '@core/rules/companyQuestions'
 import { useOptionalNavigation } from '@shell/navigation/useNavigation'
 import {
   useTemplateActions,
@@ -149,7 +150,13 @@ export function DeclarationPage() {
     ) : undefined
   const mineralsScopeTitleRequired =
     versionDef.mineralScope.mode !== 'fixed' || versionDef.questions.length > 0
-  const companyQuestionsTitleRequired = versionDef.companyQuestions.length > 0
+  const companyQuestionsTitleRequired = Array.from(
+    requiredFields.companyQuestions.values()
+  ).some((required) => required) || hasRequiredCompanyQuestionComment({
+    questions: versionDef.companyQuestions,
+    values: companyQuestions,
+    mineralKeys: displayMinerals.map((mineral) => mineral.key),
+  })
 
   const declarationPanels: Array<{ key: string; label: ReactNode; children: ReactNode }> = [
     {

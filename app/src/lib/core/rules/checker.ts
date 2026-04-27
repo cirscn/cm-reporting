@@ -13,6 +13,10 @@ import { isValidEmail } from '@core/validation/email'
 import { ERROR_KEYS, type ErrorKey } from '@core/validation/errorKeys'
 import { some } from 'lodash-es'
 
+import {
+  getCompanyQuestionAnswerValue,
+  isCompanyQuestionCommentRequired,
+} from './companyQuestions'
 import { calculateAllGating } from './gating'
 import {
   buildMineralLabelMap,
@@ -234,18 +238,16 @@ function checkCompanyQuestions(
     activeMinerals,
     (mineralKey) => gatingByMineral.get(mineralKey)?.companyQuestionsEnabled === true,
   )
-  if (!hasRequiredMineral) return
-
   for (const question of versionDef.companyQuestions) {
     if (question.perMineral) {
       // ── perMineral 公司问题：每个活跃矿种独立校验 ──
       for (const mineralKey of activeMinerals) {
-        if (!gatingByMineral.get(mineralKey)?.companyQuestionsEnabled) continue
-        checkSingleCompanyQuestion(formData, question, errors, mineralKey)
+        const required = gatingByMineral.get(mineralKey)?.companyQuestionsEnabled === true
+        checkSingleCompanyQuestion(formData, question, errors, required, mineralKey)
       }
     } else {
       // ── 全局公司问题 ──
-      checkSingleCompanyQuestion(formData, question, errors)
+      checkSingleCompanyQuestion(formData, question, errors, hasRequiredMineral)
     }
   }
 }
@@ -259,30 +261,32 @@ function checkSingleCompanyQuestion(
   formData: FormDataForChecker,
   question: TemplateVersionDef['companyQuestions'][number],
   errors: CheckerError[],
+  required: boolean,
   mineralKey?: string,
 ) {
-  const asText = (v: unknown) => (typeof v === 'string' ? v : '')
   const fieldSuffix = mineralKey ? `.${mineralKey}` : ''
 
   // ── 1. 校验回答值是否为空 ──
-  const value = mineralKey
-    ? asText(extractNestedValue(formData.companyQuestions[question.key], mineralKey))
-    : asText(formData.companyQuestions[question.key])
+  const value = getCompanyQuestionAnswerValue(
+    formData.companyQuestions,
+    question.key,
+    mineralKey
+  )
 
-  if (!value.trim()) {
+  if (required && !value.trim()) {
     pushError(errors, 'E', ERROR_KEYS.checker.requiredField, `companyQuestions.${question.key}${fieldSuffix}`, question.labelKey)
     return
   }
 
   // ── 2. 条件校验 comment：仅当回答值匹配 commentRequiredWhen 时 ──
-  if (!question.hasCommentField) return
-  const requiredWhen = question.commentRequiredWhen ?? []
-  if (requiredWhen.length === 0 || !requiredWhen.includes(value)) return
+  if (!isCompanyQuestionCommentRequired(question, value)) return
 
   const commentKey = `${question.key}_comment`
-  const comment = mineralKey
-    ? asText(extractNestedValue(formData.companyQuestions[commentKey], mineralKey))
-    : asText(formData.companyQuestions[commentKey])
+  const comment = getCompanyQuestionAnswerValue(
+    formData.companyQuestions,
+    commentKey,
+    mineralKey
+  )
 
   if (!comment.trim()) {
     pushError(
@@ -291,12 +295,6 @@ function checkSingleCompanyQuestion(
       question.commentLabelKey ?? question.labelKey,
     )
   }
-}
-
-/** 从嵌套 Record<string, Record<string, string> | string> 中提取 mineralKey 对应值。 */
-function extractNestedValue(record: Record<string, string> | string | undefined, mineralKey: string): string {
-  if (record && typeof record === 'object') return record[mineralKey] ?? ''
-  return ''
 }
 
 // ---------------------------------------------------------------------------

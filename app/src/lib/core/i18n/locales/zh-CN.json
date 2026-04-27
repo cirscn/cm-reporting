@@ -371,10 +371,10 @@
   },
   "fields": {
     "companyName": "公司名称",
-    "reportingScope": "报告范围",
+    "reportingScope": "申报范围或种类",
     "scopeDescription": "范围描述",
-    "companyId": "公司唯一标识",
-    "companyAuthId": "公司唯一授权ID",
+    "companyId": "公司唯一识别信息",
+    "companyAuthId": "公司唯一授权识别信息",
     "address": "地址",
     "contactName": "联系人姓名",
     "contactEmail": "联系人邮箱",
@@ -383,7 +383,7 @@
     "authorizerTitle": "授权人职务",
     "authorizerEmail": "授权人邮箱",
     "authorizerPhone": "授权人电话",
-    "authorizationDate": "完成日期"
+    "authorizationDate": "生效日期"
   },
   "docStatus": {
     "productListRequired": "当前范围：需要填写 Product List。",
@@ -1201,5 +1201,11 @@
     "externalPickMissingIdContent": "外部选择返回缺少必填 id，无法回写当前行。",
     "duplicateSmelterSelectionTitle": "冶炼厂重复选择",
     "duplicateSmelterSelectionContent": "同一个金属下不能重复选择同一个冶炼厂，请改选其他冶炼厂。"
+  },
+  "tips": {
+    "reportPurpose": {
+      "cmrt": "此报告的目的是收集在产品中所用锡、钽、钨、黄金等金属的采购信息。",
+      "emrt": "此报告的目的是收集产品中使用的特定原材料（特别是钴或天然云母）的采购信息。"
+    }
   }
 }

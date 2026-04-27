@@ -256,6 +256,37 @@ describe('runChecker', () => {
     ).toBe(true)
   })
 
+  it('requires CMRT company question B comment even when metal answers do not require company questions', () => {
+    const formState: FormStateForRequired = {
+      scopeType: 'A',
+      questionAnswers: {
+        Q1: buildMineralAnswerMap(cmrt, 'No'),
+        Q2: buildMineralAnswerMap(cmrt, 'No'),
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(cmrt),
+      questions: {
+        Q1: buildMineralAnswerMap(cmrt, 'No'),
+        Q2: buildMineralAnswerMap(cmrt, 'No'),
+      },
+      companyQuestions: {
+        B: 'Yes',
+        B_comment: '',
+      },
+    })
+
+    const errors = runChecker(cmrt, formState, formData)
+
+    expect(
+      errors.some(
+        (error) =>
+          error.fieldPath === 'companyQuestions.B_comment' &&
+          error.messageKey === ERROR_KEYS.checker.requiredCompanyQuestionComment
+      )
+    ).toBe(true)
+  })
+
   it('flags missing requester number when requester columns are enabled', () => {
     const emrt = getVersionDef('emrt', '2.1')
     const formState: FormStateForRequired = {
@@ -343,6 +374,40 @@ describe('runChecker', () => {
       },
       companyQuestions: {
         E: 'Yes, Using Other Format (Describe)',
+      },
+    })
+
+    const errors = runChecker(emrt, formState, formData)
+
+    expect(
+      errors.some(
+        (error) =>
+          error.fieldPath === 'companyQuestions.E_comment' &&
+          error.messageKey === ERROR_KEYS.checker.requiredCompanyQuestionComment
+      )
+    ).toBe(true)
+  })
+
+  it('requires EMRT company question E comment even when metal answers do not require company questions', () => {
+    const emrt = getVersionDef('emrt', '2.1')
+    const mineralKey = 'cobalt'
+    const formState: FormStateForRequired = {
+      scopeType: 'A',
+      selectedMinerals: [mineralKey],
+      questionAnswers: {
+        Q1: { [mineralKey]: 'No' },
+        Q2: { [mineralKey]: 'No' },
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(emrt),
+      questions: {
+        Q1: { [mineralKey]: 'No' },
+        Q2: { [mineralKey]: 'No' },
+      },
+      companyQuestions: {
+        E: 'Yes, Using Other Format (Describe)',
+        E_comment: '',
       },
     })
 

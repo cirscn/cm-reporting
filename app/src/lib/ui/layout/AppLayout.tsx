@@ -19,6 +19,7 @@ interface AppLayoutProps {
   tabs?: SidebarTab[]
   /** 工作流步骤（与 tabs 互斥，优先使用） */
   steps?: StepNavItem[]
+  purposeTip?: string
   /** 顶部横幅区域（如全局错误提示） */
   topBanner?: ReactNode
   /** 底部插槽（如分页操作） */
@@ -48,6 +49,7 @@ interface AppLayoutProps {
 export function AppLayout({
   tabs,
   steps,
+  purposeTip,
   topBanner,
   bottomSlot,
   currentTabKey,
@@ -80,7 +82,12 @@ export function AppLayout({
     <Layout className={`h-full min-h-full bg-gray-100 ${className ?? ''}`} style={layoutStyle}>
       {/* 步骤导航条 */}
       {useStepNav && (
-        <StepNav steps={steps!} currentKey={currentStepKey} onChange={onStepChange} />
+        <StepNav
+          steps={steps!}
+          currentKey={currentStepKey}
+          purposeTip={purposeTip}
+          onChange={onStepChange}
+        />
       )}
 
       {/* 顶部横幅（如全局错误提示） */}

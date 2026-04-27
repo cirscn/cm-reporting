@@ -71,4 +71,17 @@ describe('StepNav', () => {
     expect(html).toContain('step-nav-title-content')
     expect(html).toContain('step-nav-title-label')
   })
+
+  test('renders the version purpose tip above steps', () => {
+    const html = renderToStaticMarkup(
+      <StepNav
+        currentKey="declaration"
+        purposeTip="此报告的目的是收集在产品中所用锡、钽、钨、黄金等金属的采购信息。"
+        steps={[{ key: 'declaration', label: '申报' }]}
+      />,
+    )
+
+    expect(html).toContain('step-nav-purpose-tip')
+    expect(html).toContain('此报告的目的是收集在产品中所用锡、钽、钨、黄金等金属的采购信息。')
+  })
 })

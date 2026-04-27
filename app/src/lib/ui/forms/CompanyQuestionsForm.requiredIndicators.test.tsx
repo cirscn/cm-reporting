@@ -103,4 +103,26 @@ describe('CompanyQuestionsForm required indicators', () => {
     expect(html).not.toContain('company-question-required-mark')
     expect(html).not.toContain('field-required-empty')
   })
+
+  test('requires comment when current answer matches comment required condition even if question is optional', () => {
+    const versionDef = getVersionDef('cmrt', '6.6')
+    const questionB = versionDef.companyQuestions.find((question) => question.key === 'B')
+
+    if (!questionB) {
+      throw new Error('CMRT 6.6 question B is missing')
+    }
+
+    const html = renderToStaticMarkup(
+      <CompanyQuestionsForm
+        questions={[questionB]}
+        questionDefs={versionDef.questions}
+        values={{ B: 'Yes', B_comment: '' }}
+        onChange={() => undefined}
+        requiredByQuestion={new Map([['B', false]])}
+        showTitle={false}
+      />
+    )
+
+    expect(html).toContain('field-required-empty')
+  })
 })

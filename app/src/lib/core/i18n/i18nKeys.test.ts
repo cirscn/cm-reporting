@@ -164,6 +164,13 @@ function collectDocsIssues(enNode: unknown, zhNode: unknown, pathKey: string): s
 }
 
 describe('i18n keys', () => {
+  it('uses the requested zh-CN company info labels', () => {
+    expect(zhCN.fields.reportingScope).toBe('申报范围或种类')
+    expect(zhCN.fields.companyId).toBe('公司唯一识别信息')
+    expect(zhCN.fields.companyAuthId).toBe('公司唯一授权识别信息')
+    expect(zhCN.fields.authorizationDate).toBe('生效日期')
+  })
+
   it('covers registry label keys and literal t() usage', () => {
     const available = flattenKeys(enUS as Record<string, unknown>)
     const registryKeys = collectRegistryKeys()
