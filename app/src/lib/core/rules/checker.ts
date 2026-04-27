@@ -25,6 +25,12 @@ import {
 } from './helpers'
 import { getActiveMineralKeys, type FormStateForRequired } from './required'
 
+const REQUIRED_MINE_FIELDS_AFTER_METAL = [
+  { key: 'smelterName', labelKey: 'tables.mineSmelterName' },
+  { key: 'mineName', labelKey: 'tables.mineName' },
+  { key: 'mineCountry', labelKey: 'tables.mineCountry' },
+] as const
+
 // ---------------------------------------------------------------------------
 // Checker error
 // ---------------------------------------------------------------------------
@@ -93,8 +99,8 @@ export function runChecker(
   // Check minerals scope (AMRT only)
   checkMineralsScope(versionDef, formData, errors)
 
-  // Check mine list (no-op for templates without checker rules)
-  checkMineList(versionDef)
+  // Check mine list
+  checkMineList(versionDef, formData, errors)
 
   // Check email format
   checkEmailFormat(formData, errors)
@@ -457,11 +463,33 @@ function checkSmelterList(
 }
 
 // ---------------------------------------------------------------------------
-// Check mine list (no template currently requires it in Checker)
+// Check mine list
 // ---------------------------------------------------------------------------
 
-function checkMineList(versionDef: TemplateVersionDef) {
+function checkMineList(
+  versionDef: TemplateVersionDef,
+  formData: FormDataForChecker,
+  errors: CheckerError[],
+) {
   if (!versionDef.mineList.available) return
+
+  const rows = formData.mineList ?? []
+  rows.forEach((row, index) => {
+    const metal = row.metal || ''
+    if (!metal.trim()) return
+
+    REQUIRED_MINE_FIELDS_AFTER_METAL.forEach((field) => {
+      const value = row[field.key] || ''
+      if (value.trim()) return
+      pushError(
+        errors,
+        'R',
+        ERROR_KEYS.checker.requiredField,
+        `mineList.${index}.${field.key}`,
+        field.labelKey,
+      )
+    })
+  })
 }
 
 // ---------------------------------------------------------------------------

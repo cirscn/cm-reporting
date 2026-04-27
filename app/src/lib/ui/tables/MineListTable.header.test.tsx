@@ -4,6 +4,7 @@ import type { MineRow } from '@core/types/tableRows'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, test, vi } from 'vitest'
 
+import { getMineHeaderProfile, type MineColumnId } from './mineHeaderProfile'
 import { MineListTable } from './MineListTable'
 
 function resolveMessage(key: string): string {
@@ -26,13 +27,34 @@ vi.mock('@ui/i18n/useT', () => ({
   }),
 }))
 
-function renderTable(templateType: 'emrt' | 'amrt', versionId: string): string {
+const HEADER_COLUMNS: MineColumnId[] = [
+  'metal',
+  'smelterName',
+  'mineName',
+  'mineId',
+  'mineIdSource',
+  'mineCountry',
+  'mineStreet',
+  'mineCity',
+  'mineProvince',
+  'mineContactName',
+  'mineContactEmail',
+  'proposedNextSteps',
+  'comments',
+]
+
+function renderTable(
+  templateType: 'emrt' | 'amrt',
+  versionId: string,
+  options: { withMetal?: boolean } = {},
+): string {
   const versionDef = getVersionDef(templateType, versionId)
   const firstMetal = versionDef.mineralScope.minerals[0]
+  const metal = options.withMetal === false ? '' : firstMetal?.key ?? ''
   const rows: MineRow[] = [
     {
       id: 'mine-row-1',
-      metal: firstMetal?.key ?? '',
+      metal,
       smelterName: '',
       mineName: '',
       mineCountry: '',
@@ -55,11 +77,20 @@ function renderTable(templateType: 'emrt' | 'amrt', versionId: string): string {
       availableMetals={versionDef.mineralScope.minerals}
       rows={rows}
       onChange={() => undefined}
-      countryOptions={[{ value: 'CN', label: '中国' }]}
       smelterOptions={[{ value: 'smelter-1', label: 'Smelter A' }]}
-      smelterOptionsByMetal={{ [firstMetal?.key ?? '']: [{ value: 'smelter-1', label: 'Smelter A' }] }}
+      smelterOptionsByMetal={{
+        [firstMetal?.key ?? '']: [{ value: 'smelter-1', label: 'Smelter A' }],
+      }}
     />,
   )
+}
+
+function getLabels(columns: MineColumnId[]): string[] {
+  const headerProfile = getMineHeaderProfile({
+    locale: 'zh-CN',
+    t: resolveMessage,
+  })
+  return columns.map((column) => headerProfile.labels[column])
 }
 
 function expectLabelsInOrder(html: string, labels: string[]) {
@@ -73,26 +104,31 @@ function expectLabelsInOrder(html: string, labels: string[]) {
   }
 }
 
+function expectRequiredHeaderLabels(html: string, labels: string[]) {
+  for (const label of labels) {
+    const index = html.indexOf(label)
+    expect(index, `未找到必填表头：${label}`).toBeGreaterThan(-1)
+    const thEndIndex = html.indexOf('</th>', index)
+    const headerHtml = html.slice(index, thEndIndex)
+    expect(headerHtml, `表头未显示必填标识：${label}`).toContain('field-required-mark')
+  }
+}
+
+function expectNoRequiredHeaderLabels(html: string, labels: string[]) {
+  for (const label of labels) {
+    const index = html.indexOf(label)
+    expect(index, `未找到表头：${label}`).toBeGreaterThan(-1)
+    const thEndIndex = html.indexOf('</th>', index)
+    const headerHtml = html.slice(index, thEndIndex)
+    expect(headerHtml, `表头不应显示必填标识：${label}`).not.toContain('field-required-mark')
+  }
+}
+
 describe('MineListTable header alignment', () => {
   test('renders AMRT 1.1 headers in template order', () => {
     const html = renderTable('amrt', '1.1')
 
-    expectLabelsInOrder(html, [
-      '金属',
-      '从该矿厂采购的冶炼厂的名称',
-      '矿厂(矿场)名称',
-      '矿厂识别（例如《CID》）',
-      '冶炼厂出处识别号',
-      '矿厂所在国家或地区',
-      '矿厂所在街道',
-      '矿厂所在城市',
-      '矿厂地址：州/省',
-      '矿厂联系人',
-      '矿厂联系人电子邮件',
-      '建议的后续步骤',
-      '注释',
-    ])
-
+    expectLabelsInOrder(html, getLabels(HEADER_COLUMNS))
     expect(html).not.toContain('Country Code')
     expect(html).not.toContain('State / Province Code')
   })
@@ -100,23 +136,28 @@ describe('MineListTable header alignment', () => {
   test('renders EMRT 2.1 headers in the same template order', () => {
     const html = renderTable('emrt', '2.1')
 
-    expectLabelsInOrder(html, [
-      '金属',
-      '从该矿厂采购的冶炼厂的名称',
-      '矿厂(矿场)名称',
-      '矿厂识别（例如《CID》）',
-      '冶炼厂出处识别号',
-      '矿厂所在国家或地区',
-      '矿厂所在街道',
-      '矿厂所在城市',
-      '矿厂地址：州/省',
-      '矿厂联系人',
-      '矿厂联系人电子邮件',
-      '建议的后续步骤',
-      '注释',
-    ])
-
+    expectLabelsInOrder(html, getLabels(HEADER_COLUMNS))
     expect(html).not.toContain('Country Code')
     expect(html).not.toContain('State / Province Code')
+  })
+
+  test('marks mine row fields required after metal selection in headers', () => {
+    const html = renderTable('emrt', '2.1')
+
+    expectRequiredHeaderLabels(html, getLabels([
+      'smelterName',
+      'mineName',
+      'mineCountry',
+    ]))
+  })
+
+  test('hides mine row required marks before metal selection', () => {
+    const html = renderTable('emrt', '2.1', { withMetal: false })
+
+    expectNoRequiredHeaderLabels(html, getLabels([
+      'smelterName',
+      'mineName',
+      'mineCountry',
+    ]))
   })
 })

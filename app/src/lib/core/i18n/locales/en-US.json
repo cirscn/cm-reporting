@@ -109,7 +109,7 @@
     "mineName": "Mine name",
     "mineId": "CID…",
     "mineSourceId": "Source ID",
-    "mineCountry": "Select country",
+    "mineCountry": "Country / Region",
     "mineStreet": "Street",
     "mineCity": "City",
     "mineState": "State / Province",

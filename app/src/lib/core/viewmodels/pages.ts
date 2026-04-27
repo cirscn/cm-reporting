@@ -74,14 +74,12 @@ export function buildSmelterListViewModel({
 
 /** Mine List 页面派生数据。 */
 export function buildMineListViewModel({
-  templateType,
   versionDef,
   questionAnswers,
   selectedMinerals,
   customMinerals,
   smelterList,
 }: {
-  templateType: TemplateType
   versionDef: TemplateVersionDef
   questionAnswers: Record<string, Record<string, string> | string>
   selectedMinerals?: string[]
@@ -101,8 +99,6 @@ export function buildMineListViewModel({
         { selectedMinerals, customMinerals }
       ).map((mineral) => ({ ...mineral, label: labelOverrides.get(mineral.key) }))
     : []
-  const countryOptions = getCountryOptions(templateType)
-
   const smelterNames = compact<string>(
     smelterList.map((row) => {
       if (row.smelterName) return row.smelterName
@@ -144,7 +140,6 @@ export function buildMineListViewModel({
 
   return {
     availableMetals,
-    countryOptions,
     smelterOptions,
     smelterOptionsByMetal,
   }

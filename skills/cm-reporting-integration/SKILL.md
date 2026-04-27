@@ -41,6 +41,7 @@ Apply these rules in every solution:
 - `Mine List` 只对模板本身包含该工作表的版本生效：`AMRT` 全版本与 `EMRT` 2.x；`CMRT / CRT / EMRT 1.x` 不应伪造矿厂页。
 - `Mine List` 表头也必须对齐对应 RMI Excel 模板；当前 UI 不展示模板中的辅助列 `Country Code`、`State / Province Code`。
 - 矿厂表头文案变化不能改变数据契约，仍应回写到既有字段：例如矿厂识别走 `mineId`，矿厂识别来源走 `mineIdSource`。
+- `EMRT / AMRT` 的 `Mine List` 行只要选择了 `metal`，`smelterName`、`mineName`、`mineCountry` 就必须参与 checker、进度和 schema 校验；`mineCountry` 是自由文本输入，不是国家/地区下拉。
 - Respect package license (`PolyForm-Noncommercial-1.0.0`) in usage recommendations.
 - For `readOnly` behavior, treat it as **view-only contract** (not just disabled inputs):
   - hide checker page and checker entry in workflow;

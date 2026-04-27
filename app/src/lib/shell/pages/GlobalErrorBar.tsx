@@ -81,6 +81,7 @@ export function GlobalErrorBar({ onNavigateChecker }: GlobalErrorBarProps) {
     { key: 'questionMatrix', label: t('sections.questionMatrix'), ...sections.questionMatrix },
     { key: 'companyQuestions', label: t('sections.companyQuestions'), ...sections.companyQuestions },
     { key: 'smelterList', label: t('tabs.smelterList'), ...sections.smelterList },
+    { key: 'mineList', label: t('tabs.mineList'), ...sections.mineList },
     { key: 'productList', label: t('tabs.productList'), ...sections.productList },
   ].filter((s) => s.total > 0)
 

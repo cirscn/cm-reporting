@@ -19,8 +19,7 @@ export function MineListPage() {
   const { setMineList } = useTemplateActions()
   const { viewModels } = useTemplateDerived()
 
-  const { availableMetals, countryOptions, smelterOptions, smelterOptionsByMetal } =
-    viewModels.mineList
+  const { availableMetals, smelterOptions, smelterOptionsByMetal } = viewModels.mineList
 
   useFieldFocus()
 
@@ -40,7 +39,6 @@ export function MineListPage() {
         availableMetals={availableMetals}
         rows={rows}
         onChange={setMineList}
-        countryOptions={countryOptions}
         smelterOptions={smelterOptions}
         smelterOptionsByMetal={smelterOptionsByMetal}
       />

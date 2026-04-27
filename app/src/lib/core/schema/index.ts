@@ -16,6 +16,11 @@ import { z } from 'zod/v4'
 // ---------------------------------------------------------------------------
 
 const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, ERROR_KEYS.dateInvalid)
+const REQUIRED_MINE_FIELDS_AFTER_METAL = [
+  'smelterName',
+  'mineName',
+  'mineCountry',
+] as const
 
 // ---------------------------------------------------------------------------
 // Build field schema from FieldDef
@@ -263,6 +268,17 @@ export function buildMineRowSchema(versionDef: TemplateVersionDef) {
     proposedNextSteps: z.string().optional(),
     smelterName: z.string().optional(),
     comments: z.string().optional(),
+  }).superRefine((row, ctx) => {
+    if (!row.metal.trim()) return
+
+    REQUIRED_MINE_FIELDS_AFTER_METAL.forEach((field) => {
+      if (row[field]?.trim()) return
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [field],
+        message: ERROR_KEYS.required,
+      })
+    })
   })
 }
 

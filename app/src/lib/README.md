@@ -478,6 +478,7 @@ return null
 - 这些版本的矿厂列表 UI 表头已按对应 RMI Excel 模板对齐。
 - 当前 UI 显示列仍只保留业务可编辑列，不显示模板里的辅助列：`Country Code`、`State / Province Code`。
 - UI 表头文案对齐模板，不代表底层字段名变化；例如“矿厂识别（例如《CID》）”对应的仍是 `mineId` 字段。
+- `EMRT / AMRT` 矿厂行只要选择了 `metal`，`smelterName`、`mineName`、`mineCountry` 就会按必填项参与校验和进度统计；`mineCountry` 在 UI 中是文本输入框，不再使用国家/地区下拉。
 
 **行内选择上下文 (`SmelterRowPickContext`)：**
 

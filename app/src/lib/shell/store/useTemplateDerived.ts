@@ -126,7 +126,6 @@ export function useTemplateDerived(): TemplateDerived {
   const mineListViewModel = useCreation(
     () =>
       buildMineListViewModel({
-        templateType: meta.templateType,
         versionDef: meta.versionDef,
         questionAnswers: form.questions,
         selectedMinerals: form.selectedMinerals,
