@@ -1,5 +1,12 @@
 # cm-reporting
 
+## 0.7.8
+
+### Patch Changes
+
+- 08f2577: 调整 CMRT 和 EMRT 报告目的提示样式：改为信息类型标签展示，并优化长文本换行。
+- f55a27b: 调整只读态空值控件展示：只读模式下输入框、下拉框和日期选择器不再显示 placeholder，已有值仍正常展示。
+
 ## 0.7.7
 
 ### Patch Changes
