@@ -1,5 +1,11 @@
 # cm-reporting
 
+## 0.7.7
+
+### Patch Changes
+
+- 3bfbefb: 调整 CMRT 冶炼厂列表的金属下拉范围：仅显示第一步中同一金属 Q1 和 Q2 都选择 Yes 的金属，历史已有冶炼厂行不自动删除。
+
 ## 0.7.6
 
 ### Patch Changes
