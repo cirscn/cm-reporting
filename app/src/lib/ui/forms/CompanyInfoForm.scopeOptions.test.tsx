@@ -20,6 +20,8 @@ vi.mock('@ui/i18n', () => ({
 vi.mock('../fields', () => ({
   DateField: (props: {
     label?: ReactNode
+    placeholder?: string
+    formatHint?: string
     minDate?: string
     minBoundary?: 'inclusive' | 'exclusive'
     maxDate?: string
@@ -27,11 +29,14 @@ vi.mock('../fields', () => ({
     mockDateField(props)
     return <div>{props.label}</div>
   },
-  SelectField: (props: { options: Array<{ value: string; label: string }> }) => {
+  SelectField: (props: {
+    options: Array<{ value: string; label: string }>
+    placeholder?: string
+  }) => {
     mockSelectField(props)
     return <div data-kind="select-field" />
   },
-  TextField: (props: { label?: ReactNode; required?: boolean }) => {
+  TextField: (props: { label?: ReactNode; placeholder?: string; required?: boolean }) => {
     mockTextField(props)
     return <div>{props.label}</div>
   },
@@ -64,6 +69,33 @@ describe('CompanyInfoForm declaration scope options', () => {
       { value: 'B', label: 'B. Product (or List of Products)' },
       { value: 'C', label: "C. User defined [Specify in 'Description of scope']" },
     ])
+  })
+
+  test('shows company info placeholders for CMRT 6.6', () => {
+    const versionDef = getVersionDef('cmrt', '6.6')
+
+    renderToStaticMarkup(
+      <CompanyInfoForm
+        versionDef={versionDef}
+        values={{}}
+        onChange={() => undefined}
+        dateFormatHint="DD-MMM-YYYY"
+      />,
+    )
+
+    const companyNameProps = mockTextField.mock.calls
+      .map((call) => call[0] as { label?: ReactNode; placeholder?: string })
+      .find((item) => item.label === 'fields.companyName')
+    const scopeProps = mockSelectField.mock.calls[0]?.[0] as { placeholder?: string }
+    const dateProps = mockDateField.mock.calls[0]?.[0] as {
+      placeholder?: string
+      formatHint?: string
+    }
+
+    expect(companyNameProps?.placeholder).toBe('placeholders.companyName')
+    expect(scopeProps.placeholder).toBe('placeholders.declarationScope')
+    expect(dateProps.placeholder).toBe('placeholders.authorizationDate')
+    expect(dateProps.formatHint).toBe('DD-MMM-YYYY')
   })
 
   test('shows scope description for scope A without making it required', () => {

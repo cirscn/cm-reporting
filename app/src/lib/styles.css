@@ -252,6 +252,42 @@
 }
 
 /* --------------------------------------------------------------------------
+   ReadOnly Disabled Controls - 保留 disabled 语义，统一只读输入样式
+   -------------------------------------------------------------------------- */
+.ant-input-disabled,
+.ant-input-disabled:hover,
+.ant-input-number-disabled,
+.ant-input-number-disabled:hover,
+.ant-picker-disabled,
+.ant-picker-disabled:hover,
+.ant-select-disabled,
+.ant-select-disabled:hover,
+.ant-select-disabled .ant-select-selector,
+.ant-select-disabled:hover .ant-select-selector,
+.ant-select-disabled .ant-select-content,
+.ant-select-disabled:hover .ant-select-content {
+  background-color: #f5f5f5 !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: var(--ant-color-text) !important;
+  cursor: not-allowed;
+  opacity: 1;
+  -webkit-text-fill-color: var(--ant-color-text) !important;
+}
+
+.ant-input-disabled::placeholder,
+.ant-picker-disabled input::placeholder,
+.ant-select-disabled .ant-select-placeholder,
+.ant-select-disabled .ant-select-content-value,
+.ant-select-disabled .ant-select-selection-item,
+.ant-select-disabled .ant-select-selection-search-input,
+.ant-picker-disabled input {
+  color: var(--ant-color-text) !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: var(--ant-color-text) !important;
+}
+
+/* --------------------------------------------------------------------------
    Keyframe 动画 - 无法内联
    -------------------------------------------------------------------------- */
 .app-field-focus {
