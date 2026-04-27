@@ -1,5 +1,11 @@
 # cm-reporting
 
+## 0.7.6
+
+### Patch Changes
+
+- 0edd07c: 修复 EMRT/AMRT 矿厂列表在选择金属后未强制填写冶炼厂名称、矿厂名称和矿厂所在国家或地区的问题，并将矿厂所在国家或地区改为文本输入框。
+
 ## 0.7.5
 
 ### Patch Changes
