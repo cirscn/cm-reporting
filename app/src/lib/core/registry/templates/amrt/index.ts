@@ -11,11 +11,13 @@ import {
 import { amrt_1_1 } from './versions/1.1'
 import { amrt_1_2 } from './versions/1.2'
 import { amrt_1_3 } from './versions/1.3'
+import { amrt_1_31 } from './versions/1.31'
 
 const AMRT_VERSION_OVERRIDES = {
   '1.1': amrt_1_1,
   '1.2': amrt_1_2,
   '1.3': amrt_1_3,
+  '1.31': amrt_1_31,
 } satisfies Record<(typeof AMRT_VERSION_IDS)[number], AmrtVersionOverride>
 
 const AMRT_VERSION_MAP = createVersionMap(Object.values(AMRT_VERSION_OVERRIDES))

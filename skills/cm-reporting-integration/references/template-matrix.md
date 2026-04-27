@@ -30,17 +30,20 @@ Package export path base:
 | `cmrt` | `6.31` | `CMRT` | `RMI_CMRT_6.31.xlsx` |
 | `cmrt` | `6.4` | `CMRT` | `RMI_CMRT_6.4.xlsx` |
 | `cmrt` | `6.5` | `CMRT` | `RMI_CMRT_6.5.xlsx` |
+| `cmrt` | `6.6` | `CMRT` | `RMI_CMRT_6.6.xlsx` |
 | `emrt` | `1.1` | `EMRT` | `RMI_EMRT_1.1.xlsx` |
 | `emrt` | `1.11` | `EMRT` | `RMI_EMRT_1.11.xlsx` |
 | `emrt` | `1.2` | `EMRT` | `RMI_EMRT_1.2.xlsx` |
 | `emrt` | `1.3` | `EMRT` | `RMI_EMRT_1.3.xlsx` |
 | `emrt` | `2.0` | `EMRT` | `RMI_EMRT_2.0.xlsx` |
 | `emrt` | `2.1` | `EMRT` | `RMI_EMRT_2.1.xlsx` |
+| `emrt` | `2.11` | `EMRT` | `RMI_EMRT_2.11.xlsx` |
 | `crt` | `2.2` | `CRT` | `RMI_CRT_2.2.xlsx` |
 | `crt` | `2.21` | `CRT` | `RMI_CRT_2.21.xlsx` |
 | `amrt` | `1.1` | `AMRT` | `RMI_AMRT_1.1.xlsx` |
 | `amrt` | `1.2` | `AMRT` | `RMI_AMRT_1.2.xlsx` |
 | `amrt` | `1.3` | `AMRT` | `RMI_AMRT_1.3.xlsx` |
+| `amrt` | `1.31` | `AMRT` | `RMI_AMRT_1.31.xlsx` |
 
 ## 3) Recommended path resolution
 

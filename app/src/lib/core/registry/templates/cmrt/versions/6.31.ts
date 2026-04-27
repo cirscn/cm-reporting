@@ -1,3 +1,4 @@
+import { OPEN_AUTHORIZATION_DATE_CONFIG } from '../../../common/dateConfig'
 import type { CmrtVersionOverride } from '../base'
 import { CMRT_Q6_OPTIONS_V6_31_AND_ABOVE } from '../base'
 
@@ -11,5 +12,5 @@ export const cmrt_6_31: CmrtVersionOverride = {
   smelterList: {
     notListedRequireNameCountry: false,
   },
-  dateConfig: {},
+  dateConfig: OPEN_AUTHORIZATION_DATE_CONFIG,
 }

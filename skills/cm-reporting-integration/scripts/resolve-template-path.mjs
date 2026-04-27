@@ -17,12 +17,12 @@ const versionId = String(positional[1])
 const matrix = {
   cmrt: {
     dir: 'CMRT',
-    versions: ['6.01', '6.1', '6.22', '6.31', '6.4', '6.5'],
+    versions: ['6.01', '6.1', '6.22', '6.31', '6.4', '6.5', '6.6'],
     prefix: 'RMI_CMRT_',
   },
   emrt: {
     dir: 'EMRT',
-    versions: ['1.1', '1.11', '1.2', '1.3', '2.0', '2.1'],
+    versions: ['1.1', '1.11', '1.2', '1.3', '2.0', '2.1', '2.11'],
     prefix: 'RMI_EMRT_',
   },
   crt: {
@@ -32,7 +32,7 @@ const matrix = {
   },
   amrt: {
     dir: 'AMRT',
-    versions: ['1.1', '1.2', '1.3'],
+    versions: ['1.1', '1.2', '1.3', '1.31'],
     prefix: 'RMI_AMRT_',
   },
 }

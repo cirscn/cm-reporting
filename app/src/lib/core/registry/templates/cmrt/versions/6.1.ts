@@ -1,3 +1,4 @@
+import { LIMITED_AUTHORIZATION_DATE_CONFIG } from '../../../common/dateConfig'
 import type { CmrtVersionOverride } from '../base'
 import { CMRT_Q6_OPTIONS_V6_22_AND_BELOW } from '../base'
 
@@ -11,7 +12,5 @@ export const cmrt_6_1: CmrtVersionOverride = {
   smelterList: {
     notListedRequireNameCountry: true,
   },
-  dateConfig: {
-    maxDate: '2026-03-31',
-  },
+  dateConfig: LIMITED_AUTHORIZATION_DATE_CONFIG,
 }

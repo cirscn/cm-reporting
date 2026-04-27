@@ -2,6 +2,7 @@ import type { I18nKey } from '@core/i18n'
 
 import type {
   CompanyQuestionDef,
+  DateConfig,
   FieldDef,
   MineralDef,
   PageDef,
@@ -240,9 +241,7 @@ export interface CmrtVersionOverride {
     notListedRequireNameCountry: boolean
     notYetIdentifiedCountryByMetal?: Record<string, string>
   }
-  dateConfig: {
-    maxDate?: string
-  }
+  dateConfig: DateConfig
 }
 
 // ---------------------------------------------------------------------------
@@ -283,9 +282,6 @@ export function buildCmrtVersionDef(override: CmrtVersionOverride): TemplateVers
       productNameLabelKey: override.productList.productNameLabelKey,
       commentLabelKey: 'productList.cmrt.comment',
     },
-    dateConfig: {
-      minDate: '2006-12-31',
-      maxDate: override.dateConfig.maxDate,
-    },
+    dateConfig: override.dateConfig,
   }
 }

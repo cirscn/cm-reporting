@@ -48,7 +48,7 @@
 
 - 当 `Declaration Scope` 选择 `Product` 时，`Product List` 不能为空。
 - `回复方的产品编号` 始终必填。
-- 如果当前模板带请求方列（如 `CMRT 6.6`、`EMRT 2.11`、`AMRT 1.3`），`请求方的产品编号` 也必填。
+- 如果当前模板带请求方列（如 `CMRT 6.6`、`EMRT 2.11`、`AMRT 1.3 / 1.31`），`请求方的产品编号` 也必填。
 - 示例里的请求方列表头已经统一成 `Requester Product # / Requester Product Name`，但对接字段仍然是 `requesterNumber / requesterName`。
 
 ### 冶炼厂表头行为（当前示例）
@@ -60,7 +60,7 @@
 
 ### 矿厂表头行为（当前示例）
 
-- `Mine List` 只会出现在模板本身带这个工作表的版本里：`AMRT 1.1 / 1.2 / 1.3` 与 `EMRT 2.0 / 2.1 / 2.11`。
+- `Mine List` 只会出现在模板本身带这个工作表的版本里：`AMRT 1.1 / 1.2 / 1.3 / 1.31` 与 `EMRT 2.0 / 2.1 / 2.11`。
 - 这些版本的矿厂表头现在按模板文案显示，比如“从该矿厂采购的冶炼厂的名称”“矿厂(矿场)名称”“矿厂识别（例如《CID》）”。
 - 示例里不会显示矿厂模板里的辅助列 `Country Code`、`State / Province Code`。
 - 表头文案与字段名分开看：例如“矿厂识别（例如《CID》）”对应的仍是 `mineId`，不是新造了一个字段。
@@ -70,8 +70,14 @@
 - EMRT 默认会选中当前版本全部矿种（包括 `dynamic-dropdown` 版本）。
 - 在非只读模式下，用户仍可在 Declaration 页面修改矿种勾选。
 - 在只读模式下，矿种范围仅展示，不可编辑。
-- 在 `dynamic-dropdown` 模式（EMRT 2.x / AMRT 1.3）中，取消某矿种会自动清空该矿种在按矿种题目/备注中的值，并删除该矿种在 `Smelter List` / `Mine List` 的行数据。
+- 在 `dynamic-dropdown` 模式（EMRT 2.x / AMRT 1.3+）中，取消某矿种会自动清空该矿种在按矿种题目/备注中的值，并删除该矿种在 `Smelter List` / `Mine List` 的行数据。
 - 在 `dynamic-dropdown` 模式下，若 `other` 仍勾选但某个自定义矿种名称被清空，也会同步清理对应 `other-*` 的按矿种题目/备注与 `Smelter List` / `Mine List` 行数据。
+
+### AMRT 1.31 当前行为
+
+- `AMRT 1.31` 比 `AMRT 1.3` 多出 `Cadmium`、`Lead`、`Molybdenum`、`Rhenium`、`Selenium`、`Tellurium`。
+- 示例会把这些新增矿产当作正式矿产处理，不需要走 `Other` 自定义矿产。
+- Excel 导出会把这些矿产写入 Declaration、`Smelter List`、`Mine List` 和 `Minerals Scope`。
 
 ### JSON 导入/导出
 

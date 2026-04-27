@@ -168,6 +168,7 @@ export function CompanyInfoForm({
             required={isRequired}
             error={error}
             minDate={versionDef.dateConfig.minDate}
+            minBoundary={versionDef.dateConfig.minBoundary}
             maxDate={versionDef.dateConfig.maxDate}
             placeholder={placeholder}
             formatHint={resolvedDateHint}

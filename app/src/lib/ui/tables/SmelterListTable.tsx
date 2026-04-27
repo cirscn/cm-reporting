@@ -521,8 +521,8 @@ export const SmelterListTable = memo(function SmelterListTable({
     (option?.label ?? '').toLowerCase().includes(input.toLowerCase()),
   )
   const headerProfile = useCreation(
-    () => getSmelterHeaderProfile({ templateType, versionId, locale, t }),
-    [locale, t, templateType, versionId],
+    () => getSmelterHeaderProfile({ templateType, versionId, locale, t, config }),
+    [config, locale, t, templateType, versionId],
   )
   const resolveColumnTitle = useMemoizedFn((columnId: SmelterColumnId) =>
     renderRequiredHeaderLabel(

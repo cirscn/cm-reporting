@@ -28,7 +28,6 @@ export type CheckerSeverity = 'error' | 'pass'
 // ---------------------------------------------------------------------------
 // Version
 // ---------------------------------------------------------------------------
-
 /**
  * 导出接口类型：TemplateVersion。
  */
@@ -260,8 +259,9 @@ export interface ProductListConfig {
  * 导出接口类型：DateConfig。
  */
 export interface DateConfig {
-  minDate: string // ISO format
-  maxDate?: string // undefined = no upper limit
+  readonly minDate: string
+  readonly minBoundary?: 'inclusive' | 'exclusive'
+  readonly maxDate?: string
 }
 
 // ---------------------------------------------------------------------------

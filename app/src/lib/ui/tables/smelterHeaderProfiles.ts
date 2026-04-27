@@ -1,5 +1,5 @@
 import type { I18nKey, Locale } from '@core/i18n'
-import type { TemplateType } from '@core/registry/types'
+import type { SmelterListConfig, TemplateType } from '@core/registry/types'
 
 type Translate = (key: I18nKey, options?: Record<string, unknown>) => string
 
@@ -97,12 +97,17 @@ function fallbackLabels(t: Translate): Record<SmelterColumnId, string> {
   }
 }
 
-function resolveVariant(templateType: TemplateType, versionId: string): SmelterHeaderVariant {
+function resolveVariant(
+  templateType: TemplateType,
+  versionId: string,
+  config?: SmelterListConfig,
+): SmelterHeaderVariant {
   if (templateType === 'cmrt') return 'cmrt'
   if (templateType === 'crt') return 'crt-emrt-v1'
   if (templateType === 'emrt') {
     return versionId.startsWith('2.') ? 'emrt-v2' : 'crt-emrt-v1'
   }
+  if (config?.hasLookup || config?.hasIdColumn) return 'amrt-v13'
   return versionId === '1.3' ? 'amrt-v13' : 'amrt-v11-v12'
 }
 
@@ -257,8 +262,9 @@ export function getSmelterHeaderProfile(options: {
   versionId: string
   locale: Locale
   t: Translate
+  config?: SmelterListConfig
 }): SmelterHeaderProfile {
-  const variant = resolveVariant(options.templateType, options.versionId)
+  const variant = resolveVariant(options.templateType, options.versionId, options.config)
 
   if (options.locale !== 'zh-CN') {
     return buildFallbackProfile(variant, options.t)

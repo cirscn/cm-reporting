@@ -741,6 +741,21 @@ export const EXCEL_TEMPLATE_ANCHORS = {
       "amrtQ1Row": 30,
       "amrtQ2Row": 42,
       "amrtQ3Row": null
+    },
+    "1.31": {
+      "questionHeaderRowByNumber": {
+        "1": 30,
+        "2": 42
+      },
+      "questionSpanByNumber": {
+        "1": 11,
+        "2": 43
+      },
+      "companyHeaderRowByKey": {},
+      "companySpanByKey": {},
+      "amrtQ1Row": 30,
+      "amrtQ2Row": 42,
+      "amrtQ3Row": null
     }
   }
 } as const
