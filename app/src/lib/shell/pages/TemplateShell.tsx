@@ -143,9 +143,11 @@ function TemplateScaffold({
             sections.questionMatrix.completed +
             sections.companyQuestions.completed,
         }
-      case 'smelterList':
+      case 'smelter-list':
         return sections.smelterList
-      case 'productList':
+      case 'mine-list':
+        return sections.mineList
+      case 'product-list':
         return sections.productList
       default:
         return undefined

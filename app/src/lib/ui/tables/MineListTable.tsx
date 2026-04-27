@@ -7,7 +7,7 @@
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import type { MineralDef, MineListConfig } from '@core/registry/types'
 import type { MineRow } from '@core/types/tableRows'
-import { wrapRequired } from '@ui/helpers/fieldRequired'
+import { renderRequiredHeaderLabel, wrapRequired } from '@ui/helpers/fieldRequired'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useCreation, useMemoizedFn } from 'ahooks'
@@ -22,7 +22,6 @@ interface MineListTableProps {
   availableMetals: Array<MineralDef & { label?: string }>
   rows: MineRow[]
   onChange: (rows: MineRow[]) => void
-  countryOptions?: Array<{ value: string; label: string }>
   smelterOptions?: Array<{ value: string; label: string }>
   smelterOptionsByMetal?: Record<string, Array<{ value: string; label: string }>>
 }
@@ -30,6 +29,7 @@ interface MineListTableProps {
 const INPUT_FIELDS = [
   'smelterName',
   'mineName',
+  'mineCountry',
   'mineId',
   'mineIdSource',
   'mineStreet',
@@ -41,7 +41,12 @@ const INPUT_FIELDS = [
   'comments',
 ] as const
 
-const SELECT_FIELDS = ['metal', 'smelterName', 'mineCountry'] as const
+const SELECT_FIELDS = ['metal', 'smelterName'] as const
+const REQUIRED_AFTER_METAL_FIELDS = new Set([
+  'smelterName',
+  'mineName',
+  'mineCountry',
+])
 
 /** 矿山清单表格：支持增删行与行内编辑。 */
 export function MineListTable({
@@ -49,7 +54,6 @@ export function MineListTable({
   availableMetals,
   rows,
   onChange,
-  countryOptions = [],
   smelterOptions = [],
   smelterOptionsByMetal = {},
 }: MineListTableProps) {
@@ -156,6 +160,16 @@ export function MineListTable({
     () => getMineHeaderProfile({ locale, t }),
     [locale, t],
   )
+  const hasSelectedMineMetal = useCreation(
+    () => rows.some((row) => row.metal.trim()),
+    [rows],
+  )
+  const resolveColumnTitle = useMemoizedFn((column: keyof typeof headerProfile.labels) =>
+    renderRequiredHeaderLabel(
+      headerProfile.labels[column],
+      hasSelectedMineMetal && REQUIRED_AFTER_METAL_FIELDS.has(column),
+    ),
+  )
 
   const columns = useCreation<ColumnsType<MineRow>>(() => [
     {
@@ -178,7 +192,7 @@ export function MineListTable({
       ),
     },
     {
-      title: headerProfile.labels.smelterName,
+      title: resolveColumnTitle('smelterName'),
       dataIndex: 'smelterName',
       key: 'smelterName',
       width: 220,
@@ -195,6 +209,7 @@ export function MineListTable({
                 onChange={getSelectHandler(`${record.id}:smelterName`)}
                 options={filteredOptions}
                 placeholder={t('placeholders.mineSmelterSelect')}
+                disabled={componentDisabled || !record.metal}
                 showSearch
                 filterOption={filterOptionByLabel}
                 className="w-full"
@@ -208,6 +223,7 @@ export function MineListTable({
                 onChange={getSelectHandler(`${record.id}:smelterName`)}
                 placeholder={t('placeholders.mineSmelterInput')}
                 options={filteredOptions}
+                disabled={componentDisabled || !record.metal}
                 allowClear
                 filterOption={filterOptionByLabel}
                 className="w-full"
@@ -217,7 +233,7 @@ export function MineListTable({
       },
     },
     {
-      title: headerProfile.labels.mineName,
+      title: resolveColumnTitle('mineName'),
       dataIndex: 'mineName',
       key: 'mineName',
       width: 180,
@@ -260,21 +276,17 @@ export function MineListTable({
       ),
     },
     {
-      title: headerProfile.labels.mineCountry,
+      title: resolveColumnTitle('mineCountry'),
       dataIndex: 'mineCountry',
       key: 'mineCountry',
       width: 160,
       render: (value: string, record: MineRow) => (
         wrapRequired(
           Boolean(record.metal),
-          <Select
+          <Input
             value={value || undefined}
-            onChange={getSelectHandler(`${record.id}:mineCountry`)}
-            options={countryOptions}
+            onChange={getInputHandler(`${record.id}:mineCountry`)}
             placeholder={t('placeholders.mineCountry')}
-            showSearch
-            filterOption={filterOptionByLabel}
-            className="w-full"
           />,
           componentDisabled,
         )
@@ -393,13 +405,14 @@ export function MineListTable({
   ], [
     componentDisabled,
     config.smelterNameMode,
-    countryOptions,
     filterOptionByLabel,
     getInputHandler,
     getRemoveHandler,
     getSelectHandler,
     headerProfile,
+    hasSelectedMineMetal,
     metalOptions,
+    resolveColumnTitle,
     smelterOptions,
     t,
   ])

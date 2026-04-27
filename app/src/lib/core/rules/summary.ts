@@ -21,6 +21,12 @@ import {
 import type { FormStateForRequired } from './required'
 import { calculateRequiredFields, getActiveMineralKeys } from './required'
 
+const REQUIRED_MINE_FIELDS_AFTER_METAL = [
+  { key: 'smelterName', labelKey: 'tables.mineSmelterName' },
+  { key: 'mineName', labelKey: 'tables.mineName' },
+  { key: 'mineCountry', labelKey: 'tables.mineCountry' },
+] as const
+
 /**
  * 导出类型：Translate。
  */
@@ -47,6 +53,7 @@ export interface CheckerSummary {
     questionMatrix: SectionProgress
     companyQuestions: SectionProgress
     smelterList: SectionProgress
+    mineList: SectionProgress
     productList: SectionProgress
   }
 }
@@ -71,7 +78,7 @@ export function buildCheckerSummary(
 ): { summary: CheckerSummary; passedItems: PassedItem[] } {
   const asText = (value: unknown) => (typeof value === 'string' ? value : '')
   const required = calculateRequiredFields(versionDef, formState)
-  const { companyInfo, questions, companyQuestions, smelterList, productList } = formData
+  const { companyInfo, questions, companyQuestions, smelterList, mineList, productList } = formData
 
   let totalRequired = 0
   let completedRequired = 0
@@ -83,6 +90,7 @@ export function buildCheckerSummary(
 
   const declarationLabel = t('checker.groups.declaration')
   const smelterLabel = t('checker.groups.smelter')
+  const mineLabel = t('checker.groups.mine')
   const productLabel = t('checker.groups.product')
   const mineralLabelByKey = buildMineralLabelMap(versionDef)
   const mineralLabelOverrides = getCustomMineralLabels(
@@ -349,6 +357,38 @@ export function buildCheckerSummary(
     )
   }
 
+  let mineRequired = 0
+  let mineCompleted = 0
+  if (versionDef.mineList.available) {
+    const mineRows = mineList ?? []
+    mineRows.forEach((row, index) => {
+      const metal = row.metal || ''
+      if (!metal.trim()) return
+
+      REQUIRED_MINE_FIELDS_AFTER_METAL.forEach((field) => {
+        totalRequired += 1
+        mineRequired += 1
+        const value = row[field.key] || ''
+        if (!value.trim()) return
+
+        completedRequired += 1
+        mineCompleted += 1
+        addPassed(
+          `mineList.${index}.${field.key}`,
+          t(field.labelKey),
+          mineLabel,
+        )
+      })
+    })
+  }
+  if (mineRequired > 0 && mineCompleted === mineRequired) {
+    addPassed(
+      'summary.mineList',
+      t('checker.sectionComplete', { section: t('tabs.mineList') }),
+      mineLabel,
+    )
+  }
+
   // Product list required for scope B
   let productRequired = 0
   let productCompleted = 0
@@ -420,6 +460,7 @@ export function buildCheckerSummary(
         questionMatrix: { total: questionsRequired, completed: questionsCompleted },
         companyQuestions: { total: companyQuestionsRequired, completed: companyQuestionsCompleted },
         smelterList: { total: smelterRequired, completed: smelterCompleted },
+        mineList: { total: mineRequired, completed: mineCompleted },
         productList: { total: productRequired, completed: productCompleted },
       },
     },

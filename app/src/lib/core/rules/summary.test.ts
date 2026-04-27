@@ -144,4 +144,44 @@ describe('buildCheckerSummary', () => {
     expect(summary.sections.productList.total).toBe(3)
     expect(summary.sections.productList.completed).toBe(2)
   })
+
+  it('counts mine row smelter, mine name and country after a metal is selected', () => {
+    const emrt = getVersionDef('emrt', '2.1')
+    const mineralKey = 'cobalt'
+    const formState: FormStateForRequired = {
+      scopeType: 'A',
+      selectedMinerals: [mineralKey],
+      questionAnswers: {
+        Q1: { [mineralKey]: 'Yes' },
+        Q2: { [mineralKey]: 'Yes' },
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(emrt),
+      questions: {
+        Q1: { [mineralKey]: 'Yes' },
+        Q2: { [mineralKey]: 'Yes' },
+      },
+      mineList: [
+        {
+          id: 'mine-row-1',
+          metal: mineralKey,
+          smelterName: '',
+          mineName: '',
+          mineCountry: '',
+        },
+      ],
+    })
+
+    const errors = runChecker(emrt, formState, formData)
+    expect(errors.map((error) => error.fieldPath)).toEqual(expect.arrayContaining([
+      'mineList.0.smelterName',
+      'mineList.0.mineName',
+      'mineList.0.mineCountry',
+    ]))
+
+    const { summary } = buildCheckerSummary(emrt, formState, formData, t)
+    expect(summary.sections.mineList.total).toBe(3)
+    expect(summary.sections.mineList.completed).toBe(0)
+  })
 })
