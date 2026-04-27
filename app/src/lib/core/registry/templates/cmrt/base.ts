@@ -267,7 +267,7 @@ export function buildCmrtVersionDef(override: CmrtVersionOverride): TemplateVers
       smelterListGating: { type: 'q1q2-not-no' },
     },
     smelterList: {
-      metalDropdownSource: { type: 'fixed', metals: CMRT_MINERALS },
+      metalDropdownSource: { type: 'dynamic-q1q2-yes' },
       hasIdColumn: true,
       hasLookup: true,
       hasCombinedColumn: false,

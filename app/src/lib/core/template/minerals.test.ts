@@ -1,7 +1,7 @@
 import { getVersionDef } from '@core/registry'
 import { describe, expect, test } from 'vitest'
 
-import { getDisplayMinerals } from './minerals'
+import { getDisplayMinerals, getMetalsForSource } from './minerals'
 
 describe('template minerals', () => {
   test('getDisplayMinerals keeps template mineral order (EMRT 2.1)', () => {
@@ -40,5 +40,30 @@ describe('template minerals', () => {
       'zinc',
       'other',
     ])
+  })
+
+  test('CMRT smelter metal dropdown only includes minerals with Q1 and Q2 both Yes', () => {
+    const versionDef = getVersionDef('cmrt', '6.6')
+
+    const minerals = getMetalsForSource(
+      versionDef.smelterList.metalDropdownSource,
+      versionDef,
+      {
+        Q1: {
+          tantalum: 'Yes',
+          tin: 'Yes',
+          gold: 'No',
+          tungsten: '',
+        },
+        Q2: {
+          tantalum: 'Yes',
+          tin: 'No',
+          gold: 'Yes',
+          tungsten: 'Yes',
+        },
+      },
+    )
+
+    expect(minerals.map((mineral) => mineral.key)).toEqual(['tantalum'])
   })
 })

@@ -53,6 +53,21 @@ function getAnswerForMineral(
   return ''
 }
 
+function getTemplateMineralsByAnswers(
+  versionDef: TemplateVersionDef,
+  predicate: (mineral: MineralDef) => boolean
+): MineralDef[] {
+  return intersectionBy(
+    versionDef.mineralScope.minerals,
+    compact(
+      versionDef.mineralScope.minerals.map((mineral) =>
+        predicate(mineral) ? mineral : null
+      )
+    ),
+    (mineral) => mineral.key
+  )
+}
+
 /**
  * 导出函数：getMetalsForSource。
  */
@@ -77,26 +92,25 @@ export function getMetalsForSource(
   }
 
   if (source.type === 'dynamic-q1-yes') {
-    return intersectionBy(
-      versionDef.mineralScope.minerals,
-      compact(
-        versionDef.mineralScope.minerals.map((mineral) =>
-          getAnswerForMineral(answers, 'Q1', mineral.key) === 'Yes' ? mineral : null
-        )
-      ),
-      (mineral) => mineral.key
+    return getTemplateMineralsByAnswers(
+      versionDef,
+      (mineral) => getAnswerForMineral(answers, 'Q1', mineral.key) === 'Yes'
+    )
+  }
+
+  if (source.type === 'dynamic-q1q2-yes') {
+    return getTemplateMineralsByAnswers(
+      versionDef,
+      (mineral) =>
+        getAnswerForMineral(answers, 'Q1', mineral.key) === 'Yes' &&
+        getAnswerForMineral(answers, 'Q2', mineral.key) === 'Yes'
     )
   }
 
   if (source.type === 'dynamic-q2-yes') {
-    return intersectionBy(
-      versionDef.mineralScope.minerals,
-      compact(
-        versionDef.mineralScope.minerals.map((mineral) =>
-          getAnswerForMineral(answers, 'Q2', mineral.key) === 'Yes' ? mineral : null
-        )
-      ),
-      (mineral) => mineral.key
+    return getTemplateMineralsByAnswers(
+      versionDef,
+      (mineral) => getAnswerForMineral(answers, 'Q2', mineral.key) === 'Yes'
     )
   }
 

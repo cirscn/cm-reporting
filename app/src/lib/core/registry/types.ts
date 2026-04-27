@@ -204,6 +204,7 @@ export type MetalDropdownSource =
   | { type: 'fixed'; metals: MineralDef[] }
   | { type: 'dynamic-active' } // 已选矿种/自定义矿种
   | { type: 'dynamic-q1-yes' } // Q1=Yes 的矿种
+  | { type: 'dynamic-q1q2-yes' }
   | { type: 'dynamic-q2-yes' } // Q2=Yes 的矿种
 
 /**
