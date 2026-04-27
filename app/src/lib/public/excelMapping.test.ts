@@ -13,4 +13,9 @@ describe('excel mapping coverage', () => {
     CRT_VERSION_IDS.forEach((id) => expect(EXCEL_TEMPLATE_ANCHORS.crt[id]).toBeTruthy())
     AMRT_VERSION_IDS.forEach((id) => expect(EXCEL_TEMPLATE_ANCHORS.amrt[id]).toBeTruthy())
   })
+
+  test('maps AMRT 1.31 declaration question anchors', () => {
+    expect(EXCEL_TEMPLATE_ANCHORS.amrt['1.31'].amrtQ1Row).toBe(30)
+    expect(EXCEL_TEMPLATE_ANCHORS.amrt['1.31'].amrtQ2Row).toBe(42)
+  })
 })

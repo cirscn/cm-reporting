@@ -15,4 +15,30 @@ describe('template minerals', () => {
       .filter((key) => selectedSet.has(key))
     expect(minerals.map((m) => m.key)).toEqual(expected)
   })
+
+  test('AMRT 1.31 includes minerals added by the template in declaration order', () => {
+    const versionDef = getVersionDef('amrt', '1.31')
+
+    expect(versionDef.mineralScope.minerals.map((mineral) => mineral.key)).toEqual([
+      'aluminum',
+      'cadmium',
+      'iridium',
+      'lead',
+      'lime',
+      'manganese',
+      'molybdenum',
+      'palladium',
+      'platinum',
+      'rareEarthElements',
+      'rhenium',
+      'rhodium',
+      'ruthenium',
+      'selenium',
+      'silver',
+      'sodaAsh',
+      'tellurium',
+      'zinc',
+      'other',
+    ])
+  })
 })

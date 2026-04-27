@@ -140,7 +140,7 @@ function readCellText(sheetXml, cellRef, sharedStrings) {
     return mt ? decodeXmlText(mt[1] ?? '') : ''
   }
 
-  const vRe = /<v>([\s\S]*?)<\/v>/
+  const vRe = /<v\b[^>]*>([\s\S]*?)<\/v>/
   const mv = vRe.exec(body)
   if (!mv) return ''
   const raw = decodeXmlText(mv[1] ?? '')

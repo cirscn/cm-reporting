@@ -8,6 +8,7 @@ import { useT } from '@ui/i18n/useT'
 import { useMemoizedFn } from 'ahooks'
 import { ConfigProvider, DatePicker, Form } from 'antd'
 import dayjs from 'dayjs'
+import type { Dayjs } from 'dayjs'
 
 import {
   DATE_FIELD_DISPLAY_FORMAT,
@@ -28,6 +29,7 @@ interface DateFieldProps {
   disabled?: boolean
   error?: ErrorKey
   minDate?: string
+  minBoundary?: 'inclusive' | 'exclusive'
   maxDate?: string
   fieldPath?: string
   className?: string
@@ -50,6 +52,7 @@ export function DateField({
   disabled,
   error,
   minDate,
+  minBoundary = 'inclusive',
   maxDate,
   fieldPath,
   className,
@@ -68,13 +71,17 @@ export function DateField({
   const displayPlaceholder = placeholder ?? formatHint ?? t('placeholders.date')
   const formItemLayout = buildFormItemLayout({ formLayout, labelWidth })
 
-  const handleChange = useMemoizedFn((date: dayjs.Dayjs | null) => {
+  const handleChange = useMemoizedFn((date: Dayjs | null) => {
     onChange?.(date ? date.format(DATE_FIELD_STORAGE_FORMAT) : '')
   })
 
-  const disabledDate = useMemoizedFn((current: dayjs.Dayjs) => {
+  const disabledDate = useMemoizedFn((current: Dayjs) => {
     if (!current) return false
-    if (minDate && current.isBefore(dayjs(minDate), 'day')) return true
+    if (minDate) {
+      const min = dayjs(minDate)
+      if (minBoundary === 'exclusive' && !current.isAfter(min, 'day')) return true
+      if (minBoundary === 'inclusive' && current.isBefore(min, 'day')) return true
+    }
     if (maxDate && current.isAfter(dayjs(maxDate), 'day')) return true
     return false
   })

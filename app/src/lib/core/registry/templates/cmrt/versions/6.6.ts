@@ -1,3 +1,4 @@
+import { OPEN_AUTHORIZATION_DATE_CONFIG } from '../../../common/dateConfig'
 import type { CmrtVersionOverride } from '../base'
 import { CMRT_Q6_OPTIONS_V6_31_AND_ABOVE } from '../base'
 
@@ -13,5 +14,5 @@ export const cmrt_6_6: CmrtVersionOverride = {
     notListedRequireNameCountry: false,
     notYetIdentifiedCountryByMetal: { tungsten: '' },
   },
-  dateConfig: {},
+  dateConfig: OPEN_AUTHORIZATION_DATE_CONFIG,
 }

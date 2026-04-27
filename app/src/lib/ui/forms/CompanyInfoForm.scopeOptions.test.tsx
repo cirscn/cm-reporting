@@ -7,6 +7,7 @@ import { CompanyInfoForm } from './CompanyInfoForm'
 
 const mockSelectField = vi.fn()
 const mockTextField = vi.fn()
+const mockDateField = vi.fn()
 
 vi.mock('@ui/i18n', () => ({
   useT: () => ({
@@ -17,7 +18,15 @@ vi.mock('@ui/i18n', () => ({
 }))
 
 vi.mock('../fields', () => ({
-  DateField: ({ label }: { label?: ReactNode }) => <div>{label}</div>,
+  DateField: (props: {
+    label?: ReactNode
+    minDate?: string
+    minBoundary?: 'inclusive' | 'exclusive'
+    maxDate?: string
+  }) => {
+    mockDateField(props)
+    return <div>{props.label}</div>
+  },
   SelectField: (props: { options: Array<{ value: string; label: string }> }) => {
     mockSelectField(props)
     return <div data-kind="select-field" />
@@ -32,6 +41,7 @@ describe('CompanyInfoForm declaration scope options', () => {
   beforeEach(() => {
     mockSelectField.mockClear()
     mockTextField.mockClear()
+    mockDateField.mockClear()
   })
 
   test('matches the Excel template declaration scope descriptions', () => {
@@ -100,5 +110,47 @@ describe('CompanyInfoForm declaration scope options', () => {
       .find((item) => item.label === 'fields.scopeDescription')
 
     expect(props).toMatchObject({ required: true })
+  })
+
+  test('passes date range limits to authorization date field', () => {
+    const versionDef = getVersionDef('cmrt', '6.22')
+
+    renderToStaticMarkup(
+      <CompanyInfoForm
+        versionDef={versionDef}
+        values={{}}
+        onChange={() => undefined}
+      />,
+    )
+
+    const props = mockDateField.mock.calls[0]?.[0] as {
+      minDate?: string
+      maxDate?: string
+    }
+
+    expect(props.minDate).toBe('2006-12-31')
+    expect(props.maxDate).toBe('2026-03-31')
+  })
+
+  test('passes exclusive minimum date limit when version has no upper date limit', () => {
+    const versionDef = getVersionDef('cmrt', '6.6')
+
+    renderToStaticMarkup(
+      <CompanyInfoForm
+        versionDef={versionDef}
+        values={{}}
+        onChange={() => undefined}
+      />,
+    )
+
+    const props = mockDateField.mock.calls[0]?.[0] as {
+      minDate?: string
+      minBoundary?: 'inclusive' | 'exclusive'
+      maxDate?: string
+    }
+
+    expect(props.minDate).toBe('2006-12-31')
+    expect(props.minBoundary).toBe('exclusive')
+    expect(props.maxDate).toBeUndefined()
   })
 })

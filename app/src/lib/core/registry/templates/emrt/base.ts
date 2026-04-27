@@ -1,5 +1,9 @@
 import type { I18nKey } from '@core/i18n'
 
+import {
+  LIMITED_AUTHORIZATION_DATE_CONFIG,
+  OPEN_AUTHORIZATION_DATE_CONFIG,
+} from '../../common/dateConfig'
 import type {
   CompanyQuestionDef,
   FieldDef,
@@ -12,6 +16,8 @@ import type {
 } from '../../types'
 
 import type { EmrtVersionId } from './manifest'
+
+const EMRT_OPEN_DATE_VERSION_IDS = new Set<EmrtVersionId>(['2.11'])
 
 // ---------------------------------------------------------------------------
 // EMRT Minerals
@@ -364,9 +370,8 @@ export function buildEmrtVersionDef(override: EmrtVersionOverride): TemplateVers
       productNameLabelKey: 'productList.emrt.respondentName',
       commentLabelKey: 'productList.emrt.comment',
     },
-    dateConfig: {
-      minDate: '2006-12-31',
-      maxDate: '2026-03-31',
-    },
+    dateConfig: EMRT_OPEN_DATE_VERSION_IDS.has(override.id)
+      ? OPEN_AUTHORIZATION_DATE_CONFIG
+      : LIMITED_AUTHORIZATION_DATE_CONFIG,
   }
 }

@@ -5,11 +5,44 @@
 
 import { describe, expect, it } from 'vitest'
 
+import type { TemplateType } from './types'
+
 import {
   getTemplateTypes,
   getTemplateDefinition,
   getVersionDef,
 } from './index'
+
+const DATE_CONFIG_CASES: Array<{
+  type: TemplateType
+  versionId: string
+  dateConfig: {
+    minDate: string
+    minBoundary?: 'inclusive' | 'exclusive'
+    maxDate?: string
+  }
+}> = [
+  { type: 'cmrt', versionId: '6.01', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
+  { type: 'cmrt', versionId: '6.1', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
+  { type: 'cmrt', versionId: '6.22', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
+  { type: 'cmrt', versionId: '6.31', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
+  { type: 'cmrt', versionId: '6.4', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
+  { type: 'cmrt', versionId: '6.5', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
+  { type: 'cmrt', versionId: '6.6', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
+  { type: 'emrt', versionId: '1.1', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
+  { type: 'emrt', versionId: '1.11', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
+  { type: 'emrt', versionId: '1.2', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
+  { type: 'emrt', versionId: '1.3', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
+  { type: 'emrt', versionId: '2.0', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
+  { type: 'emrt', versionId: '2.1', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
+  { type: 'emrt', versionId: '2.11', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
+  { type: 'crt', versionId: '2.2', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
+  { type: 'crt', versionId: '2.21', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
+  { type: 'amrt', versionId: '1.1', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
+  { type: 'amrt', versionId: '1.2', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
+  { type: 'amrt', versionId: '1.3', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
+  { type: 'amrt', versionId: '1.31', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
+]
 
 describe('registry versions', () => {
   it('covers every version in definition and resolves to a version def', () => {
@@ -36,5 +69,11 @@ describe('registry versions', () => {
 
     expect(getVersionDef('cmrt', '6.6').version.id).toBe('6.6')
     expect(getVersionDef('emrt', '2.11').version.id).toBe('2.11')
+  })
+
+  it('defines authorization date range for every supported template version', () => {
+    DATE_CONFIG_CASES.forEach(({ type, versionId, dateConfig }) => {
+      expect(getVersionDef(type, versionId).dateConfig).toEqual(dateConfig)
+    })
   })
 })

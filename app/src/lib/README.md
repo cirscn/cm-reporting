@@ -144,7 +144,7 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 - EMRT 在初始化空表单时默认选中当前版本全部矿种（含 `dynamic-dropdown` 版本）。
 - 在非只读模式（`readOnly=false`）下，用户可在 Declaration 页继续调整矿种选择。
 - 在只读模式（`readOnly=true`）下，矿种范围仅展示当前值，不提供编辑交互。
-- 在 `dynamic-dropdown` 模式（EMRT 2.x / AMRT 1.3）下，取消某矿种会自动清空该矿种在按矿种题目与备注中的值，并删除该矿种在 `Smelter List` / `Mine List` 的历史行，避免残留不可见脏数据。
+- 在 `dynamic-dropdown` 模式（EMRT 2.x / AMRT 1.3+）下，取消某矿种会自动清空该矿种在按矿种题目与备注中的值，并删除该矿种在 `Smelter List` / `Mine List` 的历史行，避免残留不可见脏数据。
 - 当 `other` 保持勾选但某个自定义矿种槽位被清空时，会同步清理对应 `other-*` 的题目/备注与 `Smelter List` / `Mine List` 行数据。
 
 ---
@@ -357,6 +357,12 @@ URL.revokeObjectURL(url)
 
 > Excel 导出采用"最小 patch"策略——严格保留模板的 DV、格式、公式、隐藏 sheet 等，仅填入用户数据。
 
+### AMRT 1.31 矿产范围
+
+- `AMRT 1.31` 已按官方 Excel 模板接入，默认版本为 `1.31`。
+- 相比 `AMRT 1.3`，`AMRT 1.31` 新增 `Cadmium`、`Lead`、`Molybdenum`、`Rhenium`、`Selenium`、`Tellurium`。
+- 这些矿产会进入 Declaration 矿产选择、按矿产题目、`Smelter List`、`Mine List`、`Minerals Scope` 和 Excel 导出。
+
 ---
 
 ## Integrations（外部选择/回写）
@@ -425,7 +431,7 @@ return null
 
 - 当 `Declaration Scope = Product`（内部值 `scopeType === 'B'`）时，`Product List` 必须至少有 1 行数据。
 - `回复方的产品编号`（字段 `productNumber`）始终按必填处理。
-- 当模板配置 `hasRequesterColumns=true`（如 `CMRT 6.6`、`EMRT 2.11`、`AMRT 1.3`）时，`请求方的产品编号`（字段 `requesterNumber`）也按必填处理。
+- 当模板配置 `hasRequesterColumns=true`（如 `CMRT 6.6`、`EMRT 2.11`、`AMRT 1.3 / 1.31`）时，`请求方的产品编号`（字段 `requesterNumber`）也按必填处理。
 - “请求方的产品编号 / 请求方的产品名称”只是前端显示文案调整，对接字段仍分别是 `requesterNumber / requesterName`。
 
 ### SmelterList 外部选择
@@ -467,7 +473,7 @@ return null
 
 **Mine List 表头与模板对齐规则：**
 
-- `Mine List` 只在支持该工作表的模板中显示：当前是 `AMRT 1.1 / 1.2 / 1.3` 与 `EMRT 2.0 / 2.1`。
+- `Mine List` 只在支持该工作表的模板中显示：当前是 `AMRT 1.1 / 1.2 / 1.3 / 1.31` 与 `EMRT 2.0 / 2.1 / 2.11`。
 - 这些版本的矿厂列表 UI 表头已按对应 RMI Excel 模板对齐。
 - 当前 UI 显示列仍只保留业务可编辑列，不显示模板里的辅助列：`Country Code`、`State / Province Code`。
 - UI 表头文案对齐模板，不代表底层字段名变化；例如“矿厂识别（例如《CID》）”对应的仍是 `mineId` 字段。

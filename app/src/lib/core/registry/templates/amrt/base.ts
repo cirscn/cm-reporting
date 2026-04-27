@@ -1,3 +1,7 @@
+import {
+  LIMITED_AUTHORIZATION_DATE_CONFIG,
+  OPEN_AUTHORIZATION_DATE_CONFIG,
+} from '../../common/dateConfig'
 import type {
   FieldDef,
   MineralDef,
@@ -8,6 +12,8 @@ import type {
 } from '../../types'
 
 import type { AmrtVersionId } from './manifest'
+
+const AMRT_OPEN_DATE_VERSION_IDS = new Set<AmrtVersionId>(['1.31'])
 
 // ---------------------------------------------------------------------------
 // AMRT Minerals
@@ -57,6 +63,28 @@ export const AMRT_MINERALS_V13: MineralDef[] = [
   { key: 'ruthenium', labelKey: 'minerals.ruthenium' },
   { key: 'silver', labelKey: 'minerals.silver' },
   { key: 'sodaAsh', labelKey: 'minerals.sodaAsh' },
+  { key: 'zinc', labelKey: 'minerals.zinc' },
+  { key: 'other', labelKey: 'minerals.other' },
+]
+
+export const AMRT_MINERALS_V131: MineralDef[] = [
+  { key: 'aluminum', labelKey: 'minerals.aluminum' },
+  { key: 'cadmium', labelKey: 'minerals.cadmium' },
+  { key: 'iridium', labelKey: 'minerals.iridium' },
+  { key: 'lead', labelKey: 'minerals.lead' },
+  { key: 'lime', labelKey: 'minerals.lime' },
+  { key: 'manganese', labelKey: 'minerals.manganese' },
+  { key: 'molybdenum', labelKey: 'minerals.molybdenum' },
+  { key: 'palladium', labelKey: 'minerals.palladium' },
+  { key: 'platinum', labelKey: 'minerals.platinum' },
+  { key: 'rareEarthElements', labelKey: 'minerals.rareEarthElements' },
+  { key: 'rhenium', labelKey: 'minerals.rhenium' },
+  { key: 'rhodium', labelKey: 'minerals.rhodium' },
+  { key: 'ruthenium', labelKey: 'minerals.ruthenium' },
+  { key: 'selenium', labelKey: 'minerals.selenium' },
+  { key: 'silver', labelKey: 'minerals.silver' },
+  { key: 'sodaAsh', labelKey: 'minerals.sodaAsh' },
+  { key: 'tellurium', labelKey: 'minerals.tellurium' },
   { key: 'zinc', labelKey: 'minerals.zinc' },
   { key: 'other', labelKey: 'minerals.other' },
 ]
@@ -221,9 +249,8 @@ export function buildAmrtVersionDef(override: AmrtVersionOverride): TemplateVers
       productNameLabelKey: 'productList.amrt.manufacturerName',
       commentLabelKey: 'productList.amrt.comment',
     },
-    dateConfig: {
-      minDate: '2006-12-31',
-      maxDate: '2026-03-31',
-    },
+    dateConfig: AMRT_OPEN_DATE_VERSION_IDS.has(override.id)
+      ? OPEN_AUTHORIZATION_DATE_CONFIG
+      : LIMITED_AUTHORIZATION_DATE_CONFIG,
   }
 }

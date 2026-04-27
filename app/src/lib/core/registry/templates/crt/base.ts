@@ -1,3 +1,4 @@
+import { LIMITED_AUTHORIZATION_DATE_CONFIG } from '../../common/dateConfig'
 import type {
   CompanyQuestionDef,
   FieldDef,
@@ -186,9 +187,6 @@ export function buildCrtVersionDef(override: CrtVersionOverride): TemplateVersio
       productNameLabelKey: 'productList.crt.manufacturerName',
       commentLabelKey: 'productList.crt.comment',
     },
-    dateConfig: {
-      minDate: '2006-12-31',
-      maxDate: '2026-03-31',
-    },
+    dateConfig: LIMITED_AUTHORIZATION_DATE_CONFIG,
   }
 }
