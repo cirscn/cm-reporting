@@ -45,6 +45,7 @@ Apply these rules in every solution:
 - For `readOnly` behavior, treat it as **view-only contract** (not just disabled inputs):
   - hide checker page and checker entry in workflow;
   - hide global required/error hint banner and bottom prev/next actions;
+  - keep form fields disabled, but style disabled inputs/selects/date pickers with `#f5f5f5` background, transparent borders, and normal label-color content text;
   - hide table/form editing affordances (add/delete/batch/external pick/edit links), not merely `disabled`;
   - when table cells use explicit `disabled` conditions (for example SmelterList base fields), always merge global disabled state as `componentDisabled || localDisabled`;
   - suppress required yellow highlight when fields are disabled/read-only.
