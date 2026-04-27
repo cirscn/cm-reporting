@@ -32,9 +32,9 @@ interface CompanyInfoFormProps {
 
 /** 声明范围选项。 */
 const SCOPE_OPTIONS = [
-  { value: 'A', label: 'A. Company-wide' },
+  { value: 'A', label: 'A. Company' },
   { value: 'B', label: 'B. Product (or List of Products)' },
-  { value: 'C', label: 'C. User defined' },
+  { value: 'C', label: "C. User defined [Specify in 'Description of scope']" },
 ]
 
 const COMPANY_FIELD_KEYS = new Set([
@@ -212,8 +212,9 @@ export function CompanyInfoForm({
       return 'other'
     })
     const companyFieldsRaw = fieldGroups.company ?? []
+    const shouldShowScopeDescription = scopeType === 'A' || scopeType === 'C'
     const companyFieldsFiltered =
-      scopeType === 'C'
+      shouldShowScopeDescription
         ? companyFieldsRaw
         : companyFieldsRaw.filter((field) => field.key !== 'scopeDescription')
     return {

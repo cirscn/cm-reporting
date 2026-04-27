@@ -23,6 +23,7 @@ export interface StepNavItem {
 interface StepNavProps {
   steps: StepNavItem[]
   currentKey?: string
+  purposeTip?: string
   onChange?: (key: string) => void
 }
 
@@ -48,8 +49,9 @@ function renderStepTitle(step: StepNavItem, isComplete: boolean) {
 /**
  * StepNav：使用 Ant Design Steps 的步骤进度指示器。
  */
-export function StepNav({ steps, currentKey, onChange }: StepNavProps) {
+export function StepNav({ steps, currentKey, purposeTip, onChange }: StepNavProps) {
   const currentIndex = steps.findIndex((step) => step.key === currentKey)
+  const hasPurposeTip = Boolean(purposeTip?.trim())
 
   const handleChange = useMemoizedFn((index: number) => {
     const step = steps[index]
@@ -94,6 +96,7 @@ export function StepNav({ steps, currentKey, onChange }: StepNavProps) {
       }}
     >
       <div className="step-nav-inner">
+        {hasPurposeTip && <div className="step-nav-purpose-tip">{purposeTip}</div>}
         <Steps
           current={currentIndex >= 0 ? currentIndex : 0}
           items={items}

@@ -186,6 +186,42 @@ describe('TemplateShell readOnly', () => {
     expect(mockPageActions).toHaveBeenCalled()
   })
 
+  test('passes CMRT report purpose tip to the step nav layout', () => {
+    renderToStaticMarkup(
+      <TemplateShell
+        templateType="cmrt"
+        versionId="6.5"
+        readOnly={false}
+        pageKey="declaration"
+        onNavigatePage={() => undefined}
+        renderPage={() => <div>content</div>}
+      />,
+    )
+
+    const appLayoutProps = mockAppLayout.mock.calls[0]?.[0] as {
+      purposeTip?: string
+    }
+    expect(appLayoutProps.purposeTip).toBe('tips.reportPurpose.cmrt')
+  })
+
+  test('passes EMRT report purpose tip to the step nav layout', () => {
+    renderToStaticMarkup(
+      <TemplateShell
+        templateType="emrt"
+        versionId="2.11"
+        readOnly={false}
+        pageKey="declaration"
+        onNavigatePage={() => undefined}
+        renderPage={() => <div>content</div>}
+      />,
+    )
+
+    const appLayoutProps = mockAppLayout.mock.calls[0]?.[0] as {
+      purposeTip?: string
+    }
+    expect(appLayoutProps.purposeTip).toBe('tips.reportPurpose.emrt')
+  })
+
   test('hides bottom page actions when showPageActions=false', () => {
     renderToStaticMarkup(
       <TemplateShell

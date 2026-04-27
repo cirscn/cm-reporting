@@ -1,6 +1,7 @@
+import type { CompanyQuestionDef } from '@core/registry/types'
 import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { describe, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { DeclarationPage } from './DeclarationPage'
 
@@ -60,7 +61,7 @@ vi.mock('@shell/store', () => ({
           mode: 'dynamic-dropdown',
           maxCount: 3,
         },
-        companyQuestions: [{ key: 'CQ1' }],
+        companyQuestions: templateState.companyQuestions,
         questions: [{ key: 'Q1' }],
         gating: {
           companyQuestionsGating: { type: 'always' },
@@ -76,7 +77,7 @@ vi.mock('@shell/store', () => ({
       customMinerals: [],
       questions: {},
       questionComments: {},
-      companyQuestions: {},
+      companyQuestions: templateState.companyQuestionValues,
     },
   }),
   useTemplateErrors: () => ({
@@ -102,7 +103,7 @@ vi.mock('@shell/store', () => ({
         ['contactName', true],
       ]),
       questions: new Map(),
-      companyQuestions: new Map([['CQ1', true]]),
+      companyQuestions: new Map([['CQ1', derivedState.companyQuestionsRequired]]),
     },
     checkerErrors: derivedState.checkerErrors,
     viewModels: {
@@ -139,6 +140,7 @@ const navigationState = vi.hoisted(() => ({
 }))
 
 const derivedState = vi.hoisted(() => ({
+  companyQuestionsRequired: true,
   checkerErrors: [
     {
       code: 'E001',
@@ -147,6 +149,11 @@ const derivedState = vi.hoisted(() => ({
       severity: 'error' as const,
     },
   ],
+}))
+
+const templateState = vi.hoisted(() => ({
+  companyQuestions: [{ key: 'CQ1' }] as CompanyQuestionDef[],
+  companyQuestionValues: {} as Record<string, Record<string, string> | string>,
 }))
 
 vi.mock('@shell/navigation/useNavigation', () => ({
@@ -179,8 +186,17 @@ vi.mock('@ui/forms/companyQuestionsRequiredHint', () => ({
 }))
 
 describe('DeclarationPage', () => {
+  beforeEach(() => {
+    navigationState.searchParams = new URLSearchParams()
+    derivedState.companyQuestionsRequired = true
+    derivedState.checkerErrors = []
+    templateState.companyQuestions = [{ key: 'CQ1' }] as CompanyQuestionDef[]
+    templateState.companyQuestionValues = {}
+  })
+
   test('shows declaration step sections as multi-expand collapse panels with header tags and de-duplicated inner titles', () => {
     navigationState.searchParams = new URLSearchParams()
+    derivedState.companyQuestionsRequired = true
     derivedState.checkerErrors = [
       {
         code: 'E001',
@@ -255,6 +271,7 @@ describe('DeclarationPage', () => {
 
   test('keeps required markers on company questions panel title even when there is no current error', () => {
     navigationState.searchParams = new URLSearchParams()
+    derivedState.companyQuestionsRequired = true
     derivedState.checkerErrors = []
     collapseMock.mockClear()
 
@@ -269,8 +286,56 @@ describe('DeclarationPage', () => {
     expect(companyQuestionsLabelHtml).toContain('*')
   })
 
+  test('hides required marker on company questions panel title when no company question is required', () => {
+    navigationState.searchParams = new URLSearchParams()
+    derivedState.companyQuestionsRequired = false
+    derivedState.checkerErrors = []
+    collapseMock.mockClear()
+
+    renderToStaticMarkup(<DeclarationPage />)
+
+    const collapseProps = collapseMock.mock.calls[0]?.[0] as {
+      items?: Array<{ key: string; label?: ReactNode }>
+    }
+    const companyQuestionsPanel = collapseProps.items?.find((item) => item.key === 'companyQuestions')
+    const companyQuestionsLabelHtml = renderToStaticMarkup(<>{companyQuestionsPanel?.label}</>)
+
+    expect(companyQuestionsLabelHtml).toContain('sections.companyQuestions')
+    expect(companyQuestionsLabelHtml).not.toContain('*')
+  })
+
+  test('shows required marker on company questions panel title when an optional question answer requires a comment', () => {
+    derivedState.companyQuestionsRequired = false
+    templateState.companyQuestions = [
+      {
+        key: 'B',
+        labelKey: 'companyQuestions.cmrt.b',
+        options: [],
+        hasCommentField: true,
+        commentRequiredWhen: ['Yes'],
+      },
+    ]
+    templateState.companyQuestionValues = {
+      B: 'Yes',
+      B_comment: '',
+    }
+    collapseMock.mockClear()
+
+    renderToStaticMarkup(<DeclarationPage />)
+
+    const collapseProps = collapseMock.mock.calls[0]?.[0] as {
+      items?: Array<{ key: string; label?: ReactNode }>
+    }
+    const companyQuestionsPanel = collapseProps.items?.find((item) => item.key === 'companyQuestions')
+    const companyQuestionsLabelHtml = renderToStaticMarkup(<>{companyQuestionsPanel?.label}</>)
+
+    expect(companyQuestionsLabelHtml).toContain('sections.companyQuestions')
+    expect(companyQuestionsLabelHtml).toContain('*')
+  })
+
   test('expands minerals scope panel when focus field is in declaration question matrix', () => {
     navigationState.searchParams = new URLSearchParams('focus=questions.Q1.tin')
+    derivedState.companyQuestionsRequired = true
     derivedState.checkerErrors = [
       {
         code: 'E001',
@@ -292,6 +357,7 @@ describe('DeclarationPage', () => {
 
   test('expands company questions panel when focus field is in company questions', () => {
     navigationState.searchParams = new URLSearchParams('focus=companyQuestions.C.cobalt')
+    derivedState.companyQuestionsRequired = true
     derivedState.checkerErrors = [
       {
         code: 'E002',

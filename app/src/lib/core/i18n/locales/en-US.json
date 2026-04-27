@@ -1201,5 +1201,11 @@
     "externalPickMissingIdContent": "The external picker result is missing required id and cannot be applied.",
     "duplicateSmelterSelectionTitle": "Duplicate smelter selection",
     "duplicateSmelterSelectionContent": "The same smelter cannot be selected twice under the same metal. Please choose another one."
+  },
+  "tips": {
+    "reportPurpose": {
+      "cmrt": "The purpose of this report is to collect sourcing information for tin, tantalum, tungsten, gold, and other metals used in products.",
+      "emrt": "The purpose of this report is to collect sourcing information for specific raw materials used in products, especially cobalt or natural mica."
+    }
   }
 }

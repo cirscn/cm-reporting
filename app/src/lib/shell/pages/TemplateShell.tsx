@@ -3,6 +3,7 @@
  * @description 模板壳组件，提供模板上下文并渲染布局。
  */
 
+import type { I18nKey } from '@core/i18n'
 import type { PageKey, TemplateType } from '@core/registry/types'
 import { getWorkflowPages } from '@core/template/workflow'
 import type { CMReportingIntegrations } from '@lib/public/integrations'
@@ -15,6 +16,11 @@ import { ConfigProvider } from 'antd'
 import { useEffect, type ReactNode } from 'react'
 
 import { PageActions } from './PageActions'
+
+const REPORT_PURPOSE_KEYS: Partial<Record<TemplateType, I18nKey>> = {
+  cmrt: 'tips.reportPurpose.cmrt',
+  emrt: 'tips.reportPurpose.emrt',
+}
 
 /** TemplateShell Props。 */
 export interface TemplateShellProps {
@@ -59,6 +65,7 @@ export function TemplateShell({
     >
       {children}
       <TemplateScaffold
+        templateType={templateType}
         readOnly={readOnly}
         showPageActions={showPageActions}
         pageKey={pageKey}
@@ -72,6 +79,7 @@ export function TemplateShell({
 
 /** TemplateScaffold Props。 */
 interface TemplateScaffoldProps {
+  templateType: TemplateType
   readOnly?: boolean
   showPageActions?: boolean
   pageKey: PageKey
@@ -82,6 +90,7 @@ interface TemplateScaffoldProps {
 
 /** 模板页面骨架：负责 tabs/versions 计算与布局。 */
 function TemplateScaffold({
+  templateType,
   readOnly = false,
   showPageActions = true,
   pageKey,
@@ -156,6 +165,7 @@ function TemplateScaffold({
     () => workflowPages.map((page) => page.key),
     [workflowPages]
   )
+  const purposeTipKey = REPORT_PURPOSE_KEYS[templateType]
 
   /** 切换 step 时仅允许工作流页面。 */
   const handleStepChange = useMemoizedFn((key: string) => {
@@ -171,6 +181,7 @@ function TemplateScaffold({
       steps={workflowSteps}
       currentStepKey={resolvedPageKey}
       onStepChange={handleStepChange}
+      purposeTip={purposeTipKey ? t(purposeTipKey) : undefined}
       maxContentWidth={maxContentWidth}
       bottomSlot={
         readOnly || !showPageActions
