@@ -1,0 +1,44 @@
+{
+  "name": "cm-reporting-integration",
+  "version": "0.7.9",
+  "description": "Codex plugin for integrating and operating the cm-reporting React component library.",
+  "author": {
+    "name": "CM contributors",
+    "url": "https://github.com/cirscn/cm-reporting"
+  },
+  "homepage": "https://github.com/cirscn/cm-reporting",
+  "repository": "https://github.com/cirscn/cm-reporting",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "keywords": [
+    "cm-reporting",
+    "conflict-minerals",
+    "rmi",
+    "cmrt",
+    "emrt",
+    "crt",
+    "amrt",
+    "react"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "CM Reporting Integration",
+    "shortDescription": "Integrate cm-reporting in host React apps",
+    "longDescription": "Use this plugin to integrate cm-reporting with template delivery, Snapshot persistence, Excel export, external pickers, readOnly behavior, and legacy adapter flows.",
+    "developerName": "CM contributors",
+    "category": "Engineering",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/cirscn/cm-reporting",
+    "privacyPolicyURL": "https://github.com/cirscn/cm-reporting",
+    "termsOfServiceURL": "https://github.com/cirscn/cm-reporting/blob/main/LICENSE",
+    "defaultPrompt": [
+      "Use $cm-reporting-integration to wire cm-reporting into my React app.",
+      "Use $cm-reporting-integration to add Snapshot save, restore, and Excel export.",
+      "Use $cm-reporting-integration to review my readOnly integration behavior."
+    ],
+    "brandColor": "#2563EB",
+    "screenshots": []
+  }
+}
