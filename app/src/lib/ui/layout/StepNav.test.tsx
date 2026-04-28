@@ -98,4 +98,17 @@ describe('StepNav', () => {
     expect(html).toContain('data-color="blue"')
     expect(html).toContain('此报告的目的是收集在产品中所用锡、钽、钨、黄金等金属的采购信息。')
   })
+
+  test('renders the version purpose tip in a dedicated left aligned row', () => {
+    const html = renderToStaticMarkup(
+      <StepNav
+        currentKey="declaration"
+        purposeTip="此报告的目的是收集产品中使用的特定原材料的采购信息。"
+        steps={[{ key: 'declaration', label: '申报' }]}
+      />,
+    )
+
+    expect(html).toContain('step-nav-purpose-row')
+    expect(html.indexOf('step-nav-purpose-row')).toBeLessThan(html.indexOf('step-nav-inner'))
+  })
 })

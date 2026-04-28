@@ -95,12 +95,14 @@ export function StepNav({ steps, currentKey, purposeTip, onChange }: StepNavProp
         flexShrink: 0,
       }}
     >
-      <div className="step-nav-inner">
-        {hasPurposeTip && (
+      {hasPurposeTip && (
+        <div className="step-nav-purpose-row">
           <Tag color="blue" className="step-nav-purpose-tip">
             {purposeTip}
           </Tag>
-        )}
+        </div>
+      )}
+      <div className={`step-nav-inner ${hasPurposeTip ? 'step-nav-inner--with-purpose' : ''}`}>
         <Steps
           current={currentIndex >= 0 ? currentIndex : 0}
           items={items}

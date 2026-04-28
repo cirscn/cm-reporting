@@ -20,6 +20,7 @@ import { PageActions } from './PageActions'
 const REPORT_PURPOSE_KEYS: Partial<Record<TemplateType, I18nKey>> = {
   cmrt: 'tips.reportPurpose.cmrt',
   emrt: 'tips.reportPurpose.emrt',
+  amrt: 'tips.reportPurpose.amrt',
 }
 
 /** TemplateShell Props。 */

@@ -18,6 +18,8 @@
 .step-nav-container {
   width: 100%;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
   background: var(--ant-color-bg-container);
   border-bottom: 1px solid var(--ant-color-border-secondary);
@@ -29,6 +31,17 @@
   width: 100%;
   margin: 0 auto;
   padding: var(--cm-step-nav-padding);
+}
+
+.step-nav-inner--with-purpose {
+  padding-top: 8px;
+}
+
+.step-nav-purpose-row {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px 24px 0;
+  text-align: left;
 }
 
 .step-nav-purpose-tip {
