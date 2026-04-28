@@ -20,6 +20,7 @@ import type {
   SmelterLookupMode,
 } from '@lib/public/integrations'
 import { renderRequiredHeaderLabel, wrapRequired } from '@ui/helpers/fieldRequired'
+import { getReadonlyTextControlProps } from '@ui/helpers/readonlyDisplay'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useCreation, useLatest, useMemoizedFn } from 'ahooks'
@@ -520,6 +521,18 @@ export const SmelterListTable = memo(function SmelterListTable({
   const filterOptionByLabel = useMemoizedFn((input: string, option?: { label?: string }) =>
     (option?.label ?? '').toLowerCase().includes(input.toLowerCase()),
   )
+  const isSmelterBaseFieldDisabled = useMemoizedFn((record: SmelterRow) =>
+    Boolean(
+      componentDisabled ||
+      shouldDisableSmelterFieldsAfterExternalPick({
+        useExternalLookup,
+        row: record,
+        fromLookup: isFromLookup(record.smelterLookup),
+        notListed: isNotListed(record.smelterLookup),
+        notYetIdentified: isNotYetIdentified(record.smelterLookup),
+      }),
+    ),
+  )
   const headerProfile = useCreation(
     () => getSmelterHeaderProfile({ templateType, versionId, locale, t, config }),
     [config, locale, t, templateType, versionId],
@@ -530,7 +543,6 @@ export const SmelterListTable = memo(function SmelterListTable({
       headerProfile.required[columnId] === true,
     ),
   )
-
   // ---------------------------------------------------------------------------
   // 列定义（约 430 行）
   // 按业务逻辑顺序构建：metal → smelterLookup/smelterName → smelterNumber →
@@ -553,8 +565,13 @@ export const SmelterListTable = memo(function SmelterListTable({
             value={value || undefined}
             onChange={getSelectHandler(`${record.id}:metal`)}
             options={metalOptions}
-            placeholder={t('placeholders.select')}
-            className="w-full"
+            disabled={componentDisabled}
+            {...getReadonlyTextControlProps({
+              value,
+              placeholder: t('placeholders.select'),
+              disabled: componentDisabled,
+              className: 'w-full',
+            })}
           />,
           componentDisabled,
         ),
@@ -576,11 +593,16 @@ export const SmelterListTable = memo(function SmelterListTable({
                   <Input
                     value={record.smelterName || undefined}
                     onChange={getInputHandler(`${record.id}:smelterName`)}
-                    placeholder={t('placeholders.smelterNameRequired')}
+                    disabled={componentDisabled}
+                    {...getReadonlyTextControlProps({
+                      value: record.smelterName,
+                      placeholder: t('placeholders.smelterNameRequired'),
+                      disabled: componentDisabled,
+                    })}
                   />
                 ) : record.smelterLookup ? (
                   <>
-                    <Typography.Text ellipsis style={{ maxWidth: 150 }}>
+                    <Typography.Text ellipsis title={record.smelterLookup} style={{ maxWidth: 150 }}>
                       {record.smelterLookup}
                     </Typography.Text>
                     {showEditableActions && (
@@ -595,20 +617,18 @@ export const SmelterListTable = memo(function SmelterListTable({
                       </Button>
                     )}
                   </>
+                ) : showEditableActions ? (
+                  <Button
+                    type="link"
+                    size="small"
+                    onClick={() => handleExternalPickForRow(record.id)}
+                    disabled={!record.metal || rowPickingId === record.id}
+                    loading={showLoadingIndicator && rowPickingId === record.id}
+                  >
+                    {t('actions.chooseSmelter')}
+                  </Button>
                 ) : (
-                  showEditableActions
-                    ? (
-                      <Button
-                        type="link"
-                        size="small"
-                        onClick={() => handleExternalPickForRow(record.id)}
-                        disabled={!record.metal || rowPickingId === record.id}
-                        loading={showLoadingIndicator && rowPickingId === record.id}
-                      >
-                        {t('actions.chooseSmelter')}
-                      </Button>
-                    )
-                    : <Typography.Text type="secondary">-</Typography.Text>
+                  <Typography.Text type="secondary">-</Typography.Text>
                 )}
                 {showEditableActions && smelterLookupMode === 'hybrid' && (
                   <Typography.Text type="secondary" style={{ fontSize: 12 }}>
@@ -635,15 +655,25 @@ export const SmelterListTable = memo(function SmelterListTable({
                         ]
                       : []
                   }
-                  placeholder={t('placeholders.smelterName')}
                   allowClear
-                  className="w-full"
+                  disabled={componentDisabled}
+                  {...getReadonlyTextControlProps({
+                    value,
+                    placeholder: t('placeholders.smelterName'),
+                    disabled: componentDisabled,
+                    className: 'w-full',
+                  })}
                 />
                 {isNotListed(record.smelterLookup) && notListedRequiresNameCountry && (
                   <Input
                     value={record.smelterName || undefined}
                     onChange={getInputHandler(`${record.id}:smelterName`)}
-                    placeholder={t('placeholders.smelterNameRequired')}
+                    disabled={componentDisabled}
+                    {...getReadonlyTextControlProps({
+                      value: record.smelterName,
+                      placeholder: t('placeholders.smelterNameRequired'),
+                      disabled: componentDisabled,
+                    })}
                   />
                 )}
               </Flex>
@@ -676,9 +706,13 @@ export const SmelterListTable = memo(function SmelterListTable({
             <Input
               value={value || undefined}
               onChange={getInputHandler(`${record.id}:smelterNumber`)}
-              placeholder={t('placeholders.smelterNumberInput')}
-              className="font-mono text-xs"
               disabled={componentDisabled || disableAfterExternalPick}
+              {...getReadonlyTextControlProps({
+                value,
+                placeholder: t('placeholders.smelterNumberInput'),
+                disabled: componentDisabled || disableAfterExternalPick,
+                className: 'font-mono text-xs',
+              })}
             />
           )
         },
@@ -711,8 +745,12 @@ export const SmelterListTable = memo(function SmelterListTable({
           <Input
             value={value || undefined}
             onChange={getInputHandler(`${record.id}:smelterName`)}
-            placeholder={placeholder}
             disabled={componentDisabled || disableAfterExternalPick}
+            {...getReadonlyTextControlProps({
+              value,
+              placeholder,
+              disabled: componentDisabled || disableAfterExternalPick,
+            })}
           />,
           componentDisabled,
         )
@@ -747,11 +785,15 @@ export const SmelterListTable = memo(function SmelterListTable({
                 value={value || undefined}
                 onChange={getSelectHandler(`${record.id}:smelterCountry`)}
                 options={countryOptions}
-                placeholder={placeholder}
                 showSearch
                 filterOption={filterOptionByLabel}
-                className="w-full"
                 disabled={componentDisabled || disableAfterExternalPick}
+                {...getReadonlyTextControlProps({
+                  value,
+                  placeholder,
+                  disabled: componentDisabled || disableAfterExternalPick,
+                  className: 'w-full',
+                })}
               />
               {showHint && (
                 <Typography.Text type="secondary" style={{ fontSize: 12 }}>
@@ -768,100 +810,105 @@ export const SmelterListTable = memo(function SmelterListTable({
         dataIndex: 'smelterIdentification',
         key: 'smelterIdentification',
         width: 180,
-        render: (value: string, record: SmelterRow) => (
-          <Input
-            value={value || undefined}
-            onChange={getInputHandler(`${record.id}:smelterIdentification`)}
-            placeholder={t('placeholders.smelterIdentification')}
-            disabled={componentDisabled || shouldDisableSmelterFieldsAfterExternalPick({
-              useExternalLookup,
-              row: record,
-              fromLookup: isFromLookup(record.smelterLookup),
-              notListed: isNotListed(record.smelterLookup),
-              notYetIdentified: isNotYetIdentified(record.smelterLookup),
-            })}
-          />
-        ),
+        render: (value: string, record: SmelterRow) => {
+          const disabled = isSmelterBaseFieldDisabled(record)
+          return (
+            <Input
+              value={value || undefined}
+              onChange={getInputHandler(`${record.id}:smelterIdentification`)}
+              disabled={disabled}
+              {...getReadonlyTextControlProps({
+                value,
+                placeholder: t('placeholders.smelterIdentification'),
+                disabled,
+              })}
+            />
+          )
+        },
       },
       {
         title: resolveColumnTitle('sourceId'),
         dataIndex: 'sourceId',
         key: 'sourceId',
         width: 180,
-        render: (value: string, record: SmelterRow) => (
-          <Input
-            value={value || undefined}
-            onChange={getInputHandler(`${record.id}:sourceId`)}
-            placeholder={t('placeholders.smelterSourceId')}
-            disabled={componentDisabled || shouldDisableSmelterFieldsAfterExternalPick({
-              useExternalLookup,
-              row: record,
-              fromLookup: isFromLookup(record.smelterLookup),
-              notListed: isNotListed(record.smelterLookup),
-              notYetIdentified: isNotYetIdentified(record.smelterLookup),
-            })}
-          />
-        ),
+        render: (value: string, record: SmelterRow) => {
+          const disabled = isSmelterBaseFieldDisabled(record)
+          return (
+            <Input
+              value={value || undefined}
+              onChange={getInputHandler(`${record.id}:sourceId`)}
+              disabled={disabled}
+              {...getReadonlyTextControlProps({
+                value,
+                placeholder: t('placeholders.smelterSourceId'),
+                disabled,
+              })}
+            />
+          )
+        },
       },
       {
         title: resolveColumnTitle('smelterStreet'),
         dataIndex: 'smelterStreet',
         key: 'smelterStreet',
         width: 200,
-        render: (value: string, record: SmelterRow) => (
-          <Input
-            value={value || undefined}
-            onChange={getInputHandler(`${record.id}:smelterStreet`)}
-            placeholder={t('placeholders.smelterStreet')}
-            disabled={componentDisabled || shouldDisableSmelterFieldsAfterExternalPick({
-              useExternalLookup,
-              row: record,
-              fromLookup: isFromLookup(record.smelterLookup),
-              notListed: isNotListed(record.smelterLookup),
-              notYetIdentified: isNotYetIdentified(record.smelterLookup),
-            })}
-          />
-        ),
+        render: (value: string, record: SmelterRow) => {
+          const disabled = isSmelterBaseFieldDisabled(record)
+          return (
+            <Input
+              value={value || undefined}
+              onChange={getInputHandler(`${record.id}:smelterStreet`)}
+              disabled={disabled}
+              {...getReadonlyTextControlProps({
+                value,
+                placeholder: t('placeholders.smelterStreet'),
+                disabled,
+              })}
+            />
+          )
+        },
       },
       {
         title: resolveColumnTitle('smelterCity'),
         dataIndex: 'smelterCity',
         key: 'smelterCity',
         width: 160,
-        render: (value: string, record: SmelterRow) => (
-          <Input
-            value={value || undefined}
-            onChange={getInputHandler(`${record.id}:smelterCity`)}
-            placeholder={t('placeholders.smelterCity')}
-            disabled={componentDisabled || shouldDisableSmelterFieldsAfterExternalPick({
-              useExternalLookup,
-              row: record,
-              fromLookup: isFromLookup(record.smelterLookup),
-              notListed: isNotListed(record.smelterLookup),
-              notYetIdentified: isNotYetIdentified(record.smelterLookup),
-            })}
-          />
-        ),
+        render: (value: string, record: SmelterRow) => {
+          const disabled = isSmelterBaseFieldDisabled(record)
+          return (
+            <Input
+              value={value || undefined}
+              onChange={getInputHandler(`${record.id}:smelterCity`)}
+              disabled={disabled}
+              {...getReadonlyTextControlProps({
+                value,
+                placeholder: t('placeholders.smelterCity'),
+                disabled,
+              })}
+            />
+          )
+        },
       },
       {
         title: resolveColumnTitle('smelterState'),
         dataIndex: 'smelterState',
         key: 'smelterState',
         width: 170,
-        render: (value: string, record: SmelterRow) => (
-          <Input
-            value={value || undefined}
-            onChange={getInputHandler(`${record.id}:smelterState`)}
-            placeholder={t('placeholders.smelterState')}
-            disabled={componentDisabled || shouldDisableSmelterFieldsAfterExternalPick({
-              useExternalLookup,
-              row: record,
-              fromLookup: isFromLookup(record.smelterLookup),
-              notListed: isNotListed(record.smelterLookup),
-              notYetIdentified: isNotYetIdentified(record.smelterLookup),
-            })}
-          />
-        ),
+        render: (value: string, record: SmelterRow) => {
+          const disabled = isSmelterBaseFieldDisabled(record)
+          return (
+            <Input
+              value={value || undefined}
+              onChange={getInputHandler(`${record.id}:smelterState`)}
+              disabled={disabled}
+              {...getReadonlyTextControlProps({
+                value,
+                placeholder: t('placeholders.smelterState'),
+                disabled,
+              })}
+            />
+          )
+        },
       },
       {
         title: resolveColumnTitle('smelterContactName'),
@@ -872,7 +919,12 @@ export const SmelterListTable = memo(function SmelterListTable({
           <Input
             value={value || undefined}
             onChange={getInputHandler(`${record.id}:smelterContactName`)}
-            placeholder={t('placeholders.smelterContactName')}
+            disabled={componentDisabled}
+            {...getReadonlyTextControlProps({
+              value,
+              placeholder: t('placeholders.smelterContactName'),
+              disabled: componentDisabled,
+            })}
           />
         ),
       },
@@ -885,7 +937,12 @@ export const SmelterListTable = memo(function SmelterListTable({
           <Input
             value={value || undefined}
             onChange={getInputHandler(`${record.id}:smelterContactEmail`)}
-            placeholder={t('placeholders.smelterContactEmail')}
+            disabled={componentDisabled}
+            {...getReadonlyTextControlProps({
+              value,
+              placeholder: t('placeholders.smelterContactEmail'),
+              disabled: componentDisabled,
+            })}
           />
         ),
       },
@@ -898,7 +955,12 @@ export const SmelterListTable = memo(function SmelterListTable({
           <Input
             value={value || undefined}
             onChange={getInputHandler(`${record.id}:proposedNextSteps`)}
-            placeholder={t('placeholders.smelterNextSteps')}
+            disabled={componentDisabled}
+            {...getReadonlyTextControlProps({
+              value,
+              placeholder: t('placeholders.smelterNextSteps'),
+              disabled: componentDisabled,
+            })}
           />
         ),
       },
@@ -911,7 +973,12 @@ export const SmelterListTable = memo(function SmelterListTable({
           <Input
             value={value || undefined}
             onChange={getInputHandler(`${record.id}:mineName`)}
-            placeholder={t('placeholders.smelterMineName')}
+            disabled={componentDisabled}
+            {...getReadonlyTextControlProps({
+              value,
+              placeholder: t('placeholders.smelterMineName'),
+              disabled: componentDisabled,
+            })}
           />
         ),
       },
@@ -924,10 +991,15 @@ export const SmelterListTable = memo(function SmelterListTable({
           <AutoComplete
             value={value || undefined}
             onChange={getSelectHandler(`${record.id}:mineCountry`)}
-            placeholder={t('placeholders.smelterMineCountry')}
             options={countryOptions}
             allowClear
-            className="w-full"
+            disabled={componentDisabled}
+            {...getReadonlyTextControlProps({
+              value,
+              placeholder: t('placeholders.smelterMineCountry'),
+              disabled: componentDisabled,
+              className: 'w-full',
+            })}
           />
         ),
       },
@@ -941,8 +1013,13 @@ export const SmelterListTable = memo(function SmelterListTable({
             value={value || undefined}
             onChange={getSelectHandler(`${record.id}:recycledScrap`)}
             options={recycledScrapOptions}
-            placeholder={t('placeholders.select')}
-            className="w-full"
+            disabled={componentDisabled}
+            {...getReadonlyTextControlProps({
+              value,
+              placeholder: t('placeholders.select'),
+              disabled: componentDisabled,
+              className: 'w-full',
+            })}
           />
         ),
       },
@@ -955,7 +1032,12 @@ export const SmelterListTable = memo(function SmelterListTable({
           <Input
             value={value || undefined}
             onChange={getInputHandler(`${record.id}:comments`)}
-            placeholder={t('placeholders.smelterComments')}
+            disabled={componentDisabled}
+            {...getReadonlyTextControlProps({
+              value,
+              placeholder: t('placeholders.smelterComments'),
+              disabled: componentDisabled,
+            })}
           />
         ),
       },
@@ -973,8 +1055,13 @@ export const SmelterListTable = memo(function SmelterListTable({
               value={value || undefined}
               onChange={getSelectHandler(`${record.id}:combinedMetal`)}
               options={metalOptions}
-              placeholder={t('placeholders.smelterCombinedMetal')}
-              className="w-full"
+              disabled={componentDisabled}
+              {...getReadonlyTextControlProps({
+                value,
+                placeholder: t('placeholders.smelterCombinedMetal'),
+                disabled: componentDisabled,
+                className: 'w-full',
+              })}
             />
           ),
         },
@@ -987,7 +1074,12 @@ export const SmelterListTable = memo(function SmelterListTable({
             <Input
               value={value || undefined}
               onChange={getInputHandler(`${record.id}:combinedSmelter`)}
-              placeholder={t('placeholders.smelterCombinedSmelter')}
+              disabled={componentDisabled}
+              {...getReadonlyTextControlProps({
+                value,
+                placeholder: t('placeholders.smelterCombinedSmelter'),
+                disabled: componentDisabled,
+              })}
             />
           ),
         },
@@ -1031,6 +1123,7 @@ export const SmelterListTable = memo(function SmelterListTable({
     handleExternalPickForRow,
     handleRemoveRow,
     integration,
+    isSmelterBaseFieldDisabled,
     metalOptions,
     notListedRequiresNameCountry,
     rowPickingId,

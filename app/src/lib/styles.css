@@ -302,6 +302,16 @@
   opacity: 0 !important;
 }
 
+.cm-readonly-text-ellipsis.ant-input,
+.cm-readonly-text-ellipsis .ant-input,
+.cm-readonly-text-ellipsis .ant-input-number-input,
+.cm-readonly-text-ellipsis .ant-select-selection-item {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* --------------------------------------------------------------------------
    Keyframe 动画 - 无法内联
    -------------------------------------------------------------------------- */

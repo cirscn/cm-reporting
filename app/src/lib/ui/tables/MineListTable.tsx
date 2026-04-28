@@ -8,6 +8,7 @@ import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import type { MineralDef, MineListConfig } from '@core/registry/types'
 import type { MineRow } from '@core/types/tableRows'
 import { renderRequiredHeaderLabel, wrapRequired } from '@ui/helpers/fieldRequired'
+import { getReadonlyTextControlProps } from '@ui/helpers/readonlyDisplay'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useCreation, useMemoizedFn } from 'ahooks'
@@ -17,14 +18,19 @@ import type { ChangeEvent } from 'react'
 
 import { getMineHeaderProfile } from './mineHeaderProfile'
 
+type SmelterOption = { value: string; label: string }
+
 interface MineListTableProps {
   config: MineListConfig
   availableMetals: Array<MineralDef & { label?: string }>
   rows: MineRow[]
   onChange: (rows: MineRow[]) => void
-  smelterOptions?: Array<{ value: string; label: string }>
-  smelterOptionsByMetal?: Record<string, Array<{ value: string; label: string }>>
+  smelterOptions?: SmelterOption[]
+  smelterOptionsByMetal?: Record<string, SmelterOption[]>
 }
+
+const EMPTY_SMELTER_OPTIONS: SmelterOption[] = []
+const EMPTY_SMELTER_OPTIONS_BY_METAL: Record<string, SmelterOption[]> = {}
 
 const INPUT_FIELDS = [
   'smelterName',
@@ -54,8 +60,8 @@ export function MineListTable({
   availableMetals,
   rows,
   onChange,
-  smelterOptions = [],
-  smelterOptionsByMetal = {},
+  smelterOptions = EMPTY_SMELTER_OPTIONS,
+  smelterOptionsByMetal = EMPTY_SMELTER_OPTIONS_BY_METAL,
 }: MineListTableProps) {
   const { t, locale } = useT()
   const { componentDisabled } = ConfigProvider.useConfig()
@@ -184,8 +190,13 @@ export function MineListTable({
             value={value || undefined}
             onChange={getSelectHandler(`${record.id}:metal`)}
             options={metalOptions}
-            placeholder={t('placeholders.select')}
-            className="w-full"
+            disabled={componentDisabled}
+            {...getReadonlyTextControlProps({
+              value,
+              placeholder: t('placeholders.select'),
+              disabled: componentDisabled,
+              className: 'w-full',
+            })}
           />,
           componentDisabled,
         )
@@ -208,11 +219,15 @@ export function MineListTable({
                 value={value || undefined}
                 onChange={getSelectHandler(`${record.id}:smelterName`)}
                 options={filteredOptions}
-                placeholder={t('placeholders.mineSmelterSelect')}
                 disabled={componentDisabled || !record.metal}
                 showSearch
                 filterOption={filterOptionByLabel}
-                className="w-full"
+                {...getReadonlyTextControlProps({
+                  value,
+                  placeholder: t('placeholders.mineSmelterSelect'),
+                  disabled: componentDisabled,
+                  className: 'w-full',
+                })}
               />,
               componentDisabled,
             )
@@ -221,12 +236,16 @@ export function MineListTable({
               <AutoComplete
                 value={value || undefined}
                 onChange={getSelectHandler(`${record.id}:smelterName`)}
-                placeholder={t('placeholders.mineSmelterInput')}
                 options={filteredOptions}
                 disabled={componentDisabled || !record.metal}
                 allowClear
                 filterOption={filterOptionByLabel}
-                className="w-full"
+                {...getReadonlyTextControlProps({
+                  value,
+                  placeholder: t('placeholders.mineSmelterInput'),
+                  disabled: componentDisabled,
+                  className: 'w-full',
+                })}
               />,
               componentDisabled,
             )
@@ -243,7 +262,12 @@ export function MineListTable({
           <Input
             value={value || undefined}
             onChange={getInputHandler(`${record.id}:mineName`)}
-            placeholder={t('placeholders.mineName')}
+            disabled={componentDisabled}
+            {...getReadonlyTextControlProps({
+              value,
+              placeholder: t('placeholders.mineName'),
+              disabled: componentDisabled,
+            })}
           />,
           componentDisabled,
         )
@@ -258,7 +282,12 @@ export function MineListTable({
         <Input
           value={value || undefined}
           onChange={getInputHandler(`${record.id}:mineId`)}
-          placeholder={t('placeholders.mineId')}
+          disabled={componentDisabled}
+          {...getReadonlyTextControlProps({
+            value,
+            placeholder: t('placeholders.mineId'),
+            disabled: componentDisabled,
+          })}
         />
       ),
     },
@@ -271,7 +300,12 @@ export function MineListTable({
         <Input
           value={value || undefined}
           onChange={getInputHandler(`${record.id}:mineIdSource`)}
-          placeholder={t('placeholders.mineSourceId')}
+          disabled={componentDisabled}
+          {...getReadonlyTextControlProps({
+            value,
+            placeholder: t('placeholders.mineSourceId'),
+            disabled: componentDisabled,
+          })}
         />
       ),
     },
@@ -286,7 +320,12 @@ export function MineListTable({
           <Input
             value={value || undefined}
             onChange={getInputHandler(`${record.id}:mineCountry`)}
-            placeholder={t('placeholders.mineCountry')}
+            disabled={componentDisabled}
+            {...getReadonlyTextControlProps({
+              value,
+              placeholder: t('placeholders.mineCountry'),
+              disabled: componentDisabled,
+            })}
           />,
           componentDisabled,
         )
@@ -301,7 +340,12 @@ export function MineListTable({
         <Input
           value={value || undefined}
           onChange={getInputHandler(`${record.id}:mineStreet`)}
-          placeholder={t('placeholders.mineStreet')}
+          disabled={componentDisabled}
+          {...getReadonlyTextControlProps({
+            value,
+            placeholder: t('placeholders.mineStreet'),
+            disabled: componentDisabled,
+          })}
         />
       ),
     },
@@ -314,7 +358,12 @@ export function MineListTable({
         <Input
           value={value || undefined}
           onChange={getInputHandler(`${record.id}:mineCity`)}
-          placeholder={t('placeholders.mineCity')}
+          disabled={componentDisabled}
+          {...getReadonlyTextControlProps({
+            value,
+            placeholder: t('placeholders.mineCity'),
+            disabled: componentDisabled,
+          })}
         />
       ),
     },
@@ -327,7 +376,12 @@ export function MineListTable({
         <Input
           value={value || undefined}
           onChange={getInputHandler(`${record.id}:mineProvince`)}
-          placeholder={t('placeholders.mineState')}
+          disabled={componentDisabled}
+          {...getReadonlyTextControlProps({
+            value,
+            placeholder: t('placeholders.mineState'),
+            disabled: componentDisabled,
+          })}
         />
       ),
     },
@@ -340,7 +394,12 @@ export function MineListTable({
         <Input
           value={value || undefined}
           onChange={getInputHandler(`${record.id}:mineContactName`)}
-          placeholder={t('placeholders.mineContactName')}
+          disabled={componentDisabled}
+          {...getReadonlyTextControlProps({
+            value,
+            placeholder: t('placeholders.mineContactName'),
+            disabled: componentDisabled,
+          })}
         />
       ),
     },
@@ -353,7 +412,12 @@ export function MineListTable({
         <Input
           value={value || undefined}
           onChange={getInputHandler(`${record.id}:mineContactEmail`)}
-          placeholder={t('placeholders.mineContactEmail')}
+          disabled={componentDisabled}
+          {...getReadonlyTextControlProps({
+            value,
+            placeholder: t('placeholders.mineContactEmail'),
+            disabled: componentDisabled,
+          })}
         />
       ),
     },
@@ -366,7 +430,12 @@ export function MineListTable({
         <Input
           value={value || undefined}
           onChange={getInputHandler(`${record.id}:proposedNextSteps`)}
-          placeholder={t('placeholders.mineNextSteps')}
+          disabled={componentDisabled}
+          {...getReadonlyTextControlProps({
+            value,
+            placeholder: t('placeholders.mineNextSteps'),
+            disabled: componentDisabled,
+          })}
         />
       ),
     },
@@ -379,7 +448,12 @@ export function MineListTable({
         <Input
           value={value || undefined}
           onChange={getInputHandler(`${record.id}:comments`)}
-          placeholder={t('placeholders.mineComments')}
+          disabled={componentDisabled}
+          {...getReadonlyTextControlProps({
+            value,
+            placeholder: t('placeholders.mineComments'),
+            disabled: componentDisabled,
+          })}
         />
       ),
     },

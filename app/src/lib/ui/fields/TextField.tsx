@@ -4,6 +4,7 @@
  */
 
 import type { ErrorKey } from '@core/validation/errorKeys'
+import { getReadonlyTextControlProps } from '@ui/helpers/readonlyDisplay'
 import { useT } from '@ui/i18n/useT'
 import { useMemoizedFn } from 'ahooks'
 import { ConfigProvider, Form, Input } from 'antd'
@@ -91,22 +92,31 @@ export function TextField({
         <Input.TextArea
           value={value || undefined}
           onChange={handleChange}
-          placeholder={resolvedPlaceholder}
           disabled={isFieldDisabled}
           rows={rows}
-          className={inputClassName}
           autoComplete={autoComplete}
           spellCheck={spellCheck}
+          {...getReadonlyTextControlProps({
+            value,
+            placeholder: resolvedPlaceholder,
+            disabled: isFieldDisabled,
+            className: inputClassName,
+            ellipsis: false,
+          })}
         />
       ) : (
         <Input
           value={value || undefined}
           onChange={handleChange}
-          placeholder={resolvedPlaceholder}
           disabled={isFieldDisabled}
-          className={inputClassName}
           autoComplete={autoComplete}
           spellCheck={spellCheck}
+          {...getReadonlyTextControlProps({
+            value,
+            placeholder: resolvedPlaceholder,
+            disabled: isFieldDisabled,
+            className: inputClassName,
+          })}
         />
       )}
     </Form.Item>

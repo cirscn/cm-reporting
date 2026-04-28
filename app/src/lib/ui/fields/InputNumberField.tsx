@@ -4,6 +4,7 @@
  */
 
 import type { ErrorKey } from '@core/validation/errorKeys'
+import { getReadonlyTextControlProps } from '@ui/helpers/readonlyDisplay'
 import { useT } from '@ui/i18n/useT'
 import { useMemoizedFn } from 'ahooks'
 import { ConfigProvider, Form, InputNumber } from 'antd'
@@ -82,13 +83,17 @@ export function InputNumberField({
       <InputNumber
         value={normalizedValue}
         onChange={handleChange}
-        placeholder={resolvedPlaceholder}
         disabled={isFieldDisabled}
         min={min}
         max={max}
         step={step}
         size={size}
-        className={`w-full ${inputClassName ?? ''}`}
+        {...getReadonlyTextControlProps({
+          value,
+          placeholder: resolvedPlaceholder,
+          disabled: isFieldDisabled,
+          className: `w-full ${inputClassName ?? ''}`,
+        })}
       />
     </Form.Item>
   )

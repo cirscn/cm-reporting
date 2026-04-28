@@ -4,6 +4,7 @@
  */
 
 import type { ErrorKey } from '@core/validation/errorKeys'
+import { getReadonlyTextControlProps } from '@ui/helpers/readonlyDisplay'
 import { useT } from '@ui/i18n/useT'
 import { useMemoizedFn } from 'ahooks'
 import { ConfigProvider, Form, Select } from 'antd'
@@ -84,6 +85,7 @@ export function SelectField({
   })
 
   const normalizedValue = value === '' ? undefined : value
+  const selectedLabel = options.find((option) => option.value === value)?.label ?? value
 
   // 必填字段的黄色背景样式
   const selectClassName = required && !isFieldDisabled && !value ? 'field-required-empty' : undefined
@@ -104,11 +106,15 @@ export function SelectField({
         value={normalizedValue}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        placeholder={resolvedPlaceholder}
         disabled={isFieldDisabled}
         options={options}
         allowClear={allowClear}
-        className={selectClassName}
+        {...getReadonlyTextControlProps({
+          value: selectedLabel,
+          placeholder: resolvedPlaceholder,
+          disabled: isFieldDisabled,
+          className: selectClassName,
+        })}
       />
     </Form.Item>
   )

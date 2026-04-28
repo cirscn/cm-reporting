@@ -12,6 +12,7 @@ import type {
   ProductPickContext,
 } from '@lib/public/integrations'
 import { renderRequiredHeaderLabel, wrapRequired } from '@ui/helpers/fieldRequired'
+import { getReadonlyTextControlProps } from '@ui/helpers/readonlyDisplay'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useBoolean, useCreation, useLatest, useMemoizedFn } from 'ahooks'
@@ -231,7 +232,12 @@ export const ProductListTable = memo(function ProductListTable({
             <Input
               value={value || undefined}
               onChange={getInputHandler(`${record.id}:productNumber`)}
-              placeholder={t('productPlaceholders.productNumber')}
+              disabled={componentDisabled}
+              {...getReadonlyTextControlProps({
+                value,
+                placeholder: t('productPlaceholders.productNumber'),
+                disabled: componentDisabled,
+              })}
             />,
             componentDisabled,
           ),
@@ -245,7 +251,12 @@ export const ProductListTable = memo(function ProductListTable({
           <Input
             value={value || undefined}
             onChange={getInputHandler(`${record.id}:productName`)}
-            placeholder={t('productPlaceholders.productName')}
+            disabled={componentDisabled}
+            {...getReadonlyTextControlProps({
+              value,
+              placeholder: t('productPlaceholders.productName'),
+              disabled: componentDisabled,
+            })}
           />
         ),
       },
@@ -262,11 +273,16 @@ export const ProductListTable = memo(function ProductListTable({
           render: (value: string, record: ProductRow) =>
             wrapRequired(
               required,
-              <Input
-                value={value || undefined}
-                onChange={getInputHandler(`${record.id}:requesterNumber`)}
-                placeholder={t('productPlaceholders.requesterNumber')}
-              />,
+                <Input
+                  value={value || undefined}
+                  onChange={getInputHandler(`${record.id}:requesterNumber`)}
+                  disabled={componentDisabled}
+                  {...getReadonlyTextControlProps({
+                    value,
+                    placeholder: t('productPlaceholders.requesterNumber'),
+                    disabled: componentDisabled,
+                  })}
+                />,
               componentDisabled,
             ),
         },
@@ -279,7 +295,12 @@ export const ProductListTable = memo(function ProductListTable({
             <Input
               value={value || undefined}
               onChange={getInputHandler(`${record.id}:requesterName`)}
-              placeholder={t('productPlaceholders.requesterName')}
+              disabled={componentDisabled}
+              {...getReadonlyTextControlProps({
+                value,
+                placeholder: t('productPlaceholders.requesterName'),
+                disabled: componentDisabled,
+              })}
             />
           ),
         },
@@ -295,7 +316,12 @@ export const ProductListTable = memo(function ProductListTable({
         <Input
           value={value || undefined}
           onChange={getInputHandler(`${record.id}:comments`)}
-          placeholder={t('productPlaceholders.comments')}
+          disabled={componentDisabled}
+          {...getReadonlyTextControlProps({
+            value,
+            placeholder: t('productPlaceholders.comments'),
+            disabled: componentDisabled,
+          })}
         />
       ),
     })

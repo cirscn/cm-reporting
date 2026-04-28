@@ -4,6 +4,7 @@
  */
 
 import type { ErrorKey } from '@core/validation/errorKeys'
+import { getReadonlyTextControlProps } from '@ui/helpers/readonlyDisplay'
 import { useT } from '@ui/i18n/useT'
 import { useMemoizedFn } from 'ahooks'
 import { AutoComplete, ConfigProvider, Form } from 'antd'
@@ -85,12 +86,16 @@ export function AutoCompleteField({
       <AutoComplete
         value={normalizedValue}
         onChange={handleChange}
-        placeholder={resolvedPlaceholder}
         disabled={isFieldDisabled}
         options={options}
         allowClear={allowClear}
         size={size}
-        className={`w-full ${inputClassName ?? ''}`}
+        {...getReadonlyTextControlProps({
+          value,
+          placeholder: resolvedPlaceholder,
+          disabled: isFieldDisabled,
+          className: `w-full ${inputClassName ?? ''}`,
+        })}
       />
     </Form.Item>
   )
