@@ -51,6 +51,12 @@ export interface SmelterNumberLookupContext extends SmelterExternalContextBase {
   smelterNumber: string
 }
 
+export interface SmelterNumberLookupPickContext extends SmelterNumberLookupContext {
+  searchField: 'smelterNumber'
+  searchValue: string
+  candidates: ReadonlyArray<SmelterExternalPickItem>
+}
+
 export interface ProductPickContext {
   templateType: TemplateType
   versionId: string
@@ -81,6 +87,13 @@ export interface SmelterListIntegration {
    */
   onLookupSmelterByNumber?: (
     ctx: SmelterNumberLookupContext
+  ) => Promise<ExternalPickResult<SmelterExternalPickItem>>
+  /**
+   * CID 查询返回多条时，由宿主打开选择器让用户确认其中一条。
+   * searchField 固定为 smelterNumber，searchValue 是用户输入的 CID。
+   */
+  onPickSmelterForNumberLookup?: (
+    ctx: SmelterNumberLookupPickContext
   ) => Promise<ExternalPickResult<SmelterExternalPickItem>>
   /** 冶炼厂名称/选择入口交互模式：默认 'internal'（用户手填）。 */
   lookupMode?: SmelterLookupMode

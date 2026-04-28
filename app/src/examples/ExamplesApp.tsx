@@ -75,7 +75,14 @@ export function ExamplesApp({ locale, onLocaleChange }: ExamplesAppProps) {
   const [pendingSnapshot, setPendingSnapshot] = useState<ReportSnapshotV1 | null>(null)
   const [legacyCtx, setLegacyCtx] = useState<CirsGpmLegacyRoundtripContext | null>(null)
   const exportBridgeRef = useRef<DevExportBridgeRef | null>(null)
-  const { onPickProducts, onPickSmelterForRow, productModal, smelterModal } = useExampleExternalPickers()
+  const {
+    onLookupSmelterByNumber,
+    onPickProducts,
+    onPickSmelterForNumberLookup,
+    onPickSmelterForRow,
+    productModal,
+    smelterModal,
+  } = useExampleExternalPickers()
 
   const clearImportContext = useCallback(() => {
     setPendingSnapshot(null)
@@ -233,6 +240,8 @@ export function ExamplesApp({ locale, onLocaleChange }: ExamplesAppProps) {
                   if (lookup.toLowerCase() === 'smelter not yet identified') return ''
                   return SMELTER_LOOKUP_DATA[lookup] ? '' : 'smelter-row-unlisted'
                 },
+                onLookupSmelterByNumber,
+                onPickSmelterForNumberLookup,
                 onPickSmelterForRow,
               },
               productList: {

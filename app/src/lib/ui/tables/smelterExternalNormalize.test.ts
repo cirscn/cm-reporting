@@ -11,6 +11,7 @@ import {
   hasExternalSmelterNumberInput,
   isTemporarySmelterRowId,
   mergeExternalSmelterPickIntoRow,
+  resolveExternalSmelterMetal,
   resolveExternalSmelterLookup,
   resolveExternalSmelterIdentityFields,
   resolveExternalSmelterNumber,
@@ -160,6 +161,34 @@ describe('mergeExternalSmelterPickIntoRow', () => {
       smelterNumber: 'CID003875',
       smelterIdentification: 'CID003875',
       sourceId: 'RMI',
+    })
+  })
+})
+
+describe('resolveExternalSmelterMetal', () => {
+  const availableMetals = [
+    { key: 'cobalt', label: '钴' },
+    { key: 'mica', label: '云母' },
+  ]
+
+  test('外部返回中文显示名时映射成表格下拉使用的 key', () => {
+    expect(resolveExternalSmelterMetal(' 钴 ', availableMetals)).toEqual({
+      value: 'cobalt',
+      inScope: true,
+    })
+  })
+
+  test('外部返回的金属不在当前申报范围时标记为不在范围内', () => {
+    expect(resolveExternalSmelterMetal('cobalt', [{ key: 'mica', label: '云母' }])).toEqual({
+      value: 'cobalt',
+      inScope: false,
+    })
+  })
+
+  test('外部未返回金属时不拦截回填', () => {
+    expect(resolveExternalSmelterMetal('', availableMetals)).toEqual({
+      value: '',
+      inScope: true,
     })
   })
 })

@@ -17,6 +17,7 @@ import type {
   SmelterExternalPickItem,
   SmelterListIntegration,
   SmelterNumberLookupContext,
+  SmelterNumberLookupPickContext,
   SmelterRowPickContext,
   SmelterLookupMode,
 } from '@lib/public/integrations'
@@ -47,6 +48,7 @@ import {
   buildNewSmelterRowId,
   hasDuplicateSmelterSelectionForMetal,
   mergeExternalSmelterPickIntoRow,
+  resolveExternalSmelterMetal,
   shouldDisableSmelterFieldsAfterExternalPick,
 } from './smelterExternalNormalize'
 import { getSmelterHeaderProfile, type SmelterColumnId } from './smelterHeaderProfiles'
@@ -294,19 +296,68 @@ export const SmelterListTable = memo(function SmelterListTable({
     }
   })
 
-  const showSmelterNumberLookupWarning = useMemoizedFn((kind: 'notFound' | 'multiple') => {
-    if (kind === 'notFound') {
+  const showSmelterNumberLookupWarning = useMemoizedFn(
+    (kind: 'notFound' | 'multiple' | 'outOfScope') => {
+      if (kind === 'notFound') {
+        Modal.warning({
+          title: t('errors.smelterNumberLookupNotFoundTitle'),
+          content: t('errors.smelterNumberLookupNotFoundContent'),
+        })
+        return
+      }
+      if (kind === 'outOfScope') {
+        Modal.warning({
+          title: t('errors.smelterNumberLookupOutOfScopeTitle'),
+          content: t('errors.smelterNumberLookupOutOfScopeContent'),
+        })
+        return
+      }
       Modal.warning({
-        title: t('errors.smelterNumberLookupNotFoundTitle'),
-        content: t('errors.smelterNumberLookupNotFoundContent'),
+        title: t('errors.smelterNumberLookupMultipleTitle'),
+        content: t('errors.smelterNumberLookupMultipleContent'),
       })
-      return
-    }
-    Modal.warning({
-      title: t('errors.smelterNumberLookupMultipleTitle'),
-      content: t('errors.smelterNumberLookupMultipleContent'),
-    })
-  })
+    },
+  )
+
+  const resolveSmelterNumberLookupItem = useMemoizedFn(
+    async (
+      ctx: SmelterNumberLookupContext,
+      items: SmelterExternalPickItem[],
+    ): Promise<SmelterExternalPickItem | null> => {
+      if (items.length === 0) {
+        showSmelterNumberLookupWarning('notFound')
+        return null
+      }
+      if (items.length === 1) return items[0]!
+      if (!integration?.onPickSmelterForNumberLookup) {
+        showSmelterNumberLookupWarning('multiple')
+        return null
+      }
+      const pickCtx: SmelterNumberLookupPickContext = {
+        ...ctx,
+        searchField: 'smelterNumber',
+        searchValue: ctx.smelterNumber,
+        candidates: items.map((item) => ({ ...item })),
+      }
+      const result = await integration.onPickSmelterForNumberLookup(pickCtx)
+      return result?.items?.[0] ?? null
+    },
+  )
+
+  const normalizeSmelterNumberLookupPick = useMemoizedFn(
+    (picked: SmelterExternalPickItem, smelterNumber: string): SmelterExternalPickItem | null => {
+      const resolvedMetal = resolveExternalSmelterMetal(picked.metal, availableMetals)
+      if (!resolvedMetal.inScope) {
+        showSmelterNumberLookupWarning('outOfScope')
+        return null
+      }
+      return {
+        ...picked,
+        metal: resolvedMetal.value || picked.metal,
+        smelterNumber: picked.smelterNumber ?? smelterNumber,
+      }
+    },
+  )
 
   const handleSmelterNumberLookup = useMemoizedFn(async (id: string) => {
     if (componentDisabled || !integration?.onLookupSmelterByNumber || numberLookupRowId) return
@@ -328,16 +379,10 @@ export const SmelterListTable = memo(function SmelterListTable({
     setNumberLookupRowId(id)
     try {
       const result = await integration.onLookupSmelterByNumber(ctx)
-      const items = result?.items ?? []
-      if (items.length === 0) {
-        showSmelterNumberLookupWarning('notFound')
-        return
-      }
-      if (items.length > 1) {
-        showSmelterNumberLookupWarning('multiple')
-        return
-      }
-      const picked = { ...items[0]!, smelterNumber: items[0]!.smelterNumber ?? smelterNumber }
+      const pickedItem = await resolveSmelterNumberLookupItem(ctx, result?.items ?? [])
+      if (!pickedItem) return
+      const picked = normalizeSmelterNumberLookupPick(pickedItem, smelterNumber)
+      if (!picked) return
       const nextRow = applyExternalPickToRow({ row, partial: picked, preserveMetal: false })
       if (hasDuplicateSmelterSelectionForMetal({ currentRows, currentRowId: id, nextRow })) {
         Modal.warning({

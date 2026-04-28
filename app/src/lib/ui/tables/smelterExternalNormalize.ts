@@ -20,6 +20,10 @@ type ExternalSmelterIdentityFields = Pick<
 >
 
 type ExternalSmelterMergeFields = Partial<SmelterRow>
+type AvailableMetalOption = {
+  key: string
+  label?: string
+}
 
 function trimString(value: unknown): string {
   return typeof value === 'string' ? value.trim() : ''
@@ -38,6 +42,12 @@ function resolveMergedSmelterNumber(partial: ExternalSmelterMergeFields, current
   if (resolvedSmelterNumber) return resolvedSmelterNumber
   if (hasExternalSmelterNumberInput(partial)) return ''
   return trimString(current)
+}
+
+function matchesMetalOption(input: string, option: AvailableMetalOption): boolean {
+  const normalizedInput = input.toLowerCase()
+  if (option.key.trim().toLowerCase() === normalizedInput) return true
+  return trimString(option.label).toLowerCase() === normalizedInput
 }
 
 /**
@@ -67,6 +77,19 @@ export function resolveExternalSmelterNumber(
   const smelterNumber = trimString(partial.smelterNumber)
   if (smelterNumber) return smelterNumber
   return ''
+}
+
+export function resolveExternalSmelterMetal(
+  metal: string | undefined,
+  availableMetals: ReadonlyArray<AvailableMetalOption>,
+): { value: string; inScope: boolean } {
+  const normalizedMetal = trimString(metal)
+  if (!normalizedMetal) return { value: '', inScope: true }
+
+  const matched = availableMetals.find((option) => matchesMetalOption(normalizedMetal, option))
+  if (matched) return { value: matched.key, inScope: true }
+
+  return { value: normalizedMetal, inScope: false }
 }
 
 /**

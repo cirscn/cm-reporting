@@ -1209,6 +1209,8 @@
     "duplicateSmelterSelectionContent": "The same smelter cannot be selected twice under the same metal. Please choose another one.",
     "smelterNumberLookupNotFoundTitle": "Smelter number not found",
     "smelterNumberLookupNotFoundContent": "The system did not return data for this smelter number. Check the number and try again.",
+    "smelterNumberLookupOutOfScopeTitle": "Smelter metal is outside the declaration scope",
+    "smelterNumberLookupOutOfScopeContent": "This smelter belongs to a metal whose declaration Q1 and Q2 are not both Yes, so it was not filled automatically.",
     "smelterNumberLookupMultipleTitle": "Multiple smelters matched",
     "smelterNumberLookupMultipleContent": "The system returned multiple smelters and the library cannot choose one automatically. Narrow the lookup result in the host system."
   },

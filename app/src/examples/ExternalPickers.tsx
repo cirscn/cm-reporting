@@ -9,6 +9,8 @@ import type {
   ExternalPickResult,
   ProductPickContext,
   SmelterExternalPickItem,
+  SmelterNumberLookupContext,
+  SmelterNumberLookupPickContext,
   SmelterRowPickContext,
 } from '@lib/public/integrations'
 import { useMemoizedFn } from 'ahooks'
@@ -20,6 +22,13 @@ const { Text } = Typography
 
 type ResolveFn<T> = (value: T) => void
 type ExampleSmelterPickItem = SmelterExternalPickItem & Omit<Partial<SmelterRow>, 'id'>
+
+const DEMO_METAL_BY_SOURCE_PREFIX: Record<string, string> = {
+  'RMI-Ta': 'tantalum',
+  'RMI-Sn': 'tin',
+  'RMI-W': 'tungsten',
+  'RMI-Au': 'gold',
+}
 
 function stripKey<T extends { key: string }>(row: T): Omit<T, 'key'> & { id: string } {
   const { key, ...rest } = row
@@ -69,6 +78,36 @@ function buildSmelterCandidatesByMetal({
   return [...lookupItems, ...notListed]
 }
 
+function resolveDemoMetalFromSource(sourceId: string): string {
+  const prefix = Object.keys(DEMO_METAL_BY_SOURCE_PREFIX).find((key) => sourceId.startsWith(key))
+  return prefix ? DEMO_METAL_BY_SOURCE_PREFIX[prefix]! : ''
+}
+
+function buildSmelterCandidatesByNumber(
+  smelterNumber: string,
+): Array<ExampleSmelterPickItem & { key: string }> {
+  const normalized = smelterNumber.trim().toLowerCase()
+  if (!normalized) return []
+
+  return Object.entries(SMELTER_LOOKUP_DATA)
+    .filter(([, record]) => record.smelterId.toLowerCase().includes(normalized))
+    .map(([name, record]) => ({
+      key: `${record.smelterId}:${name}`,
+      id: `demo-${record.smelterId}`,
+      metal: resolveDemoMetalFromSource(record.sourceId),
+      smelterLookup: name,
+      smelterName: name,
+      smelterCountry: record.country,
+      smelterNumber: record.smelterId,
+      smelterIdentification: record.smelterId,
+      sourceId: record.sourceId,
+      smelterStreet: record.street,
+      smelterCity: record.city,
+      smelterState: record.state,
+      comments: '[examples] looked up by smelter number',
+    }))
+}
+
 function buildProductCandidates(params: {
   includeRequester: boolean
 }): Array<Partial<ProductRow> & { key: string }> {
@@ -116,6 +155,7 @@ export function useExampleExternalPickers() {
     rowId: string
     metal: string
     currentLookup: string
+    searchValue: string
   } | null>(null)
   const [productCtxInfo, setProductCtxInfo] = useState<{
     templateType: string
@@ -155,6 +195,38 @@ export function useExampleExternalPickers() {
         rowId: ctx.rowId,
         metal: ctx.metal,
         currentLookup: ctx.row.smelterLookup ?? '',
+        searchValue: '',
+      })
+      setSmelterOpen(true)
+      return new Promise<ExternalPickResult<ExampleSmelterPickItem>>((resolve) => {
+        smelterResolveRef.current = resolve
+      })
+    },
+    [smelterOpen],
+  )
+
+  const onLookupSmelterByNumber = useCallback(async (ctx: SmelterNumberLookupContext) => {
+    return { items: buildSmelterCandidatesByNumber(ctx.smelterNumber).map(stripKey) }
+  }, [])
+
+  const onPickSmelterForNumberLookup = useCallback(
+    async (ctx: SmelterNumberLookupPickContext) => {
+      if (smelterOpen) return null
+      setSmelterCandidates(
+        ctx.candidates.map((item, index) => ({
+          ...item,
+          key: `${item.smelterNumber ?? item.id}:${index}`,
+        })),
+      )
+      setSelectedSmelterKeys([])
+      setSmelterCtxInfo({
+        templateType: ctx.templateType,
+        versionId: ctx.versionId,
+        rowsCount: ctx.currentRows.length,
+        rowId: ctx.rowId,
+        metal: ctx.row.metal ?? '',
+        currentLookup: ctx.row.smelterLookup ?? '',
+        searchValue: ctx.searchValue,
       })
       setSmelterOpen(true)
       return new Promise<ExternalPickResult<ExampleSmelterPickItem>>((resolve) => {
@@ -272,7 +344,8 @@ export function useExampleExternalPickers() {
           先在表格内选择 metal，再在该行点击“选择冶炼厂/修改”。当前：Template{' '}
           {smelterCtxInfo?.templateType ?? '-'} / Version {smelterCtxInfo?.versionId ?? '-'} / Row{' '}
           {smelterCtxInfo?.rowId ?? '-'} / Metal {smelterCtxInfo?.metal ?? '-'} / Current{' '}
-          {smelterCtxInfo?.rowsCount ?? 0} / Lookup {smelterCtxInfo?.currentLookup || '-'}
+          {smelterCtxInfo?.rowsCount ?? 0} / Lookup {smelterCtxInfo?.currentLookup || '-'} / Number{' '}
+          {smelterCtxInfo?.searchValue || '-'}
         </Text>
         <Table
           rowKey="key"
@@ -330,6 +403,8 @@ export function useExampleExternalPickers() {
 
   return {
     onPickSmelterForRow,
+    onLookupSmelterByNumber,
+    onPickSmelterForNumberLookup,
     onPickProducts,
     smelterModal,
     productModal,

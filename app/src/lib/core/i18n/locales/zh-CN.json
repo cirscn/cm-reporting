@@ -1209,6 +1209,8 @@
     "duplicateSmelterSelectionContent": "同一个金属下不能重复选择同一个冶炼厂，请改选其他冶炼厂。",
     "smelterNumberLookupNotFoundTitle": "未找到冶炼厂编号",
     "smelterNumberLookupNotFoundContent": "系统未返回该冶炼厂编号对应的数据，请确认编号后重试。",
+    "smelterNumberLookupOutOfScopeTitle": "冶炼厂金属不在当前申报范围内",
+    "smelterNumberLookupOutOfScopeContent": "该冶炼厂对应金属在申报步骤中不是 Q1、Q2 都为 Yes，因此不会自动填充。",
     "smelterNumberLookupMultipleTitle": "冶炼厂编号匹配多条数据",
     "smelterNumberLookupMultipleContent": "系统返回了多条冶炼厂数据，无法自动判断，请在系统侧收窄查询结果。"
   },

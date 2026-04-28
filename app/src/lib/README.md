@@ -229,6 +229,7 @@ import type {
   ProductListIntegration,
   ProductPickContext,
   SmelterListIntegration,
+  SmelterNumberLookupPickContext,
   SmelterRowPickContext,
   ExternalPickResult,
   ExternalAddMode,
@@ -446,6 +447,7 @@ return null
 | `rowClassName` | `(record, index) => string` | - | 自定义行 className（由宿主提供 CSS） |
 | `onPickSmelterForRow` | `(ctx) => Promise<ExternalPickResult>` | - | 行内外部选择（点击“新增一行”后，选择 metal，再为当前行选择冶炼厂） |
 | `onLookupSmelterByNumber` | `(ctx) => Promise<ExternalPickResult>` | - | 输入冶炼厂 CID 后由宿主系统查询主数据并回填当前行 |
+| `onPickSmelterForNumberLookup` | `(ctx) => Promise<ExternalPickResult>` | - | CID 查询返回多条时，由宿主打开选择器让用户确认一条；`ctx.searchField='smelterNumber'`，`ctx.searchValue` 为用户输入值 |
 
 **外部回写字段规则：**
 
@@ -460,7 +462,9 @@ return null
 - 锁定后的空字段不显示 placeholder，避免把 `Source ID`、`街道`、`城市` 等占位提示误看成真实数据；有真实值的只读文本会单行省略，鼠标悬浮显示全文。
 - 如果宿主外部回写只带了 `smelterName`、没带 `smelterLookup`，库会自动用 `smelterName` 回填到 `smelterLookup`，保证“冶炼厂查找”列显示正常，且 checker 不会把该行继续判成未选择冶炼厂。
 - 外部回写里 `smelterNumber` 是冶炼厂 CID 展示号；“冶炼厂识别”列也会使用该 CID。`sourceId` 是来源识别号；如果宿主把 RMI 来源值放在 `smelterIdentification` 且未传 `sourceId`，库会把该值归入 `sourceId`。
-- 配置 `onLookupSmelterByNumber` 后，用户在“冶炼厂识别号码输入列”输入 CID 并离开输入框时，库会把 CID 交给宿主查询；宿主返回唯一结果时自动回填金属、名称、国家、CID、RMI 来源和地址等字段。返回 0 条或多条时会明确提示，不会自动猜测。
+- 配置 `onLookupSmelterByNumber` 后，用户在“冶炼厂识别号码输入列”输入 CID 并离开输入框时，库会把 CID 交给宿主查询；宿主返回唯一结果时，库会先确认该结果的 `metal` 仍在当前申报范围内（例如 Q1/Q2 都为 `Yes`），再自动回填金属、名称、国家、CID、RMI 来源和地址等字段；不在范围内时只提示，不写入表格。
+- 若 `onLookupSmelterByNumber` 返回多条，库会优先调用 `onPickSmelterForNumberLookup`，由宿主用选择器让用户确认一条；未配置该回调时只提示多条，不自动猜测。
+- 外部回写 `metal` 可传内部 key（如 `cobalt`），也可传当前下拉显示名（如 `钴`）；库会归一化成下拉使用的 key。归一化失败且该金属不在当前可选范围时，不自动回填。
 - 当全局只读（`readOnly=true`）或父级 `ConfigProvider` 处于禁用态时，上述字段仍遵循 `parentDisabled || readOnly` 禁用规则，不会被局部锁定条件覆盖。
 - 上述规则适用于 `onPickSmelterForRow`（行内）与 `onLookupSmelterByNumber`（按 CID 查询）。
 - `saveDraft()` / `submit()` 返回的 Snapshot 中会按该规则回传：
@@ -509,6 +513,12 @@ interface SmelterNumberLookupContext {
   rowId: string
   row: Readonly<SmelterRow>
   smelterNumber: string // 用户输入的 CID
+}
+
+interface SmelterNumberLookupPickContext extends SmelterNumberLookupContext {
+  searchField: 'smelterNumber'
+  searchValue: string // 默认搜索值，即用户输入的 CID
+  candidates: ReadonlyArray<SmelterExternalPickItem> // 本次 CID 查询返回的多条候选
 }
 
 type SmelterExternalPickItem = Partial<SmelterRow> & {

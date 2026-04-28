@@ -24,7 +24,9 @@
 - 锁定后的空字段不显示 placeholder；有真实值的只读文本会单行省略，鼠标悬浮显示全文。
 - 如果宿主外部回写只带了 `smelterName`、没带 `smelterLookup`，示例里的“冶炼厂查找”列会自动显示这个名称，checker 也会按该值判断为已选冶炼厂。
 - 外部回写时，`smelterNumber` 对应 CID，示例里的“冶炼厂识别”列也显示这个 CID；`sourceId` 对应 RMI 来源识别号。若宿主暂时把 RMI 来源放在 `smelterIdentification` 且未传 `sourceId`，库会归一化到 `sourceId`。
-- 宿主接入 `onLookupSmelterByNumber` 后，在“冶炼厂识别号码输入列”输入 CID 并离开输入框，库会调用宿主查询并回填金属、冶炼厂名称、国家、CID、RMI 来源和地址字段。
+- 宿主接入 `onLookupSmelterByNumber` 后，在“冶炼厂识别号码输入列”输入 CID 并离开输入框，库会调用宿主查询；唯一结果只有在对应金属仍属于当前申报范围时才会回填，避免把 Q1/Q2 未同时为 `Yes` 的金属写入冶炼厂列表。
+- 如果 CID 查询返回多条，示例通过 `onPickSmelterForNumberLookup` 复用冶炼厂选择弹窗；默认搜索字段是 `smelterNumber`，默认搜索值是用户输入的 CID，用户勾选确认后才回填。
+- 外部结果里的 `metal` 可以传内部 key（如 `cobalt`）或当前下拉显示名（如 `钴`），库会统一转成下拉使用的 key；转不出来或不在当前可选范围时只提示，不自动填。
 
 ### 全局只读演示
 
@@ -48,7 +50,7 @@
 
 - 冶炼厂列表仅保留“新增一行”入口，不再提供顶部“从外部选择”批量入口。
 - 外部冶炼厂选择改为行内触发：先新增一行并选择 `metal`，再在该行点击“选择冶炼厂/编辑”执行外部选择。
-- 若宿主配置 `onLookupSmelterByNumber`，也可以先输入 CID 并离开输入框，由宿主系统查询并自动回填当前行。
+- 若宿主配置 `onLookupSmelterByNumber`，也可以先输入 CID 并离开输入框，由宿主系统查询；唯一且在申报范围内的结果会自动回填，多条结果会交给 `onPickSmelterForNumberLookup` 弹窗确认。
 
 ### Product List 当前行为
 
