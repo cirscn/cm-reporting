@@ -1,5 +1,11 @@
 # cm-reporting
 
+## 0.7.9
+
+### Patch Changes
+
+- ff78cca: 调整只读与外部锁定字段展示行为：锁定后的空字段不再显示占位提示，避免将 Source ID、街道、城市等 placeholder 误看成真实值；只读文本过长时以省略号结尾，并可通过鼠标悬浮查看全文。
+
 ## 0.7.8
 
 ### Patch Changes
