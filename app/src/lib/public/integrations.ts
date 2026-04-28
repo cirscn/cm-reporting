@@ -18,7 +18,8 @@ export type ExternalPickResult<T> = { items: T[] } | null | undefined
 /**
  * 冶炼厂行内外部选择回写项：
  * - id：宿主数据主键（用于覆盖行 id，external/hybrid 模式下必填）
- * - smelterNumber：冶炼厂识别号码（仅用于展示列）
+ * - smelterNumber：冶炼厂 CID 展示号，“冶炼厂识别”列也使用该 CID
+ * - sourceId：来源识别号，例如 RMI
  * - smelterId：兼容字段，不建议继续使用
  */
 export type SmelterExternalPickItem = Omit<Partial<SmelterRow>, 'id'> & {

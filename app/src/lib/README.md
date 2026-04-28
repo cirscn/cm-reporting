@@ -458,6 +458,7 @@ return null
 - 行内外部选择成功后（且非 `Smelter not listed / not yet identified`），`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state` 字段会锁定为不可编辑。
 - 锁定后的空字段不显示 placeholder，避免把 `Source ID`、`街道`、`城市` 等占位提示误看成真实数据；有真实值的只读文本会单行省略，鼠标悬浮显示全文。
 - 如果宿主外部回写只带了 `smelterName`、没带 `smelterLookup`，库会自动用 `smelterName` 回填到 `smelterLookup`，保证“冶炼厂查找”列显示正常，且 checker 不会把该行继续判成未选择冶炼厂。
+- 外部回写里 `smelterNumber` 是冶炼厂 CID 展示号；“冶炼厂识别”列也会使用该 CID。`sourceId` 是来源识别号；如果宿主把 RMI 来源值放在 `smelterIdentification` 且未传 `sourceId`，库会把该值归入 `sourceId`。
 - 当全局只读（`readOnly=true`）或父级 `ConfigProvider` 处于禁用态时，上述字段仍遵循 `parentDisabled || readOnly` 禁用规则，不会被局部锁定条件覆盖。
 - 上述规则适用于 `onPickSmelterForRow`（行内）。
 - `saveDraft()` / `submit()` 返回的 Snapshot 中会按该规则回传：

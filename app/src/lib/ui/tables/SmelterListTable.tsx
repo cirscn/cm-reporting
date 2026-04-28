@@ -46,6 +46,7 @@ import {
   buildNewSmelterRowId,
   hasDuplicateSmelterSelectionForMetal,
   hasExternalSmelterNumberInput,
+  resolveExternalSmelterIdentityFields,
   resolveExternalSmelterLookup,
   resolveExternalSmelterNumber,
   resolveExternalSmelterRowId,
@@ -230,6 +231,21 @@ export const SmelterListTable = memo(function SmelterListTable({
         if (normalizedMergedSmelterNumber !== merged.smelterNumber) {
           merged.smelterNumber = normalizedMergedSmelterNumber
         }
+      }
+      const hasIdentityInput =
+        hasExternalSmelterNumberInput(partial) ||
+        typeof partial.smelterIdentification === 'string' ||
+        typeof partial.sourceId === 'string'
+      if (hasIdentityInput) {
+        const identityFields = resolveExternalSmelterIdentityFields(
+          {
+            smelterIdentification: partial.smelterIdentification,
+            sourceId: partial.sourceId,
+          },
+          merged.smelterNumber ?? '',
+        )
+        merged.smelterIdentification = identityFields.smelterIdentification
+        merged.sourceId = identityFields.sourceId
       }
       if (!merged.smelterLookup) return merged
       if (!smelterLookupMeta) return merged

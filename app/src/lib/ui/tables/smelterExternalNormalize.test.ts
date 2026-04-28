@@ -11,6 +11,7 @@ import {
   hasExternalSmelterNumberInput,
   isTemporarySmelterRowId,
   resolveExternalSmelterLookup,
+  resolveExternalSmelterIdentityFields,
   resolveExternalSmelterNumber,
   resolveExternalSmelterRowId,
   resolveSmelterSelectionKey,
@@ -50,6 +51,51 @@ describe('resolveExternalSmelterNumber', () => {
     expect(resolveExternalSmelterNumber({ smelterId: 'SM-001', id: 'ROW-001' })).toBe('')
     expect(resolveExternalSmelterNumber({ smelterNumber: '  ' })).toBe('')
     expect(resolveExternalSmelterNumber({})).toBe('')
+  })
+})
+
+describe('resolveExternalSmelterIdentityFields', () => {
+  test('外部回写把 CID 放入冶炼厂识别，把 RMI 来源放入 sourceId', () => {
+    expect(
+      resolveExternalSmelterIdentityFields(
+        {
+          smelterIdentification: ' RMI ',
+        },
+        ' CID003875 ',
+      ),
+    ).toEqual({
+      smelterIdentification: 'CID003875',
+      sourceId: 'RMI',
+    })
+  })
+
+  test('外部显式回写 sourceId 时优先使用 sourceId', () => {
+    expect(
+      resolveExternalSmelterIdentityFields(
+        {
+          smelterIdentification: 'CID003875',
+          sourceId: ' RMI ',
+        },
+        'CID003875',
+      ),
+    ).toEqual({
+      smelterIdentification: 'CID003875',
+      sourceId: 'RMI',
+    })
+  })
+
+  test('smelterIdentification 已经是 CID 时不把它复制到 sourceId', () => {
+    expect(
+      resolveExternalSmelterIdentityFields(
+        {
+          smelterIdentification: 'CID003875',
+        },
+        'CID003875',
+      ),
+    ).toEqual({
+      smelterIdentification: 'CID003875',
+      sourceId: '',
+    })
   })
 })
 

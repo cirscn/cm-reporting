@@ -35,6 +35,7 @@ Apply these rules in every solution:
 - `SmelterList` 行内外部选择成功后（非 `Smelter not listed / not yet identified`），应锁定基础主数据字段不可编辑：`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state`。
 - `SmelterList` 锁定后的空字段不得显示 placeholder，避免把 `Source ID`、`街道`、`城市` 等占位提示误看成真实数据；有真实值的只读文本应单行省略，鼠标悬浮显示全文。
 - 宿主外部回写若只提供 `smelterName`、未提供 `smelterLookup`，库会自动把 `smelterName` 作为 `smelterLookup` 显示与校验来源；宿主如有独立查找值，仍优先回写 `smelterLookup`。
+- `SmelterList` 外部回写里 `smelterNumber` 对应 CID，UI 的“冶炼厂识别”列也显示该 CID；`sourceId` 对应 RMI 来源识别号。若宿主暂时把 RMI 来源写在 `smelterIdentification` 且未提供 `sourceId`，库会归一化到 `sourceId`。
 - `SmelterList` 外部选择入口为“行内模式”：仅保留“新增一行”后在行内触发外部选择，不提供顶部批量“从外部选择”入口。
 - `Smelter List` 表头必须按当前 `templateType + versionId` 对齐到对应 RMI Excel 模板，不能把所有调查类型强行共用一套表头。
 - `CMRT / CRT / EMRT / AMRT` 都要保留版本差异支持；只能调整 UI 列标题、顺序和显隐，不能借机改动 Snapshot / 后端字段语义。

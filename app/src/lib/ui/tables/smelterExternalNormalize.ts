@@ -14,6 +14,15 @@ type ExternalSmelterIdFields = Pick<Partial<SmelterRow>, 'id'> & {
   smelterNumber?: string
 }
 
+type ExternalSmelterIdentityFields = Pick<
+  Partial<SmelterRow>,
+  'smelterIdentification' | 'sourceId'
+>
+
+function trimString(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : ''
+}
+
 /**
  * 解析外部回写后的冶炼厂查找显示值：
  * - 优先使用 smelterLookup
@@ -38,10 +47,31 @@ export function resolveExternalSmelterLookup(
 export function resolveExternalSmelterNumber(
   partial: ExternalSmelterIdFields,
 ): string {
-  const smelterNumber =
-    typeof partial.smelterNumber === 'string' ? partial.smelterNumber.trim() : ''
+  const smelterNumber = trimString(partial.smelterNumber)
   if (smelterNumber) return smelterNumber
   return ''
+}
+
+/**
+ * 解析外部回写的冶炼厂识别与来源识别号：
+ * - smelterNumber 是 CID 展示号，冶炼厂识别列也应显示该 CID
+ * - sourceId 优先使用显式 sourceId
+ * - 部分宿主会把 RMI 来源写进 smelterIdentification，这里转入 sourceId
+ */
+export function resolveExternalSmelterIdentityFields(
+  partial: ExternalSmelterIdentityFields,
+  smelterNumber: string,
+): Required<ExternalSmelterIdentityFields> {
+  const normalizedNumber = trimString(smelterNumber)
+  const explicitSourceId = trimString(partial.sourceId)
+  const externalIdentification = trimString(partial.smelterIdentification)
+  const sourceFromIdentification =
+    normalizedNumber && externalIdentification !== normalizedNumber ? externalIdentification : ''
+
+  return {
+    smelterIdentification: normalizedNumber || externalIdentification,
+    sourceId: explicitSourceId || sourceFromIdentification,
+  }
 }
 
 /**
