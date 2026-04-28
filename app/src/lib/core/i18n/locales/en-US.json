@@ -1206,7 +1206,11 @@
     "externalPickFailedContent": "The external picker did not return data successfully. Please try again.",
     "externalPickMissingIdContent": "The external picker result is missing required id and cannot be applied.",
     "duplicateSmelterSelectionTitle": "Duplicate smelter selection",
-    "duplicateSmelterSelectionContent": "The same smelter cannot be selected twice under the same metal. Please choose another one."
+    "duplicateSmelterSelectionContent": "The same smelter cannot be selected twice under the same metal. Please choose another one.",
+    "smelterNumberLookupNotFoundTitle": "Smelter number not found",
+    "smelterNumberLookupNotFoundContent": "The system did not return data for this smelter number. Check the number and try again.",
+    "smelterNumberLookupMultipleTitle": "Multiple smelters matched",
+    "smelterNumberLookupMultipleContent": "The system returned multiple smelters and the library cannot choose one automatically. Narrow the lookup result in the host system."
   },
   "tips": {
     "reportPurpose": {

@@ -1206,7 +1206,11 @@
     "externalPickFailedContent": "外部选择器未能成功返回数据，请重试。",
     "externalPickMissingIdContent": "外部选择返回缺少必填 id，无法回写当前行。",
     "duplicateSmelterSelectionTitle": "冶炼厂重复选择",
-    "duplicateSmelterSelectionContent": "同一个金属下不能重复选择同一个冶炼厂，请改选其他冶炼厂。"
+    "duplicateSmelterSelectionContent": "同一个金属下不能重复选择同一个冶炼厂，请改选其他冶炼厂。",
+    "smelterNumberLookupNotFoundTitle": "未找到冶炼厂编号",
+    "smelterNumberLookupNotFoundContent": "系统未返回该冶炼厂编号对应的数据，请确认编号后重试。",
+    "smelterNumberLookupMultipleTitle": "冶炼厂编号匹配多条数据",
+    "smelterNumberLookupMultipleContent": "系统返回了多条冶炼厂数据，无法自动判断，请在系统侧收窄查询结果。"
   },
   "tips": {
     "reportPurpose": {

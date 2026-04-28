@@ -19,8 +19,25 @@ type ExternalSmelterIdentityFields = Pick<
   'smelterIdentification' | 'sourceId'
 >
 
+type ExternalSmelterMergeFields = Partial<SmelterRow>
+
 function trimString(value: unknown): string {
   return typeof value === 'string' ? value.trim() : ''
+}
+
+function hasExternalSmelterIdentityInput(partial: ExternalSmelterMergeFields): boolean {
+  return (
+    hasExternalSmelterNumberInput(partial) ||
+    typeof partial.smelterIdentification === 'string' ||
+    typeof partial.sourceId === 'string'
+  )
+}
+
+function resolveMergedSmelterNumber(partial: ExternalSmelterMergeFields, current: string): string {
+  const resolvedSmelterNumber = resolveExternalSmelterNumber(partial)
+  if (resolvedSmelterNumber) return resolvedSmelterNumber
+  if (hasExternalSmelterNumberInput(partial)) return ''
+  return trimString(current)
 }
 
 /**
@@ -71,6 +88,50 @@ export function resolveExternalSmelterIdentityFields(
   return {
     smelterIdentification: normalizedNumber || externalIdentification,
     sourceId: explicitSourceId || sourceFromIdentification,
+  }
+}
+
+export function mergeExternalSmelterPickIntoRow(params: {
+  row: SmelterRow
+  partial: ExternalSmelterMergeFields
+  preserveMetal: boolean
+}): SmelterRow {
+  const resolvedRowId = resolveExternalSmelterRowId(
+    {
+      id: params.partial.id,
+      smelterId: params.partial.smelterId,
+      smelterNumber: params.partial.smelterNumber,
+    },
+    params.row.id,
+  )
+  if (!resolvedRowId.trim()) return params.row
+  const resolvedLookup = resolveExternalSmelterLookup({
+    smelterLookup: params.partial.smelterLookup,
+    smelterName: params.partial.smelterName,
+  })
+  const merged: SmelterRow = {
+    ...params.row,
+    ...(params.partial as Record<string, string | undefined>),
+    id: resolvedRowId,
+    metal: params.preserveMetal ? params.row.metal : params.partial.metal ?? params.row.metal,
+    smelterLookup: resolvedLookup || params.row.smelterLookup,
+    smelterNumber: resolveMergedSmelterNumber(
+      params.partial,
+      params.partial.smelterNumber ?? params.row.smelterNumber ?? '',
+    ),
+  }
+  if (!hasExternalSmelterIdentityInput(params.partial)) return merged
+  const identityFields = resolveExternalSmelterIdentityFields(
+    {
+      smelterIdentification: params.partial.smelterIdentification,
+      sourceId: params.partial.sourceId,
+    },
+    merged.smelterNumber ?? '',
+  )
+  return {
+    ...merged,
+    smelterIdentification: identityFields.smelterIdentification,
+    sourceId: identityFields.sourceId,
   }
 }
 

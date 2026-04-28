@@ -35,6 +35,7 @@ export type {
   ExternalPickResult,
   SmelterExternalPickItem,
   SmelterLookupMode,
+  SmelterNumberLookupContext,
   SmelterRowPickContext,
   ProductListIntegration,
   ProductPickContext,

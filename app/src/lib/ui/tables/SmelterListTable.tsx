@@ -16,6 +16,7 @@ import type { SmelterRow } from '@core/types/tableRows'
 import type {
   SmelterExternalPickItem,
   SmelterListIntegration,
+  SmelterNumberLookupContext,
   SmelterRowPickContext,
   SmelterLookupMode,
 } from '@lib/public/integrations'
@@ -45,11 +46,7 @@ import { memo, useState } from 'react'
 import {
   buildNewSmelterRowId,
   hasDuplicateSmelterSelectionForMetal,
-  hasExternalSmelterNumberInput,
-  resolveExternalSmelterIdentityFields,
-  resolveExternalSmelterLookup,
-  resolveExternalSmelterNumber,
-  resolveExternalSmelterRowId,
+  mergeExternalSmelterPickIntoRow,
   shouldDisableSmelterFieldsAfterExternalPick,
 } from './smelterExternalNormalize'
 import { getSmelterHeaderProfile, type SmelterColumnId } from './smelterHeaderProfiles'
@@ -138,6 +135,7 @@ export const SmelterListTable = memo(function SmelterListTable({
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const rowsRef = useLatest(rows)
   const [rowPickingId, setRowPickingId] = useState<string | null>(null)
+  const [numberLookupRowId, setNumberLookupRowId] = useState<string | null>(null)
   const validSelectedRowKeys = useCreation(() => {
     const valid = new Set(rows.map((r) => r.id))
     return selectedRowKeys.filter((k) => valid.has(k))
@@ -204,49 +202,16 @@ export const SmelterListTable = memo(function SmelterListTable({
   const getCurrentRowsSnapshot = useMemoizedFn(() => rowsRef.current.map((r) => ({ ...r })))
 
   const applyExternalPickToRow = useMemoizedFn(
-    (row: SmelterRow, partial: SmelterExternalPickItem): SmelterRow => {
-      const resolvedRowId = resolveExternalSmelterRowId(partial, row.id)
-      if (!resolvedRowId.trim()) {
-        return row
-      }
-      const resolvedLookup = resolveExternalSmelterLookup({
-        smelterLookup: partial.smelterLookup,
-        smelterName: partial.smelterName,
+    (params: {
+      row: SmelterRow
+      partial: SmelterExternalPickItem
+      preserveMetal: boolean
+    }): SmelterRow => {
+      const merged = mergeExternalSmelterPickIntoRow({
+        row: params.row,
+        partial: params.partial,
+        preserveMetal: params.preserveMetal,
       })
-      const merged: SmelterRow = {
-        ...row,
-        ...(partial as Record<string, string | undefined>),
-        id: resolvedRowId,
-        metal: row.metal,
-        smelterLookup: resolvedLookup || row.smelterLookup,
-      }
-      const resolvedSmelterNumber = resolveExternalSmelterNumber(partial)
-      if (resolvedSmelterNumber) {
-        merged.smelterNumber = resolvedSmelterNumber
-      } else if (hasExternalSmelterNumberInput(partial)) {
-        merged.smelterNumber = ''
-      } else {
-        const normalizedMergedSmelterNumber =
-          typeof merged.smelterNumber === 'string' ? merged.smelterNumber.trim() : ''
-        if (normalizedMergedSmelterNumber !== merged.smelterNumber) {
-          merged.smelterNumber = normalizedMergedSmelterNumber
-        }
-      }
-      const hasIdentityInput =
-        hasExternalSmelterNumberInput(partial) ||
-        typeof partial.smelterIdentification === 'string' ||
-        typeof partial.sourceId === 'string'
-      if (hasIdentityInput) {
-        const identityFields = resolveExternalSmelterIdentityFields(
-          {
-            smelterIdentification: partial.smelterIdentification,
-            sourceId: partial.sourceId,
-          },
-          merged.smelterNumber ?? '',
-        )
-        merged.smelterIdentification = identityFields.smelterIdentification
-        merged.sourceId = identityFields.sourceId
-      }
       if (!merged.smelterLookup) return merged
       if (!smelterLookupMeta) return merged
       const mergedWithName: SmelterRow =
@@ -300,7 +265,11 @@ export const SmelterListTable = memo(function SmelterListTable({
         })
         return
       }
-      const nextRow = applyExternalPickToRow(row, picked)
+      const nextRow = applyExternalPickToRow({
+        row,
+        partial: picked,
+        preserveMetal: true,
+      })
       if (
         hasDuplicateSmelterSelectionForMetal({
           currentRows,
@@ -322,6 +291,69 @@ export const SmelterListTable = memo(function SmelterListTable({
       })
     } finally {
       setRowPickingId(null)
+    }
+  })
+
+  const showSmelterNumberLookupWarning = useMemoizedFn((kind: 'notFound' | 'multiple') => {
+    if (kind === 'notFound') {
+      Modal.warning({
+        title: t('errors.smelterNumberLookupNotFoundTitle'),
+        content: t('errors.smelterNumberLookupNotFoundContent'),
+      })
+      return
+    }
+    Modal.warning({
+      title: t('errors.smelterNumberLookupMultipleTitle'),
+      content: t('errors.smelterNumberLookupMultipleContent'),
+    })
+  })
+
+  const handleSmelterNumberLookup = useMemoizedFn(async (id: string) => {
+    if (componentDisabled || !integration?.onLookupSmelterByNumber || numberLookupRowId) return
+    const currentRows = rowsRef.current
+    const row = currentRows.find((r) => r.id === id)
+    const smelterNumber = row?.smelterNumber?.trim() ?? ''
+    if (!row || !smelterNumber) return
+    const ctx: SmelterNumberLookupContext = {
+      templateType,
+      versionId,
+      locale,
+      versionDef,
+      config,
+      currentRows: getCurrentRowsSnapshot(),
+      rowId: id,
+      row: { ...row },
+      smelterNumber,
+    }
+    setNumberLookupRowId(id)
+    try {
+      const result = await integration.onLookupSmelterByNumber(ctx)
+      const items = result?.items ?? []
+      if (items.length === 0) {
+        showSmelterNumberLookupWarning('notFound')
+        return
+      }
+      if (items.length > 1) {
+        showSmelterNumberLookupWarning('multiple')
+        return
+      }
+      const picked = { ...items[0]!, smelterNumber: items[0]!.smelterNumber ?? smelterNumber }
+      const nextRow = applyExternalPickToRow({ row, partial: picked, preserveMetal: false })
+      if (hasDuplicateSmelterSelectionForMetal({ currentRows, currentRowId: id, nextRow })) {
+        Modal.warning({
+          title: t('errors.duplicateSmelterSelectionTitle'),
+          content: t('errors.duplicateSmelterSelectionContent'),
+        })
+        return
+      }
+      updateRowById(id, nextRow)
+    } catch {
+      Modal.error({
+        title: t('errors.externalPickFailedTitle'),
+        content: t('errors.externalPickFailedContent'),
+      })
+    } finally {
+      setNumberLookupRowId(null)
     }
   })
 
@@ -718,15 +750,23 @@ export const SmelterListTable = memo(function SmelterListTable({
             notListed,
             notYetIdentified,
           })
+          const disabled =
+            componentDisabled || disableAfterExternalPick || numberLookupRowId === record.id
           return (
             <Input
               value={value || undefined}
               onChange={getInputHandler(`${record.id}:smelterNumber`)}
-              disabled={componentDisabled || disableAfterExternalPick}
+              onBlur={() => {
+                void handleSmelterNumberLookup(record.id)
+              }}
+              onPressEnter={(event) => {
+                event.currentTarget.blur()
+              }}
+              disabled={disabled}
               {...getReadonlyTextControlProps({
                 value,
                 placeholder: t('placeholders.smelterNumberInput'),
-                disabled: componentDisabled || disableAfterExternalPick,
+                disabled,
                 className: 'font-mono text-xs',
               })}
             />

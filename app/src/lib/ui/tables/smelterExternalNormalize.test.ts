@@ -10,6 +10,7 @@ import {
   hasDuplicateSmelterSelectionForMetal,
   hasExternalSmelterNumberInput,
   isTemporarySmelterRowId,
+  mergeExternalSmelterPickIntoRow,
   resolveExternalSmelterLookup,
   resolveExternalSmelterIdentityFields,
   resolveExternalSmelterNumber,
@@ -95,6 +96,70 @@ describe('resolveExternalSmelterIdentityFields', () => {
     ).toEqual({
       smelterIdentification: 'CID003875',
       sourceId: '',
+    })
+  })
+})
+
+describe('mergeExternalSmelterPickIntoRow', () => {
+  test('行内外部选择保留用户已选 metal', () => {
+    expect(
+      mergeExternalSmelterPickIntoRow({
+        row: {
+          id: 'row-1',
+          metal: 'cobalt',
+          smelterLookup: '',
+          smelterName: '',
+          smelterCountry: '',
+        },
+        partial: {
+          id: 'smelter-1',
+          metal: 'tantalum',
+          smelterName: 'Picked Smelter',
+          smelterNumber: 'CID003875',
+          smelterIdentification: 'RMI',
+        },
+        preserveMetal: true,
+      }),
+    ).toMatchObject({
+      id: 'smelter-1',
+      metal: 'cobalt',
+      smelterLookup: 'Picked Smelter',
+      smelterName: 'Picked Smelter',
+      smelterNumber: 'CID003875',
+      smelterIdentification: 'CID003875',
+      sourceId: 'RMI',
+    })
+  })
+
+  test('按 CID 查询回写时允许系统返回的 metal 填充当前行', () => {
+    expect(
+      mergeExternalSmelterPickIntoRow({
+        row: {
+          id: 'row-1',
+          metal: '',
+          smelterLookup: '',
+          smelterName: '',
+          smelterCountry: '',
+        },
+        partial: {
+          id: 'smelter-1',
+          metal: 'cobalt',
+          smelterName: 'Picked Smelter',
+          smelterCountry: 'CHINA',
+          smelterNumber: 'CID003875',
+          sourceId: 'RMI',
+        },
+        preserveMetal: false,
+      }),
+    ).toMatchObject({
+      id: 'smelter-1',
+      metal: 'cobalt',
+      smelterLookup: 'Picked Smelter',
+      smelterName: 'Picked Smelter',
+      smelterCountry: 'CHINA',
+      smelterNumber: 'CID003875',
+      smelterIdentification: 'CID003875',
+      sourceId: 'RMI',
     })
   })
 })

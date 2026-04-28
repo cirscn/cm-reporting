@@ -45,6 +45,12 @@ export interface SmelterRowPickContext extends SmelterExternalContextBase {
   metal: string
 }
 
+export interface SmelterNumberLookupContext extends SmelterExternalContextBase {
+  rowId: string
+  row: Readonly<SmelterRow>
+  smelterNumber: string
+}
+
 export interface ProductPickContext {
   templateType: TemplateType
   versionId: string
@@ -66,6 +72,15 @@ export interface SmelterListIntegration {
    */
   onPickSmelterForRow?: (
     ctx: SmelterRowPickContext
+  ) => Promise<ExternalPickResult<SmelterExternalPickItem>>
+  /**
+   * 根据冶炼厂 CID 编号查询并回写当前行。
+   * - 返回 0 条时库会提示未找到
+   * - 返回 1 条时库会自动回填
+   * - 返回多条时库会提示宿主收窄结果，不自动猜测
+   */
+  onLookupSmelterByNumber?: (
+    ctx: SmelterNumberLookupContext
   ) => Promise<ExternalPickResult<SmelterExternalPickItem>>
   /** 冶炼厂名称/选择入口交互模式：默认 'internal'（用户手填）。 */
   lookupMode?: SmelterLookupMode
