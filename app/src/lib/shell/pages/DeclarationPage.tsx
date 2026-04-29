@@ -21,39 +21,16 @@ import { LAYOUT } from '@ui/theme/spacing'
 import { Collapse, Flex, Tag, Typography } from 'antd'
 import { type ReactNode, useState } from 'react'
 
+import {
+  DECLARATION_PANEL_KEY_VALUES,
+  getActiveDeclarationPanelKeys,
+} from './declarationPanelState'
 import { useFieldFocus } from './useFieldFocus'
 
-const DECLARATION_PANEL_KEYS = Object.freeze({
-  companyInfo: 'companyInfo',
-  mineralsScope: 'mineralsScope',
-  companyQuestions: 'companyQuestions',
-})
+const DECLARATION_PANEL_KEYS = DECLARATION_PANEL_KEY_VALUES
 
 const DEFAULT_ACTIVE_DECLARATION_PANELS = [DECLARATION_PANEL_KEYS.companyInfo]
 const DECLARATION_COMPANY_INFO_LABEL_WIDTH = 220
-
-function getDeclarationPanelKeyForFieldPath(fieldPath: string | null) {
-  if (!fieldPath) {
-    return DECLARATION_PANEL_KEYS.companyInfo
-  }
-
-  const fieldGroup = fieldPath.split('.')[0]
-  if (fieldGroup === 'companyQuestions') {
-    return DECLARATION_PANEL_KEYS.companyQuestions
-  }
-
-  if (
-    fieldGroup === 'questions' ||
-    fieldGroup === 'questionComments' ||
-    fieldGroup === 'mineralsScope' ||
-    fieldGroup === 'selectedMinerals' ||
-    fieldGroup === 'customMinerals'
-  ) {
-    return DECLARATION_PANEL_KEYS.mineralsScope
-  }
-
-  return DECLARATION_PANEL_KEYS.companyInfo
-}
 
 function normalizeCollapseKeys(keys: string | string[]) {
   if (Array.isArray(keys)) {
@@ -109,12 +86,18 @@ export function DeclarationPage() {
   const focusFieldPath =
     navigation?.state.searchParams.get('focus') ??
     (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('focus') : null)
-  const [manualActivePanelKeys, setManualActivePanelKeys] = useState<string[]>(
-    DEFAULT_ACTIVE_DECLARATION_PANELS,
-  )
-  const activePanelKeys = focusFieldPath
-    ? [getDeclarationPanelKeyForFieldPath(focusFieldPath)]
-    : manualActivePanelKeys
+  const [manualPanelState, setManualPanelState] = useState<{
+    manualActivePanelKeys: string[]
+    ignoredFocusFieldPath: string | null
+  }>({
+    manualActivePanelKeys: DEFAULT_ACTIVE_DECLARATION_PANELS,
+    ignoredFocusFieldPath: null,
+  })
+  const activePanelKeys = getActiveDeclarationPanelKeys({
+    focusFieldPath,
+    ignoredFocusFieldPath: manualPanelState.ignoredFocusFieldPath,
+    manualActivePanelKeys: manualPanelState.manualActivePanelKeys,
+  })
 
   useFieldFocus()
 
@@ -246,7 +229,12 @@ export function DeclarationPage() {
       <Collapse
         items={declarationPanels}
         activeKey={activePanelKeys}
-        onChange={(keys) => setManualActivePanelKeys(normalizeCollapseKeys(keys))}
+        onChange={(keys) =>
+          setManualPanelState({
+            manualActivePanelKeys: normalizeCollapseKeys(keys),
+            ignoredFocusFieldPath: focusFieldPath,
+          })
+        }
       />
     </Flex>
   )

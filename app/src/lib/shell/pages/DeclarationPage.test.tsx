@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { DeclarationPage } from './DeclarationPage'
+import { getActiveDeclarationPanelKeys } from './declarationPanelState'
 
 const {
   collapseMock,
@@ -355,6 +356,19 @@ describe('DeclarationPage', () => {
     expect(collapseProps.activeKey).toEqual(['mineralsScope'])
   })
 
+  test('expands company info panel when focus field is in company info', () => {
+    navigationState.searchParams = new URLSearchParams('focus=companyInfo.companyName')
+    collapseMock.mockClear()
+
+    renderToStaticMarkup(<DeclarationPage />)
+
+    const collapseProps = collapseMock.mock.calls[0]?.[0] as {
+      activeKey?: string[]
+    }
+
+    expect(collapseProps.activeKey).toEqual(['companyInfo'])
+  })
+
   test('expands company questions panel when focus field is in company questions', () => {
     navigationState.searchParams = new URLSearchParams('focus=companyQuestions.C.cobalt')
     derivedState.companyQuestionsRequired = true
@@ -375,5 +389,25 @@ describe('DeclarationPage', () => {
     }
 
     expect(collapseProps.activeKey).toEqual(['companyQuestions'])
+  })
+
+  test('keeps manual expanded panels after user changes collapse with focus param present', () => {
+    const activeKeys = getActiveDeclarationPanelKeys({
+      focusFieldPath: 'companyInfo.companyName',
+      ignoredFocusFieldPath: 'companyInfo.companyName',
+      manualActivePanelKeys: ['companyInfo', 'companyQuestions'],
+    })
+
+    expect(activeKeys).toEqual(['companyInfo', 'companyQuestions'])
+  })
+
+  test('uses focus panel before user changes collapse manually', () => {
+    const activeKeys = getActiveDeclarationPanelKeys({
+      focusFieldPath: 'companyInfo.companyName',
+      ignoredFocusFieldPath: null,
+      manualActivePanelKeys: ['companyQuestions'],
+    })
+
+    expect(activeKeys).toEqual(['companyInfo'])
   })
 })
