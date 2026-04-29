@@ -16,7 +16,7 @@ import { getReadonlyTextControlProps } from '@ui/helpers/readonlyDisplay'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useBoolean, useCreation, useLatest, useMemoizedFn } from 'ahooks'
-import { Button, Card, ConfigProvider, Flex, Modal, Table, Input, Tag, Typography } from 'antd'
+import { App, Button, Card, ConfigProvider, Flex, Table, Input, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
 import type { ChangeEvent } from 'react'
@@ -61,6 +61,7 @@ export const ProductListTable = memo(function ProductListTable({
 }: ProductListTableProps) {
   const { t, locale } = useT()
   const { componentDisabled } = ConfigProvider.useConfig()
+  const { modal } = App.useApp()
   /** 批量选择状态（受控）。 */
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const [externalPicking, { setTrue: startPicking, setFalse: stopPicking }] = useBoolean(false)
@@ -128,7 +129,7 @@ export const ProductListTable = memo(function ProductListTable({
       const normalized = items.map((item, index) => normalizeExternalProductRow(item, index))
       onChange([...rowsRef.current, ...normalized])
     } catch {
-      Modal.error({
+      modal.error({
         title: t('errors.externalPickFailedTitle'),
         content: t('errors.externalPickFailedContent'),
       })
@@ -190,7 +191,7 @@ export const ProductListTable = memo(function ProductListTable({
   const handleBatchDelete = useMemoizedFn(() => {
     if (componentDisabled) return
     if (validSelectedRowKeys.length === 0) return
-    Modal.confirm({
+    modal.confirm({
       title: t('confirm.batchDelete'),
       content: t('confirm.batchDeleteContent', { count: validSelectedRowKeys.length }),
       okText: t('actions.batchDelete'),

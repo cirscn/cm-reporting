@@ -27,12 +27,12 @@ import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useCreation, useLatest, useMemoizedFn } from 'ahooks'
 import {
+  App,
   AutoComplete,
   Button,
   Card,
   ConfigProvider,
   Flex,
-  Modal,
   Table,
   Select,
   Input,
@@ -133,6 +133,7 @@ export const SmelterListTable = memo(function SmelterListTable({
 }: SmelterListTableProps) {
   const { t, locale } = useT()
   const { componentDisabled } = ConfigProvider.useConfig()
+  const { modal } = App.useApp()
   /** 批量选择状态（受控）。 */
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const rowsRef = useLatest(rows)
@@ -261,7 +262,7 @@ export const SmelterListTable = memo(function SmelterListTable({
       if (!picked) return
       const pickedRowId = typeof picked.id === 'string' ? picked.id.trim() : ''
       if (!pickedRowId) {
-        Modal.error({
+        modal.error({
           title: t('errors.externalPickFailedTitle'),
           content: t('errors.externalPickMissingIdContent'),
         })
@@ -279,7 +280,7 @@ export const SmelterListTable = memo(function SmelterListTable({
           nextRow,
         })
       ) {
-        Modal.warning({
+        modal.warning({
           title: t('errors.duplicateSmelterSelectionTitle'),
           content: t('errors.duplicateSmelterSelectionContent'),
         })
@@ -287,7 +288,7 @@ export const SmelterListTable = memo(function SmelterListTable({
       }
       updateRowById(id, nextRow)
     } catch {
-      Modal.error({
+      modal.error({
         title: t('errors.externalPickFailedTitle'),
         content: t('errors.externalPickFailedContent'),
       })
@@ -299,20 +300,20 @@ export const SmelterListTable = memo(function SmelterListTable({
   const showSmelterNumberLookupWarning = useMemoizedFn(
     (kind: 'notFound' | 'multiple' | 'outOfScope') => {
       if (kind === 'notFound') {
-        Modal.warning({
+        modal.warning({
           title: t('errors.smelterNumberLookupNotFoundTitle'),
           content: t('errors.smelterNumberLookupNotFoundContent'),
         })
         return
       }
       if (kind === 'outOfScope') {
-        Modal.warning({
+        modal.warning({
           title: t('errors.smelterNumberLookupOutOfScopeTitle'),
           content: t('errors.smelterNumberLookupOutOfScopeContent'),
         })
         return
       }
-      Modal.warning({
+      modal.warning({
         title: t('errors.smelterNumberLookupMultipleTitle'),
         content: t('errors.smelterNumberLookupMultipleContent'),
       })
@@ -385,7 +386,7 @@ export const SmelterListTable = memo(function SmelterListTable({
       if (!picked) return
       const nextRow = applyExternalPickToRow({ row, partial: picked, preserveMetal: false })
       if (hasDuplicateSmelterSelectionForMetal({ currentRows, currentRowId: id, nextRow })) {
-        Modal.warning({
+        modal.warning({
           title: t('errors.duplicateSmelterSelectionTitle'),
           content: t('errors.duplicateSmelterSelectionContent'),
         })
@@ -393,7 +394,7 @@ export const SmelterListTable = memo(function SmelterListTable({
       }
       updateRowById(id, nextRow)
     } catch {
-      Modal.error({
+      modal.error({
         title: t('errors.externalPickFailedTitle'),
         content: t('errors.externalPickFailedContent'),
       })
@@ -557,7 +558,7 @@ export const SmelterListTable = memo(function SmelterListTable({
   const handleBatchDelete = useMemoizedFn(() => {
     if (componentDisabled) return
     if (validSelectedRowKeys.length === 0) return
-    Modal.confirm({
+    modal.confirm({
       title: t('confirm.batchDelete'),
       content: t('confirm.batchDeleteContent', { count: validSelectedRowKeys.length }),
       okText: t('actions.batchDelete'),
