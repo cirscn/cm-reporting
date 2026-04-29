@@ -1,5 +1,11 @@
 # cm-reporting
 
+## 0.8.2
+
+### Patch Changes
+
+- 2a870b3: 修复申报页从校验定位字段后，`focus` 参数持续锁定折叠面板，导致公司层面问题面板点击后无法展开的问题。
+
 ## 0.8.1
 
 ### Patch Changes
