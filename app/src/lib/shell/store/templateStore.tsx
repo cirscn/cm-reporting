@@ -13,7 +13,7 @@
 import { getVersionDef } from '@core/registry'
 import type { TemplateType, TemplateVersionDef } from '@core/registry/types'
 import { runChecker } from '@core/rules/checker'
-import { calculateGating } from '@core/rules/gating'
+import { calculateGating, type QuestionAnswers } from '@core/rules/gating'
 import { buildFormSchema } from '@core/schema'
 import { createEmptyFormData } from '@core/template/formDefaults'
 import { getActiveMineralKeys } from '@core/template/minerals'
@@ -43,6 +43,18 @@ const EMPTY_ERRORS: TemplateFormErrors = {
   mineralsScopeRows: {},
   questions: {},
   companyQuestions: {},
+}
+
+function pruneSmelterRowsOutsideGating(params: {
+  rows: SmelterRow[]
+  versionDef: TemplateVersionDef
+  questions: QuestionAnswers
+}): SmelterRow[] {
+  const { rows, versionDef, questions } = params
+  return rows.filter((row) => {
+    const metal = typeof row.metal === 'string' ? row.metal.trim() : ''
+    return !metal || calculateGating(versionDef, questions, metal).smelterListRequired
+  })
 }
 
 // ---------------------------------------------------------------------------
@@ -351,6 +363,12 @@ function createTemplateStore(
     } else if (!gating.laterQuestionsEnabled) {
       laterKeys.forEach((k) => clearQuestion(k, mineralKey))
     }
+
+    s.smelterList = pruneSmelterRowsOutsideGating({
+      rows: s.smelterList,
+      versionDef,
+      questions: nextQuestions,
+    })
   }
 
   /**

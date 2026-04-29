@@ -20,7 +20,10 @@ function CaptureStore({ onReady }: { onReady: (store: TemplateStore) => void }) 
   return null
 }
 
-function createTemplateStoreForTest(templateType: 'emrt' | 'amrt', versionId: string): TemplateStore {
+function createTemplateStoreForTest(
+  templateType: 'cmrt' | 'crt' | 'emrt' | 'amrt',
+  versionId: string,
+): TemplateStore {
   let captured: TemplateStore | null = null
 
   renderToStaticMarkup(
@@ -86,6 +89,92 @@ function buildMineRow(id: string, metal: string): MineRow {
 }
 
 describe('TemplateStore 取消矿种级联清理', () => {
+  test('CMRT Q1/Q2 从 Yes 改成非 Yes 后删除对应冶炼厂金属行', () => {
+    const removedMineral = 'tin'
+    const keptMineral = 'gold'
+    const versionDef = getVersionDef('cmrt', '6.5')
+    const formData = createEmptyFormData(versionDef)
+
+    writePerMineralValue(formData.questions, 'Q1', removedMineral, 'Yes')
+    writePerMineralValue(formData.questions, 'Q2', removedMineral, 'Yes')
+    writePerMineralValue(formData.questions, 'Q1', keptMineral, 'Yes')
+    writePerMineralValue(formData.questions, 'Q2', keptMineral, 'Yes')
+    formData.smelterList = [
+      buildSmelterRow('smelter-removed', removedMineral),
+      buildSmelterRow('smelter-kept', keptMineral),
+    ]
+
+    const store = createTemplateStoreForTest('cmrt', '6.5')
+    store.getState().setFormData(formData)
+    store.getState().setQuestionValue('Q2', removedMineral, 'No')
+    const next = store.getState()
+
+    expect(next.smelterList.map((row) => row.metal)).toEqual([keptMineral])
+    expect(readPerMineralValue(next.questions, 'Q2', removedMineral)).toBe('No')
+  })
+
+  test('EMRT 固定金属版本 Q1/Q2 从 Yes 改成非 Yes 后删除对应冶炼厂金属行', () => {
+    const removedMineral = 'cobalt'
+    const keptMineral = 'mica'
+    const versionDef = getVersionDef('emrt', '1.3')
+    const formData = createEmptyFormData(versionDef)
+
+    writePerMineralValue(formData.questions, 'Q1', removedMineral, 'Yes')
+    writePerMineralValue(formData.questions, 'Q2', removedMineral, 'Yes')
+    writePerMineralValue(formData.questions, 'Q1', keptMineral, 'Yes')
+    writePerMineralValue(formData.questions, 'Q2', keptMineral, 'Yes')
+    formData.smelterList = [
+      buildSmelterRow('smelter-removed', removedMineral),
+      buildSmelterRow('smelter-kept', keptMineral),
+    ]
+
+    const store = createTemplateStoreForTest('emrt', '1.3')
+    store.getState().setFormData(formData)
+    store.getState().setQuestionValue('Q2', removedMineral, 'Unknown')
+    const next = store.getState()
+
+    expect(next.smelterList.map((row) => row.metal)).toEqual([keptMineral])
+    expect(readPerMineralValue(next.questions, 'Q2', removedMineral)).toBe('Unknown')
+  })
+
+  test('AMRT 动态金属版本 Q1 从 Yes 改成非 Yes 后删除对应冶炼厂金属行', () => {
+    const removedMineral = 'silver'
+    const keptMineral = 'aluminum'
+    const versionDef = getVersionDef('amrt', '1.3')
+    const formData = createEmptyFormData(versionDef)
+    formData.selectedMinerals = [removedMineral, keptMineral]
+
+    writePerMineralValue(formData.questions, 'Q1', removedMineral, 'Yes')
+    writePerMineralValue(formData.questions, 'Q1', keptMineral, 'Yes')
+    formData.smelterList = [
+      buildSmelterRow('smelter-removed', removedMineral),
+      buildSmelterRow('smelter-kept', keptMineral),
+    ]
+
+    const store = createTemplateStoreForTest('amrt', '1.3')
+    store.getState().setFormData(formData)
+    store.getState().setQuestionValue('Q1', removedMineral, 'No')
+    const next = store.getState()
+
+    expect(next.smelterList.map((row) => row.metal)).toEqual([keptMineral])
+    expect(readPerMineralValue(next.questions, 'Q1', removedMineral)).toBe('No')
+  })
+
+  test('CRT 整表 Q1 从 Yes 改成非 Yes 后删除所有冶炼厂金属行', () => {
+    const versionDef = getVersionDef('crt', '2.21')
+    const formData = createEmptyFormData(versionDef)
+    formData.questions.Q1 = 'Yes'
+    formData.smelterList = [buildSmelterRow('smelter-cobalt', 'cobalt')]
+
+    const store = createTemplateStoreForTest('crt', '2.21')
+    store.getState().setFormData(formData)
+    store.getState().setQuestionValue('Q1', null, 'No')
+    const next = store.getState()
+
+    expect(next.smelterList).toEqual([])
+    expect(next.questions.Q1).toBe('No')
+  })
+
   test('EMRT 2.1 取消矿种后清空按矿种题目并删除关联列表行', () => {
     const removedMineral = 'nickel'
     const keptMineral = 'cobalt'

@@ -112,6 +112,6 @@
 ### Checker 门控一致性（Smelter List）
 
 - `Smelter List` 的 checker 错误与完成度统计使用同一门控条件。
-- 当 `Q1/Q2` 调整后使冶炼厂不再必填时，历史残留的 `smelterList` 行不会继续拉低 checker 完成度。
+- 当 `Q1/Q2` 调整后使某金属不再需要填写冶炼厂时，该金属的 `smelterList` 行会自动删除。
 - 因此在该场景下，期望表现是：`checker` 错误数与顶部完成度状态保持一致。
 - 对带 `smelterLookup` 下拉的模板版本，如果某行已经选了 `metal` 但没选冶炼厂，该行会直接在 checker 中报未完成。

@@ -171,6 +171,13 @@ describe('i18n keys', () => {
     expect(zhCN.fields.authorizationDate).toBe('生效日期')
   })
 
+  it('uses the requested zh-CN smelter number out-of-scope modal copy', () => {
+    expect(zhCN.errors.smelterNumberLookupOutOfScopeTitle).toBe('提示')
+    expect(zhCN.errors.smelterNumberLookupOutOfScopeContent).toBe(
+      '冶炼厂金属不在当前申报范围内',
+    )
+  })
+
   it('covers registry label keys and literal t() usage', () => {
     const available = flattenKeys(enUS as Record<string, unknown>)
     const registryKeys = collectRegistryKeys()
