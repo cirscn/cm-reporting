@@ -11,6 +11,11 @@
 
 启动后可通过页面顶部的 `Examples` 场景选择器切换不同场景。
 
+### 宿主样式接入
+
+- 新项目推荐导入 `cm-reporting/styles.scoped.css`；`CMReporting` 会在内部创建样式作用域容器，宿主不需要额外包 DOM。
+- 旧入口 `cm-reporting/styles.css` 仍保留兼容，但它是全局样式，会影响宿主页面里的链接、标题、列表和部分 Ant Design 控件。
+
 ### 外置保存/提交示例
 
 - `CMReportingRefScenario` 已演示外置保存/提交按钮：

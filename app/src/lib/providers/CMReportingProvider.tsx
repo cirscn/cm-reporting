@@ -7,6 +7,7 @@ import i18n, { initI18n, isI18nInitialized, type Locale } from '@core/i18n'
 import { AppThemeScope } from '@ui/theme/AppThemeScope'
 import type { CMCSSVariables } from '@ui/theme/index'
 import { defaultAntdTheme } from '@ui/theme/index'
+import { useAppThemeScopeStyle } from '@ui/theme/useAppThemeScopeStyle'
 import { App as AntApp, ConfigProvider, Flex, Spin } from 'antd'
 import type { ThemeConfig } from 'antd'
 import enUS from 'antd/locale/en_US'
@@ -14,7 +15,7 @@ import zhCN from 'antd/locale/zh_CN'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import type { ReactNode } from 'react'
-import { Suspense, useEffect, useRef } from 'react'
+import { Suspense, useCallback, useEffect, useRef } from 'react'
 
 // 确保 react-i18next 在任何组件渲染前就拿到已注册的 i18n 实例（避免在 render 阶段 init 导致订阅组件更新）。
 if (!isI18nInitialized()) initI18n('en-US')
@@ -34,6 +35,16 @@ const applyLocale = (nextLocale: Locale) => {
   dayjs.locale(DAYJS_LOCALE_BY_APP[nextLocale] ?? 'en')
 }
 
+const FULL_HEIGHT_STYLE = { height: '100%', minHeight: '100%' } as const
+
+function resolveFallbackPopupContainer(triggerNode?: HTMLElement): HTMLElement {
+  if (triggerNode?.parentElement) {
+    return triggerNode.parentElement
+  }
+
+  return globalThis.document.body
+}
+
 /**
  * CMReportingProvider Props。
  */
@@ -50,6 +61,33 @@ export interface CMReportingProviderProps {
   children: ReactNode
   /** 加载中显示的内容 */
   fallback?: ReactNode
+}
+
+interface CMReportingScopeRootProps {
+  children: ReactNode
+  cssVariables?: CMCSSVariables
+  fallback: ReactNode
+}
+
+function CMReportingScopeRoot({ children, cssVariables, fallback }: CMReportingScopeRootProps) {
+  const scopeRef = useRef<HTMLDivElement>(null)
+  const scopeStyle = useAppThemeScopeStyle(cssVariables)
+
+  const getPopupContainer = useCallback((triggerNode?: HTMLElement) => {
+    return scopeRef.current ?? resolveFallbackPopupContainer(triggerNode)
+  }, [])
+
+  return (
+    <ConfigProvider getPopupContainer={getPopupContainer}>
+      <div ref={scopeRef} className="cm-reporting-scope" style={scopeStyle}>
+        <AntApp style={FULL_HEIGHT_STYLE}>
+          <AppThemeScope>
+            <Suspense fallback={fallback}>{children}</Suspense>
+          </AppThemeScope>
+        </AntApp>
+      </div>
+    </ConfigProvider>
+  )
 }
 
 /**
@@ -91,11 +129,9 @@ export function CMReportingProvider({
 
   return (
     <ConfigProvider theme={theme} locale={ANT_LOCALE_BY_APP[locale]}>
-      <AntApp>
-        <AppThemeScope cssVariables={cssVariables}>
-          <Suspense fallback={loadingFallback}>{children}</Suspense>
-        </AppThemeScope>
-      </AntApp>
+      <CMReportingScopeRoot cssVariables={cssVariables} fallback={loadingFallback}>
+        {children}
+      </CMReportingScopeRoot>
     </ConfigProvider>
   )
 }

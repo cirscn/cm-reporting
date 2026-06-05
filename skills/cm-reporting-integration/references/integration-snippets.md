@@ -18,17 +18,17 @@
 npm install cm-reporting react react-dom antd @ant-design/icons
 ```
 
-Import styles once:
+Import scoped styles once:
 
 ```ts
-import 'cm-reporting/styles.css'
+import 'cm-reporting/styles.scoped.css'
 ```
 
 ## 2) Minimal mount
 
 ```tsx
 import { CMReporting } from 'cm-reporting'
-import 'cm-reporting/styles.css'
+import 'cm-reporting/styles.scoped.css'
 
 export function ReportingPage() {
   return (

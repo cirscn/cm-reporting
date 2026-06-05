@@ -20,7 +20,7 @@ Key exports from package root:
 - `exportToExcel`
 - `cirsGpmLegacyAdapter`
 - types: `CMReportingProps`, `CMReportingRef`, `ReportSnapshotV1`, `CMReportingIntegrations`, `ExportExcelInput`
-- assets exports: `cm-reporting/styles.css`, `cm-reporting/templates/*`
+- assets exports: `cm-reporting/styles.scoped.css`, `cm-reporting/styles.css`, `cm-reporting/templates/*`
 
 ## 2) Component props contract
 

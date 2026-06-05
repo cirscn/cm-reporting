@@ -39,6 +39,7 @@
       "require": "./dist/index.cjs"
     },
     "./styles.css": "./dist/cm-reporting.css",
+    "./styles.scoped.css": "./dist/cm-reporting.scoped.css",
     "./templates/*": "./dist/templates/*"
   },
   "files": [
@@ -50,7 +51,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:lib": "vite build --config vite.lib.config.ts && node scripts/flatten-css-layers.mjs",
+    "build:lib": "vite build --config vite.lib.config.ts && node scripts/flatten-css-layers.mjs && node scripts/scope-css.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -59,7 +60,7 @@
     "generate:excel-mapping": "node scripts/generate-excel-mapping.js",
     "validate:excel-mapping": "node scripts/generate-excel-mapping.js --check",
     "pretest": "pnpm validate:templates && pnpm validate:excel-mapping",
-    "test": "vitest run",
+    "test": "vitest run && node --test scripts/scope-css.node-test.mjs",
     "sg:scan": "sg scan -c ../sgconfig.yml ./src",
     "sg:fix": "sg scan -c ../sgconfig.yml ./src -U",
     "changeset": "changeset",

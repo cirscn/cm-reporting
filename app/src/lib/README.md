@@ -54,6 +54,8 @@ function App() {
 }
 ```
 
+宿主项目推荐导入 `cm-reporting/styles.scoped.css`。`CMReporting` 会在内部创建 `cm-reporting-scope` 容器，并把 Ant Design 弹层挂回该容器内，这样库里的 Tailwind reset、只读态样式和 Ant Design 覆盖只会影响组件内部。旧入口 `cm-reporting/styles.css` 仍保留兼容，但它会全局生效。
+
 通过 `ref` 可在宿主侧获取快照、回填、导出 JSON/Excel 等操作：
 
 ```tsx

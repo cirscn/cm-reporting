@@ -14,12 +14,14 @@
 
 Check:
 
-- Ensure `import 'cm-reporting/styles.css'` exists.
+- Ensure `import 'cm-reporting/styles.scoped.css'` exists.
+- Ensure the app is mounted through `CMReporting` or `CMReportingProvider`, which creates the `.cm-reporting-scope` container internally.
 - Ensure styles are imported once and not shadowed by reset overrides.
 
 Action:
 
 - Move style import to app entry or feature shell.
+- Use `cm-reporting/styles.css` only if the host accepts global CSS effects.
 - Re-check global CSS specificity conflicts.
 
 ### Symptom: peer dependency warnings at install/runtime

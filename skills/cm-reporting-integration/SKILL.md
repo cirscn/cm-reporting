@@ -22,7 +22,7 @@ Route requests first, then load the minimum references.
 Apply these rules in every solution:
 
 - Keep `templateType` and `versionId` strictly matched across render, restore, and export.
-- Import `cm-reporting/styles.css` exactly once in host runtime.
+- Prefer importing `cm-reporting/styles.scoped.css` exactly once; `CMReporting` creates its own `.cm-reporting-scope` root and popup container internally. Keep `cm-reporting/styles.css` only for legacy hosts that accept global CSS effects.
 - Provide official template `.xlsx` as `ArrayBuffer` when calling Excel export APIs.
 - Treat Snapshot as full-state contract (`schemaVersion/templateType/versionId/data`).
 - Before calling `cirsGpmLegacyAdapter.toInternal(...)`, normalize only the known legacy nullable-array fields from `null` to `[]`: `cmtRangeQuestions`, `cmtCompanyQuestions`, `cmtSmelters`, `cmtParts`, `minList`, `amrtReasonList`.

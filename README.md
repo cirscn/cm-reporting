@@ -46,7 +46,7 @@ pnpm add cm-reporting
 
 ```tsx
 import { CMReporting } from 'cm-reporting'
-import 'cm-reporting/styles.css'
+import 'cm-reporting/styles.scoped.css'
 
 function App() {
   return (
@@ -60,7 +60,9 @@ function App() {
 }
 ```
 
-`cm-reporting/styles.css` 为已编译的纯 CSS 产物，宿主项目无需（也不应）对该文件再次执行 Tailwind 编译。
+推荐使用 `cm-reporting/styles.scoped.css`。`CMReporting` 会在内部创建 `cm-reporting-scope` 容器，并把 Ant Design 弹层挂回该容器内，让组件库样式只影响自身区域。旧的 `cm-reporting/styles.css` 仍保留兼容，但它会全局生效，仅建议已确认可接受全局样式影响的旧项目继续使用。
+
+`cm-reporting/styles.scoped.css` 与 `cm-reporting/styles.css` 都是已编译的纯 CSS 产物，宿主项目无需（也不应）对这些文件再次执行 Tailwind 编译。
 
 ## 支持的模板
 
@@ -161,7 +163,7 @@ node skills/cm-reporting-integration/scripts/resolve-template-path.mjs cmrt 6.5
 ### 集成约束（摘要）
 
 - `templateType` 与 `versionId` 在渲染、恢复、导出全链路必须严格匹配
-- 宿主运行时仅导入一次 `cm-reporting/styles.css`
+- 宿主运行时优先仅导入一次 `cm-reporting/styles.scoped.css`；旧项目确认可接受全局样式影响时才继续使用 `cm-reporting/styles.css`
 - Excel 导出需传入官方模板 `.xlsx` 的 `ArrayBuffer`
 - `Snapshot` 需按完整状态契约处理：`schemaVersion/templateType/versionId/data`
 - 集成回调返回值需为 `{ items: [...] } | null | undefined`
