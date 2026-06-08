@@ -54,7 +54,7 @@ function App() {
 }
 ```
 
-宿主项目推荐导入 `cm-reporting/styles.scoped.css`。`CMReporting` 会在内部创建 `cm-reporting-scope` 容器，并把 Ant Design 弹层挂回该容器内，这样库里的 Tailwind reset、只读态样式和 Ant Design 覆盖只会影响组件内部。旧入口 `cm-reporting/styles.css` 仍保留兼容，但它会全局生效。
+宿主项目推荐导入 `cm-reporting/styles.scoped.css`。`CMReporting` 会在内部创建 `cm-reporting-scope` 容器，并把 Ant Design 弹层挂回该容器内，这样库里的只读态样式和 Ant Design 覆盖只会影响组件内部。`cm-reporting/styles.scoped.css` 与旧入口 `cm-reporting/styles.css` 都不包含 Tailwind preflight/reset；旧入口仍保留兼容，但它仍是全局选择器入口，仅适合已确认可接受全局样式影响的旧项目。
 
 `CMReporting` 默认继承宿主外层 Ant Design `ConfigProvider` 的主题，不会自动套用库内 `defaultAntdTheme`。如果宿主希望强制使用库自带主题，可显式传入 `theme={defaultAntdTheme}`，或通过 `mergeThemeConfig(...)` 基于库主题扩展。
 

@@ -62,9 +62,9 @@ export function App() {
 }
 ```
 
-使用 `styles.scoped.css` 时，`CMReporting` 会在内部创建 `cm-reporting-scope` 容器，并把 Ant Design 弹层挂回该容器内，让库样式只影响自身区域。旧的 `cm-reporting/styles.css` 仍保留兼容，但它会全局生效，仅建议已确认可接受全局样式影响的旧项目继续使用。
+使用 `styles.scoped.css` 时，`CMReporting` 会在内部创建 `cm-reporting-scope` 容器，并把 Ant Design 弹层挂回该容器内，让库样式只影响自身区域。旧的 `cm-reporting/styles.css` 仍保留兼容，但它仍是全局选择器入口，仅建议已确认可接受全局样式影响的旧项目继续使用。
 
-`cm-reporting/styles.scoped.css` 与 `cm-reporting/styles.css` 都是已编译的纯 CSS 产物，宿主项目无需（也不应）对这些文件再次执行 Tailwind 编译。
+`cm-reporting/styles.scoped.css` 与 `cm-reporting/styles.css` 都是已编译的纯 CSS 产物，且都不包含 Tailwind preflight/reset。宿主项目无需（也不应）对这些文件再次执行 Tailwind 编译。
 
 ## API
 

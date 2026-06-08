@@ -1,8 +1,9 @@
 /* CM Reporting CSS Variables */
 @import "./variables.css";
 
-/* Tailwind CSS v4 */
-@import "tailwindcss";
+/* Tailwind CSS v4: omit preflight/reset in embeddable library output */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
 
 /* 仅扫描 lib 代码，避免 demo 样式进入库产物 */
 @config "../../tailwind.lib.config.js";

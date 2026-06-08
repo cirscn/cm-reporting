@@ -22,7 +22,7 @@ Route requests first, then load the minimum references.
 Apply these rules in every solution:
 
 - Keep `templateType` and `versionId` strictly matched across render, restore, and export.
-- Prefer importing `cm-reporting/styles.scoped.css` exactly once; `CMReporting` creates its own `.cm-reporting-scope` root and popup container internally. Keep `cm-reporting/styles.css` only for legacy hosts that accept global CSS effects.
+- Prefer importing `cm-reporting/styles.scoped.css` exactly once; `CMReporting` creates its own `.cm-reporting-scope` root and popup container internally. Both `cm-reporting/styles.scoped.css` and `cm-reporting/styles.css` exclude Tailwind preflight/reset. Keep `cm-reporting/styles.css` only for legacy hosts that accept global selector effects.
 - Do not add host-side theme patches for normal integration: `CMReporting` inherits the host Ant Design `ConfigProvider` theme by default. Pass `theme={defaultAntdTheme}` or `mergeThemeConfig(...)` only when the host explicitly wants the library theme instead of the system theme.
 - Provide official template `.xlsx` as `ArrayBuffer` when calling Excel export APIs.
 - Treat Snapshot as full-state contract (`schemaVersion/templateType/versionId/data`).
