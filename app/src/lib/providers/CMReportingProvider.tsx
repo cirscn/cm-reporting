@@ -6,7 +6,6 @@
 import i18n, { initI18n, isI18nInitialized, type Locale } from '@core/i18n'
 import { AppThemeScope } from '@ui/theme/AppThemeScope'
 import type { CMCSSVariables } from '@ui/theme/index'
-import { defaultAntdTheme } from '@ui/theme/index'
 import { useAppThemeScopeStyle } from '@ui/theme/useAppThemeScopeStyle'
 import { App as AntApp, ConfigProvider, Flex, Spin } from 'antd'
 import type { ThemeConfig } from 'antd'
@@ -97,7 +96,7 @@ function CMReportingScopeRoot({ children, cssVariables, fallback }: CMReportingS
 export function CMReportingProvider({
   locale = 'en-US',
   onLocaleChange,
-  theme = defaultAntdTheme,
+  theme,
   cssVariables,
   children,
   fallback,

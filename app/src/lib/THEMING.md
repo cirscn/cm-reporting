@@ -2,6 +2,8 @@
 
 本指南说明如何自定义 CM Reporting 组件库的样式。
 
+`CMReporting` 默认继承宿主外层 Ant Design `ConfigProvider` 的主题。也就是说，宿主系统已经配置了主色、圆角、字体等 token 时，直接渲染 `CMReporting` 就会跟随宿主；库不会在未传 `theme` 时强行使用 `defaultAntdTheme`。
+
 ## 快速开始
 
 ### 方式一：通过 CSS 变量覆盖
@@ -180,7 +182,7 @@ interface CMCSSVariables {
 
 ## Ant Design 主题配置
 
-除了 CM 自定义变量外，还可以通过 `theme` prop 自定义 Ant Design 主题：
+除了 CM 自定义变量外，还可以通过 `theme` prop 自定义 Ant Design 主题。这个 prop 只用于宿主明确要局部覆盖时；不传时会继承宿主外层 `ConfigProvider`：
 
 ```tsx
 import { CMReportingProvider } from '@anthropic/cm-reporting'
@@ -194,6 +196,16 @@ const customTheme: ThemeConfig = {
 }
 
 <CMReportingProvider theme={customTheme}>
+  <YourApp />
+</CMReportingProvider>
+```
+
+如果宿主想使用库自带的默认蓝色主题，需要显式传入：
+
+```tsx
+import { CMReportingProvider, defaultAntdTheme } from '@anthropic/cm-reporting'
+
+<CMReportingProvider theme={defaultAntdTheme}>
   <YourApp />
 </CMReportingProvider>
 ```

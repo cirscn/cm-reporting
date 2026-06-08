@@ -5,6 +5,7 @@
 
 import type { Locale } from '@core/i18n'
 import { CMReportingProvider } from '@lib/providers/CMReportingProvider'
+import { defaultAntdTheme } from '@ui/theme/index'
 import 'antd/dist/reset.css'
 import { StrictMode, useCallback, useState } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -21,7 +22,7 @@ export function Root() {
   }, [])
 
   return (
-    <CMReportingProvider locale={locale}>
+    <CMReportingProvider locale={locale} theme={defaultAntdTheme}>
       <ExamplesApp locale={locale} onLocaleChange={handleLocaleChange} />
     </CMReportingProvider>
   )

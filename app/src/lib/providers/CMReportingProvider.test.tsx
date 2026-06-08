@@ -5,6 +5,7 @@
 
 import { initI18n } from '@core/i18n'
 import { useT } from '@ui/i18n/useT'
+import type { ThemeConfig } from 'antd'
 import type { ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, test, vi } from 'vitest'
@@ -22,6 +23,7 @@ vi.mock('antd', async () => {
     ConfigProvider: (props: {
       children?: ReactNode
       getPopupContainer?: (triggerNode?: HTMLElement) => HTMLElement
+      theme?: ThemeConfig
     }) => {
       mockConfigProvider(props)
       return <div data-config-provider>{props.children}</div>
@@ -94,6 +96,38 @@ describe('CMReportingProvider', () => {
     expect(html.indexOf('data-config-provider')).toBeLessThan(
       html.indexOf('class="cm-reporting-scope"'),
     )
+  })
+
+  test('inherits host Ant Design theme when no explicit theme is passed', () => {
+    mockConfigProvider.mockClear()
+
+    renderToStaticMarkup(
+      <CMReportingProvider locale="en-US">
+        <span>content</span>
+      </CMReportingProvider>
+    )
+
+    const rootProviderProps = mockConfigProvider.mock.calls[0]?.[0]
+    expect(rootProviderProps?.theme).toBeUndefined()
+  })
+
+  test('uses explicit theme when host asks to override it', () => {
+    mockConfigProvider.mockClear()
+
+    const theme: ThemeConfig = {
+      token: {
+        colorPrimary: '#1993ff',
+      },
+    }
+
+    renderToStaticMarkup(
+      <CMReportingProvider locale="en-US" theme={theme}>
+        <span>content</span>
+      </CMReportingProvider>
+    )
+
+    const rootProviderProps = mockConfigProvider.mock.calls[0]?.[0]
+    expect(rootProviderProps?.theme).toBe(theme)
   })
 
   test('routes Ant Design popups into the reporting scope root', () => {

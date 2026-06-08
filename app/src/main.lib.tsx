@@ -12,6 +12,7 @@ import {
 import type { TemplateType } from '@core/registry/types'
 import { CMReportingApp } from '@lib/CMReportingApp'
 import { CMReportingProvider } from '@lib/providers/CMReportingProvider'
+import { defaultAntdTheme } from '@ui/theme/index'
 import 'antd/dist/reset.css'
 import '@lib/styles.css'
 import { StrictMode } from 'react'
@@ -37,7 +38,7 @@ const locale = resolveLocale(search.get('locale'))
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <CMReportingProvider locale={locale}>
+    <CMReportingProvider locale={locale} theme={defaultAntdTheme}>
       <CMReportingApp templateType={templateType} versionId={versionId} />
     </CMReportingProvider>
   </StrictMode>,

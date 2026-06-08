@@ -56,6 +56,8 @@ function App() {
 
 宿主项目推荐导入 `cm-reporting/styles.scoped.css`。`CMReporting` 会在内部创建 `cm-reporting-scope` 容器，并把 Ant Design 弹层挂回该容器内，这样库里的 Tailwind reset、只读态样式和 Ant Design 覆盖只会影响组件内部。旧入口 `cm-reporting/styles.css` 仍保留兼容，但它会全局生效。
 
+`CMReporting` 默认继承宿主外层 Ant Design `ConfigProvider` 的主题，不会自动套用库内 `defaultAntdTheme`。如果宿主希望强制使用库自带主题，可显式传入 `theme={defaultAntdTheme}`，或通过 `mergeThemeConfig(...)` 基于库主题扩展。
+
 通过 `ref` 可在宿主侧获取快照、回填、导出 JSON/Excel 等操作：
 
 ```tsx
@@ -102,7 +104,7 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 | `versionId` | `string` | ✅ | 模板版本号，如 `'6.6'`、`'2.11'` |
 | `locale` | `Locale` | - | 语言：`'en-US' \| 'zh-CN'`，默认 `'en-US'` |
 | `onLocaleChange` | `(locale: Locale) => void` | - | 语言变化回调 |
-| `theme` | `object` | - | Ant Design 主题 token 覆盖 |
+| `theme` | `object` | - | Ant Design 主题 token 覆盖；不传时继承宿主 `ConfigProvider` |
 | `cssVariables` | `object` | - | CSS 变量覆盖 |
 | `readOnly` | `boolean` | - | 全局只读模式（默认 `false`）。启用后进入“仅浏览”态：禁用输入并拦截用户编辑相关 store action；空值控件不展示 placeholder，同时隐藏 checker 页、必填横幅、上下页操作与新增删除等编辑入口。 |
 | `showPageActions` | `boolean` | - | 是否显示底部翻页操作（默认 `true`）。默认仅包含上一页/下一页，不包含内置提交按钮。 |
@@ -179,7 +181,7 @@ import { CMReportingApp } from '@lib/CMReportingApp'
 - `CMReportingApp` 内置的工作流步骤条默认固定在组件顶部，适合长表单连续填写时始终看见当前步骤。
 - 中间内容区独立滚动；如果宿主把组件放进弹窗、抽屉或自定义容器，记得让该容器本身有明确高度。
 
-> **注意**：使用 `CMReportingApp` 时需自行包裹 `CMReportingProvider`（提供 i18n 与主题），并用 `useCMReporting` 或 `useTemplateActions` 进行数据操作。
+> **注意**：使用 `CMReportingApp` 时需自行包裹 `CMReportingProvider`（提供 i18n 与弹层容器）。`CMReportingProvider` 不传 `theme` 时会继承宿主 Ant Design 主题；需要库自带主题时请显式传 `defaultAntdTheme`。
 
 ---
 
