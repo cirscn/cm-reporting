@@ -283,7 +283,7 @@
 .ant-select-disabled:hover .ant-select-selector,
 .ant-select-disabled .ant-select-content,
 .ant-select-disabled:hover .ant-select-content {
-  background-color: #f5f5f5 !important;
+  background-color: #eeeeee !important;
   border-color: transparent !important;
   box-shadow: none !important;
   color: var(--ant-color-text) !important;

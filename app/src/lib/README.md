@@ -148,7 +148,7 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 - EMRT 在初始化空表单时默认选中当前版本全部矿种（含 `dynamic-dropdown` 版本）。
 - 在非只读模式（`readOnly=false`）下，用户可在 Declaration 页继续调整矿种选择。
 - 在只读模式（`readOnly=true`）下，矿种范围仅展示当前值，不提供编辑交互。
-- 在只读模式下，输入框、下拉框、日期选择等控件仍保留 `disabled` 表单语义；已有内容正常显示，空值控件不展示 placeholder，背景统一为 `#f5f5f5`，边框透明，内容文字与 label 使用同一文本色。
+- 在只读模式下，输入框、下拉框、日期选择等控件仍保留 `disabled` 表单语义；已有内容正常显示，空值控件不展示 placeholder，背景统一为 `#eeeeee`，边框透明，内容文字与 label 使用同一文本色。
 - 在 `dynamic-dropdown` 模式（EMRT 2.x / AMRT 1.3+）下，取消某矿种会自动清空该矿种在按矿种题目与备注中的值，并删除该矿种在 `Smelter List` / `Mine List` 的历史行，避免残留不可见脏数据。
 - 当 `other` 保持勾选但某个自定义矿种槽位被清空时，会同步清理对应 `other-*` 的题目/备注与 `Smelter List` / `Mine List` 行数据。
 
@@ -464,6 +464,7 @@ return null
 - 同一个 `metal` 下禁止重复选择同一冶炼厂（按回写 `id` 去重）。
 - 行内外部选择成功后（且非 `Smelter not listed / not yet identified`），`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state` 字段会锁定为不可编辑。
 - 锁定后的空字段不显示 placeholder，避免把 `Source ID`、`街道`、`城市` 等占位提示误看成真实数据；有真实值的只读文本会单行省略，鼠标悬浮显示全文。
+- 问题矩阵中被门控禁用的空回答框和空备注框同样不显示 placeholder，避免把“请选择”“备注”误看成已填内容。
 - 如果宿主外部回写只带了 `smelterName`、没带 `smelterLookup`，库会自动用 `smelterName` 回填到 `smelterLookup`，保证“冶炼厂查找”列显示正常，且 checker 不会把该行继续判成未选择冶炼厂。
 - 外部回写里 `smelterNumber` 是冶炼厂 CID 展示号；“冶炼厂识别”列也会使用该 CID。`sourceId` 是来源识别号；如果宿主把 RMI 来源值放在 `smelterIdentification` 且未传 `sourceId`，库会把该值归入 `sourceId`。
 - 配置 `onLookupSmelterByNumber` 后，用户在“冶炼厂识别号码输入列”输入 CID 并离开输入框时，库会把 CID 交给宿主查询；宿主返回唯一结果时，库会先确认该结果的 `metal` 仍在当前申报范围内（例如 Q1/Q2 都为 `Yes`），再自动回填金属、名称、国家、CID、RMI 来源和地址等字段；不在范围内时只提示，不写入表格。

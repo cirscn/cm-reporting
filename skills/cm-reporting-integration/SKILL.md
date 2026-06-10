@@ -34,7 +34,7 @@ Apply these rules in every solution:
 - `SmelterList` 新增行应先生成临时 ID（`smelter-new-<timestamp>`）；宿主外部选择回写 `id` 后覆盖该临时 ID，未回写 `id` 时本次回写无效并提示错误。
 - `SmelterList` 行内外部选择需保证同一个 `metal` 下冶炼厂唯一，按回写 `id` 判重。
 - `SmelterList` 行内外部选择成功后（非 `Smelter not listed / not yet identified`），应锁定基础主数据字段不可编辑：`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state`。
-- `SmelterList` 锁定后的空字段不得显示 placeholder，避免把 `Source ID`、`街道`、`城市` 等占位提示误看成真实数据；有真实值的只读文本应单行省略，鼠标悬浮显示全文。
+- `SmelterList` 锁定后的空字段不得显示 placeholder，问题矩阵被门控禁用的空回答/备注也不得显示 placeholder，避免把 `Source ID`、`街道`、`城市`、`请选择`、`备注` 等占位提示误看成真实数据；有真实值的只读文本应单行省略，鼠标悬浮显示全文。
 - 宿主外部回写若只提供 `smelterName`、未提供 `smelterLookup`，库会自动把 `smelterName` 作为 `smelterLookup` 显示与校验来源；宿主如有独立查找值，仍优先回写 `smelterLookup`。
 - `SmelterList` 外部回写里 `smelterNumber` 对应 CID，UI 的“冶炼厂识别”列也显示该 CID；`sourceId` 对应 RMI 来源识别号。若宿主暂时把 RMI 来源写在 `smelterIdentification` 且未提供 `sourceId`，库会归一化到 `sourceId`。
 - 如需支持“输入 CID 自动回填”，宿主应实现 `onLookupSmelterByNumber(ctx)`，用 `ctx.smelterNumber` 查询真实冶炼厂主数据，并按 `{ items: [SmelterExternalPickItem] }` 返回结果；唯一结果只有在其 `metal` 属于当前申报范围时才会自动回填，不在范围内时库会提示且不写入。
@@ -52,7 +52,7 @@ Apply these rules in every solution:
 - For `readOnly` behavior, treat it as **view-only contract** (not just disabled inputs):
   - hide checker page and checker entry in workflow;
   - hide global required/error hint banner and bottom prev/next actions;
-  - keep form fields disabled, hide placeholder text for empty disabled controls, but keep actual values visible with `#f5f5f5` background, transparent borders, and normal label-color content text;
+  - keep form fields disabled, hide placeholder text for empty disabled controls, but keep actual values visible with `#eeeeee` background, transparent borders, and normal label-color content text;
   - render overflowing read-only text with ellipsis and expose the full value on hover;
   - hide table/form editing affordances (add/delete/batch/external pick/edit links), not merely `disabled`;
   - when table cells use explicit `disabled` conditions (for example SmelterList base fields), always merge global disabled state as `componentDisabled || localDisabled`;

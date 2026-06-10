@@ -7,6 +7,7 @@ import type { I18nKey } from '@core/i18n'
 import type { MineralDef, QuestionDef, TemplateVersionDef } from '@core/registry/types'
 import type { GatingResult } from '@core/rules/gating'
 import type { ErrorKey } from '@core/validation/errorKeys'
+import { getReadonlyTextControlProps } from '@ui/helpers/readonlyDisplay'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
 import { useT } from '@ui/i18n/useT'
 import { useCreation, useMemoizedFn } from 'ahooks'
@@ -360,6 +361,8 @@ function QuestionRow({
             const cellHandler = getCellHandler(question.key, mineral.key, question.perMineral)
             const commentHandler = getCommentHandler(question.key, mineral.key, question.perMineral)
             const options = getOptions(question.key, mineral.key, question.perMineral)
+            const selectedLabel =
+              options.find((option) => option.value === currentValue)?.label ?? currentValue
 
             return (
               <div key={mineral.key} className="question-matrix-grid">
@@ -377,15 +380,19 @@ function QuestionRow({
                     onChange={cellHandler}
                     onKeyDown={createKeyDownHandler(options, cellHandler, isDisabled)}
                     options={options}
-                    placeholder={t('placeholders.select')}
                     disabled={isDisabled}
                     allowClear
-                    className={selectClassName}
                     data-field-path={
                       question.perMineral
                         ? `questions.${question.key}.${mineral.key}`
                         : `questions.${question.key}`
                     }
+                    {...getReadonlyTextControlProps({
+                      value: selectedLabel,
+                      placeholder: t('placeholders.select'),
+                      disabled: isDisabled,
+                      className: selectClassName,
+                    })}
                   />
                 </div>
 
@@ -393,7 +400,6 @@ function QuestionRow({
                   <Input.TextArea
                     value={currentComment || undefined}
                     onChange={(e) => commentHandler?.(e.target.value)}
-                    placeholder={t('placeholders.comments')}
                     disabled={isDisabled}
                     autoSize={{ minRows: 1, maxRows: 2 }}
                     rows={1}
@@ -403,6 +409,12 @@ function QuestionRow({
                         ? `questionComments.${question.key}.${mineral.key}`
                         : `questionComments.${question.key}`
                     }
+                    {...getReadonlyTextControlProps({
+                      value: currentComment,
+                      placeholder: t('placeholders.comments'),
+                      disabled: isDisabled,
+                      ellipsis: false,
+                    })}
                   />
                 </div>
               </div>
