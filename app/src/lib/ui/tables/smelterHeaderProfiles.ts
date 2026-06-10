@@ -178,7 +178,7 @@ function buildZhLabels(variant: SmelterHeaderVariant): Record<SmelterColumnId, s
       ...common,
       metal: '金属',
       smelterLookup: '冶炼厂查找',
-      smelterName: '冶炼厂名称(1)',
+      smelterName: '冶炼厂名称',
       smelterCountry: '冶炼厂所在国家或地区',
       mineName: '填写矿井名称，或如果所用矿产来自于回收料和报废料，请填写“回收”或“报废”。',
       mineCountry:
@@ -193,7 +193,7 @@ function buildZhLabels(variant: SmelterHeaderVariant): Record<SmelterColumnId, s
       ...common,
       metal: '金属 l',
       smelterLookup: '冶炼厂查找',
-      smelterName: '冶炼厂名称(1)',
+      smelterName: '冶炼厂名称',
       smelterCountry: '冶炼工厂地址（国家）',
       mineName: '填所有矿井名称，或如所用矿产来自回收料和报废料时请填“回收”或“报废”。',
       mineCountry: '填所有矿井所在的国家名称，或如所用矿产来自回收料和报废料时请填“回收”或“报废”。',

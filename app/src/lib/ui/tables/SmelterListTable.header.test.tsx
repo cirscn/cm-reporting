@@ -14,6 +14,17 @@ function getColumns(templateType: 'cmrt' | 'emrt' | 'crt' | 'amrt', versionId: s
   })
 }
 
+function getZhColumns(templateType: 'cmrt' | 'emrt' | 'crt' | 'amrt', versionId: string) {
+  const versionDef = getVersionDef(templateType, versionId)
+  return getSmelterHeaderProfile({
+    templateType,
+    versionId,
+    locale: 'zh-CN',
+    t: (key) => key,
+    config: versionDef.smelterList,
+  })
+}
+
 function expectStartsWith(columns: SmelterColumnId[], expected: SmelterColumnId[]) {
   expect(columns.slice(0, expected.length)).toEqual(expected)
 }
@@ -107,5 +118,12 @@ describe('SmelterListTable header alignment', () => {
       smelterName: true,
       smelterCountry: true,
     })
+  })
+
+  test('hides Excel footnote markers from CMRT smelter name header', () => {
+    const profile = getZhColumns('cmrt', '6.6')
+
+    expect(profile.labels.smelterName).toBe('冶炼厂名称')
+    expect(profile.labels.smelterName).not.toContain('(1)')
   })
 })

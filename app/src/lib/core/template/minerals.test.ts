@@ -66,4 +66,20 @@ describe('template minerals', () => {
 
     expect(minerals.map((mineral) => mineral.key)).toEqual(['tantalum'])
   })
+
+  test('EMRT 2.x smelter metal dropdown excludes minerals outside declaration scope', () => {
+    const versionDef = getVersionDef('emrt', '2.1')
+
+    const minerals = getMetalsForSource(
+      versionDef.smelterList.metalDropdownSource,
+      versionDef,
+      {
+        Q1: { cobalt: 'Yes', copper: 'Yes' },
+        Q2: { cobalt: 'Yes', copper: 'Yes' },
+      },
+      { selectedMinerals: ['cobalt'], customMinerals: [] },
+    )
+
+    expect(minerals.map((mineral) => mineral.key)).toEqual(['cobalt'])
+  })
 })

@@ -457,6 +457,7 @@
     "requiredCompanyQuestionComment": "Comment is required: {{field}}.",
     "requiredProductList": "Product List is required for scope B.",
     "requiredSmelterList": "Smelter List entry required for {{field}}.",
+    "outOfScopeSmelterMetal": "The current declaration scope does not include \"{{field}}\". Please delete unrelated smelters.",
     "invalidEmail": "Invalid email format: {{field}}."
   },
   "revision": {

@@ -6,7 +6,7 @@
 // 说明：模块实现
 import type { I18nKey } from '@core/i18n'
 import type { TemplateVersionDef } from '@core/registry/types'
-import { getCustomMineralLabels } from '@core/template/minerals'
+import { getCustomMineralLabels, getMetalsForSource } from '@core/template/minerals'
 import { isSmelterNotListed } from '@core/transform'
 import type { MineralsScopeRow } from '@core/types/tableRows'
 import { isValidEmail } from '@core/validation/email'
@@ -380,6 +380,67 @@ function checkMineralsScope(
 // Check smelter list
 // ---------------------------------------------------------------------------
 
+function getSelectableSmelterMetalKeys(
+  versionDef: TemplateVersionDef,
+  formState: FormStateForRequired
+): Set<string> {
+  return new Set(
+    getMetalsForSource(
+      versionDef.smelterList.metalDropdownSource,
+      versionDef,
+      formState.questionAnswers,
+      {
+        selectedMinerals: formState.selectedMinerals,
+        customMinerals: formState.customMinerals,
+      }
+    ).map((mineral) => mineral.key)
+  )
+}
+
+function getSmelterMetalErrorLabel(params: {
+  metal: string
+  mineralLabelMap: Map<string, I18nKey>
+  mineralLabelOverrides: Map<string, string>
+}): {
+  fieldLabelKey?: I18nKey
+  messageValues?: Record<string, string>
+} {
+  const override = params.mineralLabelOverrides.get(params.metal)
+  if (override) return { messageValues: { field: override } }
+
+  const labelKey = params.mineralLabelMap.get(params.metal)
+  if (labelKey) return { fieldLabelKey: labelKey }
+
+  return { messageValues: { field: params.metal } }
+}
+
+function checkOutOfScopeSmelterMetals(params: {
+  rows: FormDataForChecker['smelterList']
+  selectableMetalKeys: Set<string>
+  mineralLabelMap: Map<string, I18nKey>
+  mineralLabelOverrides: Map<string, string>
+  errors: CheckerError[]
+}) {
+  params.rows.forEach((row, index) => {
+    const metal = (row.metal ?? '').trim()
+    if (!metal || params.selectableMetalKeys.has(metal)) return
+
+    const label = getSmelterMetalErrorLabel({
+      metal,
+      mineralLabelMap: params.mineralLabelMap,
+      mineralLabelOverrides: params.mineralLabelOverrides,
+    })
+    pushError(
+      params.errors,
+      'R',
+      ERROR_KEYS.checker.outOfScopeSmelterMetal,
+      `smelterList.${index}.metal`,
+      label.fieldLabelKey,
+      label.messageValues
+    )
+  })
+}
+
 function checkSmelterList(
   versionDef: TemplateVersionDef,
   formState: FormStateForRequired,
@@ -395,11 +456,20 @@ function checkSmelterList(
     formState.customMinerals ?? [],
     formState.selectedMinerals ?? []
   )
+  const selectableMetalKeys = getSelectableSmelterMetalKeys(versionDef, formState)
 
   const requiredMinerals = getRequiredSmelterMinerals({
     versionDef,
     activeMinerals,
     gatingByMineral,
+  })
+
+  checkOutOfScopeSmelterMetals({
+    rows,
+    selectableMetalKeys,
+    mineralLabelMap,
+    mineralLabelOverrides,
+    errors,
   })
 
   if (requiredMinerals.length === 0) return
@@ -424,6 +494,7 @@ function checkSmelterList(
   rows.forEach((row, index) => {
     const metal = row.metal || ''
     if (!metal.trim()) return
+    if (!selectableMetalKeys.has(metal.trim())) return
     const lookup = row.smelterLookup || ''
     if (lookup.trim()) return
     pushError(
@@ -438,6 +509,8 @@ function checkSmelterList(
   if (!versionDef.smelterList.notListedRequireNameCountry) return
 
   rows.forEach((row, index) => {
+    const metal = (row.metal || '').trim()
+    if (metal && !selectableMetalKeys.has(metal)) return
     if (!isSmelterNotListed(row.smelterLookup || '')) return
     const name = row.smelterName || ''
     if (!name.trim()) {

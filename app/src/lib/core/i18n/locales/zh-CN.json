@@ -457,6 +457,7 @@
     "requiredCompanyQuestionComment": "需要填写备注：{{field}}。",
     "requiredProductList": "申报范围为 B 时必须填写产品列表。",
     "requiredSmelterList": "{{field}} 需要填写冶炼厂记录。",
+    "outOfScopeSmelterMetal": "当前申报范围不涉及“{{field}}”，请删除无关冶炼厂。",
     "invalidEmail": "邮箱格式不正确：{{field}}。"
   },
   "revision": {

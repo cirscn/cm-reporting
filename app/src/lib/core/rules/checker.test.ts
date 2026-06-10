@@ -662,6 +662,82 @@ describe('runChecker', () => {
     expect(lookupError?.fieldLabelKey).toBe('tables.smelterLookup')
   })
 
+  it('flags CMRT imported smelter row when its metal is not selectable by Q1/Q2', () => {
+    const mineralKey = 'tin'
+    const formState: FormStateForRequired = {
+      scopeType: 'A',
+      questionAnswers: {
+        Q1: {
+          ...buildMineralAnswerMap(cmrt, 'Yes'),
+          [mineralKey]: 'Yes',
+        },
+        Q2: {
+          ...buildMineralAnswerMap(cmrt, 'Yes'),
+          [mineralKey]: 'No',
+        },
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(cmrt),
+      questions: formState.questionAnswers,
+      smelterList: [{ metal: mineralKey, smelterLookup: 'Tin Smelter' }],
+    })
+
+    const errors = runChecker(cmrt, formState, formData)
+
+    const outOfScopeError = errors.find((error) => error.fieldPath === 'smelterList.0.metal')
+
+    expect(outOfScopeError?.messageKey).toBe(ERROR_KEYS.checker.outOfScopeSmelterMetal)
+    expect(outOfScopeError?.fieldLabelKey).toBe('minerals.tin')
+  })
+
+  it('flags EMRT imported smelter row when its metal is not selected in declaration scope', () => {
+    const emrt = getVersionDef('emrt', '2.1')
+    const formState: FormStateForRequired = {
+      scopeType: 'A',
+      selectedMinerals: ['cobalt'],
+      questionAnswers: {
+        Q1: { cobalt: 'Yes', copper: 'Yes' },
+        Q2: { cobalt: 'Yes', copper: 'Yes' },
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(emrt),
+      questions: formState.questionAnswers,
+      smelterList: [{ metal: 'copper', smelterLookup: 'Copper Smelter' }],
+    })
+
+    const errors = runChecker(emrt, formState, formData)
+
+    const outOfScopeError = errors.find((error) => error.fieldPath === 'smelterList.0.metal')
+
+    expect(outOfScopeError?.messageKey).toBe(ERROR_KEYS.checker.outOfScopeSmelterMetal)
+    expect(outOfScopeError?.fieldLabelKey).toBe('minerals.copper')
+  })
+
+  it('flags CRT imported smelter row when its metal is not part of the template dropdown', () => {
+    const crt = getVersionDef('crt', '2.21')
+    const formState: FormStateForRequired = {
+      scopeType: 'A',
+      questionAnswers: {
+        Q1: 'Yes',
+        Q2: 'Yes',
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(crt),
+      questions: formState.questionAnswers,
+      smelterList: [{ metal: 'tin', smelterLookup: 'Tin Smelter' }],
+    })
+
+    const errors = runChecker(crt, formState, formData)
+
+    const outOfScopeError = errors.find((error) => error.fieldPath === 'smelterList.0.metal')
+
+    expect(outOfScopeError?.messageKey).toBe(ERROR_KEYS.checker.outOfScopeSmelterMetal)
+    expect(outOfScopeError?.messageValues?.field).toBe('tin')
+  })
+
   it.todo('requires mine list row fields when mine list rules are enabled')
   it.todo('requires smelter list row fields when smelter list row-level rules are enabled')
 })

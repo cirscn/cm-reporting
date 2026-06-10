@@ -53,14 +53,24 @@ function getAnswerForMineral(
   return ''
 }
 
-function getTemplateMineralsByAnswers(
+function getMineralsByAnswers(
   versionDef: TemplateVersionDef,
+  options: { selectedMinerals?: string[]; customMinerals?: string[] } | undefined,
   predicate: (mineral: MineralDef) => boolean
 ): MineralDef[] {
+  const minerals =
+    versionDef.mineralScope.mode === 'fixed'
+      ? versionDef.mineralScope.minerals
+      : getActiveMinerals(
+          versionDef,
+          options?.selectedMinerals ?? [],
+          options?.customMinerals ?? []
+        )
+
   return intersectionBy(
-    versionDef.mineralScope.minerals,
+    minerals,
     compact(
-      versionDef.mineralScope.minerals.map((mineral) =>
+      minerals.map((mineral) =>
         predicate(mineral) ? mineral : null
       )
     ),
@@ -92,15 +102,17 @@ export function getMetalsForSource(
   }
 
   if (source.type === 'dynamic-q1-yes') {
-    return getTemplateMineralsByAnswers(
+    return getMineralsByAnswers(
       versionDef,
+      options,
       (mineral) => getAnswerForMineral(answers, 'Q1', mineral.key) === 'Yes'
     )
   }
 
   if (source.type === 'dynamic-q1q2-yes') {
-    return getTemplateMineralsByAnswers(
+    return getMineralsByAnswers(
       versionDef,
+      options,
       (mineral) =>
         getAnswerForMineral(answers, 'Q1', mineral.key) === 'Yes' &&
         getAnswerForMineral(answers, 'Q2', mineral.key) === 'Yes'
@@ -108,8 +120,9 @@ export function getMetalsForSource(
   }
 
   if (source.type === 'dynamic-q2-yes') {
-    return getTemplateMineralsByAnswers(
+    return getMineralsByAnswers(
       versionDef,
+      options,
       (mineral) => getAnswerForMineral(answers, 'Q2', mineral.key) === 'Yes'
     )
   }

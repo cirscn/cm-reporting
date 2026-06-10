@@ -19,6 +19,7 @@ export const ERROR_KEYS = {
     requiredCompanyQuestionComment: 'checker.requiredCompanyQuestionComment',
     requiredProductList: 'checker.requiredProductList',
     requiredSmelterList: 'checker.requiredSmelterList',
+    outOfScopeSmelterMetal: 'checker.outOfScopeSmelterMetal',
     invalidEmail: 'checker.invalidEmail',
   },
   minerals: {
