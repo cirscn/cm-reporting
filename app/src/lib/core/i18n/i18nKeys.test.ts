@@ -178,6 +178,12 @@ describe('i18n keys', () => {
     )
   })
 
+  it('uses the requested zh-CN CMRT annual disclosure option labels', () => {
+    expect(zhCN.options.yesWithSec).toBe('是，受证券交易委员会规则规限')
+    expect(zhCN.options.yesWithEu).toBe('是，受欧盟条例规限')
+    expect(zhCN.options.yesWithSecAndEu).toBe('是，受证券交易委员会和欧盟条例规限')
+  })
+
   it('covers registry label keys and literal t() usage', () => {
     const available = flattenKeys(enUS as Record<string, unknown>)
     const registryKeys = collectRegistryKeys()

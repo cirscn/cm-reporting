@@ -214,9 +214,9 @@
     "yesIpc1755": "是，符合 IPC1755（如 CMRT）",
     "yesIpc1755Emrt": "是，符合 IPC1755（如 EMRT）",
     "yesWhenMoreValidated": "是，当更多处理商通过验证时",
-    "yesWithSec": "是，向 SEC 报告",
-    "yesWithEu": "是，向欧盟报告",
-    "yesWithSecAndEu": "是，向 SEC 与欧盟报告"
+    "yesWithSec": "是，受证券交易委员会规则规限",
+    "yesWithEu": "是，受欧盟条例规限",
+    "yesWithSecAndEu": "是，受证券交易委员会和欧盟条例规限"
   },
   "minerals": {
     "tantalum": "钽",
