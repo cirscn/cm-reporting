@@ -715,6 +715,66 @@ describe('runChecker', () => {
     expect(outOfScopeError?.fieldLabelKey).toBe('minerals.copper')
   })
 
+  it('reports each out-of-scope smelter metal only once', () => {
+    const emrt = getVersionDef('emrt', '2.1')
+    const formState: FormStateForRequired = {
+      scopeType: 'A',
+      selectedMinerals: ['cobalt'],
+      questionAnswers: {
+        Q1: { cobalt: 'Yes', lithium: 'Yes' },
+        Q2: { cobalt: 'Yes', lithium: 'Yes' },
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(emrt),
+      questions: formState.questionAnswers,
+      smelterList: [
+        { metal: 'lithium', smelterLookup: 'Lithium Smelter A' },
+        { metal: 'lithium', smelterLookup: 'Lithium Smelter B' },
+      ],
+    })
+
+    const errors = runChecker(emrt, formState, formData)
+
+    const outOfScopeErrors = errors.filter(
+      (error) => error.messageKey === ERROR_KEYS.checker.outOfScopeSmelterMetal
+    )
+
+    expect(outOfScopeErrors).toHaveLength(1)
+    expect(outOfScopeErrors[0]?.fieldLabelKey).toBe('minerals.lithium')
+  })
+
+  it('reports missing required smelter records before out-of-scope smelter metals', () => {
+    const emrt = getVersionDef('emrt', '2.1')
+    const formState: FormStateForRequired = {
+      scopeType: 'A',
+      selectedMinerals: ['cobalt'],
+      questionAnswers: {
+        Q1: { cobalt: 'Yes', lithium: 'Yes' },
+        Q2: { cobalt: 'Yes', lithium: 'Yes' },
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(emrt),
+      questions: formState.questionAnswers,
+      smelterList: [{ metal: 'lithium', smelterLookup: 'Lithium Smelter' }],
+    })
+
+    const errors = runChecker(emrt, formState, formData)
+    const smelterMessages = errors
+      .filter(
+        (error) =>
+          error.messageKey === ERROR_KEYS.checker.requiredSmelterList ||
+          error.messageKey === ERROR_KEYS.checker.outOfScopeSmelterMetal
+      )
+      .map((error) => error.messageKey)
+
+    expect(smelterMessages).toEqual([
+      ERROR_KEYS.checker.requiredSmelterList,
+      ERROR_KEYS.checker.outOfScopeSmelterMetal,
+    ])
+  })
+
   it('flags CRT imported smelter row when its metal is not part of the template dropdown', () => {
     const crt = getVersionDef('crt', '2.21')
     const formState: FormStateForRequired = {

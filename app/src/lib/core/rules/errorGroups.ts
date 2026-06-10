@@ -6,6 +6,7 @@
 // 说明：将错误分组规则下沉到 core，避免 UI 重复维护。
 import type { I18nKey } from '@core/i18n'
 import type { TemplateType, TemplateVersionDef } from '@core/registry/types'
+import { ERROR_KEYS } from '@core/validation/errorKeys'
 import { groupBy } from 'lodash-es'
 
 import type { CheckerError } from './checker'
@@ -91,6 +92,12 @@ const parseIndex = (value: string) => {
 const buildOrderMap = (keys: string[]) =>
   new Map(keys.map((key, index) => [key, index]))
 
+const getSmelterMessageRank = (error: CheckerError) => {
+  if (error.messageKey === ERROR_KEYS.checker.requiredSmelterList) return 0
+  if (error.messageKey === ERROR_KEYS.checker.outOfScopeSmelterMetal) return 2
+  return 1
+}
+
 const buildSortKeyFactory = (versionDef: TemplateVersionDef | undefined) => {
   if (!versionDef) {
     return (_groupKey: ErrorGroupKey, error: CheckerError) => error.fieldPath
@@ -136,12 +143,13 @@ const buildSortKeyFactory = (versionDef: TemplateVersionDef | undefined) => {
         return `${base}-${suffix}-${mineralIndex}-${error.fieldPath}`
       }
       case 'smelter': {
+        const messageRank = getSmelterMessageRank(error)
         const index = parseIndex(parts[1] ?? '')
         if (index !== null) {
-          return `${index}-smelter-${error.fieldPath}`
+          return `${messageRank}-${index}-smelter-${error.fieldPath}`
         }
         const mineralIndex = mineralOrder.get(parts[1] ?? '') ?? 999
-        return `${mineralIndex}-mineral-${error.fieldPath}`
+        return `${messageRank}-${mineralIndex}-mineral-${error.fieldPath}`
       }
       case 'mine': {
         const index = parseIndex(parts[1] ?? '')

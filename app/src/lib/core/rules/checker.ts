@@ -421,9 +421,13 @@ function checkOutOfScopeSmelterMetals(params: {
   mineralLabelOverrides: Map<string, string>
   errors: CheckerError[]
 }) {
+  const reportedMetals = new Set<string>()
   params.rows.forEach((row, index) => {
     const metal = (row.metal ?? '').trim()
     if (!metal || params.selectableMetalKeys.has(metal)) return
+    if (reportedMetals.has(metal)) return
+
+    reportedMetals.add(metal)
 
     const label = getSmelterMetalErrorLabel({
       metal,
@@ -439,6 +443,29 @@ function checkOutOfScopeSmelterMetals(params: {
       label.messageValues
     )
   })
+}
+
+function checkRequiredSmelterMinerals(params: {
+  requiredMinerals: string[]
+  rows: FormDataForChecker['smelterList']
+  mineralLabelMap: Map<string, I18nKey>
+  mineralLabelOverrides: Map<string, string>
+  errors: CheckerError[]
+}) {
+  for (const mineralKey of params.requiredMinerals) {
+    const hasRow = some(params.rows, (row) => row.metal === mineralKey)
+    if (hasRow) continue
+
+    const override = params.mineralLabelOverrides.get(mineralKey)
+    pushError(
+      params.errors,
+      'R',
+      ERROR_KEYS.checker.requiredSmelterList,
+      `smelterList.${mineralKey}`,
+      override ? undefined : params.mineralLabelMap.get(mineralKey),
+      override ? { field: override } : undefined
+    )
+  }
 }
 
 function checkSmelterList(
@@ -464,6 +491,16 @@ function checkSmelterList(
     gatingByMineral,
   })
 
+  if (requiredMinerals.length > 0) {
+    checkRequiredSmelterMinerals({
+      requiredMinerals,
+      rows,
+      mineralLabelMap,
+      mineralLabelOverrides,
+      errors,
+    })
+  }
+
   checkOutOfScopeSmelterMetals({
     rows,
     selectableMetalKeys,
@@ -473,21 +510,6 @@ function checkSmelterList(
   })
 
   if (requiredMinerals.length === 0) return
-
-  for (const mineralKey of requiredMinerals) {
-    const hasRow = some(rows, (row) => row.metal === mineralKey)
-    if (!hasRow) {
-      const override = mineralLabelOverrides.get(mineralKey)
-      pushError(
-        errors,
-        'R',
-        ERROR_KEYS.checker.requiredSmelterList,
-        `smelterList.${mineralKey}`,
-        override ? undefined : mineralLabelMap.get(mineralKey),
-        override ? { field: override } : undefined
-      )
-    }
-  }
 
   if (!versionDef.smelterList.hasLookup) return
 

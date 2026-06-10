@@ -28,6 +28,8 @@ interface QuestionMatrixFormProps {
 
 type QuestionOptionItem = { value: string; label: string }
 
+const EMPTY_QUESTION_ERRORS: Record<string, Record<string, ErrorKey> | ErrorKey> = {}
+
 /**
  * 辅助函数：生成选项签名（用于检测就地修改）。
  */
@@ -61,7 +63,7 @@ export function QuestionMatrixForm({
   onCommentChange,
   gatingByMineral,
   requiredByQuestion,
-  errors = {},
+  errors = EMPTY_QUESTION_ERRORS,
   headerMode = 'card',
 }: QuestionMatrixFormProps) {
   const { t } = useT()
@@ -398,7 +400,7 @@ function QuestionRow({
 
                 <div className="question-matrix-comment">
                   <Input.TextArea
-                    value={currentComment || undefined}
+                    value={currentComment}
                     onChange={(e) => commentHandler?.(e.target.value)}
                     disabled={isDisabled}
                     autoSize={{ minRows: 1, maxRows: 2 }}
