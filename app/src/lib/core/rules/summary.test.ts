@@ -113,7 +113,7 @@ describe('buildCheckerSummary', () => {
     expect(summary.sections.smelterList.completed).toBe(1)
   })
 
-  it('counts requester number as required progress when requester columns are enabled', () => {
+  it('does not count requester number as required progress when requester columns are enabled', () => {
     const emrt = getVersionDef('emrt', '2.1')
     const formState: FormStateForRequired = {
       scopeType: 'B',
@@ -141,7 +141,7 @@ describe('buildCheckerSummary', () => {
     })
 
     const { summary } = buildCheckerSummary(emrt, formState, formData, t)
-    expect(summary.sections.productList.total).toBe(3)
+    expect(summary.sections.productList.total).toBe(2)
     expect(summary.sections.productList.completed).toBe(2)
   })
 

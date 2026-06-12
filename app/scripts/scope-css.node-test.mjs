@@ -11,6 +11,8 @@ test('scopes component styles but drops Tailwind preflight resets', () => {
     'a{color:inherit;text-decoration:inherit}',
     'button,a,[role=button],.ant-btn,.ant-select,.ant-input,.ant-picker{touch-action:manipulation}',
     '.ant-input-disabled,.ant-input-disabled:hover{color:var(--ant-color-text)!important}',
+    '.cm-reporting-scope .cm-reporting-modal-root .cm-reporting-modal-wrap{position:fixed;inset:0}',
+    '.cm-reporting-scope .cm-reporting-modal-root .cm-reporting-modal-wrap{display:flex;align-items:flex-start;justify-content:center}',
     '@media(hover:hover){.hover\\:bg-blue-50\\/50:hover{background:#eff6ff80}}',
     '@keyframes fadeIn{from{opacity:0}to{opacity:1}}',
     '@property --tw-rotate-x{syntax:"*";inherits:false}',
@@ -25,6 +27,15 @@ test('scopes component styles but drops Tailwind preflight resets', () => {
     /\.cm-reporting-scope button,\.cm-reporting-scope a,\.cm-reporting-scope \[role=button\]/,
   )
   assert.match(output, /\.cm-reporting-scope \.ant-input-disabled/)
+  assert.match(
+    output,
+    /\.cm-reporting-scope \.cm-reporting-modal-root \.cm-reporting-modal-wrap\{position:fixed;inset:0\}/,
+  )
+  assert.match(
+    output,
+    /\.cm-reporting-scope \.cm-reporting-modal-root \.cm-reporting-modal-wrap\{display:flex;align-items:flex-start;justify-content:center\}/,
+  )
+  assert.doesNotMatch(output, /\.cm-reporting-scope \.cm-reporting-scope/)
   assert.match(output, /@media\(hover:hover\)\{\.cm-reporting-scope \.hover\\:bg-blue-50\\\/50:hover/)
   assert.match(output, /@keyframes fadeIn/)
   assert.match(output, /@keyframes fadeIn\{from\{opacity:0\}to\{opacity:1\}\}/)

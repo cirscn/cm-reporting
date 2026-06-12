@@ -20,6 +20,7 @@ export const ERROR_KEYS = {
     requiredProductList: 'checker.requiredProductList',
     requiredSmelterList: 'checker.requiredSmelterList',
     outOfScopeSmelterMetal: 'checker.outOfScopeSmelterMetal',
+    duplicateSmelterSelection: 'checker.duplicateSmelterSelection',
     invalidEmail: 'checker.invalidEmail',
   },
   minerals: {

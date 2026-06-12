@@ -14,9 +14,10 @@ import type {
 import { renderRequiredHeaderLabel, wrapRequired } from '@ui/helpers/fieldRequired'
 import { getReadonlyTextControlProps } from '@ui/helpers/readonlyDisplay'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
+import { useScopedModal } from '@ui/hooks/useScopedModal'
 import { useT } from '@ui/i18n/useT'
 import { useBoolean, useCreation, useLatest, useMemoizedFn } from 'ahooks'
-import { App, Button, Card, ConfigProvider, Flex, Table, Input, Tag, Typography } from 'antd'
+import { Button, Card, ConfigProvider, Flex, Table, Input, Tag, Typography } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import type { TableRowSelection } from 'antd/es/table/interface'
 import type { ChangeEvent } from 'react'
@@ -61,7 +62,7 @@ export const ProductListTable = memo(function ProductListTable({
 }: ProductListTableProps) {
   const { t, locale } = useT()
   const { componentDisabled } = ConfigProvider.useConfig()
-  const { modal } = App.useApp()
+  const modal = useScopedModal()
   /** 批量选择状态（受控）。 */
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const [externalPicking, { setTrue: startPicking, setFalse: stopPicking }] = useBoolean(false)
@@ -267,25 +268,22 @@ export const ProductListTable = memo(function ProductListTable({
     if (enableRequesterColumns) {
       base.push(
         {
-          title: renderRequiredHeaderLabel(t('tables.requesterNumber'), required),
+          title: t('tables.requesterNumber'),
           dataIndex: 'requesterNumber',
           key: 'requesterNumber',
           width: 180,
-          render: (value: string, record: ProductRow) =>
-            wrapRequired(
-              required,
-                <Input
-                  value={value || undefined}
-                  onChange={getInputHandler(`${record.id}:requesterNumber`)}
-                  disabled={componentDisabled}
-                  {...getReadonlyTextControlProps({
-                    value,
-                    placeholder: t('productPlaceholders.requesterNumber'),
-                    disabled: componentDisabled,
-                  })}
-                />,
-              componentDisabled,
-            ),
+          render: (value: string, record: ProductRow) => (
+            <Input
+              value={value || undefined}
+              onChange={getInputHandler(`${record.id}:requesterNumber`)}
+              disabled={componentDisabled}
+              {...getReadonlyTextControlProps({
+                value,
+                placeholder: t('productPlaceholders.requesterNumber'),
+                disabled: componentDisabled,
+              })}
+            />
+          ),
         },
         {
           title: t('tables.requesterName'),

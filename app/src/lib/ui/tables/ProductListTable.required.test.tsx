@@ -82,7 +82,7 @@ describe('ProductListTable required behavior', () => {
     expect(emrtHtml).toContain(REQUESTER_NAME_LABEL)
   })
 
-  test('highlights respondent and requester product numbers as required for CMRT 6.6', () => {
+  test('highlights only respondent product number as required for CMRT 6.6', () => {
     const html = renderTable('cmrt', '6.6', [
       {
         id: 'row-1',
@@ -94,7 +94,7 @@ describe('ProductListTable required behavior', () => {
       },
     ])
 
-    expect(html.split('class="field-required"').length - 1).toBe(2)
+    expect(html.split('class="field-required"').length - 1).toBe(1)
   })
 
   test('keeps requester columns for AMRT 1.3', () => {

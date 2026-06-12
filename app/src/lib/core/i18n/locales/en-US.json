@@ -458,6 +458,7 @@
     "requiredProductList": "Product List is required for scope B.",
     "requiredSmelterList": "Smelter List entry required for {{field}}.",
     "outOfScopeSmelterMetal": "The current declaration scope does not include \"{{field}}\". Please delete unrelated smelters.",
+    "duplicateSmelterSelection": "The same smelter cannot be selected twice under {{field}}. Please delete the duplicate row.",
     "invalidEmail": "Invalid email format: {{field}}."
   },
   "revision": {

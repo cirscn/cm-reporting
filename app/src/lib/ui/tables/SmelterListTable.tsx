@@ -24,10 +24,10 @@ import type {
 import { renderRequiredHeaderLabel, wrapRequired } from '@ui/helpers/fieldRequired'
 import { getReadonlyTextControlProps } from '@ui/helpers/readonlyDisplay'
 import { useHandlerMap } from '@ui/hooks/useHandlerMap'
+import { useScopedModal } from '@ui/hooks/useScopedModal'
 import { useT } from '@ui/i18n/useT'
 import { useCreation, useLatest, useMemoizedFn } from 'ahooks'
 import {
-  App,
   AutoComplete,
   Button,
   Card,
@@ -133,7 +133,7 @@ export const SmelterListTable = memo(function SmelterListTable({
 }: SmelterListTableProps) {
   const { t, locale } = useT()
   const { componentDisabled } = ConfigProvider.useConfig()
-  const { modal } = App.useApp()
+  const modal = useScopedModal()
   /** 批量选择状态（受控）。 */
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const rowsRef = useLatest(rows)
@@ -683,18 +683,7 @@ export const SmelterListTable = memo(function SmelterListTable({
             Boolean(record.metal),
             useExternalLookup && integration?.onPickSmelterForRow ? (
               <Flex align="center" gap={8}>
-                {isNotListed(record.smelterLookup) && notListedRequiresNameCountry ? (
-                  <Input
-                    value={record.smelterName || undefined}
-                    onChange={getInputHandler(`${record.id}:smelterName`)}
-                    disabled={componentDisabled}
-                    {...getReadonlyTextControlProps({
-                      value: record.smelterName,
-                      placeholder: t('placeholders.smelterNameRequired'),
-                      disabled: componentDisabled,
-                    })}
-                  />
-                ) : record.smelterLookup ? (
+                {record.smelterLookup ? (
                   <>
                     <Typography.Text ellipsis title={record.smelterLookup} style={{ maxWidth: 150 }}>
                       {record.smelterLookup}
@@ -758,18 +747,6 @@ export const SmelterListTable = memo(function SmelterListTable({
                     className: 'w-full',
                   })}
                 />
-                {isNotListed(record.smelterLookup) && notListedRequiresNameCountry && (
-                  <Input
-                    value={record.smelterName || undefined}
-                    onChange={getInputHandler(`${record.id}:smelterName`)}
-                    disabled={componentDisabled}
-                    {...getReadonlyTextControlProps({
-                      value: record.smelterName,
-                      placeholder: t('placeholders.smelterNameRequired'),
-                      disabled: componentDisabled,
-                    })}
-                  />
-                )}
               </Flex>
             ),
             componentDisabled,

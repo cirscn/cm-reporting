@@ -24,6 +24,7 @@ import {
   getRequiredSmelterMinerals,
 } from './helpers'
 import { getActiveMineralKeys, type FormStateForRequired } from './required'
+import { findDuplicateSmelterSelections } from './smelterDuplicates'
 
 const REQUIRED_MINE_FIELDS_AFTER_METAL = [
   { key: 'smelterName', labelKey: 'tables.mineSmelterName' },
@@ -332,19 +333,6 @@ function checkProductList(
         versionDef.productList.productNumberLabelKey
       )
     }
-
-    if (!versionDef.productList.hasRequesterColumns) return
-
-    const requesterNumber = row.requesterNumber || ''
-    if (!requesterNumber.trim()) {
-      pushError(
-        errors,
-        'R',
-        ERROR_KEYS.checker.requiredField,
-        `productList.${index}.requesterNumber`,
-        'tables.requesterNumber'
-      )
-    }
   })
 }
 
@@ -468,6 +456,23 @@ function checkRequiredSmelterMinerals(params: {
   }
 }
 
+function checkDuplicateSmelterSelections(params: {
+  rows: FormDataForChecker['smelterList']
+  errors: CheckerError[]
+}) {
+  const duplicates = findDuplicateSmelterSelections(params.rows)
+  duplicates.forEach((duplicate) => {
+    pushError(
+      params.errors,
+      'R',
+      ERROR_KEYS.checker.duplicateSmelterSelection,
+      `smelterList.${duplicate.index}.id`,
+      undefined,
+      { field: duplicate.metal }
+    )
+  })
+}
+
 function checkSmelterList(
   versionDef: TemplateVersionDef,
   formState: FormStateForRequired,
@@ -500,6 +505,8 @@ function checkSmelterList(
       errors,
     })
   }
+
+  checkDuplicateSmelterSelections({ rows, errors })
 
   checkOutOfScopeSmelterMetals({
     rows,

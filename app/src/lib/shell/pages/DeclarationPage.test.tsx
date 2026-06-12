@@ -195,7 +195,7 @@ describe('DeclarationPage', () => {
     templateState.companyQuestionValues = {}
   })
 
-  test('shows declaration step sections as multi-expand collapse panels with header tags and de-duplicated inner titles', () => {
+  test('shows declaration step sections as single-expand collapse panels with header tags and de-duplicated inner titles', () => {
     navigationState.searchParams = new URLSearchParams()
     derivedState.companyQuestionsRequired = true
     derivedState.checkerErrors = [
@@ -222,7 +222,7 @@ describe('DeclarationPage', () => {
       items?: Array<{ key: string; label?: ReactNode; children?: ReactNode }>
     }
 
-    expect(collapseProps.accordion).not.toBe(true)
+    expect(collapseProps.accordion).toBe(true)
     expect(collapseProps.activeKey).toEqual(['companyInfo'])
     expect(collapseProps.items?.map((item) => item.key)).toEqual([
       'companyInfo',
@@ -391,14 +391,14 @@ describe('DeclarationPage', () => {
     expect(collapseProps.activeKey).toEqual(['companyQuestions'])
   })
 
-  test('keeps manual expanded panels after user changes collapse with focus param present', () => {
+  test('keeps only latest manual panel after user changes collapse with focus param present', () => {
     const activeKeys = getActiveDeclarationPanelKeys({
       focusFieldPath: 'companyInfo.companyName',
       ignoredFocusFieldPath: 'companyInfo.companyName',
       manualActivePanelKeys: ['companyInfo', 'companyQuestions'],
     })
 
-    expect(activeKeys).toEqual(['companyInfo', 'companyQuestions'])
+    expect(activeKeys).toEqual(['companyQuestions'])
   })
 
   test('uses focus panel before user changes collapse manually', () => {

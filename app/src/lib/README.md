@@ -142,6 +142,7 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 - 当用户后续将 `Q1/Q2` 改为否定或其它不满足当前模板门控的选项，导致某金属不再要求冶炼厂时，该金属在 `smelterList` 中的行会自动删除。
 - 该规则用于确保 checker 错误数与完成度一致，避免“错误为 0 但完成度下降”的状态偏差。
 - 对所有带 `smelterLookup` 下拉的模板版本，只要某一行已经选择 `metal`，该行的 `smelterLookup` 就属于 checker 必填；未选择时会直接判定为未完成。
+- 导入或 `setFormData()` 写入的 `Smelter List` 数据也会检查重复冶炼厂；判重口径与行内外部选择一致：同一个 `metal` 下按行 `id` 判重，`smelter-new-*` 临时 ID 不参与判重。
 
 **EMRT 申报范围默认值说明：**
 
@@ -437,7 +438,7 @@ return null
 
 - 当 `Declaration Scope = Product`（内部值 `scopeType === 'B'`）时，`Product List` 必须至少有 1 行数据。
 - `回复方的产品编号`（字段 `productNumber`）始终按必填处理。
-- 当模板配置 `hasRequesterColumns=true`（如 `CMRT 6.6`、`EMRT 2.11`、`AMRT 1.3 / 1.31`）时，`请求方的产品编号`（字段 `requesterNumber`）也按必填处理。
+- 当模板配置 `hasRequesterColumns=true`（如 `CMRT 6.6`、`EMRT 2.11`、`AMRT 1.3 / 1.31`）时，会展示请求方列，但 `请求方的产品编号`（字段 `requesterNumber`）不参与必填校验。
 - “请求方的产品编号 / 请求方的产品名称”只是前端显示文案调整，对接字段仍分别是 `requesterNumber / requesterName`。
 
 ### SmelterList 外部选择
@@ -462,6 +463,7 @@ return null
 - 点击“新增一行”时，库会先生成临时行 ID（格式：`smelter-new-<timestamp>`）。
 - 宿主回写了 `id` 后，库会使用该 `id` 覆盖临时行 ID；未回写 `id` 时本次回写无效并提示错误。
 - 同一个 `metal` 下禁止重复选择同一冶炼厂（按回写 `id` 去重）。
+- 导入或 `setFormData()` 写入的历史数据如果存在同一个 `metal` 下同一 `id` 的重复冶炼厂，也会在 checker / `validate()` 中报错；`smelter-new-*` 临时 ID 不参与判重。
 - 行内外部选择成功后（且非 `Smelter not listed / not yet identified`），`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state` 字段会锁定为不可编辑。
 - 锁定后的空字段不显示 placeholder，避免把 `Source ID`、`街道`、`城市` 等占位提示误看成真实数据；有真实值的只读文本会单行省略，鼠标悬浮显示全文。
 - 问题矩阵中被门控禁用的空回答框和空备注框同样不显示 placeholder，避免把“请选择”“备注”误看成已填内容。

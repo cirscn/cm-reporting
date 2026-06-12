@@ -40,7 +40,7 @@ export function getActiveDeclarationPanelKeys({
     return [getDeclarationPanelKeyForFieldPath(focusFieldPath)]
   }
 
-  return manualActivePanelKeys
+  return manualActivePanelKeys.slice(-1)
 }
 
 export const DECLARATION_PANEL_KEY_VALUES = DECLARATION_PANEL_KEYS

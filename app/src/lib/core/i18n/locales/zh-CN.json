@@ -420,7 +420,7 @@
     "passedEmpty": "暂无通过项",
     "passedProductList": "已填写产品清单",
     "passedProductRow": "产品清单第 {{index}} 行已填写产品编号",
-    "passedSmelterForMineral": "{{mineral}} 冶炼厂记录已填写",
+    "passedSmelterForMineral": "{{mineral}} 冶炼厂已填写",
     "sectionComplete": "{{section}} 必填项已完成",
     "validEmail": "邮箱有效：{{field}}",
     "submit": "提交",
@@ -456,8 +456,9 @@
     "requiredField": "{{field}} 为必填项。",
     "requiredCompanyQuestionComment": "需要填写备注：{{field}}。",
     "requiredProductList": "申报范围为 B 时必须填写产品列表。",
-    "requiredSmelterList": "{{field}} 需要填写冶炼厂记录。",
+    "requiredSmelterList": "{{field}} 需要填写冶炼厂。",
     "outOfScopeSmelterMetal": "当前申报范围不涉及“{{field}}”，请删除无关冶炼厂。",
+    "duplicateSmelterSelection": "同一个金属（{{field}}）下不能重复选择同一个冶炼厂，请删除重复行。",
     "invalidEmail": "邮箱格式不正确：{{field}}。"
   },
   "revision": {

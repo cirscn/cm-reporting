@@ -409,21 +409,6 @@ export function buildCheckerSummary(
         productCompleted += 1
         addPassed(`productList.${row.id}.productNumber`, t('checker.passedProductRow', { index: index + 1 }), productLabel)
       }
-
-      if (!versionDef.productList.hasRequesterColumns) return
-
-      totalRequired += 1
-      productRequired += 1
-      const requesterNumber = row.requesterNumber || ''
-      if (requesterNumber.trim()) {
-        completedRequired += 1
-        productCompleted += 1
-        addPassed(
-          `productList.${row.id}.requesterNumber`,
-          t('tables.requesterNumber'),
-          productLabel,
-        )
-      }
     })
     if (productRequired > 0 && productCompleted === productRequired) {
       addPassed(

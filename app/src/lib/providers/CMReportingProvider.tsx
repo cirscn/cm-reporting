@@ -4,6 +4,7 @@
  */
 
 import i18n, { initI18n, isI18nInitialized, type Locale } from '@core/i18n'
+import { ModalContainerContext } from '@ui/hooks/modalScopeContext'
 import { AppThemeScope } from '@ui/theme/AppThemeScope'
 import type { CMCSSVariables } from '@ui/theme/index'
 import { useAppThemeScopeStyle } from '@ui/theme/useAppThemeScopeStyle'
@@ -79,11 +80,13 @@ function CMReportingScopeRoot({ children, cssVariables, fallback }: CMReportingS
   return (
     <ConfigProvider getPopupContainer={getPopupContainer}>
       <div ref={scopeRef} className="cm-reporting-scope" style={scopeStyle}>
-        <AntApp style={FULL_HEIGHT_STYLE}>
-          <AppThemeScope>
-            <Suspense fallback={fallback}>{children}</Suspense>
-          </AppThemeScope>
-        </AntApp>
+        <ModalContainerContext.Provider value={getPopupContainer}>
+          <AntApp style={FULL_HEIGHT_STYLE}>
+            <AppThemeScope>
+              <Suspense fallback={fallback}>{children}</Suspense>
+            </AppThemeScope>
+          </AntApp>
+        </ModalContainerContext.Provider>
       </div>
     </ConfigProvider>
   )

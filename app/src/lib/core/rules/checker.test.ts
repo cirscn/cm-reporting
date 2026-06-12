@@ -287,7 +287,7 @@ describe('runChecker', () => {
     ).toBe(true)
   })
 
-  it('flags missing requester number when requester columns are enabled', () => {
+  it('allows missing requester number when requester columns are enabled', () => {
     const emrt = getVersionDef('emrt', '2.1')
     const formState: FormStateForRequired = {
       scopeType: 'B',
@@ -322,7 +322,7 @@ describe('runChecker', () => {
           error.fieldPath === 'productList.0.requesterNumber' &&
           error.messageKey === ERROR_KEYS.checker.requiredField
       )
-    ).toBe(true)
+    ).toBe(false)
   })
 
   it('does not require comment for CMRT company question E when selecting other format', () => {
@@ -660,6 +660,51 @@ describe('runChecker', () => {
 
     expect(lookupError?.messageKey).toBe(ERROR_KEYS.checker.requiredField)
     expect(lookupError?.fieldLabelKey).toBe('tables.smelterLookup')
+  })
+
+  it('flags imported duplicate smelter selections using the same rule as external picking', () => {
+    const mineralKey = 'gold'
+    const formState: FormStateForRequired = {
+      scopeType: 'A',
+      questionAnswers: {
+        Q1: buildMineralAnswerMap(cmrt, 'Yes'),
+        Q2: buildMineralAnswerMap(cmrt, 'Yes'),
+      },
+    }
+    const formData = buildFormData({
+      companyInfo: buildCompanyInfo(cmrt),
+      questions: formState.questionAnswers,
+      smelterList: [
+        {
+          id: 'smelter-external-1',
+          metal: mineralKey,
+          smelterLookup: 'Gold Smelter A',
+        },
+        {
+          id: 'smelter-external-1',
+          metal: mineralKey,
+          smelterLookup: 'Gold Smelter A',
+        },
+        {
+          id: 'smelter-external-1',
+          metal: 'tin',
+          smelterLookup: 'Tin Smelter A',
+        },
+        {
+          id: 'smelter-new-1',
+          metal: mineralKey,
+          smelterLookup: 'Temporary Gold Smelter',
+        },
+      ],
+    })
+
+    const errors = runChecker(cmrt, formState, formData)
+    const duplicateErrors = errors.filter(
+      (error) => error.messageKey === ERROR_KEYS.checker.duplicateSmelterSelection
+    )
+
+    expect(duplicateErrors).toHaveLength(1)
+    expect(duplicateErrors[0]?.fieldPath).toBe('smelterList.1.id')
   })
 
   it('flags CMRT imported smelter row when its metal is not selectable by Q1/Q2', () => {

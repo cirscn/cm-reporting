@@ -5,7 +5,7 @@
 
 // 说明：将错误分组规则下沉到 core，避免 UI 重复维护。
 import type { I18nKey } from '@core/i18n'
-import type { TemplateType, TemplateVersionDef } from '@core/registry/types'
+import type { TemplateVersionDef } from '@core/registry/types'
 import { ERROR_KEYS } from '@core/validation/errorKeys'
 import { groupBy } from 'lodash-es'
 
@@ -30,34 +30,16 @@ export type ErrorGroup = {
   items: CheckerError[]
 }
 
-const CMRT_GROUP_ORDER: Array<{ key: ErrorGroupKey; labelKey: I18nKey }> = [
+const CHECKER_GROUP_ORDER: Array<{ key: ErrorGroupKey; labelKey: I18nKey }> = [
   { key: 'companyInfo', labelKey: 'checker.groups.companyInfo' },
+  { key: 'smelter', labelKey: 'checker.groups.smelter' },
   { key: 'mineralsScope', labelKey: 'checker.groups.mineralsScope' },
   { key: 'questionMatrix', labelKey: 'checker.groups.questionMatrix' },
   { key: 'companyQuestions', labelKey: 'checker.groups.companyQuestions' },
-  { key: 'smelter', labelKey: 'checker.groups.smelter' },
   { key: 'mine', labelKey: 'checker.groups.mine' },
   { key: 'product', labelKey: 'checker.groups.product' },
   { key: 'other', labelKey: 'checker.groups.other' },
 ] as const
-
-const DEFAULT_GROUP_ORDER: Array<{ key: ErrorGroupKey; labelKey: I18nKey }> = [
-  { key: 'companyInfo', labelKey: 'checker.groups.companyInfo' },
-  { key: 'mineralsScope', labelKey: 'checker.groups.mineralsScope' },
-  { key: 'questionMatrix', labelKey: 'checker.groups.questionMatrix' },
-  { key: 'companyQuestions', labelKey: 'checker.groups.companyQuestions' },
-  { key: 'product', labelKey: 'checker.groups.product' },
-  { key: 'smelter', labelKey: 'checker.groups.smelter' },
-  { key: 'mine', labelKey: 'checker.groups.mine' },
-  { key: 'other', labelKey: 'checker.groups.other' },
-] as const
-
-/**
- * 选择分组顺序：CMRT 按 Excel Checker（Smelter 在 Product 之前），
- * 其余模板按 PRD（Product 在 Smelter 之前）。
- */
-const getGroupOrder = (templateType?: TemplateType) =>
-  templateType === 'cmrt' ? CMRT_GROUP_ORDER : DEFAULT_GROUP_ORDER
 
 const getGroupKey = (fieldPath: string): ErrorGroupKey => {
   const prefix = fieldPath.split('.')[0]
@@ -94,8 +76,9 @@ const buildOrderMap = (keys: string[]) =>
 
 const getSmelterMessageRank = (error: CheckerError) => {
   if (error.messageKey === ERROR_KEYS.checker.requiredSmelterList) return 0
+  if (error.messageKey === ERROR_KEYS.checker.duplicateSmelterSelection) return 1
   if (error.messageKey === ERROR_KEYS.checker.outOfScopeSmelterMetal) return 2
-  return 1
+  return 3
 }
 
 const buildSortKeyFactory = (versionDef: TemplateVersionDef | undefined) => {
@@ -171,9 +154,8 @@ export function groupCheckerErrors(
 ): ErrorGroup[] {
   const grouped = groupBy(errors, (error) => getGroupKey(error.fieldPath))
   const sortKeyFactory = buildSortKeyFactory(versionDef)
-  const groupOrder = getGroupOrder(versionDef?.templateType)
 
-  return groupOrder.flatMap((group) => {
+  return CHECKER_GROUP_ORDER.flatMap((group) => {
     const items = grouped[group.key]
     if (!items || items.length === 0) return []
     const sorted = [...items].sort((a, b) =>

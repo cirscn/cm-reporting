@@ -227,6 +227,7 @@ export function DeclarationPage() {
   return (
     <Flex vertical gap={LAYOUT.sectionGap}>
       <Collapse
+        accordion
         items={declarationPanels}
         activeKey={activePanelKeys}
         onChange={(keys) =>

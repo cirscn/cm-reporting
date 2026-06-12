@@ -11,10 +11,11 @@ function readTableSource(fileName: string): string {
 }
 
 describe('table modal context usage', () => {
-  test.each(TABLE_FILES)('%s uses App modal instead of static Modal methods', (fileName) => {
+  test.each(TABLE_FILES)('%s uses scoped modal instead of direct modal APIs', (fileName) => {
     const source = readTableSource(fileName)
 
-    expect(source).toContain('App.useApp()')
+    expect(source).toContain('useScopedModal()')
+    expect(source).not.toContain('App.useApp()')
     expect(source).not.toMatch(STATIC_MODAL_METHOD_PATTERN)
   })
 })

@@ -1,0 +1,39 @@
+/* Command modal positioning fallback for host style gaps. */
+.cm-reporting-scope .cm-reporting-modal-root .cm-reporting-modal-wrap {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: fixed;
+  inset: 0;
+  overflow: auto;
+  outline: 0;
+}
+
+.cm-reporting-scope .cm-reporting-modal-root .cm-reporting-modal-wrap .ant-modal {
+  position: relative;
+  top: 100px;
+  width: auto;
+  max-width: calc(100vw - 32px);
+  margin: 0 auto;
+}
+
+.cm-reporting-scope .cm-reporting-modal-root .cm-reporting-modal-wrap.ant-modal-centered {
+  align-items: center;
+  text-align: center;
+}
+
+.cm-reporting-scope .cm-reporting-modal-root .cm-reporting-modal-wrap.ant-modal-centered::before {
+  display: inline-block;
+  width: 0;
+  height: 100%;
+  vertical-align: middle;
+  content: "";
+}
+
+.cm-reporting-scope .cm-reporting-modal-root .cm-reporting-modal-wrap.ant-modal-centered .ant-modal {
+  top: 0;
+  display: inline-block;
+  padding-bottom: 0;
+  text-align: start;
+  vertical-align: middle;
+}
