@@ -606,6 +606,8 @@ const { snapshot, ctx } = cirsGpmLegacyAdapter.toInternal(legacyJson)
 // ctx: CirsGpmLegacyRoundtripContext — 保存用于精确回写
 ```
 
+> Legacy `cmtCompany.effectiveDate` 有值时按原时间戳转换；为空字符串、空白字符串、`0` 或 `'0'` 时按未填写处理，导入后的 `companyInfo.authorizationDate` 为空，不会显示 1970-01-01。
+
 ### 导出 Snapshot → Legacy JSON
 
 **精确回写（Roundtrip）**：需要导入时保存的 `ctx`

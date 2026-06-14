@@ -21,6 +21,8 @@ import { parseCirsGpmLegacyReport } from './parse'
 import { getCirsGpmLegacyPlan, normalizeMineralLabel } from './planCache'
 import type { CirsGpmLegacyRoundtripContext, NullableFieldState } from './types'
 
+const LEGACY_EMPTY_EFFECTIVE_DATE_TIMESTAMP = 0
+
 function readFieldState(obj: Record<string, unknown> | undefined, key: string): NullableFieldState {
   if (!obj) return { exists: false, wasNull: false, wasString: false, wasNumber: false }
   const exists = Object.prototype.hasOwnProperty.call(obj, key)
@@ -61,8 +63,15 @@ function normalizeLegacyAnswer(templateType: string, questionKey: string, value:
   return trimmed
 }
 
+function isEmptyLegacyEffectiveDate(value: string | number | null | undefined): boolean {
+  if (value === null || value === undefined) return true
+  if (typeof value === 'number') return value === LEGACY_EMPTY_EFFECTIVE_DATE_TIMESTAMP
+  const trimmed = value.trim()
+  return !trimmed || trimmed === String(LEGACY_EMPTY_EFFECTIVE_DATE_TIMESTAMP)
+}
+
 function epochMsToDateString(value: string | number | null | undefined): string {
-  if (value === null || value === undefined) return ''
+  if (isEmptyLegacyEffectiveDate(value)) return ''
   const ms = typeof value === 'number' ? value : Number(value)
   if (!Number.isFinite(ms)) return ''
   return epochMsToChinaIsoDate(ms) ?? ''

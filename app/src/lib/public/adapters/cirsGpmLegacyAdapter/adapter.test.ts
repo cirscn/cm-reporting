@@ -37,6 +37,28 @@ describe('cirsGpmLegacyAdapter', () => {
     expect(snapshot.data.companyInfo.authorizationDate).toBe('2025-06-12')
   })
 
+  test('keeps empty legacy effectiveDate as an empty authorizationDate', () => {
+    const legacy = asRecord(loadFixture('cmrt.json'))
+    const company = asRecord(legacy.cmtCompany)
+    company.effectiveDate = ''
+
+    const { snapshot } = cirsGpmLegacyAdapter.toInternal(legacy)
+
+    expect(snapshot.data.companyInfo.authorizationDate).toBe('')
+  })
+
+  test('keeps zero legacy effectiveDate sentinel as an empty authorizationDate', () => {
+    for (const effectiveDate of [0, '0'] as const) {
+      const legacy = asRecord(loadFixture('cmrt.json'))
+      const company = asRecord(legacy.cmtCompany)
+      company.effectiveDate = effectiveDate
+
+      const { snapshot } = cirsGpmLegacyAdapter.toInternal(legacy)
+
+      expect(snapshot.data.companyInfo.authorizationDate).toBe('')
+    }
+  })
+
   test('roundtrip (EMRT) keeps legacy JSON exactly', () => {
     const legacy = loadFixture('emrt.json')
     const { snapshot, ctx } = cirsGpmLegacyAdapter.toInternal(legacy)
