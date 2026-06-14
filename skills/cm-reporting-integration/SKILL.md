@@ -28,7 +28,7 @@ Apply these rules in every solution:
 - Treat Snapshot as full-state contract (`schemaVersion/templateType/versionId/data`).
 - Before calling `cirsGpmLegacyAdapter.toInternal(...)`, normalize only the known legacy nullable-array fields from `null` to `[]`: `cmtRangeQuestions`, `cmtCompanyQuestions`, `cmtSmelters`, `cmtParts`, `minList`, `amrtReasonList`.
 - Do not silently coerce unrelated wrong types in legacy payloads; keep non-contract violations visible.
-- `companyInfo.authorizationDate` 推荐传 `YYYY-MM-DD`；运行时兼容秒/毫秒时间戳（number/数字字符串），并会归一化为 `YYYY-MM-DD`。
+- `companyInfo.authorizationDate` 推荐传 `YYYY-MM-DD`；运行时兼容秒/毫秒时间戳（number/数字字符串），并会按北京时间日历日归一化为 `YYYY-MM-DD`，例如 `1749657600000` 会得到 `2025-06-12`。
 - Return integrations callback result in `{ items: [...] } | null | undefined` shape only.
 - 对 `SmelterList` 外部回写结果，`id` 与冶炼厂识别号码语义严格分离：`id` 仅用于行主键与去重判定；识别号码应由 `smelterNumber` 回写并仅用于展示（`smelterId` 仅内部兼容）。
 - `SmelterList` 新增行应先生成临时 ID（`smelter-new-<timestamp>`）；宿主外部选择回写 `id` 后覆盖该临时 ID，未回写 `id` 时本次回写无效并提示错误。

@@ -11,6 +11,10 @@ describe('normalizeAuthorizationDateInput', () => {
     expect(normalizeAuthorizationDateInput(1770595200000)).toBe('2026-02-09')
   })
 
+  test('converts China local midnight millisecond timestamp to ISO date', () => {
+    expect(normalizeAuthorizationDateInput(1749657600000)).toBe('2025-06-12')
+  })
+
   test('converts second timestamp to ISO date', () => {
     expect(normalizeAuthorizationDateInput(1770595200)).toBe('2026-02-09')
   })
@@ -18,6 +22,7 @@ describe('normalizeAuthorizationDateInput', () => {
   test('converts numeric timestamp string to ISO date', () => {
     expect(normalizeAuthorizationDateInput('1770595200000')).toBe('2026-02-09')
     expect(normalizeAuthorizationDateInput('1770595200')).toBe('2026-02-09')
+    expect(normalizeAuthorizationDateInput('1749657600000')).toBe('2025-06-12')
   })
 
   test('handles older timestamps correctly by digit-based detection', () => {

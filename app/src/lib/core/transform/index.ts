@@ -24,6 +24,14 @@ const MONTH_NAMES = [
 
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
 const INTEGER_PATTERN = /^-?\d+$/
+const DATE_PART_PAD_LENGTH = 2
+const CHINA_TIME_ZONE_OFFSET_HOURS = 8
+const MINUTES_PER_HOUR = 60
+const SECONDS_PER_MINUTE = 60
+const MILLISECONDS_PER_SECOND = 1000
+const MILLISECONDS_PER_MINUTE = SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND
+const MILLISECONDS_PER_HOUR = MINUTES_PER_HOUR * MILLISECONDS_PER_MINUTE
+const CHINA_TIME_ZONE_OFFSET_MS = CHINA_TIME_ZONE_OFFSET_HOURS * MILLISECONDS_PER_HOUR
 const TIMESTAMP_SECONDS_DIGITS_MIN = 9
 const TIMESTAMP_SECONDS_DIGITS_MAX = 10
 const TIMESTAMP_MILLISECONDS_DIGITS_MIN = 11
@@ -53,13 +61,13 @@ export function toIsoDate(displayDate: string): string {
   return `${year}-${month}-${day?.padStart(2, '0')}`
 }
 
-function epochMsToIsoDate(epochMs: number): string | null {
+export function epochMsToChinaIsoDate(epochMs: number): string | null {
   if (!Number.isFinite(epochMs)) return null
-  const date = new Date(epochMs)
+  const date = new Date(epochMs + CHINA_TIME_ZONE_OFFSET_MS)
   if (Number.isNaN(date.getTime())) return null
   const year = date.getUTCFullYear()
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
-  const day = String(date.getUTCDate()).padStart(2, '0')
+  const month = String(date.getUTCMonth() + 1).padStart(DATE_PART_PAD_LENGTH, '0')
+  const day = String(date.getUTCDate()).padStart(DATE_PART_PAD_LENGTH, '0')
   return `${year}-${month}-${day}`
 }
 
@@ -78,10 +86,10 @@ function normalizeNumericTimestamp(raw: number, rawText?: string): string | null
   if (!Number.isInteger(raw)) return null
   const digits = countTimestampDigits(raw, rawText)
   if (digits >= TIMESTAMP_MILLISECONDS_DIGITS_MIN && digits <= TIMESTAMP_MILLISECONDS_DIGITS_MAX) {
-    return epochMsToIsoDate(raw)
+    return epochMsToChinaIsoDate(raw)
   }
   if (digits >= TIMESTAMP_SECONDS_DIGITS_MIN && digits <= TIMESTAMP_SECONDS_DIGITS_MAX) {
-    return epochMsToIsoDate(raw * 1000)
+    return epochMsToChinaIsoDate(raw * MILLISECONDS_PER_SECOND)
   }
   return null
 }

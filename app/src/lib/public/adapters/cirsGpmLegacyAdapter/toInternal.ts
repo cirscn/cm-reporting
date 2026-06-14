@@ -11,6 +11,7 @@
 
 import { createEmptyFormData } from '@core/template/formDefaults'
 import { deepCloneJson } from '@core/template/strings'
+import { epochMsToChinaIsoDate } from '@core/transform'
 import type { MineRow, MineralsScopeRow, ProductRow, SmelterRow } from '@core/types/tableRows'
 
 import type { ReportSnapshotV1 } from '../../snapshot'
@@ -64,11 +65,7 @@ function epochMsToDateString(value: string | number | null | undefined): string 
   if (value === null || value === undefined) return ''
   const ms = typeof value === 'number' ? value : Number(value)
   if (!Number.isFinite(ms)) return ''
-  const d = new Date(ms)
-  const y = d.getUTCFullYear()
-  const m = String(d.getUTCMonth() + 1).padStart(2, '0')
-  const day = String(d.getUTCDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
+  return epochMsToChinaIsoDate(ms) ?? ''
 }
 
 // humanizeKey / createEmptyFormData / deepCloneJson 已提取到 @core/template/strings.ts 和 @core/template/formDefaults.ts

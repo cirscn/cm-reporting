@@ -280,7 +280,7 @@ interface ReportSnapshotV1 {
 ```
 
 > `companyInfo.authorizationDate` 的内部标准格式为 `YYYY-MM-DD`。  
-> 运行时导入（如 `parseSnapshot` / `setSnapshot` 回填）额外兼容时间戳输入（秒级或毫秒级，number/数字字符串），并会自动归一化为 `YYYY-MM-DD`。
+> 运行时导入（如 `parseSnapshot` / `setSnapshot` 回填）额外兼容时间戳输入（秒级或毫秒级，number/数字字符串），并会按北京时间日历日自动归一化为 `YYYY-MM-DD`；例如 `1749657600000` 会得到 `2025-06-12`。
 
 ### 导出 JSON
 
@@ -320,7 +320,7 @@ ref.current?.setSnapshot(snapshot)
 ```
 
 - 推荐传 `YYYY-MM-DD`。
-- 运行时兼容秒/毫秒时间戳（如 `1770595200` / `1770595200000`），内部会归一化为 `YYYY-MM-DD`。
+- 运行时兼容秒/毫秒时间戳（如 `1770595200` / `1770595200000`），内部会按北京时间日历日归一化为 `YYYY-MM-DD`；例如 `1749657600000` 会得到 `2025-06-12`。
 - 非法日期（如 `2026/02/09`）不会被自动修正，仍由现有校验提示错误。
 
 ### 初始化（编辑旧报告）

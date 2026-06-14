@@ -27,6 +27,16 @@ describe('cirsGpmLegacyAdapter', () => {
     expect(out).toEqual(legacy)
   })
 
+  test('reads China local midnight effectiveDate as the same calendar date', () => {
+    const legacy = asRecord(loadFixture('cmrt.json'))
+    const company = asRecord(legacy.cmtCompany)
+    company.effectiveDate = '1749657600000'
+
+    const { snapshot } = cirsGpmLegacyAdapter.toInternal(legacy)
+
+    expect(snapshot.data.companyInfo.authorizationDate).toBe('2025-06-12')
+  })
+
   test('roundtrip (EMRT) keeps legacy JSON exactly', () => {
     const legacy = loadFixture('emrt.json')
     const { snapshot, ctx } = cirsGpmLegacyAdapter.toInternal(legacy)
