@@ -1,5 +1,11 @@
 # cm-reporting
 
+## 0.8.12
+
+### Patch Changes
+
+- 87bde29: 修复 legacy 导入中公司信息完成日期未填写时被显示为 1970-01-01 的问题。
+
 ## 0.8.11
 
 ### Patch Changes
