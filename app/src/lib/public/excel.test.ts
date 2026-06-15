@@ -99,11 +99,11 @@ describe('exportToExcel', () => {
         productList: [
           {
             id: 'product-1',
-            productNumber: 'RESP-001',
-            productName: 'Responder Product',
-            requesterNumber: 'REQ-001',
-            requesterName: 'Requester Product',
-            comments: 'Product note',
+            partNumber: 'RESP-001',
+            partName: 'Responder Product',
+            requestPartNumber: 'REQ-001',
+            requestPartName: 'Requester Product',
+            remark: 'Product note',
           },
         ],
       },

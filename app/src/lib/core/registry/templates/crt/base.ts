@@ -183,8 +183,8 @@ export function buildCrtVersionDef(override: CrtVersionOverride): TemplateVersio
     mineList: { available: false },
     productList: {
       hasRequesterColumns: false,
-      productNumberLabelKey: 'productList.crt.manufacturerNumber',
-      productNameLabelKey: 'productList.crt.manufacturerName',
+      partNumberLabelKey: 'productList.crt.manufacturerNumber',
+      partNameLabelKey: 'productList.crt.manufacturerName',
       commentLabelKey: 'productList.crt.comment',
     },
     dateConfig: LIMITED_AUTHORIZATION_DATE_CONFIG,

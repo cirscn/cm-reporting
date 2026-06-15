@@ -35,8 +35,15 @@ function hasInputEnabledByPlaceholder(html: string, placeholder: string): boolea
   ).test(html)
 }
 
+function hasDisabledInputByValue(html: string, value: string): boolean {
+  const escapedValue = escapeRegExp(value)
+  return new RegExp(`<input(?=[^>]*value="${escapedValue}")(?=[^>]*disabled="")[^>]*>`).test(
+    html,
+  )
+}
+
 function hasCountrySelectDisabled(html: string): boolean {
-  return /<div class="[^"]*ant-select[^"]*ant-select-disabled[^"]*">/.test(html)
+  return /class="[^"]*ant-select-disabled[^"]*"/.test(html)
 }
 
 function hasCountrySelectEnabled(html: string): boolean {
@@ -151,6 +158,28 @@ describe('SmelterListTable readOnly disabled behavior', () => {
     expect(html).not.toContain('placeholder="placeholders.smelterSourceId"')
     expect(html).not.toContain('placeholder="placeholders.smelterStreet"')
     expect(html).not.toContain('placeholder="placeholders.smelterCity"')
+  })
+
+  test('locks custom not listed smelter fields selected from external picker', () => {
+    const html = renderExternallyLockedSmelterListTable({
+      id: 'custom-not-listed-1',
+      smelterLookup: SMELTER_LOOKUP_META.notListed,
+      smelterName: 'Custom Smelter',
+      smelterCountry: 'Morocco',
+      smelterNumber: 'CID-CUSTOM-1',
+      smelterIdentification: 'CID-CUSTOM-1',
+      sourceId: 'RMI',
+      smelterStreet: '12 Custom Street',
+      smelterCity: 'Rabat',
+      smelterState: 'Rabat-Sale-Kenitra',
+    })
+
+    expect(hasDisabledInputByValue(html, 'Custom Smelter')).toBe(true)
+    expect(hasDisabledInputByValue(html, 'CID-CUSTOM-1')).toBe(true)
+    expect(hasDisabledInputByValue(html, 'RMI')).toBe(true)
+    expect(hasDisabledInputByValue(html, '12 Custom Street')).toBe(true)
+    expect(hasDisabledInputByValue(html, 'Rabat')).toBe(true)
+    expect(hasCountrySelectDisabled(html)).toBe(true)
   })
 
   test('adds full text title for locked text fields so ellipsis can reveal content', () => {

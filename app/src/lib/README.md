@@ -428,7 +428,7 @@ interface ProductPickContext {
 
 ```ts
 // 确认选择：返回 items 数组（追加到列表末尾）
-return { items: [{ productNumber: 'P-001', productName: 'xxx' }] }
+return { items: [{ partNumber: 'P-001', partName: 'xxx' }] }
 
 // 取消选择
 return null
@@ -437,9 +437,10 @@ return null
 **Product List 当前规则：**
 
 - 当 `Declaration Scope = Product`（内部值 `scopeType === 'B'`）时，`Product List` 必须至少有 1 行数据。
-- `回复方的产品编号`（字段 `productNumber`）始终按必填处理。
-- 当模板配置 `hasRequesterColumns=true`（如 `CMRT 6.6`、`EMRT 2.11`、`AMRT 1.3 / 1.31`）时，会展示请求方列，但 `请求方的产品编号`（字段 `requesterNumber`）不参与必填校验。
-- “请求方的产品编号 / 请求方的产品名称”只是前端显示文案调整，对接字段仍分别是 `requesterNumber / requesterName`。
+- `回复方的产品编号`（字段 `partNumber`）始终按必填处理。
+- `回复方的产品名称` 对应字段 `partName`，注释对应字段 `remark`。
+- 当模板配置 `hasRequesterColumns=true`（如 `CMRT 6.6`、`EMRT 2.11`、`AMRT 1.3 / 1.31`）时，会展示请求方列，但 `请求方的产品编号`（字段 `requestPartNumber`）不参与必填校验。
+- `请求方的产品名称` 对应字段 `requestPartName`。
 
 ### SmelterList 外部选择
 
@@ -464,7 +465,7 @@ return null
 - 宿主回写了 `id` 后，库会使用该 `id` 覆盖临时行 ID；未回写 `id` 时本次回写无效并提示错误。
 - 同一个 `metal` 下禁止重复选择同一冶炼厂（按回写 `id` 去重）。
 - 导入或 `setFormData()` 写入的历史数据如果存在同一个 `metal` 下同一 `id` 的重复冶炼厂，也会在 checker / `validate()` 中报错；`smelter-new-*` 临时 ID 不参与判重。
-- 行内外部选择成功后（且非 `Smelter not listed / not yet identified`），`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state` 字段会锁定为不可编辑。
+- 行内外部选择成功后（包括宿主回写正式 `id` 的自定义 `Smelter not listed`，不包括手动新增的临时 `Smelter not listed` 与 `Smelter not yet identified`），`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state` 字段会锁定为不可编辑。
 - 锁定后的空字段不显示 placeholder，避免把 `Source ID`、`街道`、`城市` 等占位提示误看成真实数据；有真实值的只读文本会单行省略，鼠标悬浮显示全文。
 - 问题矩阵中被门控禁用的空回答框和空备注框同样不显示 placeholder，避免把“请选择”“备注”误看成已填内容。
 - 如果宿主外部回写只带了 `smelterName`、没带 `smelterLookup`，库会自动用 `smelterName` 回填到 `smelterLookup`，保证“冶炼厂查找”列显示正常，且 checker 不会把该行继续判成未选择冶炼厂。

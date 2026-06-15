@@ -245,7 +245,7 @@ Integrations 允许宿主接管冶炼厂/产品的"选择"交互，典型场景�
       label: '从系统选择产品',
       onPickProducts: async (ctx) => {
         // ctx.currentRows — 当前已有行
-        return { items: [{ productNumber: 'P-001', productName: 'xxx' }] }
+        return { items: [{ partNumber: 'P-001', partName: 'xxx' }] }
       },
     },
   }}

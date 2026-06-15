@@ -27,7 +27,7 @@
 - 冶炼厂新增行会先使用临时 ID（`smelter-new-<timestamp>`），当宿主外部选择回写 `id` 后覆盖临时 ID；若未回写 `id` 则本次回写无效并提示错误。
 - 同一个 `metal` 下不能重复选择同一冶炼厂（按回写 `id` 判重）。
 - 导入或 `setFormData()` 写入的历史数据也会按同一口径进入 checker / `validate()`；同一 `metal` 下重复的非临时 `id` 会报错，`smelter-new-*` 临时 ID 不参与判重。
-- 行内外部选择成功后（非 `Smelter not listed / not yet identified`），`smelterNumber`、`国家`、`冶炼厂识别`、`识别号来源`、`街道`、`城市`、`州/省` 会自动锁定为不可编辑。
+- 行内外部选择成功后（包括宿主回写正式 `id` 的自定义 `Smelter not listed`，不包括手动新增的临时 `Smelter not listed` 与 `Smelter not yet identified`），`smelterNumber`、`国家`、`冶炼厂识别`、`识别号来源`、`街道`、`城市`、`州/省` 会自动锁定为不可编辑。
 - 锁定后的空字段不显示 placeholder；有真实值的只读文本会单行省略，鼠标悬浮显示全文。
 - 如果宿主外部回写只带了 `smelterName`、没带 `smelterLookup`，示例里的“冶炼厂查找”列会自动显示这个名称，checker 也会按该值判断为已选冶炼厂。
 - 外部回写时，`smelterNumber` 对应 CID，示例里的“冶炼厂识别”列也显示这个 CID；`sourceId` 对应 RMI 来源识别号。若宿主暂时把 RMI 来源放在 `smelterIdentification` 且未传 `sourceId`，库会归一化到 `sourceId`。
@@ -64,7 +64,7 @@
 - 当 `Declaration Scope` 选择 `Product` 时，`Product List` 不能为空。
 - `回复方的产品编号` 始终必填。
 - 如果当前模板带请求方列（如 `CMRT 6.6`、`EMRT 2.11`、`AMRT 1.3 / 1.31`），会展示 `请求方的产品编号`，但它不参与必填校验。
-- 示例里的请求方列表头已经统一成 `Requester Product # / Requester Product Name`，但对接字段仍然是 `requesterNumber / requesterName`。
+- 示例里的请求方列表头已经统一成 `Requester Product # / Requester Product Name`，对接字段是 `requestPartNumber / requestPartName`。
 
 ### 冶炼厂表头行为（当前示例）
 

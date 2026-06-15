@@ -245,8 +245,8 @@ export function buildAmrtVersionDef(override: AmrtVersionOverride): TemplateVers
     },
     productList: {
       hasRequesterColumns: override.productList.hasRequesterColumns,
-      productNumberLabelKey: 'productList.amrt.manufacturerNumber',
-      productNameLabelKey: 'productList.amrt.manufacturerName',
+      partNumberLabelKey: 'productList.amrt.manufacturerNumber',
+      partNameLabelKey: 'productList.amrt.manufacturerName',
       commentLabelKey: 'productList.amrt.comment',
     },
     dateConfig: AMRT_OPEN_DATE_VERSION_IDS.has(override.id)

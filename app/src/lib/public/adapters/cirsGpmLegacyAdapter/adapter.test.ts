@@ -115,26 +115,26 @@ describe('cirsGpmLegacyAdapter', () => {
     expect(range.some((x) => x.question === 'My Custom Metal')).toBe(false)
   })
 
-	  test('reads legacy product list aliases (CMRT: partNumber/partName/remark)', () => {
-	    const legacy = loadFixture('cmrt_parts_alt.json')
-	    const { snapshot, ctx } = cirsGpmLegacyAdapter.toInternal(legacy)
+  test('reads legacy product list aliases (CMRT: partNumber/partName/remark)', () => {
+    const legacy = loadFixture('cmrt_parts_alt.json')
+    const { snapshot, ctx } = cirsGpmLegacyAdapter.toInternal(legacy)
 
-	    expect(snapshot.data.productList[0]?.productNumber).toBe('物料号1')
-	    expect(snapshot.data.productList[0]?.productName).toBe('物料名称1')
-	    expect(snapshot.data.productList[0]?.requesterNumber).toBeUndefined()
-	    expect(snapshot.data.productList[0]?.requesterName).toBeUndefined()
-	    expect(snapshot.data.productList[0]?.comments).toBe('备注1')
+    expect(snapshot.data.productList[0]?.partNumber).toBe('物料号1')
+    expect(snapshot.data.productList[0]?.partName).toBe('物料名称1')
+    expect(snapshot.data.productList[0]?.requestPartNumber).toBeUndefined()
+    expect(snapshot.data.productList[0]?.requestPartName).toBeUndefined()
+    expect(snapshot.data.productList[0]?.remark).toBe('备注1')
 
-	    const out = cirsGpmLegacyAdapter.toExternal(snapshot, ctx)
-	    expect(out).toEqual(legacy)
-	  })
+    const out = cirsGpmLegacyAdapter.toExternal(snapshot, ctx)
+    expect(out).toEqual(legacy)
+  })
 
   test('writes back to legacy product list alias keys on edit (CMRT)', () => {
     const legacy = loadFixture('cmrt_parts_alt.json')
     const { snapshot, ctx } = cirsGpmLegacyAdapter.toInternal(legacy)
 
-    snapshot.data.productList[0]!.productName = '新名称'
-    snapshot.data.productList[0]!.comments = '新备注'
+    snapshot.data.productList[0]!.partName = '新名称'
+    snapshot.data.productList[0]!.remark = '新备注'
 
     const out = cirsGpmLegacyAdapter.toExternal(snapshot, ctx)
     const parts = asArray(asRecord(out).cmtParts).map(asRecord)

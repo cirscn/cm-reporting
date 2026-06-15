@@ -10,14 +10,17 @@ describe('schema - product row', () => {
 
     const schema = buildProductRowSchema(versionDef)
     const parsed = schema.parse({
-      productNumber: 'PN',
-      productName: 'Name',
-      requesterNumber: 'REQ-PN',
-      requesterName: 'REQ-Name',
-      comments: 'C',
+      partNumber: 'PN',
+      partName: 'Name',
+      requestPartNumber: 'REQ-PN',
+      requestPartName: 'REQ-Name',
+      remark: 'C',
     })
 
-    expect(parsed.requesterNumber).toBe('REQ-PN')
-    expect(parsed.requesterName).toBe('REQ-Name')
+    expect(parsed.partNumber).toBe('PN')
+    expect(parsed.partName).toBe('Name')
+    expect(parsed.requestPartNumber).toBe('REQ-PN')
+    expect(parsed.requestPartName).toBe('REQ-Name')
+    expect(parsed.remark).toBe('C')
   })
 })

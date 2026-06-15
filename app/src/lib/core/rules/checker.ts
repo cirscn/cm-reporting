@@ -323,14 +323,14 @@ function checkProductList(
   }
 
   rows.forEach((row, index) => {
-    const productNumber = row.productNumber || ''
-    if (!productNumber.trim()) {
+    const partNumber = row.partNumber || ''
+    if (!partNumber.trim()) {
       pushError(
         errors,
         'R',
         ERROR_KEYS.checker.requiredField,
-        `productList.${index}.productNumber`,
-        versionDef.productList.productNumberLabelKey
+        `productList.${index}.partNumber`,
+        versionDef.productList.partNumberLabelKey
       )
     }
   })

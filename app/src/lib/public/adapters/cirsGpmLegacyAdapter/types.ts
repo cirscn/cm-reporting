@@ -167,7 +167,7 @@ export interface CirsGpmLegacyRoundtripContext {
 
   productLegacyIndexByInternalId: Map<string, number>
   productFieldStatesByIndex: Map<number, Map<string, NullableFieldState>>
-  productLegacyKeyByInternalKeyByIndex: Map<number, Map<'productNumber' | 'productName' | 'requesterNumber' | 'requesterName' | 'comments', string>>
+  productLegacyKeyByInternalKeyByIndex: Map<number, Map<'partNumber' | 'partName' | 'requestPartNumber' | 'requestPartName' | 'remark', string>>
 
   amrtReasonIndexByInternalId: Map<string, number>
   amrtReasonFieldStatesByIndex: Map<number, Map<string, NullableFieldState>>

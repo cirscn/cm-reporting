@@ -544,8 +544,8 @@ function patchProducts(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpmLeg
     return null
   })()
   const keyFor = (
-    mapping: Map<'productNumber' | 'productName' | 'requesterNumber' | 'requesterName' | 'comments', string> | null | undefined,
-    internalKey: 'productNumber' | 'productName' | 'requesterNumber' | 'requesterName' | 'comments',
+    mapping: Map<'partNumber' | 'partName' | 'requestPartNumber' | 'requestPartName' | 'remark', string> | null | undefined,
+    internalKey: 'partNumber' | 'partName' | 'requestPartNumber' | 'requestPartName' | 'remark',
     fallback: string
   ): string => mapping?.get(internalKey) ?? fallback
 
@@ -557,28 +557,28 @@ function patchProducts(out: CirsGpmLegacyReport, data: FormData, ctx: CirsGpmLeg
       const mapping = ctx.productLegacyKeyByInternalKeyByIndex.get(legacyIndex) ?? null
       const write = (key: string, value: string) => writeLegacyField(item, states, key, value)
 
-      write(keyFor(mapping, 'productNumber', 'productNumber'), row.productNumber)
-      write(keyFor(mapping, 'productName', 'productName'), row.productName)
-      write(keyFor(mapping, 'requesterNumber', 'requesterNumber'), row.requesterNumber ?? '')
-      write(keyFor(mapping, 'requesterName', 'requesterName'), row.requesterName ?? '')
-      write(keyFor(mapping, 'comments', 'comments'), row.comments ?? '')
+      write(keyFor(mapping, 'partNumber', 'partNumber'), row.partNumber)
+      write(keyFor(mapping, 'partName', 'partName'), row.partName)
+      write(keyFor(mapping, 'requestPartNumber', 'requestPartNumber'), row.requestPartNumber ?? '')
+      write(keyFor(mapping, 'requestPartName', 'requestPartName'), row.requestPartName ?? '')
+      write(keyFor(mapping, 'remark', 'remark'), row.remark ?? '')
       next.push(item)
       continue
     }
 
     const created: Record<string, unknown> = { id: row.id }
     const map = defaultLegacyKeys
-    const numberKey = keyFor(map, 'productNumber', 'productNumber')
-    const nameKey = keyFor(map, 'productName', 'productName')
-    const requesterNumberKey = keyFor(map, 'requesterNumber', 'requesterNumber')
-    const requesterNameKey = keyFor(map, 'requesterName', 'requesterName')
-    const commentsKey = keyFor(map, 'comments', 'comments')
+    const numberKey = keyFor(map, 'partNumber', 'partNumber')
+    const nameKey = keyFor(map, 'partName', 'partName')
+    const requestPartNumberKey = keyFor(map, 'requestPartNumber', 'requestPartNumber')
+    const requestPartNameKey = keyFor(map, 'requestPartName', 'requestPartName')
+    const remarkKey = keyFor(map, 'remark', 'remark')
 
-    if (!isEmpty(row.productNumber)) created[numberKey] = row.productNumber
-    if (!isEmpty(row.productName)) created[nameKey] = row.productName
-    if (!isEmpty(row.requesterNumber)) created[requesterNumberKey] = row.requesterNumber
-    if (!isEmpty(row.requesterName)) created[requesterNameKey] = row.requesterName
-    if (!isEmpty(row.comments)) created[commentsKey] = row.comments
+    if (!isEmpty(row.partNumber)) created[numberKey] = row.partNumber
+    if (!isEmpty(row.partName)) created[nameKey] = row.partName
+    if (!isEmpty(row.requestPartNumber)) created[requestPartNumberKey] = row.requestPartNumber
+    if (!isEmpty(row.requestPartName)) created[requestPartNameKey] = row.requestPartName
+    if (!isEmpty(row.remark)) created[remarkKey] = row.remark
     next.push(created)
   }
 

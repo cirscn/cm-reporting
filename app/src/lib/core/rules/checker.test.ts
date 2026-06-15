@@ -117,7 +117,7 @@ describe('runChecker', () => {
     ).toBe(true)
   })
 
-  it('flags missing product number when product list has rows', () => {
+  it('flags missing part number when product list has rows', () => {
     const formState: FormStateForRequired = {
       scopeType: 'B',
       questionAnswers: {
@@ -128,7 +128,7 @@ describe('runChecker', () => {
     const formData = buildFormData({
       companyInfo: buildCompanyInfo(cmrt),
       questions: buildQuestionValues(cmrt, 'No'),
-      productList: [{ id: 'row-1', productNumber: '' }],
+      productList: [{ id: 'row-1', partNumber: '' }],
     })
 
     const errors = runChecker(cmrt, formState, formData)
@@ -136,7 +136,7 @@ describe('runChecker', () => {
     expect(
       errors.some(
         (error) =>
-          error.fieldPath === 'productList.0.productNumber' &&
+          error.fieldPath === 'productList.0.partNumber' &&
           error.messageKey === ERROR_KEYS.checker.requiredField
       )
     ).toBe(true)
@@ -287,7 +287,7 @@ describe('runChecker', () => {
     ).toBe(true)
   })
 
-  it('allows missing requester number when requester columns are enabled', () => {
+  it('allows missing request part number when requester columns are enabled', () => {
     const emrt = getVersionDef('emrt', '2.1')
     const formState: FormStateForRequired = {
       scopeType: 'B',
@@ -306,10 +306,10 @@ describe('runChecker', () => {
       productList: [
         {
           id: 'row-1',
-          productNumber: 'RESP-001',
-          productName: 'Product A',
-          requesterNumber: '',
-          requesterName: 'Requester Product A',
+          partNumber: 'RESP-001',
+          partName: 'Product A',
+          requestPartNumber: '',
+          requestPartName: 'Requester Product A',
         },
       ],
     })
@@ -319,7 +319,7 @@ describe('runChecker', () => {
     expect(
       errors.some(
         (error) =>
-          error.fieldPath === 'productList.0.requesterNumber' &&
+          error.fieldPath === 'productList.0.requestPartNumber' &&
           error.messageKey === ERROR_KEYS.checker.requiredField
       )
     ).toBe(false)

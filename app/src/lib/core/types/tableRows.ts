@@ -62,11 +62,11 @@ export interface MineRow {
  */
 export interface ProductRow {
   id: string
-  productNumber: string
-  productName: string
-  requesterNumber?: string
-  requesterName?: string
-  comments: string
+  partNumber: string
+  partName: string
+  requestPartNumber?: string
+  requestPartName?: string
+  remark: string
   [key: string]: string | undefined
 }
 

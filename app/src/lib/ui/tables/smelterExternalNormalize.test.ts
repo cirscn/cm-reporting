@@ -305,16 +305,31 @@ describe('shouldDisableSmelterFieldsAfterExternalPick', () => {
     ).toBe(false)
   })
 
-  test('not listed / not yet identified 不锁定', () => {
+  test('手动 not listed 新增行不锁定', () => {
     expect(
       shouldDisableSmelterFieldsAfterExternalPick({
         useExternalLookup: true,
-        row: { id: 'CID-1', smelterLookup: 'Smelter not listed' },
+        row: { id: 'smelter-new-1', smelterLookup: 'Smelter not listed' },
         fromLookup: false,
         notListed: true,
         notYetIdentified: false,
       }),
     ).toBe(false)
+  })
+
+  test('外部选择的自定义 not listed 冶炼厂锁定', () => {
+    expect(
+      shouldDisableSmelterFieldsAfterExternalPick({
+        useExternalLookup: true,
+        row: { id: 'custom-smelter-1', smelterLookup: 'Smelter not listed' },
+        fromLookup: false,
+        notListed: true,
+        notYetIdentified: false,
+      }),
+    ).toBe(true)
+  })
+
+  test('not yet identified 不锁定', () => {
     expect(
       shouldDisableSmelterFieldsAfterExternalPick({
         useExternalLookup: true,

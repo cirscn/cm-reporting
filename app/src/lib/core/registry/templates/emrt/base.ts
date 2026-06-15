@@ -366,8 +366,8 @@ export function buildEmrtVersionDef(override: EmrtVersionOverride): TemplateVers
     },
     productList: {
       hasRequesterColumns: override.productList.hasRequesterColumns,
-      productNumberLabelKey: 'productList.emrt.respondentNumber',
-      productNameLabelKey: 'productList.emrt.respondentName',
+      partNumberLabelKey: 'productList.emrt.respondentNumber',
+      partNameLabelKey: 'productList.emrt.respondentName',
       commentLabelKey: 'productList.emrt.comment',
     },
     dateConfig: EMRT_OPEN_DATE_VERSION_IDS.has(override.id)

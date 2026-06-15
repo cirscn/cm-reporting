@@ -113,7 +113,7 @@ describe('buildCheckerSummary', () => {
     expect(summary.sections.smelterList.completed).toBe(1)
   })
 
-  it('does not count requester number as required progress when requester columns are enabled', () => {
+  it('does not count request part number as required progress when requester columns are enabled', () => {
     const emrt = getVersionDef('emrt', '2.1')
     const formState: FormStateForRequired = {
       scopeType: 'B',
@@ -132,10 +132,10 @@ describe('buildCheckerSummary', () => {
       productList: [
         {
           id: 'row-1',
-          productNumber: 'RESP-001',
-          productName: 'Product A',
-          requesterNumber: '',
-          requesterName: 'Requester Product A',
+          partNumber: 'RESP-001',
+          partName: 'Product A',
+          requestPartNumber: '',
+          requestPartName: 'Requester Product A',
         },
       ],
     })

@@ -234,8 +234,8 @@ export interface CmrtVersionOverride {
   q6Options: QuestionOption[]
   productList: {
     hasRequesterColumns?: boolean
-    productNumberLabelKey: I18nKey
-    productNameLabelKey: I18nKey
+    partNumberLabelKey: I18nKey
+    partNameLabelKey: I18nKey
   }
   smelterList: {
     notListedRequireNameCountry: boolean
@@ -278,8 +278,8 @@ export function buildCmrtVersionDef(override: CmrtVersionOverride): TemplateVers
     mineList: { available: false },
     productList: {
       hasRequesterColumns: override.productList.hasRequesterColumns ?? false,
-      productNumberLabelKey: override.productList.productNumberLabelKey,
-      productNameLabelKey: override.productList.productNameLabelKey,
+      partNumberLabelKey: override.productList.partNumberLabelKey,
+      partNameLabelKey: override.productList.partNameLabelKey,
       commentLabelKey: 'productList.cmrt.comment',
     },
     dateConfig: override.dateConfig,

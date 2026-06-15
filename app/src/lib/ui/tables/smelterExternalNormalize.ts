@@ -187,7 +187,7 @@ export function shouldDisableSmelterFieldsAfterExternalPick(params: {
   notYetIdentified: boolean
 }): boolean {
   if (!params.useExternalLookup) return false
-  if (params.notListed || params.notYetIdentified) return false
+  if (params.notYetIdentified) return false
   const normalizedLookup = params.row.smelterLookup.trim()
   if (!normalizedLookup) return false
   if (params.fromLookup) return true

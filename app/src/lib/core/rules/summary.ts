@@ -403,11 +403,11 @@ export function buildCheckerSummary(
     productList.forEach((row, index) => {
       totalRequired += 1
       productRequired += 1
-      const value = row.productNumber || ''
+      const value = row.partNumber || ''
       if (value.trim()) {
         completedRequired += 1
         productCompleted += 1
-        addPassed(`productList.${row.id}.productNumber`, t('checker.passedProductRow', { index: index + 1 }), productLabel)
+        addPassed(`productList.${row.id}.partNumber`, t('checker.passedProductRow', { index: index + 1 }), productLabel)
       }
     })
     if (productRequired > 0 && productCompleted === productRequired) {

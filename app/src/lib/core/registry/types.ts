@@ -247,8 +247,8 @@ export interface MineListConfig {
  */
 export interface ProductListConfig {
   hasRequesterColumns: boolean
-  productNumberLabelKey: I18nKey
-  productNameLabelKey: I18nKey
+  partNumberLabelKey: I18nKey
+  partNameLabelKey: I18nKey
   commentLabelKey: I18nKey
 }
 

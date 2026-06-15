@@ -6,8 +6,8 @@ export const cmrt_6_22: CmrtVersionOverride = {
   id: '6.22',
   q6Options: CMRT_Q6_OPTIONS_V6_22_AND_BELOW,
   productList: {
-    productNumberLabelKey: 'productList.cmrt.manufacturerNumber',
-    productNameLabelKey: 'productList.cmrt.manufacturerName',
+    partNumberLabelKey: 'productList.cmrt.manufacturerNumber',
+    partNameLabelKey: 'productList.cmrt.manufacturerName',
   },
   smelterList: {
     notListedRequireNameCountry: false,

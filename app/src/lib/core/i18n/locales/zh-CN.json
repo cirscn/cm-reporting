@@ -119,11 +119,11 @@
     "mineComments": "注释"
   },
   "productPlaceholders": {
-    "productNumber": "PRD-xxxx-xxx",
-    "productName": "产品名称",
-    "requesterNumber": "请求方的产品编号",
-    "requesterName": "请求方的产品名称",
-    "comments": "注释"
+    "partNumber": "PRD-xxxx-xxx",
+    "partName": "产品名称",
+    "requestPartNumber": "请求方的产品编号",
+    "requestPartName": "请求方的产品名称",
+    "remark": "注释"
   },
   "hints": {
     "companyName": "使用正式注册名称，不得使用缩写。",
@@ -164,8 +164,8 @@
     "mineralsScopeReasonPrt": "纳入 PRT 的原因",
     "mineralsScopeReasonAmrt": "纳入 AMRT 的原因",
     "comments": "备注",
-    "requesterNumber": "请求方的产品编号",
-    "requesterName": "请求方的产品名称",
+    "requestPartNumber": "请求方的产品编号",
+    "requestPartName": "请求方的产品名称",
     "noData": "暂无数据"
   },
   "actions": {

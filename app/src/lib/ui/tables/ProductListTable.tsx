@@ -41,11 +41,11 @@ interface ProductListTableProps {
 }
 
 const INPUT_FIELDS = [
-  'productNumber',
-  'productName',
-  'requesterNumber',
-  'requesterName',
-  'comments',
+  'partNumber',
+  'partName',
+  'requestPartNumber',
+  'requestPartName',
+  'remark',
 ] as const
 
 /** 产品清单表格：支持增删行、行内编辑与外部选择。 */
@@ -81,9 +81,9 @@ export const ProductListTable = memo(function ProductListTable({
     if (componentDisabled) return
     const newRow: ProductRow = {
       id: `product-${Date.now()}`,
-      productNumber: '',
-      productName: '',
-      comments: '',
+      partNumber: '',
+      partName: '',
+      remark: '',
     }
     onChange([...rows, newRow])
   })
@@ -100,11 +100,11 @@ export const ProductListTable = memo(function ProductListTable({
       return {
         ...(partial as Record<string, string | undefined>),
         id: typeof partial.id === 'string' && partial.id.trim() ? partial.id : idBase,
-        productNumber: partial.productNumber ?? '',
-        productName: partial.productName ?? '',
-        requesterNumber: partial.requesterNumber ?? '',
-        requesterName: partial.requesterName ?? '',
-        comments: partial.comments ?? '',
+        partNumber: partial.partNumber ?? '',
+        partName: partial.partName ?? '',
+        requestPartNumber: partial.requestPartNumber ?? '',
+        requestPartName: partial.requestPartName ?? '',
+        remark: partial.remark ?? '',
       }
     },
   )
@@ -223,9 +223,9 @@ export const ProductListTable = memo(function ProductListTable({
   const columns = useCreation<ColumnsType<ProductRow>>(() => {
     const base: ColumnsType<ProductRow> = [
       {
-        title: renderRequiredHeaderLabel(t(config.productNumberLabelKey), required),
-        dataIndex: 'productNumber',
-        key: 'productNumber',
+        title: renderRequiredHeaderLabel(t(config.partNumberLabelKey), required),
+        dataIndex: 'partNumber',
+        key: 'partNumber',
         width: 180,
         fixed: 'left',
         render: (value: string, record: ProductRow) =>
@@ -233,11 +233,11 @@ export const ProductListTable = memo(function ProductListTable({
             required,
             <Input
               value={value || undefined}
-              onChange={getInputHandler(`${record.id}:productNumber`)}
+              onChange={getInputHandler(`${record.id}:partNumber`)}
               disabled={componentDisabled}
               {...getReadonlyTextControlProps({
                 value,
-                placeholder: t('productPlaceholders.productNumber'),
+                placeholder: t('productPlaceholders.partNumber'),
                 disabled: componentDisabled,
               })}
             />,
@@ -245,18 +245,18 @@ export const ProductListTable = memo(function ProductListTable({
           ),
       },
       {
-        title: t(config.productNameLabelKey),
-        dataIndex: 'productName',
-        key: 'productName',
+        title: t(config.partNameLabelKey),
+        dataIndex: 'partName',
+        key: 'partName',
         width: 200,
         render: (value: string, record: ProductRow) => (
           <Input
             value={value || undefined}
-            onChange={getInputHandler(`${record.id}:productName`)}
+            onChange={getInputHandler(`${record.id}:partName`)}
             disabled={componentDisabled}
             {...getReadonlyTextControlProps({
               value,
-              placeholder: t('productPlaceholders.productName'),
+              placeholder: t('productPlaceholders.partName'),
               disabled: componentDisabled,
             })}
           />
@@ -268,36 +268,36 @@ export const ProductListTable = memo(function ProductListTable({
     if (enableRequesterColumns) {
       base.push(
         {
-          title: t('tables.requesterNumber'),
-          dataIndex: 'requesterNumber',
-          key: 'requesterNumber',
+          title: t('tables.requestPartNumber'),
+          dataIndex: 'requestPartNumber',
+          key: 'requestPartNumber',
           width: 180,
           render: (value: string, record: ProductRow) => (
             <Input
               value={value || undefined}
-              onChange={getInputHandler(`${record.id}:requesterNumber`)}
+              onChange={getInputHandler(`${record.id}:requestPartNumber`)}
               disabled={componentDisabled}
               {...getReadonlyTextControlProps({
                 value,
-                placeholder: t('productPlaceholders.requesterNumber'),
+                placeholder: t('productPlaceholders.requestPartNumber'),
                 disabled: componentDisabled,
               })}
             />
           ),
         },
         {
-          title: t('tables.requesterName'),
-          dataIndex: 'requesterName',
-          key: 'requesterName',
+          title: t('tables.requestPartName'),
+          dataIndex: 'requestPartName',
+          key: 'requestPartName',
           width: 200,
           render: (value: string, record: ProductRow) => (
             <Input
               value={value || undefined}
-              onChange={getInputHandler(`${record.id}:requesterName`)}
+              onChange={getInputHandler(`${record.id}:requestPartName`)}
               disabled={componentDisabled}
               {...getReadonlyTextControlProps({
                 value,
-                placeholder: t('productPlaceholders.requesterName'),
+                placeholder: t('productPlaceholders.requestPartName'),
                 disabled: componentDisabled,
               })}
             />
@@ -308,17 +308,17 @@ export const ProductListTable = memo(function ProductListTable({
 
     base.push({
       title: t(config.commentLabelKey),
-      dataIndex: 'comments',
-      key: 'comments',
+      dataIndex: 'remark',
+      key: 'remark',
       width: 200,
       render: (value: string, record: ProductRow) => (
         <Input
           value={value || undefined}
-          onChange={getInputHandler(`${record.id}:comments`)}
+          onChange={getInputHandler(`${record.id}:remark`)}
           disabled={componentDisabled}
           {...getReadonlyTextControlProps({
             value,
-            placeholder: t('productPlaceholders.comments'),
+            placeholder: t('productPlaceholders.remark'),
             disabled: componentDisabled,
           })}
         />

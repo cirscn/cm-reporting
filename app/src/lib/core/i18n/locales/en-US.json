@@ -119,11 +119,11 @@
     "mineComments": "Comments"
   },
   "productPlaceholders": {
-    "productNumber": "PRD-xxxx-xxx",
-    "productName": "Product name",
-    "requesterNumber": "Requester Product Number",
-    "requesterName": "Requester Product Name",
-    "comments": "Comments"
+    "partNumber": "PRD-xxxx-xxx",
+    "partName": "Product name",
+    "requestPartNumber": "Requester Product Number",
+    "requestPartName": "Requester Product Name",
+    "remark": "Comments"
   },
   "hints": {
     "companyName": "Use the formal registered name; no abbreviations.",
@@ -164,8 +164,8 @@
     "mineralsScopeReasonPrt": "Reasons for inclusion on the PRT",
     "mineralsScopeReasonAmrt": "Reasons for inclusion on the AMRT",
     "comments": "Comments",
-    "requesterNumber": "Requester Product Number",
-    "requesterName": "Requester Product Name",
+    "requestPartNumber": "Requester Product Number",
+    "requestPartName": "Requester Product Name",
     "noData": "No data"
   },
   "actions": {

@@ -57,22 +57,22 @@ describe('ProductListTable required behavior', () => {
     const cmrtHtml = renderTable('cmrt', '6.6', [
       {
         id: 'row-1',
-        productNumber: '',
-        productName: '',
-        requesterNumber: '',
-        requesterName: '',
-        comments: '',
+        partNumber: '',
+        partName: '',
+        requestPartNumber: '',
+        requestPartName: '',
+        remark: '',
       },
     ])
 
     const emrtHtml = renderTable('emrt', '2.11', [
       {
         id: 'row-1',
-        productNumber: '',
-        productName: '',
-        requesterNumber: '',
-        requesterName: '',
-        comments: '',
+        partNumber: '',
+        partName: '',
+        requestPartNumber: '',
+        requestPartName: '',
+        remark: '',
       },
     ])
 
@@ -86,11 +86,11 @@ describe('ProductListTable required behavior', () => {
     const html = renderTable('cmrt', '6.6', [
       {
         id: 'row-1',
-        productNumber: '',
-        productName: '',
-        requesterNumber: '',
-        requesterName: '',
-        comments: '',
+        partNumber: '',
+        partName: '',
+        requestPartNumber: '',
+        requestPartName: '',
+        remark: '',
       },
     ])
 
@@ -101,9 +101,9 @@ describe('ProductListTable required behavior', () => {
     const html = renderTable('amrt', '1.3', [
       {
         id: 'row-1',
-        productNumber: '',
-        productName: '',
-        comments: '',
+        partNumber: '',
+        partName: '',
+        remark: '',
       },
     ])
 

@@ -35,7 +35,7 @@ Apply these rules in every solution:
 - `SmelterList` 新增行应先生成临时 ID（`smelter-new-<timestamp>`）；宿主外部选择回写 `id` 后覆盖该临时 ID，未回写 `id` 时本次回写无效并提示错误。
 - `SmelterList` 行内外部选择需保证同一个 `metal` 下冶炼厂唯一，按回写 `id` 判重。
 - 导入或 `setFormData()` 写入的 `SmelterList` 历史数据也会在 checker / `validate()` 中按同一口径判重：同一个 `metal` 下重复的非临时 `id` 会报错，`smelter-new-*` 临时 ID 不参与判重。
-- `SmelterList` 行内外部选择成功后（非 `Smelter not listed / not yet identified`），应锁定基础主数据字段不可编辑：`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state`。
+- `SmelterList` 行内外部选择成功后（包括宿主回写正式 `id` 的自定义 `Smelter not listed`，不包括手动新增的临时 `Smelter not listed` 与 `Smelter not yet identified`），应锁定基础主数据字段不可编辑：`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state`。
 - `SmelterList` 锁定后的空字段不得显示 placeholder，问题矩阵被门控禁用的空回答/备注也不得显示 placeholder，避免把 `Source ID`、`街道`、`城市`、`请选择`、`备注` 等占位提示误看成真实数据；有真实值的只读文本应单行省略，鼠标悬浮显示全文。
 - 宿主外部回写若只提供 `smelterName`、未提供 `smelterLookup`，库会自动把 `smelterName` 作为 `smelterLookup` 显示与校验来源；宿主如有独立查找值，仍优先回写 `smelterLookup`。
 - `SmelterList` 外部回写里 `smelterNumber` 对应 CID，UI 的“冶炼厂识别”列也显示该 CID；`sourceId` 对应 RMI 来源识别号。若宿主暂时把 RMI 来源写在 `smelterIdentification` 且未提供 `sourceId`，库会归一化到 `sourceId`。
@@ -66,8 +66,8 @@ Apply these rules in every solution:
 - For all templates, keep `Smelter List` rows under the same Q1/Q2 gating as the current template: when a metal no longer requires smelter disclosure, rows for that metal are automatically removed from `smelterList`.
 - For any template version with `smelterLookup` dropdown support, once a `Smelter List` row has a selected `metal`, treat `smelterLookup` as checker-required; missing lookup must stay visible as an unfinished item instead of silently passing.
 - For `EMRT`, default selection should include all declared minerals on empty initialization; when `readOnly=false`, users can still edit the declaration scope selections.
-- For `Product List`, when `Declaration Scope = Product` (`scopeType === 'B'`), the list itself is required and `productNumber` is always required; versions with `hasRequesterColumns=true` (for example `CMRT 6.6`, `EMRT 2.11`, and `AMRT 1.3 / 1.31`) still show `requesterNumber`, but it is not required.
-- Treat “请求方的产品编号 / 请求方的产品名称” as UI labels only; integration payload fields remain `requesterNumber / requesterName`.
+- For `Product List`, when `Declaration Scope = Product` (`scopeType === 'B'`), the list itself is required and `partNumber` is always required; versions with `hasRequesterColumns=true` (for example `CMRT 6.6`, `EMRT 2.11`, and `AMRT 1.3 / 1.31`) still show `requestPartNumber`, but it is not required.
+- Product List integration payload fields are `partNumber / partName / requestPartNumber / requestPartName / remark`.
 - 对 `dynamic-dropdown` 范围模板（`EMRT` 2.x / `AMRT` 1.3+），当取消某个矿种时，应预期库会自动执行级联清理：清空该矿种的按矿种题目/备注答案，并删除关联的 `Smelter List` / `Mine List` 行数据。
 - 当 `other` 保持勾选但某个自定义矿种名称被清空时，库会按槽位清理对应 `other-*` 的按矿种答案与关联列表行。
 

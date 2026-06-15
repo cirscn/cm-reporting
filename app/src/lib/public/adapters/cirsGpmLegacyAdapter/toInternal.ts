@@ -383,7 +383,7 @@ export function cirsGpmLegacyToInternal(input: unknown): { snapshot: ReportSnaps
   const productFieldStatesByIndex = new Map<number, Map<string, NullableFieldState>>()
   const productLegacyKeyByInternalKeyByIndex = new Map<
     number,
-    Map<'productNumber' | 'productName' | 'requesterNumber' | 'requesterName' | 'comments', string>
+    Map<'partNumber' | 'partName' | 'requestPartNumber' | 'requestPartName' | 'remark', string>
   >()
   const legacyProducts = legacy.cmtParts ?? []
   const productList: ProductRow[] = []
@@ -410,31 +410,31 @@ export function cirsGpmLegacyToInternal(input: unknown): { snapshot: ReportSnaps
     productFieldStatesByIndex.set(i, stateMap)
 
     const legacyKeyByInternal = new Map<
-      'productNumber' | 'productName' | 'requesterNumber' | 'requesterName' | 'comments',
+      'partNumber' | 'partName' | 'requestPartNumber' | 'requestPartName' | 'remark',
       string
     >()
-    legacyKeyByInternal.set('productNumber', pickLegacyKey(obj, ['productNumber', 'partNumber']))
-    legacyKeyByInternal.set('productName', pickLegacyKey(obj, ['productName', 'partName']))
-    legacyKeyByInternal.set('requesterNumber', pickLegacyKey(obj, ['requesterNumber', 'requestPartNumber']))
-    legacyKeyByInternal.set('requesterName', pickLegacyKey(obj, ['requesterName', 'requestPartName']))
-    legacyKeyByInternal.set('comments', pickLegacyKey(obj, ['comments', 'remark']))
+    legacyKeyByInternal.set('partNumber', pickLegacyKey(obj, ['partNumber', 'productNumber']))
+    legacyKeyByInternal.set('partName', pickLegacyKey(obj, ['partName', 'productName']))
+    legacyKeyByInternal.set('requestPartNumber', pickLegacyKey(obj, ['requestPartNumber', 'requesterNumber']))
+    legacyKeyByInternal.set('requestPartName', pickLegacyKey(obj, ['requestPartName', 'requesterName']))
+    legacyKeyByInternal.set('remark', pickLegacyKey(obj, ['remark', 'comments']))
     productLegacyKeyByInternalKeyByIndex.set(i, legacyKeyByInternal)
 
-    const numValue = toAnyString(obj[legacyKeyByInternal.get('productNumber')!])
-    const nameValue = toAnyString(obj[legacyKeyByInternal.get('productName')!])
-    const requesterNumberKey = legacyKeyByInternal.get('requesterNumber')!
-    const requesterNameKey = legacyKeyByInternal.get('requesterName')!
-    const requesterNumberValue = toAnyString(obj[requesterNumberKey])
-    const requesterNameValue = toAnyString(obj[requesterNameKey])
-    const commentsValue = toAnyString(obj[legacyKeyByInternal.get('comments')!])
+    const numValue = toAnyString(obj[legacyKeyByInternal.get('partNumber')!])
+    const nameValue = toAnyString(obj[legacyKeyByInternal.get('partName')!])
+    const requestPartNumberKey = legacyKeyByInternal.get('requestPartNumber')!
+    const requestPartNameKey = legacyKeyByInternal.get('requestPartName')!
+    const requestPartNumberValue = toAnyString(obj[requestPartNumberKey])
+    const requestPartNameValue = toAnyString(obj[requestPartNameKey])
+    const remarkValue = toAnyString(obj[legacyKeyByInternal.get('remark')!])
 
     productList.push({
       id: internalId,
-      productNumber: numValue,
-      productName: nameValue,
-      requesterNumber: requesterNumberValue ? requesterNumberValue : undefined,
-      requesterName: requesterNameValue ? requesterNameValue : undefined,
-      comments: commentsValue,
+      partNumber: numValue,
+      partName: nameValue,
+      requestPartNumber: requestPartNumberValue ? requestPartNumberValue : undefined,
+      requestPartName: requestPartNameValue ? requestPartNameValue : undefined,
+      remark: remarkValue,
     })
   }
   data.productList = productList

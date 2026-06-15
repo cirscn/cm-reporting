@@ -7,8 +7,8 @@ export const cmrt_6_6: CmrtVersionOverride = {
   q6Options: CMRT_Q6_OPTIONS_V6_31_AND_ABOVE,
   productList: {
     hasRequesterColumns: true,
-    productNumberLabelKey: 'productList.cmrt.respondentNumber',
-    productNameLabelKey: 'productList.cmrt.respondentName',
+    partNumberLabelKey: 'productList.cmrt.respondentNumber',
+    partNameLabelKey: 'productList.cmrt.respondentName',
   },
   smelterList: {
     notListedRequireNameCountry: false,

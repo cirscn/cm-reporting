@@ -114,24 +114,24 @@ function buildProductCandidates(params: {
   const base: Array<Partial<ProductRow> & { key: string }> = [
     {
       key: 'prd-001',
-      productNumber: 'PRD-001',
-      productName: 'Examples Product A',
-      comments: '[examples] picked from external (with extra field preserved)',
+      partNumber: 'PRD-001',
+      partName: 'Examples Product A',
+      remark: '[examples] picked from external (with extra field preserved)',
       demoExtra: 'kept-by-normalizer',
     },
     {
       key: 'prd-002',
-      productNumber: 'PRD-002',
-      productName: 'Examples Product B',
-      comments: '[examples] picked from external',
+      partNumber: 'PRD-002',
+      partName: 'Examples Product B',
+      remark: '[examples] picked from external',
       demoExtra: 'kept-by-normalizer',
     },
   ]
   if (!params.includeRequester) return base
   return base.map((row, index) => ({
     ...row,
-    requesterNumber: `REQ-00${index + 1}`,
-    requesterName: 'Examples Requester',
+    requestPartNumber: `REQ-00${index + 1}`,
+    requestPartName: 'Examples Requester',
   }))
 }
 
@@ -256,7 +256,7 @@ export function useExampleExternalPickers() {
   )
 
   const includeProductRequesterColumns = productCandidates.some((row) =>
-    Boolean(row.requesterNumber || row.requesterName),
+    Boolean(row.requestPartNumber || row.requestPartName),
   )
 
   const smelterColumns = useMemo<ColumnsType<ExampleSmelterPickItem & { key: string }>>(
@@ -277,21 +277,21 @@ export function useExampleExternalPickers() {
 
   const productColumns = useMemo<ColumnsType<Partial<ProductRow> & { key: string }>>(() => {
     const cols: ColumnsType<Partial<ProductRow> & { key: string }> = [
-      { title: 'Product #', dataIndex: 'productNumber', key: 'productNumber', width: 160 },
-      { title: 'Product Name', dataIndex: 'productName', key: 'productName' },
+      { title: 'Product #', dataIndex: 'partNumber', key: 'partNumber', width: 160 },
+      { title: 'Product Name', dataIndex: 'partName', key: 'partName' },
     ]
     if (includeProductRequesterColumns) {
       cols.push(
         {
           title: 'Requester Product #',
-          dataIndex: 'requesterNumber',
-          key: 'requesterNumber',
+          dataIndex: 'requestPartNumber',
+          key: 'requestPartNumber',
           width: 160,
         },
         {
           title: 'Requester Product Name',
-          dataIndex: 'requesterName',
-          key: 'requesterName',
+          dataIndex: 'requestPartName',
+          key: 'requestPartName',
           width: 180,
         },
       )

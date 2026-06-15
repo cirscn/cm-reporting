@@ -546,8 +546,8 @@ function writeProductListSheet(
   hasRequesterColumns: boolean
 ): string {
   const colByKey: Record<string, string> = hasRequesterColumns
-    ? { productNumber: 'B', productName: 'C', requesterNumber: 'D', requesterName: 'E', comments: 'F' }
-    : { productNumber: 'B', productName: 'C', comments: 'D' }
+    ? { partNumber: 'B', partName: 'C', requestPartNumber: 'D', requestPartName: 'E', remark: 'F' }
+    : { partNumber: 'B', partName: 'C', remark: 'D' }
   return writeListSheetRows(sheetXml, 6, rows, colByKey)
 }
 

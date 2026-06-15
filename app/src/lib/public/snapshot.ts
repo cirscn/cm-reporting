@@ -83,11 +83,11 @@ const mineRowSchema = z.object({
 
 const productRowSchema = z.object({
   id: z.string(),
-  productNumber: z.string(),
-  productName: z.string(),
-  requesterNumber: z.string().optional(),
-  requesterName: z.string().optional(),
-  comments: z.string(),
+  partNumber: z.string(),
+  partName: z.string(),
+  requestPartNumber: z.string().optional(),
+  requestPartName: z.string().optional(),
+  remark: z.string(),
 }).catchall(z.string().optional())
 
 // 注意：这里做“结构级”校验（顶层 keys/类型），不做“按模板版本”细粒度校验。
