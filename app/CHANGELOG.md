@@ -1,5 +1,11 @@
 # cm-reporting
 
+## 0.8.13
+
+### Patch Changes
+
+- 68e995e: 修复 checker 中重复冶炼厂校验提示重复展示的问题：同一个矿产下即使存在多条重复冶炼厂记录，也只展示一条重复提示。
+
 ## 0.8.12
 
 ### Patch Changes
