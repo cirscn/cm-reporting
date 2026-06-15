@@ -687,6 +687,11 @@ describe('runChecker', () => {
         },
         {
           id: 'smelter-external-1',
+          metal: mineralKey,
+          smelterLookup: 'Gold Smelter A',
+        },
+        {
+          id: 'smelter-external-1',
           metal: 'tin',
           smelterLookup: 'Tin Smelter A',
         },

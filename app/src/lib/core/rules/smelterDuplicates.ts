@@ -44,16 +44,19 @@ export function findDuplicateSmelterSelections(
   rows: ReadonlyArray<SmelterSelectionRow>,
 ): Array<{ index: number; firstIndex: number; selectionKey: string; metal: string }> {
   const seen = new Map<string, number>()
+  const reportedMetals = new Set<string>()
   const duplicates: Array<{ index: number; firstIndex: number; selectionKey: string; metal: string }> = []
 
   rows.forEach((row, index) => {
     const metal = row.metal?.trim() ?? ''
     const selectionKey = resolveSmelterSelectionKey(row)
     if (!metal || !selectionKey) return
+    if (reportedMetals.has(metal)) return
     const duplicateKey = `${metal}${DUPLICATE_KEY_SEPARATOR}${selectionKey}`
     const firstIndex = seen.get(duplicateKey)
     if (firstIndex !== undefined) {
       duplicates.push({ index, firstIndex, selectionKey, metal })
+      reportedMetals.add(metal)
       return
     }
     seen.set(duplicateKey, index)
