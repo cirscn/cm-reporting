@@ -1,5 +1,15 @@
 # cm-reporting
 
+## 0.9.0
+
+### Minor Changes
+
+- 230015f: 破坏性变更：产品列表公开字段统一改名为 `partNumber`、`partName`、`requestPartNumber`、`requestPartName`、`remark`，同步更新 Snapshot、外部选择、校验、Excel 导出与集成文档。
+
+### Patch Changes
+
+- 230015f: 修复外部选择自定义冶炼厂后，冶炼厂主数据信息仍可在列表中编辑的问题。
+
 ## 0.8.13
 
 ### Patch Changes
