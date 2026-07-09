@@ -1,0 +1,180 @@
+/* Smelter List Table */
+.smelter-list-table .ant-table-thead > tr > th {
+  white-space: nowrap;
+}
+
+.smelter-list-table .ant-table-thead > tr > th .ant-table-column-title {
+  white-space: nowrap;
+}
+
+/* Question Modules */
+.question-matrix-row,
+.company-question-row {
+  padding: 12px 0;
+}
+
+.question-matrix-row + .question-matrix-row,
+.company-question-row + .company-question-row {
+  border-top: 1px solid var(--ant-color-border-secondary);
+}
+
+.question-matrix-grid {
+  display: grid;
+  grid-template-columns: var(--cm-question-matrix-label-width) var(--cm-question-matrix-answer-width) minmax(0, 1fr);
+  column-gap: 12px;
+  align-items: start;
+}
+
+.question-matrix-label {
+  padding-top: 5px;
+  padding-right: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+  justify-self: start;
+}
+
+.question-matrix-answer .ant-select,
+.question-matrix-answer .ant-select-selector,
+.question-matrix-comment .ant-input,
+.question-matrix-comment .ant-input-textarea {
+  width: 100%;
+}
+
+.company-question-grid {
+  display: grid;
+  grid-template-columns: var(--cm-company-question-label-width) var(--cm-company-question-answer-width) minmax(0, 1fr);
+  column-gap: 12px;
+  row-gap: 8px;
+  align-items: start;
+}
+
+.company-question-grid-per-mineral {
+  grid-template-columns: var(--cm-company-question-label-width) var(--cm-company-question-answer-width) minmax(0, 1fr);
+  row-gap: 8px;
+}
+
+.company-question-label {
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ant-color-text);
+}
+
+.company-question-label-full {
+  grid-column: 1 / -1;
+  padding-right: 12px;
+}
+
+.company-question-mineral-row {
+  display: contents;
+}
+
+.company-question-mineral-label {
+  grid-column: 1;
+  text-align: left;
+  padding-left: 12px;
+  line-height: 1.5;
+}
+
+.company-question-required-mark {
+  margin-left: 4px;
+}
+
+.company-question-answer .ant-form-item,
+.company-question-comment .ant-form-item {
+  margin-bottom: 0;
+}
+
+.company-question-answer .ant-select,
+.company-question-answer .ant-select-selector,
+.company-question-comment .ant-input,
+.company-question-comment .ant-input-textarea {
+  width: 100%;
+}
+
+/* Required Field Highlight */
+.field-required-empty .ant-input,
+.field-required-empty .ant-input-number,
+.field-required-empty .ant-picker,
+.field-required-empty.ant-input,
+.field-required-empty.ant-input-number,
+.field-required-empty.ant-picker {
+  background-color: var(--cm-field-required-bg) !important;
+  border-color: var(--cm-field-required-border) !important;
+}
+
+.field-required-empty.ant-select.ant-select-outlined {
+  --ant-select-active-border-color: var(--cm-field-required-border);
+  --ant-select-hover-border-color: var(--cm-field-required-border);
+}
+
+.field-required-empty.ant-select.ant-select-outlined:not(.ant-select-disabled) {
+  background-color: var(--cm-field-required-bg) !important;
+  border-color: var(--cm-field-required-border) !important;
+}
+
+.field-required-empty.ant-select .ant-select-selector,
+.field-required-empty .ant-select .ant-select-selector {
+  background-color: var(--cm-field-required-bg) !important;
+  border-color: var(--cm-field-required-border) !important;
+}
+
+.field-required-empty .ant-input-number-input {
+  background-color: transparent !important;
+}
+
+/* ReadOnly Disabled Controls */
+.ant-input-disabled,
+.ant-input-disabled:hover,
+.ant-input-number-disabled,
+.ant-input-number-disabled:hover,
+.ant-picker-disabled,
+.ant-picker-disabled:hover,
+.ant-select-disabled,
+.ant-select-disabled:hover,
+.ant-select-disabled .ant-select-selector,
+.ant-select-disabled:hover .ant-select-selector,
+.ant-select-disabled .ant-select-content,
+.ant-select-disabled:hover .ant-select-content {
+  background-color: #eeeeee !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: var(--ant-color-text) !important;
+  cursor: not-allowed;
+  opacity: 1;
+  -webkit-text-fill-color: var(--ant-color-text) !important;
+}
+
+.ant-input-disabled::placeholder,
+.ant-picker-disabled input::placeholder,
+.ant-select-disabled .ant-select-placeholder,
+.ant-select-disabled .ant-select-content-value,
+.ant-select-disabled .ant-select-selection-item,
+.ant-select-disabled .ant-select-selection-search-input,
+.ant-picker-disabled input {
+  color: var(--ant-color-text) !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: var(--ant-color-text) !important;
+}
+
+.cm-reporting-readonly .ant-input-disabled::placeholder,
+.cm-reporting-readonly .ant-input-number-disabled input::placeholder,
+.cm-reporting-readonly .ant-picker-disabled input::placeholder {
+  color: transparent !important;
+  opacity: 0 !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.cm-reporting-readonly .ant-select-disabled .ant-select-placeholder {
+  opacity: 0 !important;
+}
+
+.cm-readonly-text-ellipsis.ant-input,
+.cm-readonly-text-ellipsis .ant-input,
+.cm-readonly-text-ellipsis .ant-input-number-input,
+.cm-readonly-text-ellipsis .ant-select-selection-item {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

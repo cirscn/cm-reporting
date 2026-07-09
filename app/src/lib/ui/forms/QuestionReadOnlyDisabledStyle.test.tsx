@@ -82,7 +82,7 @@ describe('ReadOnly disabled style', () => {
   })
 
   test('styles disabled controls without border or faded text', () => {
-    const css = readFileSync(resolve(process.cwd(), 'src/lib/styles.css'), 'utf8')
+    const css = readFileSync(resolve(process.cwd(), 'src/lib/form-overrides.css'), 'utf8')
 
     expect(css).toContain('ReadOnly Disabled Controls')
     expect(css).toContain('background-color: #eeeeee')

@@ -6,6 +6,11 @@ import { describe, expect, test, vi } from 'vitest'
 
 import { StepNav } from './StepNav'
 
+function readStepNavCss() {
+  const stylesPath = path.resolve(import.meta.dirname, '../../step-nav.css')
+  return fs.readFileSync(stylesPath, 'utf8')
+}
+
 vi.mock('@ant-design/icons', () => ({
   CheckCircleOutlined: () => <span data-kind="check-icon" />,
 }))
@@ -61,14 +66,41 @@ vi.mock('antd', () => ({
 
 describe('StepNav', () => {
   test('keeps the current step indicator circular in styles', () => {
-    const stylesPath = path.resolve(import.meta.dirname, '../../styles.css')
-    const css = fs.readFileSync(stylesPath, 'utf8')
+    const css = readStepNavCss()
 
     expect(css).toContain('.step-nav-steps .ant-steps-item-process .ant-steps-item-icon')
     expect(css).toContain('border-radius: 50%')
-    expect(css).toContain('width: 32px')
-    expect(css).toContain('height: 32px')
+    expect(css).toContain('--cm-step-nav-icon-size: 32px')
+    expect(css).toContain('width: var(--cm-step-nav-icon-size)')
+    expect(css).toContain('height: var(--cm-step-nav-icon-size)')
     expect(css).not.toContain('transform: scale(1.05)')
+  })
+
+  test('styles the readonly current completed step as a clear selected state', () => {
+    const css = readStepNavCss()
+
+    expect(css).toContain(
+      '.step-nav-steps .step-nav-item--active-completed .ant-steps-item-icon',
+    )
+    expect(css).toContain('background: var(--ant-color-primary)')
+    expect(css).toContain('color: var(--ant-color-text-light-solid) !important')
+    expect(css).toContain(
+      '.step-nav-steps .step-nav-item--active-completed .step-nav-title-content',
+    )
+    expect(css).toContain('background: var(--ant-color-primary-bg)')
+  })
+
+  test('centers the horizontal connector line on the step icon', () => {
+    const css = readStepNavCss()
+
+    expect(css).toContain('--cm-step-nav-line-top: 15px')
+    expect(css).toContain('.step-nav-steps.ant-steps-horizontal .ant-steps-item-tail')
+    expect(css).toContain('top: var(--cm-step-nav-line-top) !important')
+    expect(css).toContain('.step-nav-steps .ant-steps-item-rail')
+    expect(css).toContain('height: var(--cm-step-nav-line-height) !important')
+    expect(css).toContain(
+      'transform: translateY(calc(var(--cm-step-nav-line-height) / -2)) !important',
+    )
   })
 
   test('sticks to the top so step navigation stays visible while content scrolls', () => {
