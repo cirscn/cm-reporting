@@ -1,5 +1,11 @@
 # cm-reporting
 
+## 0.9.3
+
+### Patch Changes
+
+- 7de5566: 调整顶部步骤条连接线位置，并简化只读完成步骤的选中高亮样式。
+
 ## 0.9.2
 
 ### Patch Changes
