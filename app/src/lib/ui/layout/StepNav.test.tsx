@@ -76,31 +76,29 @@ describe('StepNav', () => {
     expect(css).not.toContain('transform: scale(1.05)')
   })
 
-  test('styles the readonly current completed step as a clear selected state', () => {
+  test('styles the readonly current completed step with icon fill only', () => {
     const css = readStepNavCss()
 
     expect(css).toContain(
       '.step-nav-steps .step-nav-item--active-completed .ant-steps-item-icon',
     )
-    expect(css).toContain('background: var(--ant-color-primary)')
+    expect(css).toContain('background: var(--ant-color-success)')
+    expect(css).toContain('border-color: var(--ant-color-success)')
     expect(css).toContain('color: var(--ant-color-text-light-solid) !important')
-    expect(css).toContain(
+    expect(css).not.toContain(
       '.step-nav-steps .step-nav-item--active-completed .step-nav-title-content',
     )
-    expect(css).toContain('background: var(--ant-color-primary-bg)')
+    expect(css).not.toContain('transform: scale(')
   })
 
-  test('centers the horizontal connector line on the step icon', () => {
+  test('aligns the horizontal connector line higher against the step title', () => {
     const css = readStepNavCss()
 
-    expect(css).toContain('--cm-step-nav-line-top: 15px')
+    expect(css).toContain('.step-nav-steps .ant-steps-item-title::after')
+    expect(css).toContain('top: calc(var(--ant-steps-title-line-height) / 3) !important')
     expect(css).toContain('.step-nav-steps.ant-steps-horizontal .ant-steps-item-tail')
-    expect(css).toContain('top: var(--cm-step-nav-line-top) !important')
     expect(css).toContain('.step-nav-steps .ant-steps-item-rail')
     expect(css).toContain('height: var(--cm-step-nav-line-height) !important')
-    expect(css).toContain(
-      'transform: translateY(calc(var(--cm-step-nav-line-height) / -2)) !important',
-    )
   })
 
   test('sticks to the top so step navigation stays visible while content scrolls', () => {
