@@ -1,5 +1,11 @@
 # cm-reporting
 
+## 0.9.4
+
+### Patch Changes
+
+- 1ba08a5: 将顶部步骤条当前完成步骤图标改为实心绿色圆底白色对勾，去除内部描边圆。
+
 ## 0.9.3
 
 ### Patch Changes
