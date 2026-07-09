@@ -3,7 +3,7 @@
  * @description 工作流步骤导航组件，使用 Ant Design Steps 组件实现。
  */
 
-import { CheckCircleOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined, CheckOutlined } from '@ant-design/icons'
 import { useMemoizedFn } from 'ahooks'
 import { Steps, Tag } from 'antd'
 
@@ -79,6 +79,12 @@ function resolveStepStatus(options: {
   return 'wait'
 }
 
+function renderStepIcon(isComplete: boolean, isActiveCompleted: boolean) {
+  if (!isComplete) return undefined
+  if (isActiveCompleted) return <CheckOutlined />
+  return <CheckCircleOutlined style={{ color: 'var(--ant-color-success)' }} />
+}
+
 function buildStepItems(options: {
   steps: StepNavItem[]
   currentIndex: number
@@ -99,9 +105,7 @@ function buildStepItems(options: {
         isComplete,
         showProgress: !allStepsCompleted,
       }),
-      icon: isComplete ? (
-        <CheckCircleOutlined style={{ color: 'var(--ant-color-success)' }} />
-      ) : undefined,
+      icon: renderStepIcon(isComplete, isActiveCompleted),
       status,
     }
   })

@@ -13,6 +13,7 @@ function readStepNavCss() {
 
 vi.mock('@ant-design/icons', () => ({
   CheckCircleOutlined: () => <span data-kind="check-icon" />,
+  CheckOutlined: () => <span data-kind="simple-check-icon" />,
 }))
 
 vi.mock('ahooks', () => ({
@@ -195,7 +196,8 @@ describe('StepNav', () => {
     expect(html).not.toContain('12/12')
     expect(html).not.toContain('0/1')
     expect(html).toContain('data-current="0"')
-    expect(html.match(/data-kind="check-icon"/g)).toHaveLength(3)
+    expect(html.match(/data-kind="simple-check-icon"/g)).toHaveLength(1)
+    expect(html.match(/data-kind="check-icon"/g)).toHaveLength(2)
     expect(html).toContain('step-nav-item--active-completed')
   })
 })
