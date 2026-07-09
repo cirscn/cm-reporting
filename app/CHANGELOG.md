@@ -1,5 +1,11 @@
 # cm-reporting
 
+## 0.9.2
+
+### Patch Changes
+
+- fb54d52: 优化只读状态下顶部步骤条的当前步骤高亮，并修正步骤连接线与圆点的居中对齐。
+
 ## 0.9.1
 
 ### Patch Changes
