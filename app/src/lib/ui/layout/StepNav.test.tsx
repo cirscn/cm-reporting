@@ -12,8 +12,12 @@ function readStepNavCss() {
 }
 
 vi.mock('@ant-design/icons', () => ({
-  CheckCircleOutlined: () => <span data-kind="check-icon" />,
-  CheckOutlined: () => <span data-kind="simple-check-icon" />,
+  CheckCircleOutlined: (props: { className?: string }) => (
+    <span className={props.className} data-kind="check-icon" />
+  ),
+  CheckOutlined: (props: { className?: string }) => (
+    <span className={props.className} data-kind="simple-check-icon" />
+  ),
 }))
 
 vi.mock('ahooks', () => ({
@@ -77,14 +81,17 @@ describe('StepNav', () => {
     expect(css).not.toContain('transform: scale(1.05)')
   })
 
-  test('styles the readonly current completed step with icon fill only', () => {
+  test('keeps completed and active completed check circles the same visual size', () => {
     const css = readStepNavCss()
 
-    expect(css).toContain(
-      '.step-nav-steps .step-nav-item--active-completed .ant-steps-item-icon',
-    )
+    expect(css).toContain('--cm-step-nav-check-size: 20px')
+    expect(css).toContain('.step-nav-complete-check-icon')
+    expect(css).toContain('.step-nav-active-check-icon')
+    expect(css).toContain('font-size: var(--cm-step-nav-check-size) !important')
+    expect(css).toContain('width: var(--cm-step-nav-check-size)')
+    expect(css).toContain('height: var(--cm-step-nav-check-size)')
+    expect(css).toContain('border: 1px solid var(--ant-color-success)')
     expect(css).toContain('background: var(--ant-color-success)')
-    expect(css).toContain('border-color: var(--ant-color-success)')
     expect(css).toContain('color: var(--ant-color-text-light-solid) !important')
     expect(css).not.toContain(
       '.step-nav-steps .step-nav-item--active-completed .step-nav-title-content',
@@ -196,6 +203,8 @@ describe('StepNav', () => {
     expect(html).not.toContain('12/12')
     expect(html).not.toContain('0/1')
     expect(html).toContain('data-current="0"')
+    expect(html).toContain('step-nav-active-check-icon')
+    expect(html).toContain('step-nav-complete-check-icon')
     expect(html.match(/data-kind="simple-check-icon"/g)).toHaveLength(1)
     expect(html.match(/data-kind="check-icon"/g)).toHaveLength(2)
     expect(html).toContain('step-nav-item--active-completed')

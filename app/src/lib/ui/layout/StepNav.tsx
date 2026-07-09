@@ -81,8 +81,8 @@ function resolveStepStatus(options: {
 
 function renderStepIcon(isComplete: boolean, isActiveCompleted: boolean) {
   if (!isComplete) return undefined
-  if (isActiveCompleted) return <CheckOutlined />
-  return <CheckCircleOutlined style={{ color: 'var(--ant-color-success)' }} />
+  if (isActiveCompleted) return <CheckOutlined className="step-nav-active-check-icon" />
+  return <CheckCircleOutlined className="step-nav-complete-check-icon" />
 }
 
 function buildStepItems(options: {
