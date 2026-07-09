@@ -20,6 +20,7 @@ interface AppLayoutProps {
   /** 工作流步骤（与 tabs 互斥，优先使用） */
   steps?: StepNavItem[]
   purposeTip?: string
+  allStepsCompleted?: boolean
   /** 顶部横幅区域（如全局错误提示） */
   topBanner?: ReactNode
   /** 底部插槽（如分页操作） */
@@ -50,6 +51,7 @@ export function AppLayout({
   tabs,
   steps,
   purposeTip,
+  allStepsCompleted = false,
   topBanner,
   bottomSlot,
   currentTabKey,
@@ -86,6 +88,7 @@ export function AppLayout({
           steps={steps!}
           currentKey={currentStepKey}
           purposeTip={purposeTip}
+          allStepsCompleted={allStepsCompleted}
           onChange={onStepChange}
         />
       )}

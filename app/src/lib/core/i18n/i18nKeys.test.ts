@@ -15,6 +15,8 @@ import { describe, expect, it } from 'vitest'
 import enUS from './locales/en-US.json'
 import zhCN from './locales/zh-CN.json'
 
+const STATUS_ICON_PREFIX = /^[\u2705\u26a0]\ufe0f?\s/u
+
 function flattenKeys(obj: Record<string, unknown>, prefix = ''): Set<string> {
   const result = new Set<string>()
   Object.entries(obj).forEach(([key, value]) => {
@@ -216,6 +218,17 @@ describe('i18n keys', () => {
     const empty = [...codeKeys].filter((key) => !key.trim())
 
     expect(empty, empty.join(', ')).toEqual([])
+  })
+
+  it('keeps global checker banner copy free of duplicated status icons', () => {
+    const messages = [
+      enUS.checker.globalErrorBar,
+      enUS.checker.globalSuccessBar,
+      zhCN.checker.globalErrorBar,
+      zhCN.checker.globalSuccessBar,
+    ]
+
+    expect(messages.filter((message) => STATUS_ICON_PREFIX.test(message))).toEqual([])
   })
 
   it('checks docs content structure and non-empty entries', () => {

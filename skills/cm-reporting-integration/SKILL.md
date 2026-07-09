@@ -57,11 +57,13 @@ Apply these rules in every solution:
   - keep form fields disabled, hide placeholder text for empty disabled controls, but keep actual values visible with `#eeeeee` background, transparent borders, and normal label-color content text;
   - render overflowing read-only text with ellipsis and expose the full value on hover;
   - hide table/form editing affordances (add/delete/batch/external pick/edit links), not merely `disabled`;
+  - show the workflow step nav as a completed task: all visible steps use check icons, progress counts such as `12/12` are hidden, and the first browsable step remains highlighted by default;
   - when table cells use explicit `disabled` conditions (for example SmelterList base fields), always merge global disabled state as `componentDisabled || localDisabled`;
   - suppress required yellow highlight when fields are disabled/read-only.
 - In controlled routing mode, if readOnly flow remaps page (e.g. `checker` fallback), always sync parent state via navigation callback to avoid route/UI drift.
 - Never override host-level `ConfigProvider` disabled state with local false. Effective disabled rule must be `parentDisabled || readOnly`.
 - Treat the workflow step nav as a sticky header: keep `Declaration / Smelter List / Mine List / Product List / Checker` visible while the middle content area scrolls.
+- In editable mode, only steps with completed validation progress use check icons; unfinished steps and steps without validation progress must keep their numeric step marker.
 - If host app renders `cm-reporting` inside a modal, drawer, split pane, or custom shell, ensure the container has a calculable height so the library can keep scroll inside the content area instead of the whole page.
 - For all templates, keep `Smelter List` rows under the same Q1/Q2 gating as the current template: when a metal no longer requires smelter disclosure, rows for that metal are automatically removed from `smelterList`.
 - For any template version with `smelterLookup` dropdown support, once a `Smelter List` row has a selected `metal`, treat `smelterLookup` as checker-required; missing lookup must stay visible as an unfinished item instead of silently passing.

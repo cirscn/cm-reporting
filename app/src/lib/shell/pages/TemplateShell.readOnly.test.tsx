@@ -62,6 +62,7 @@ vi.mock('@ui/layout/AppLayout', () => ({
   AppLayout: (props: {
     children?: ReactNode
     bottomSlot?: ReactNode
+    allStepsCompleted?: boolean
   }) => {
     mockAppLayout(props)
     return (
@@ -128,9 +129,11 @@ describe('TemplateShell readOnly', () => {
     expect(renderPage).toHaveBeenCalledWith('declaration')
 
     const appLayoutProps = mockAppLayout.mock.calls[0]?.[0] as {
+      allStepsCompleted?: boolean
       steps?: Array<{ key: string }>
       currentStepKey?: string
     }
+    expect(appLayoutProps.allStepsCompleted).toBe(true)
     expect(appLayoutProps.currentStepKey).toBe('declaration')
     expect(appLayoutProps.steps?.some((step) => step.key === 'checker')).toBe(false)
 
@@ -194,9 +197,11 @@ describe('TemplateShell readOnly', () => {
     )
 
     const appLayoutProps = mockAppLayout.mock.calls[0]?.[0] as {
+      allStepsCompleted?: boolean
       steps?: Array<{ key: string }>
       currentStepKey?: string
     }
+    expect(appLayoutProps.allStepsCompleted).toBe(false)
     expect(appLayoutProps.currentStepKey).toBe('declaration')
     expect(appLayoutProps.steps?.some((step) => step.key === 'checker')).toBe(true)
     expect(mockRequiredHintBanner).toHaveBeenCalled()

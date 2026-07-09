@@ -6,6 +6,10 @@ import { describe, expect, test, vi } from 'vitest'
 
 import { StepNav } from './StepNav'
 
+vi.mock('@ant-design/icons', () => ({
+  CheckCircleOutlined: () => <span data-kind="check-icon" />,
+}))
+
 vi.mock('ahooks', () => ({
   useMemoizedFn: <T extends (...args: never[]) => unknown>(fn: T) => fn,
 }))
@@ -13,14 +17,28 @@ vi.mock('ahooks', () => ({
 vi.mock('antd', () => ({
   Steps: ({
     className,
+    current,
     items,
   }: {
     className?: string
-    items?: Array<{ key: string; title?: React.ReactNode }>
+    current?: number
+    items?: Array<{
+      key: string
+      title?: React.ReactNode
+      className?: string
+      icon?: React.ReactNode
+      status?: string
+    }>
   }) => (
-    <div data-kind="steps" className={className}>
-      {items?.map((item) => (
-        <div key={item.key} data-kind="step-item">
+    <div data-current={current} data-kind="steps" className={className}>
+      {items?.map((item, index) => (
+        <div
+          key={item.key}
+          className={item.className}
+          data-kind="step-item"
+          data-status={item.status}
+        >
+          {item.icon ?? <span data-kind="step-number">{index + 1}</span>}
           {item.title}
         </div>
       ))}
@@ -110,5 +128,44 @@ describe('StepNav', () => {
 
     expect(html).toContain('step-nav-purpose-row')
     expect(html.indexOf('step-nav-purpose-row')).toBeLessThan(html.indexOf('step-nav-inner'))
+  })
+
+  test('keeps incomplete editable steps numbered while showing their progress', () => {
+    const html = renderToStaticMarkup(
+      <StepNav
+        currentKey="checker"
+        steps={[
+          { key: 'declaration', label: '申报', progress: { completed: 12, total: 12 } },
+          { key: 'smelter-list', label: '冶炼厂列表', progress: { completed: 0, total: 1 } },
+          { key: 'product-list', label: '产品列表' },
+          { key: 'checker', label: '校验' },
+        ]}
+      />,
+    )
+
+    expect(html).toContain('0/1')
+    expect(html).toContain('data-status="wait"')
+    expect(html).toContain('data-kind="step-number"')
+    expect(html).not.toContain('产品列表</span><span data-kind="tag"')
+    expect(html.match(/data-kind="check-icon"/g)).toHaveLength(1)
+  })
+
+  test('marks all readonly completed steps as checked and hides progress counts', () => {
+    const html = renderToStaticMarkup(
+      <StepNav
+        allStepsCompleted
+        steps={[
+          { key: 'declaration', label: '申报', progress: { completed: 12, total: 12 } },
+          { key: 'smelter-list', label: '冶炼厂列表', progress: { completed: 0, total: 1 } },
+          { key: 'product-list', label: '产品列表' },
+        ]}
+      />,
+    )
+
+    expect(html).not.toContain('12/12')
+    expect(html).not.toContain('0/1')
+    expect(html).toContain('data-current="0"')
+    expect(html.match(/data-kind="check-icon"/g)).toHaveLength(3)
+    expect(html).toContain('step-nav-item--active-completed')
   })
 })

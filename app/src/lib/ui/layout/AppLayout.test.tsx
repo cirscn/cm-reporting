@@ -4,7 +4,7 @@ import { describe, expect, test, vi } from 'vitest'
 
 import { AppLayout } from './AppLayout'
 
-const { layoutMock, contentMock } = vi.hoisted(() => ({
+const { layoutMock, contentMock, stepNavMock } = vi.hoisted(() => ({
   layoutMock: vi.fn(
     ({
       children,
@@ -33,6 +33,9 @@ const { layoutMock, contentMock } = vi.hoisted(() => ({
       </main>
     ),
   ),
+  stepNavMock: vi.fn((props: Record<string, unknown>) => (
+    <nav data-kind="step-nav" data-props-count={Object.keys(props).length} />
+  )),
 }))
 
 vi.mock('ahooks', () => ({
@@ -68,10 +71,30 @@ vi.mock('./Sidebar', () => ({
 }))
 
 vi.mock('./StepNav', () => ({
-  StepNav: () => <nav data-kind="step-nav" />,
+  StepNav: (props: Record<string, unknown>) => stepNavMock(props),
 }))
 
 describe('AppLayout', () => {
+  test('passes completed workflow state to step navigation', () => {
+    stepNavMock.mockClear()
+
+    renderToStaticMarkup(
+      <AppLayout
+        allStepsCompleted
+        currentStepKey="declaration"
+        steps={[{ key: 'declaration', label: '申报' }]}
+      >
+        <div>content</div>
+      </AppLayout>,
+    )
+
+    expect(stepNavMock).toHaveBeenCalled()
+    expect(stepNavMock.mock.calls[0]?.[0]).toMatchObject({
+      allStepsCompleted: true,
+      currentKey: 'declaration',
+    })
+  })
+
   test('keeps root overflow visible so sticky step nav can follow modal body scroll', () => {
     layoutMock.mockClear()
     contentMock.mockClear()

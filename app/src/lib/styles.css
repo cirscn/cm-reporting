@@ -111,6 +111,17 @@
   box-shadow: 0 2px 8px rgba(22, 119, 255, 0.25);
 }
 
+/* 完成态下当前步骤仍保持选中高亮 */
+.step-nav-steps .step-nav-item--active-completed .ant-steps-item-title {
+  color: var(--ant-color-primary) !important;
+  font-weight: 600 !important;
+}
+
+.step-nav-steps .step-nav-item--active-completed .ant-steps-item-icon {
+  border-color: var(--ant-color-primary);
+  box-shadow: 0 2px 8px rgba(22, 119, 255, 0.25);
+}
+
 /* 步骤导航中的进度标签样式 */
 .step-nav-steps .ant-tag {
   font-size: 11px;

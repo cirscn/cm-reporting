@@ -106,7 +106,7 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 | `onLocaleChange` | `(locale: Locale) => void` | - | 语言变化回调 |
 | `theme` | `object` | - | Ant Design 主题 token 覆盖；不传时继承宿主 `ConfigProvider` |
 | `cssVariables` | `object` | - | CSS 变量覆盖 |
-| `readOnly` | `boolean` | - | 全局只读模式（默认 `false`）。启用后进入“仅浏览”态：禁用输入并拦截用户编辑相关 store action；空值控件不展示 placeholder，同时隐藏 checker 页、必填横幅、上下页操作与新增删除等编辑入口。 |
+| `readOnly` | `boolean` | - | 全局只读模式（默认 `false`）。启用后进入“仅浏览”态：禁用输入并拦截用户编辑相关 store action；空值控件不展示 placeholder，同时隐藏 checker 页、必填横幅、上下页操作与新增删除等编辑入口；顶部步骤条按已完成任务展示，隐藏 `12/12` 这类校验计数，并把所有可见步骤显示为已完成。 |
 | `showPageActions` | `boolean` | - | 是否显示底部翻页操作（默认 `true`）。默认仅包含上一页/下一页，不包含内置提交按钮。 |
 | `maxContentWidth` | `number` | - | 内容区最大宽度（不设则撑满父容器） |
 | `integrations` | `CMReportingIntegrations` | - | 外部选择/回写扩展点 |
@@ -118,6 +118,7 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 
 - 顶部步骤条（如“申报 / 冶炼厂 / 矿场列表 / 产品列表 / 校验”）默认使用吸顶布局，长内容滚动时会固定在组件顶部。
 - 页面主体内容区单独滚动，不会把步骤条一起卷走；宿主若自行包裹容器，需要给外层提供可计算高度，避免整个页面跟着外层一起滚。
+- 编辑态下，只有进度已真实完成的步骤显示勾；未校验通过或无需校验的步骤显示步骤数字。只读态下，步骤条按已完成任务展示，隐藏进度计数，并默认高亮第一个可浏览步骤。
 
 **Ref API (`CMReportingRef`)：**
 
@@ -173,13 +174,14 @@ import { CMReportingApp } from '@lib/CMReportingApp'
 | `onNavigatePage` | `(pageKey: PageKey) => void` | - | 页面导航回调（受控模式） |
 | `showPageActions` | `boolean` | - | 是否显示底部翻页操作（默认 `true`）。传 `false` 可由宿主完全接管保存/提交流程。 |
 | `maxContentWidth` | `number` | - | 内容区最大宽度 |
-| `readOnly` | `boolean` | - | 全局只读模式（默认 `false`）。只读下会自动隐藏 checker 页并回退到可浏览页；若在受控 `pageKey` 模式下发生回退，会通过 `onNavigatePage` 同步父级状态。 |
+| `readOnly` | `boolean` | - | 全局只读模式（默认 `false`）。只读下会自动隐藏 checker 页并回退到可浏览页；若在受控 `pageKey` 模式下发生回退，会通过 `onNavigatePage` 同步父级状态；顶部步骤条按已完成任务展示，不再显示校验进度计数。 |
 | `integrations` | `CMReportingIntegrations` | - | 外部选择/回写扩展点 |
 | `children` | `ReactNode` | - | 内部插入点（用于 snapshot 绑定等） |
 
 **工作流布局说明：**
 
 - `CMReportingApp` 内置的工作流步骤条默认固定在组件顶部，适合长表单连续填写时始终看见当前步骤。
+- 编辑态下未完成或无需校验的步骤显示数字；只读态下所有可见步骤显示完成勾，且隐藏 `completed/total` 计数。
 - 中间内容区独立滚动；如果宿主把组件放进弹窗、抽屉或自定义容器，记得让该容器本身有明确高度。
 
 > **注意**：使用 `CMReportingApp` 时需自行包裹 `CMReportingProvider`（提供 i18n 与弹层容器）。`CMReportingProvider` 不传 `theme` 时会继承宿主 Ant Design 主题；需要库自带主题时请显式传 `defaultAntdTheme`。
