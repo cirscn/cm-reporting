@@ -38,7 +38,7 @@ Apply these rules in every solution:
 - `SmelterList` 行内外部选择成功后（包括宿主回写正式 `id` 的自定义 `Smelter not listed`，不包括手动新增的临时 `Smelter not listed` 与 `Smelter not yet identified`），应锁定基础主数据字段不可编辑：`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state`。
 - `SmelterList` 锁定后的空字段不得显示 placeholder，问题矩阵被门控禁用的空回答/备注也不得显示 placeholder，避免把 `Source ID`、`街道`、`城市`、`请选择`、`备注` 等占位提示误看成真实数据；有真实值的只读文本应单行省略，鼠标悬浮显示全文。
 - 宿主外部回写若只提供 `smelterName`、未提供 `smelterLookup`，库会自动把 `smelterName` 作为 `smelterLookup` 显示与校验来源；宿主如有独立查找值，仍优先回写 `smelterLookup`。
-- `SmelterList` 外部回写里 `smelterNumber` 对应 CID，UI 的“冶炼厂识别”列也显示该 CID；`sourceId` 对应 RMI 来源识别号。若宿主暂时把 RMI 来源写在 `smelterIdentification` 且未提供 `sourceId`，库会归一化到 `sourceId`。
+- `SmelterList` 外部回写里 `smelterNumber` 对应 CID，UI 的“冶炼厂识别”列也显示该 CID；`sourceId` 对应 RMI 来源识别号。若宿主暂时把 RMI 来源写在 `smelterIdentification` 且未提供 `sourceId`，库会归一化到 `sourceId`。`sourceId` 不再作为冶炼厂列表的表格列展示，仅作为数据字段保留（参与外部回写归一化与 Excel 导出）。
 - 如需支持“输入 CID 自动回填”，宿主应实现 `onLookupSmelterByNumber(ctx)`，用 `ctx.smelterNumber` 查询真实冶炼厂主数据，并按 `{ items: [SmelterExternalPickItem] }` 返回结果；唯一结果只有在其 `metal` 属于当前申报范围时才会自动回填，不在范围内时库会提示且不写入。
 - `onLookupSmelterByNumber(ctx)` 返回多条时，推荐实现 `onPickSmelterForNumberLookup(ctx)`，用现有冶炼厂选择弹窗展示 `ctx.candidates`；默认搜索字段为 `ctx.searchField === 'smelterNumber'`，默认搜索值为 `ctx.searchValue`（用户输入的 CID），用户勾选确认后返回 `{ items: [picked] }`。
 - `SmelterList` 外部回写的 `metal` 可以是内部 key（如 `cobalt`）或当前下拉显示名（如 `钴`），库会归一化到下拉 key；归一化失败或该金属不在当前可选范围时，不要伪造其它 metal 绕过申报范围。

@@ -73,7 +73,6 @@ describe('SmelterListTable header alignment', () => {
       'smelterName',
       'smelterCountry',
       'smelterIdentification',
-      'sourceId',
     ])
     expect(profile.columns).not.toContain('smelterNumberInput')
     expect(profile.columns).not.toContain('smelterLookup')

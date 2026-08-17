@@ -10,7 +10,6 @@ export type SmelterColumnId =
   | 'smelterName'
   | 'smelterCountry'
   | 'smelterIdentification'
-  | 'sourceId'
   | 'smelterStreet'
   | 'smelterCity'
   | 'smelterState'
@@ -44,7 +43,6 @@ const CMRT_AND_V2_COLUMNS: SmelterColumnId[] = [
   'smelterName',
   'smelterCountry',
   'smelterIdentification',
-  'sourceId',
   'smelterStreet',
   'smelterCity',
   'smelterState',
@@ -62,7 +60,6 @@ const AMRT_V11_V12_COLUMNS: SmelterColumnId[] = [
   'smelterName',
   'smelterCountry',
   'smelterIdentification',
-  'sourceId',
   'smelterStreet',
   'smelterCity',
   'smelterState',
@@ -83,7 +80,6 @@ function fallbackLabels(t: Translate): Record<SmelterColumnId, string> {
     smelterName: t('tables.smelterName'),
     smelterCountry: t('tables.country'),
     smelterIdentification: t('tables.smelterIdentification'),
-    sourceId: t('tables.sourceId'),
     smelterStreet: t('tables.street'),
     smelterCity: t('tables.city'),
     smelterState: t('tables.stateProvince'),
@@ -149,7 +145,6 @@ function buildZhLabels(variant: SmelterHeaderVariant): Record<SmelterColumnId, s
   const common = {
     smelterNumberInput: '冶炼厂识别号码输入列',
     smelterIdentification: '冶炼厂识别',
-    sourceId: '冶炼厂出处识别号',
     smelterStreet:
       variant === 'cmrt' || variant.startsWith('amrt')
         ? '冶炼厂所在街道'

@@ -75,7 +75,6 @@ const INPUT_FIELDS = [
   'smelterNumber',
   'smelterName',
   'smelterIdentification',
-  'sourceId',
   'smelterStreet',
   'smelterCity',
   'smelterState',
@@ -103,7 +102,6 @@ const SMELTER_COLUMN_KEY_BY_ID: Record<SmelterColumnId, string> = {
   smelterName: 'smelterName',
   smelterCountry: 'smelterCountry',
   smelterIdentification: 'smelterIdentification',
-  sourceId: 'sourceId',
   smelterStreet: 'smelterStreet',
   smelterCity: 'smelterCity',
   smelterState: 'smelterState',
@@ -640,7 +638,7 @@ export const SmelterListTable = memo(function SmelterListTable({
   // ---------------------------------------------------------------------------
   // 列定义（约 430 行）
   // 按业务逻辑顺序构建：metal → smelterLookup/smelterName → smelterNumber →
-  // country → identification → sourceId → 地址字段 → recycledScrap → comments → 操作
+  // country → identification → 地址字段 → recycledScrap → comments → 操作
   // 每列的 render 函数负责行内编辑（Input/Select/AutoComplete）和必填标记。
   // ---------------------------------------------------------------------------
   const columns = useCreation<ColumnsType<SmelterRow>>(() => {
@@ -899,27 +897,6 @@ export const SmelterListTable = memo(function SmelterListTable({
               {...getReadonlyTextControlProps({
                 value,
                 placeholder: t('placeholders.smelterIdentification'),
-                disabled,
-              })}
-            />
-          )
-        },
-      },
-      {
-        title: resolveColumnTitle('sourceId'),
-        dataIndex: 'sourceId',
-        key: 'sourceId',
-        width: 180,
-        render: (value: string, record: SmelterRow) => {
-          const disabled = isSmelterBaseFieldDisabled(record)
-          return (
-            <Input
-              value={value || undefined}
-              onChange={getInputHandler(`${record.id}:sourceId`)}
-              disabled={disabled}
-              {...getReadonlyTextControlProps({
-                value,
-                placeholder: t('placeholders.smelterSourceId'),
                 disabled,
               })}
             />

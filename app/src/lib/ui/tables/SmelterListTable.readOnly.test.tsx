@@ -133,7 +133,6 @@ describe('SmelterListTable readOnly disabled behavior', () => {
     expect(hasDisabledInput(html)).toBe(true)
     expect(html).not.toContain('placeholder="placeholders.smelterNumberInput"')
     expect(html).not.toContain('placeholder="placeholders.smelterIdentification"')
-    expect(html).not.toContain('placeholder="placeholders.smelterSourceId"')
     expect(html).not.toContain('placeholder="placeholders.smelterStreet"')
     expect(html).not.toContain('placeholder="placeholders.smelterCity"')
     expect(html).not.toContain('placeholder="placeholders.smelterState"')
@@ -145,7 +144,6 @@ describe('SmelterListTable readOnly disabled behavior', () => {
 
     expect(hasInputEnabledByPlaceholder(html, 'placeholders.smelterNumberInput')).toBe(true)
     expect(hasInputEnabledByPlaceholder(html, 'placeholders.smelterIdentification')).toBe(true)
-    expect(hasInputEnabledByPlaceholder(html, 'placeholders.smelterSourceId')).toBe(true)
     expect(hasInputEnabledByPlaceholder(html, 'placeholders.smelterStreet')).toBe(true)
     expect(hasInputEnabledByPlaceholder(html, 'placeholders.smelterCity')).toBe(true)
     expect(hasInputEnabledByPlaceholder(html, 'placeholders.smelterState')).toBe(true)
@@ -155,7 +153,6 @@ describe('SmelterListTable readOnly disabled behavior', () => {
   test('does not show placeholder text for empty fields locked by external pick', () => {
     const html = renderExternallyLockedSmelterListTable({})
 
-    expect(html).not.toContain('placeholder="placeholders.smelterSourceId"')
     expect(html).not.toContain('placeholder="placeholders.smelterStreet"')
     expect(html).not.toContain('placeholder="placeholders.smelterCity"')
   })
@@ -176,7 +173,6 @@ describe('SmelterListTable readOnly disabled behavior', () => {
 
     expect(hasDisabledInputByValue(html, 'Custom Smelter')).toBe(true)
     expect(hasDisabledInputByValue(html, 'CID-CUSTOM-1')).toBe(true)
-    expect(hasDisabledInputByValue(html, 'RMI')).toBe(true)
     expect(hasDisabledInputByValue(html, '12 Custom Street')).toBe(true)
     expect(hasDisabledInputByValue(html, 'Rabat')).toBe(true)
     expect(hasCountrySelectDisabled(html)).toBe(true)
