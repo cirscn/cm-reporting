@@ -1,5 +1,11 @@
 # cm-reporting
 
+## 0.9.5
+
+### Patch Changes
+
+- 61baeff: 统一顶部步骤条当前完成图标与普通完成图标的可见圆圈尺寸。
+
 ## 0.9.4
 
 ### Patch Changes
