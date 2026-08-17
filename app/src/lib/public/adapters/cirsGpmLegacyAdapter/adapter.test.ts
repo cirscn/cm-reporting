@@ -27,6 +27,21 @@ describe('cirsGpmLegacyAdapter', () => {
     expect(out).toEqual(legacy)
   })
 
+  test('infers templateType/versionId from identifiers without RMI_ prefix', () => {
+    const cases = [
+      { fixture: 'cmrt.json', identifier: 'CMRT_6.5', versionId: '6.5' },
+      { fixture: 'emrt.json', identifier: 'emrt_2.1', versionId: '2.1' },
+    ] as const
+    for (const { fixture, identifier, versionId } of cases) {
+      const legacy = asRecord(loadFixture(fixture))
+      legacy.name = identifier
+
+      const { snapshot } = cirsGpmLegacyAdapter.toInternal(legacy)
+
+      expect(snapshot.versionId).toBe(versionId)
+    }
+  })
+
   test('reads China local midnight effectiveDate as the same calendar date', () => {
     const legacy = asRecord(loadFixture('cmrt.json'))
     const company = asRecord(legacy.cmtCompany)

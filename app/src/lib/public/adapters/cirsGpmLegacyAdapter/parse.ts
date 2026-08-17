@@ -10,7 +10,8 @@ export interface ParsedCirsGpmLegacyReport {
   versionId: string
 }
 
-const VERSION_RE = /RMI_(CMRT|EMRT|CRT|AMRT)_([0-9.]+)/i
+// 兼容带与不带 RMI_ 前缀的标识（如 RMI_CMRT_6.5 与 CMRT_6.5）
+const VERSION_RE = /(?:RMI_)?(CMRT|EMRT|CRT|AMRT)_([0-9.]+)/i
 
 function normalizeTemplateType(value: string): TemplateType | null {
   const lower = value.toLowerCase()
