@@ -47,7 +47,7 @@ function App() {
     <CMReporting
       ref={ref}
       templateType="cmrt"
-      versionId="6.6"
+      versionId="6.6.1"
       locale="zh-CN"
     />
   )
@@ -101,7 +101,7 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 | Prop | 类型 | 必须 | 说明 |
 |------|------|:----:|------|
 | `templateType` | `TemplateType` | ✅ | 模板类型：`'cmrt' \| 'emrt' \| 'crt' \| 'amrt'` |
-| `versionId` | `string` | ✅ | 模板版本号，如 `'6.6'`、`'2.11'` |
+| `versionId` | `string` | ✅ | 模板版本号，如 `'6.6.1'`、`'2.11.1'` |
 | `locale` | `Locale` | - | 语言：`'en-US' \| 'zh-CN'`，默认 `'en-US'` |
 | `onLocaleChange` | `(locale: Locale) => void` | - | 语言变化回调 |
 | `theme` | `object` | - | Ant Design 主题 token 覆盖；不传时继承宿主 `ConfigProvider` |
@@ -366,10 +366,12 @@ URL.revokeObjectURL(url)
 
 > Excel 导出采用"最小 patch"策略——严格保留模板的 DV、格式、公式、隐藏 sheet 等，仅填入用户数据。
 
-### AMRT 1.31 矿产范围
+### 无 Logo 正式升版与 AMRT 矿产范围
 
-- `AMRT 1.31` 已按官方 Excel 模板接入，默认版本为 `1.31`。
-- 相比 `AMRT 1.3`，`AMRT 1.31` 新增 `Cadmium`、`Lead`、`Molybdenum`、`Rhenium`、`Selenium`、`Tellurium`。
+- `CMRT 6.6.1`、`EMRT 2.11.1`、`AMRT 1.31.1` 作为独立正式版本接入，分别是 `6.6`、`2.11`、`1.31` 的无 Logo 版本。
+- 三个升版与对应旧版本结构、字段和规则一致，但 Snapshot 与 Excel 导出会保留独立 `versionId`，便于后续溯源。
+- 官方无 Logo 文件名不带 `RMI_` 前缀：`CMRT_6.6.1.xlsx`、`EMRT_2.11.1.xlsx`、`AMRT_1.31.1.xlsx`。
+- `AMRT 1.31.1` 是默认版本；相比 `AMRT 1.3`，它延续 `1.31` 新增的 `Cadmium`、`Lead`、`Molybdenum`、`Rhenium`、`Selenium`、`Tellurium`。
 - 这些矿产会进入 Declaration 矿产选择、按矿产题目、`Smelter List`、`Mine List`、`Minerals Scope` 和 Excel 导出。
 
 ---
@@ -441,7 +443,7 @@ return null
 - 当 `Declaration Scope = Product`（内部值 `scopeType === 'B'`）时，`Product List` 必须至少有 1 行数据。
 - `回复方的产品编号`（字段 `partNumber`）始终按必填处理。
 - `回复方的产品名称` 对应字段 `partName`，注释对应字段 `remark`。
-- 当模板配置 `hasRequesterColumns=true`（如 `CMRT 6.6`、`EMRT 2.11`、`AMRT 1.3 / 1.31`）时，会展示请求方列，但 `请求方的产品编号`（字段 `requestPartNumber`）不参与必填校验。
+- 当模板配置 `hasRequesterColumns=true`（如 `CMRT 6.6 / 6.6.1`、`EMRT 2.11 / 2.11.1`、`AMRT 1.3 / 1.31 / 1.31.1`）时，会展示请求方列，但 `请求方的产品编号`（字段 `requestPartNumber`）不参与必填校验。
 - `请求方的产品名称` 对应字段 `requestPartName`。
 
 ### SmelterList 外部选择
@@ -492,7 +494,7 @@ return null
 
 **Mine List 表头与模板对齐规则：**
 
-- `Mine List` 只在支持该工作表的模板中显示：当前是 `AMRT 1.1 / 1.2 / 1.3 / 1.31` 与 `EMRT 2.0 / 2.1 / 2.11`。
+- `Mine List` 只在支持该工作表的模板中显示：当前是 `AMRT 1.1 / 1.2 / 1.3 / 1.31 / 1.31.1` 与 `EMRT 2.0 / 2.1 / 2.11 / 2.11.1`。
 - 这些版本的矿厂列表 UI 表头已按对应 RMI Excel 模板对齐。
 - 当前 UI 显示列仍只保留业务可编辑列，不显示模板里的辅助列：`Country Code`、`State / Province Code`。
 - UI 表头文案对齐模板，不代表底层字段名变化；例如“矿厂识别（例如《CID》）”对应的仍是 `mineId` 字段。

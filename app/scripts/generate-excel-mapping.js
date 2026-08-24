@@ -17,6 +17,8 @@ import { fileURLToPath } from 'node:url'
 
 import { unzipSync } from 'fflate'
 
+import { getTemplateFilename } from './template-file-names.js'
+
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const APP_ROOT = resolve(__dirname, '..')
 
@@ -320,7 +322,8 @@ function generate() {
     }
 
     for (const versionId of versions) {
-      const templatePath = join(APP_ROOT, 'templates', t.typeUpper, `RMI_${t.typeUpper}_${versionId}.xlsx`)
+      const filename = getTemplateFilename(t.typeUpper, versionId)
+      const templatePath = join(APP_ROOT, 'templates', t.typeUpper, filename)
       const templateKey = `${t.typeLower}@${versionId}`
       if (!existsSync(templatePath)) {
         throw new Error(`Template file not found: ${templatePath}`)

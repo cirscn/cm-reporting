@@ -29,6 +29,7 @@ const DATE_CONFIG_CASES: Array<{
   { type: 'cmrt', versionId: '6.4', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
   { type: 'cmrt', versionId: '6.5', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
   { type: 'cmrt', versionId: '6.6', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
+  { type: 'cmrt', versionId: '6.6.1', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
   { type: 'emrt', versionId: '1.1', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
   { type: 'emrt', versionId: '1.11', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
   { type: 'emrt', versionId: '1.2', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
@@ -36,12 +37,14 @@ const DATE_CONFIG_CASES: Array<{
   { type: 'emrt', versionId: '2.0', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
   { type: 'emrt', versionId: '2.1', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
   { type: 'emrt', versionId: '2.11', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
+  { type: 'emrt', versionId: '2.11.1', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
   { type: 'crt', versionId: '2.2', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
   { type: 'crt', versionId: '2.21', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
   { type: 'amrt', versionId: '1.1', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
   { type: 'amrt', versionId: '1.2', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
   { type: 'amrt', versionId: '1.3', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
   { type: 'amrt', versionId: '1.31', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
+  { type: 'amrt', versionId: '1.31.1', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
 ]
 
 describe('registry versions', () => {
@@ -60,16 +63,29 @@ describe('registry versions', () => {
     })
   })
 
-  it('supports CMRT 6.6 and EMRT 2.11 version definitions', () => {
-    const cmrtDefinition = getTemplateDefinition('cmrt')
-    const emrtDefinition = getTemplateDefinition('emrt')
+  it('uses the unbranded releases as traceable default versions', () => {
+    expect(getTemplateDefinition('cmrt').defaultVersion).toBe('6.6.1')
+    expect(getTemplateDefinition('emrt').defaultVersion).toBe('2.11.1')
+    expect(getTemplateDefinition('amrt').defaultVersion).toBe('1.31.1')
 
-    expect(cmrtDefinition.versions.some((version) => version.id === '6.6')).toBe(true)
-    expect(emrtDefinition.versions.some((version) => version.id === '2.11')).toBe(true)
-
-    expect(getVersionDef('cmrt', '6.6').version.id).toBe('6.6')
-    expect(getVersionDef('emrt', '2.11').version.id).toBe('2.11')
+    expect(getVersionDef('cmrt', '6.6.1').version.id).toBe('6.6.1')
+    expect(getVersionDef('emrt', '2.11.1').version.id).toBe('2.11.1')
+    expect(getVersionDef('amrt', '1.31.1').version.id).toBe('1.31.1')
   })
+
+  it.each([
+    ['cmrt', '6.6', '6.6.1'],
+    ['emrt', '2.11', '2.11.1'],
+    ['amrt', '1.31', '1.31.1'],
+  ] as const)(
+    'keeps %s %s and %s rules identical except version metadata',
+    (type, brandedVersion, unbrandedVersion) => {
+      const branded = getVersionDef(type, brandedVersion)
+      const unbranded = getVersionDef(type, unbrandedVersion)
+
+      expect({ ...unbranded, version: branded.version }).toEqual(branded)
+    }
+  )
 
   it('defines authorization date range for every supported template version', () => {
     DATE_CONFIG_CASES.forEach(({ type, versionId, dateConfig }) => {

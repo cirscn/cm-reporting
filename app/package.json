@@ -60,7 +60,7 @@
     "generate:excel-mapping": "node scripts/generate-excel-mapping.js",
     "validate:excel-mapping": "node scripts/generate-excel-mapping.js --check",
     "pretest": "pnpm validate:templates && pnpm validate:excel-mapping",
-    "test": "vitest run && node --test scripts/scope-css.node-test.mjs",
+    "test": "vitest run && node --test scripts/scope-css.node-test.mjs scripts/template-file-names.node-test.mjs",
     "sg:scan": "sg scan -c ../sgconfig.yml ./src",
     "sg:fix": "sg scan -c ../sgconfig.yml ./src -U",
     "changeset": "changeset",

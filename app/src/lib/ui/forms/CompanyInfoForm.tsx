@@ -88,7 +88,7 @@ const SPELLCHECK_DISABLED_KEYS = new Set([
 ])
 
 const DEFAULT_COMPANY_INFO_FIELD_SPAN = 12
-const CMRT_PROMPT_VERSION_IDS = new Set(['6.31', '6.4', '6.5', '6.6'])
+const CMRT_PROMPT_VERSION_IDS = new Set(['6.31', '6.4', '6.5', '6.6', '6.6.1'])
 
 /**
  * CompanyInfoForm：公司信息表单组件。

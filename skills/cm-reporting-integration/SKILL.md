@@ -68,15 +68,18 @@ Apply these rules in every solution:
 - For all templates, keep `Smelter List` rows under the same Q1/Q2 gating as the current template: when a metal no longer requires smelter disclosure, rows for that metal are automatically removed from `smelterList`.
 - For any template version with `smelterLookup` dropdown support, once a `Smelter List` row has a selected `metal`, treat `smelterLookup` as checker-required; missing lookup must stay visible as an unfinished item instead of silently passing.
 - For `EMRT`, default selection should include all declared minerals on empty initialization; when `readOnly=false`, users can still edit the declaration scope selections.
-- For `Product List`, when `Declaration Scope = Product` (`scopeType === 'B'`), the list itself is required and `partNumber` is always required; versions with `hasRequesterColumns=true` (for example `CMRT 6.6`, `EMRT 2.11`, and `AMRT 1.3 / 1.31`) still show `requestPartNumber`, but it is not required.
+- For `Product List`, when `Declaration Scope = Product` (`scopeType === 'B'`), the list itself is required and `partNumber` is always required; versions with `hasRequesterColumns=true` (for example `CMRT 6.6 / 6.6.1`, `EMRT 2.11 / 2.11.1`, and `AMRT 1.3 / 1.31 / 1.31.1`) still show `requestPartNumber`, but it is not required.
 - Product List integration payload fields are `partNumber / partName / requestPartNumber / requestPartName / remark`.
 - 对 `dynamic-dropdown` 范围模板（`EMRT` 2.x / `AMRT` 1.3+），当取消某个矿种时，应预期库会自动执行级联清理：清空该矿种的按矿种题目/备注答案，并删除关联的 `Smelter List` / `Mine List` 行数据。
 - 当 `other` 保持勾选但某个自定义矿种名称被清空时，库会按槽位清理对应 `other-*` 的按矿种答案与关联列表行。
 
-## AMRT 1.31 Notes
+## Unbranded Version Notes
 
-- Use `templateType="amrt"` with `versionId="1.31"` for the latest AMRT template file `RMI_AMRT_1.31.xlsx`.
-- `AMRT 1.31` adds `Cadmium`, `Lead`, `Molybdenum`, `Rhenium`, `Selenium`, and `Tellurium` compared with `AMRT 1.3`.
+- Treat `CMRT 6.6.1`, `EMRT 2.11.1`, and `AMRT 1.31.1` as independent official versions for snapshot and export traceability.
+- These versions only remove the template Logo; their structures and rules match `CMRT 6.6`, `EMRT 2.11`, and `AMRT 1.31` respectively.
+- Their official filenames do not use the `RMI_` prefix: `CMRT_6.6.1.xlsx`, `EMRT_2.11.1.xlsx`, and `AMRT_1.31.1.xlsx`.
+- Use `templateType="amrt"` with `versionId="1.31.1"` for the latest AMRT template file `AMRT_1.31.1.xlsx`.
+- `AMRT 1.31 / 1.31.1` adds `Cadmium`, `Lead`, `Molybdenum`, `Rhenium`, `Selenium`, and `Tellurium` compared with `AMRT 1.3`.
 - Treat those six entries as first-class minerals in Snapshot data, not as `Other` custom minerals.
 - Excel export writes these minerals through Declaration, `Smelter List`, `Mine List`, and `Minerals Scope` using the original template patch flow.
 

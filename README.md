@@ -68,10 +68,10 @@ function App() {
 
 | 模板 | 版本 | 说明 |
 |------|------|------|
-| CMRT | 6.01, 6.1, 6.22, 6.31, 6.4, 6.5 | 冲突矿产报告模板 |
-| EMRT | 1.1, 1.11, 1.2, 1.3, 2.0, 2.1 | 扩展矿产报告模板 |
+| CMRT | 6.01, 6.1, 6.22, 6.31, 6.4, 6.5, 6.6, 6.6.1 | 冲突矿产报告模板 |
+| EMRT | 1.1, 1.11, 1.2, 1.3, 2.0, 2.1, 2.11, 2.11.1 | 扩展矿产报告模板 |
 | CRT | 2.2, 2.21 | 钴报告模板 |
-| AMRT | 1.1, 1.2, 1.3 | 附加矿产报告模板 |
+| AMRT | 1.1, 1.2, 1.3, 1.31, 1.31.1 | 附加矿产报告模板 |
 
 ## 开发
 
@@ -121,10 +121,10 @@ $ pnpm validate:templates
 
 Validating templates...
 
-✓ CMRT: 6 versions, all templates found
-✓ EMRT: 6 versions, all templates found
+✓ CMRT: 8 versions, all templates found
+✓ EMRT: 8 versions, all templates found
 ✓ CRT: 2 versions, all templates found
-✓ AMRT: 3 versions, all templates found
+✓ AMRT: 5 versions, all templates found
 
 All template validations passed.
 ```

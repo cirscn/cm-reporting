@@ -17,7 +17,7 @@ import type {
 
 import type { EmrtVersionId } from './manifest'
 
-const EMRT_OPEN_DATE_VERSION_IDS = new Set<EmrtVersionId>(['2.11'])
+const EMRT_OPEN_DATE_VERSION_IDS = new Set<EmrtVersionId>(['2.11', '2.11.1'])
 
 // ---------------------------------------------------------------------------
 // EMRT Minerals

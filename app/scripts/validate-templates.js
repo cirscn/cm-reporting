@@ -16,6 +16,8 @@ import { readFileSync, existsSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { getTemplateFilename } from './template-file-names.js'
+
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const APP_ROOT = resolve(__dirname, '..')
 
@@ -71,10 +73,10 @@ function extractVersions(manifestContent, arrayName) {
 
 /**
  * Get the expected template file path for a given type and version.
- * Format: templates/{TYPE}/RMI_{TYPE}_{VERSION}.xlsx
+ * 文件名使用官方发布名；无 Logo 版本不带 RMI_ 前缀。
  */
 function getTemplateFilePath(type, version) {
-  return join(APP_ROOT, 'templates', type, `RMI_${type}_${version}.xlsx`)
+  return join(APP_ROOT, 'templates', type, getTemplateFilename(type, version))
 }
 
 /**
@@ -118,7 +120,7 @@ function validateTemplates() {
       } else {
         missing.push({
           version,
-          expectedPath: `templates/${template.type}/RMI_${template.type}_${version}.xlsx`,
+          expectedPath: `templates/${template.type}/${getTemplateFilename(template.type, version)}`,
         })
       }
     }
