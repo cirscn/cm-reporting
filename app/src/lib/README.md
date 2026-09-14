@@ -471,6 +471,7 @@ return null
 - 导入或 `setFormData()` 写入的历史数据如果存在同一个 `metal` 下同一 `id` 的重复冶炼厂，也会在 checker / `validate()` 中报错；`smelter-new-*` 临时 ID 不参与判重。
 - 行内外部选择成功后（包括宿主回写正式 `id` 的自定义 `Smelter not listed`，不包括手动新增的临时 `Smelter not listed` 与 `Smelter not yet identified`），`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state` 字段会锁定为不可编辑。
 - `smelterLookup` 为 `Smelter not listed`（兼容大小写变体）时，该自定义冶炼厂整行的可见文字会使用宿主 Ant Design 主题的错误色标红；该规则在编辑态和只读态都生效。
+- 标红覆盖 Ant Design 5/6 的 AutoComplete 实际输入文字，包含只读时“冶炼厂查找”列的 `Smelter not listed`。
 - 锁定后的空字段不显示 placeholder，避免把 `Source ID`、`街道`、`城市` 等占位提示误看成真实数据；有真实值的只读文本会单行省略，鼠标悬浮显示全文。
 - 问题矩阵中被门控禁用的空回答框和空备注框同样不显示 placeholder，避免把“请选择”“备注”误看成已填内容。
 - 如果宿主外部回写只带了 `smelterName`、没带 `smelterLookup`，库会自动用 `smelterName` 回填到 `smelterLookup`，保证“冶炼厂查找”列显示正常，且 checker 不会把该行继续判成未选择冶炼厂。

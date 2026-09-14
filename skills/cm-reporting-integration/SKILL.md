@@ -37,6 +37,7 @@ Apply these rules in every solution:
 - 导入或 `setFormData()` 写入的 `SmelterList` 历史数据也会在 checker / `validate()` 中按同一口径判重：同一个 `metal` 下重复的非临时 `id` 会报错，`smelter-new-*` 临时 ID 不参与判重。
 - `SmelterList` 行内外部选择成功后（包括宿主回写正式 `id` 的自定义 `Smelter not listed`，不包括手动新增的临时 `Smelter not listed` 与 `Smelter not yet identified`），应锁定基础主数据字段不可编辑：`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state`。
 - `SmelterList` 中 `smelterLookup` 为 `Smelter not listed`（兼容大小写变体）的自定义冶炼厂由库内置整行文字标红，编辑态、只读态和外部选择锁定态保持一致；宿主 `rowClassName` 只追加额外 className，不应替代该表现。
+- 内置标红覆盖 Ant Design 5/6 的 AutoComplete 实际输入文字，包含只读“冶炼厂查找”列；宿主无需额外补写此控件的标红样式。
 - `SmelterList` 锁定后的空字段不得显示 placeholder，问题矩阵被门控禁用的空回答/备注也不得显示 placeholder，避免把 `Source ID`、`街道`、`城市`、`请选择`、`备注` 等占位提示误看成真实数据；有真实值的只读文本应单行省略，鼠标悬浮显示全文。
 - 宿主外部回写若只提供 `smelterName`、未提供 `smelterLookup`，库会自动把 `smelterName` 作为 `smelterLookup` 显示与校验来源；宿主如有独立查找值，仍优先回写 `smelterLookup`。
 - `SmelterList` 外部回写里 `smelterNumber` 对应 CID，UI 的“冶炼厂识别”列也显示该 CID；`sourceId` 对应 RMI 来源识别号。若宿主暂时把 RMI 来源写在 `smelterIdentification` 且未提供 `sourceId`，库会归一化到 `sourceId`。`sourceId` 不再作为冶炼厂列表的表格列展示，仅作为数据字段保留（参与外部回写归一化与 Excel 导出）。
