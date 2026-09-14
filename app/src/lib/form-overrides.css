@@ -178,3 +178,24 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Custom smelters */
+.smelter-list-table .cm-smelter-row-custom > td,
+.smelter-list-table .cm-smelter-row-custom .ant-typography,
+.smelter-list-table .cm-smelter-row-custom .ant-input,
+.smelter-list-table .cm-smelter-row-custom .ant-select-selector,
+.smelter-list-table .cm-smelter-row-custom .ant-select-selection-item,
+.smelter-list-table .cm-smelter-row-custom .ant-select-content-value,
+.smelter-list-table .cm-smelter-row-custom .ant-select-input,
+.smelter-list-table .cm-smelter-row-custom .ant-tag,
+.smelter-list-table .cm-smelter-row-custom .ant-btn {
+  color: var(--app-error) !important;
+  -webkit-text-fill-color: var(--app-error) !important;
+}
+
+.smelter-list-table .cm-smelter-row-custom .ant-select-selection-placeholder,
+.smelter-list-table .cm-smelter-row-custom .ant-select-placeholder,
+.smelter-list-table .cm-smelter-row-custom .ant-input::placeholder {
+  color: var(--app-error-text) !important;
+  -webkit-text-fill-color: var(--app-error-text) !important;
+}

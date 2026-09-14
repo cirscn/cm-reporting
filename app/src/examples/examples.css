@@ -22,8 +22,8 @@
 }
 
 /* --------------------------------------------------------------------------
-   Examples - Smelter List: 未列出的冶炼厂标红示例
-   宿主可通过 SmelterListIntegration.rowClassName 自定义规则与样式
+   Examples - Smelter List: 外部名称未命中 lookup 主数据的宿主附加标红
+   Smelter not listed 由库内置样式处理，此处不重复实现
    -------------------------------------------------------------------------- */
 .smelter-list-table .smelter-row-unlisted .ant-typography,
 .smelter-list-table .smelter-row-unlisted .ant-input,

@@ -25,6 +25,8 @@ describe('AppThemeScope', () => {
     mockUseToken.mockReturnValue({
       token: {
         colorBgLayout: '#101010',
+        colorError: '#d32029',
+        colorErrorText: '#a8071a',
       },
     })
 
@@ -35,6 +37,8 @@ describe('AppThemeScope', () => {
     )
 
     expect(html).toContain('--app-bg-layout:#101010')
+    expect(html).toContain('--app-error:#d32029')
+    expect(html).toContain('--app-error-text:#a8071a')
   })
 
   test('prefers cssVar values when available', () => {

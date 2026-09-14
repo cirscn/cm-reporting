@@ -69,7 +69,7 @@ export interface ProductPickContext {
 export interface SmelterListIntegration {
   /** 是否在触发外部选择时展示按钮 loading（默认 false）。 */
   showLoadingIndicator?: boolean
-  /** 表格行样式：返回 className，交由宿主自行提供 CSS（不内置任何表现）。 */
+  /** 表格行样式：宿主返回的 className 会追加到库内置行样式，宿主需自行提供对应 CSS。 */
   rowClassName?: (record: SmelterRow, index: number) => string
   /**
    * 行内外部选择：先在表格中选择 metal，再为当前行选择冶炼厂并回写。

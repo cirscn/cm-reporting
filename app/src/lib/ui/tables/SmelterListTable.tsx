@@ -71,6 +71,8 @@ interface SmelterListTableProps {
   integration?: SmelterListIntegration
 }
 
+const CUSTOM_SMELTER_ROW_CLASS_NAME = 'cm-smelter-row-custom'
+
 const INPUT_FIELDS = [
   'smelterNumber',
   'smelterName',
@@ -1212,7 +1214,11 @@ export const SmelterListTable = memo(function SmelterListTable({
     ),
   }
 
-  const rowClassName = integration?.rowClassName
+  const getSmelterRowClassName = useMemoizedFn((record: SmelterRow, index: number) => {
+    const builtInClassName = isNotListed(record.smelterLookup) ? CUSTOM_SMELTER_ROW_CLASS_NAME : ''
+    const integrationClassName = integration?.rowClassName?.(record, index) ?? ''
+    return [builtInClassName, integrationClassName].filter(Boolean).join(' ')
+  })
 
   return (
     <Card
@@ -1273,7 +1279,7 @@ export const SmelterListTable = memo(function SmelterListTable({
         columns={columns}
         dataSource={rows}
         rowKey="id"
-        rowClassName={rowClassName ? (record, index) => rowClassName(record, index) : undefined}
+        rowClassName={getSmelterRowClassName}
         rowSelection={showEditableActions ? rowSelection : undefined}
         pagination={false}
         scroll={{ x: 'max-content', y: rows.length > 20 ? 600 : undefined }}

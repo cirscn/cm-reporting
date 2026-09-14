@@ -118,8 +118,9 @@
 
 ### SmelterList 行样式
 
-- `SmelterListIntegration.rowClassName(record, index)` 由宿主决定 className，库不内置任何“标红”等表现。
-- Examples 里的 `.smelter-row-unlisted` 仅用于演示宿主自定义样式与规则。
+- 库会自动将 `smelterLookup = Smelter not listed` 的自定义冶炼厂整行文字标红，禁用输入框和下拉框中的实际值也保持红色。
+- `SmelterListIntegration.rowClassName(record, index)` 可继续追加宿主自定义 className，不会覆盖库内置标红。
+- Examples 里的 `.smelter-row-unlisted` 只标记“外部名称未命中 lookup 主数据”的宿主附加规则，不处理由库内置标红的 `Smelter not listed`。
 
 ### Checker 门控一致性（Smelter List）
 

@@ -454,7 +454,7 @@ return null
 |------|------|------|------|
 | `showLoadingIndicator` | `boolean` | `false` | 外部选择时展示 loading |
 | `lookupMode` | `SmelterLookupMode` | `'internal'` | 冶炼厂名称交互模式：`'internal'`（手填）/ `'external'`（外部选择）/ `'hybrid'`（两者结合） |
-| `rowClassName` | `(record, index) => string` | - | 自定义行 className（由宿主提供 CSS） |
+| `rowClassName` | `(record, index) => string` | - | 追加宿主自定义行 className；不会覆盖库内置的自定义冶炼厂标红 class |
 | `onPickSmelterForRow` | `(ctx) => Promise<ExternalPickResult>` | - | 行内外部选择（点击“新增一行”后，选择 metal，再为当前行选择冶炼厂） |
 | `onLookupSmelterByNumber` | `(ctx) => Promise<ExternalPickResult>` | - | 输入冶炼厂 CID 后由宿主系统查询主数据并回填当前行 |
 | `onPickSmelterForNumberLookup` | `(ctx) => Promise<ExternalPickResult>` | - | CID 查询返回多条时，由宿主打开选择器让用户确认一条；`ctx.searchField='smelterNumber'`，`ctx.searchValue` 为用户输入值 |
@@ -470,6 +470,7 @@ return null
 - 同一个 `metal` 下禁止重复选择同一冶炼厂（按回写 `id` 去重）。
 - 导入或 `setFormData()` 写入的历史数据如果存在同一个 `metal` 下同一 `id` 的重复冶炼厂，也会在 checker / `validate()` 中报错；`smelter-new-*` 临时 ID 不参与判重。
 - 行内外部选择成功后（包括宿主回写正式 `id` 的自定义 `Smelter not listed`，不包括手动新增的临时 `Smelter not listed` 与 `Smelter not yet identified`），`smelterNumber`、`country`、`smelterIdentification`、`sourceId`、`street`、`city`、`state` 字段会锁定为不可编辑。
+- `smelterLookup` 为 `Smelter not listed`（兼容大小写变体）时，该自定义冶炼厂整行的可见文字会使用宿主 Ant Design 主题的错误色标红；该规则在编辑态和只读态都生效。
 - 锁定后的空字段不显示 placeholder，避免把 `Source ID`、`街道`、`城市` 等占位提示误看成真实数据；有真实值的只读文本会单行省略，鼠标悬浮显示全文。
 - 问题矩阵中被门控禁用的空回答框和空备注框同样不显示 placeholder，避免把“请选择”“备注”误看成已填内容。
 - 如果宿主外部回写只带了 `smelterName`、没带 `smelterLookup`，库会自动用 `smelterName` 回填到 `smelterLookup`，保证“冶炼厂查找”列显示正常，且 checker 不会把该行继续判成未选择冶炼厂。

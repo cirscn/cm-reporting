@@ -3,13 +3,17 @@
  * @description Examples 场景：宿主通过 `SmelterListIntegration.rowClassName` 自定义行样式。
  */
 
-import { SMELTER_LOOKUP_DATA } from '@core/data/lookups'
 import { CMReportingApp } from '@lib/CMReportingApp'
 import type { SmelterRow } from '@lib/index'
 import { CMReportingProvider } from '@lib/providers/CMReportingProvider'
 import { useTemplateActions } from '@lib/shell/store'
 import { Flex, Typography } from 'antd'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect } from 'react'
+
+import {
+  getExampleSmelterRowClassName,
+  SMELTER_ROW_CLASS_NAME_SEED_ROWS,
+} from '../smelterRowClassName'
 
 function SeedSmelterList({ rows }: { rows: SmelterRow[] }) {
   const { setSmelterList } = useTemplateActions()
@@ -20,56 +24,6 @@ function SeedSmelterList({ rows }: { rows: SmelterRow[] }) {
 }
 
 export function SmelterRowClassNameScenario() {
-  const seedRows = useMemo<SmelterRow[]>(
-    () => [
-      {
-        id: 'S1',
-        metal: 'Sn',
-        smelterLookup: 'Malaysia Smelting Corporation',
-        smelterName: '',
-        smelterCountry: '',
-        smelterIdentification: '',
-        sourceId: '',
-        smelterStreet: '',
-        smelterCity: '',
-        smelterState: '',
-        smelterContactName: '',
-        smelterContactEmail: '',
-        proposedNextSteps: '',
-        mineName: '',
-        mineCountry: '',
-        recycledScrap: '',
-        comments: '',
-        combinedMetal: '',
-        combinedSmelter: '',
-        smelterId: '',
-      },
-      {
-        id: 'S2',
-        metal: 'Sn',
-        smelterLookup: 'Some External Smelter Not In Lookup',
-        smelterName: '',
-        smelterCountry: '',
-        smelterIdentification: '',
-        sourceId: '',
-        smelterStreet: '',
-        smelterCity: '',
-        smelterState: '',
-        smelterContactName: '',
-        smelterContactEmail: '',
-        proposedNextSteps: '',
-        mineName: '',
-        mineCountry: '',
-        recycledScrap: '',
-        comments: '',
-        combinedMetal: '',
-        combinedSmelter: '',
-        smelterId: '',
-      },
-    ],
-    []
-  )
-
   const handleNavigatePage = useCallback(() => {}, [])
 
   return (
@@ -78,7 +32,9 @@ export function SmelterRowClassNameScenario() {
         SmelterListIntegration.rowClassName
       </Typography.Title>
       <Typography.Paragraph style={{ margin: 0 }}>
-        本示例仅展示“宿主决定样式”的接口形态；具体 CSS 可参考 `app/src/examples/examples.css:24`。
+        第三行的 Smelter not listed 由库自动标红；第二行演示宿主通过 rowClassName
+        仅为“外部名称未命中 lookup 主数据”的附加规则标红，具体 CSS 可参考
+        `app/src/examples/examples.css:24`。
       </Typography.Paragraph>
 
       <CMReportingProvider locale="zh-CN">
@@ -90,17 +46,11 @@ export function SmelterRowClassNameScenario() {
           integrations={{
             smelterList: {
               lookupMode: 'external',
-              rowClassName: (record) => {
-                const lookup = record.smelterLookup?.trim() ?? ''
-                if (!lookup) return ''
-                if (lookup.toLowerCase() === 'smelter not listed') return 'smelter-row-unlisted'
-                if (lookup.toLowerCase() === 'smelter not yet identified') return ''
-                return SMELTER_LOOKUP_DATA[lookup] ? '' : 'smelter-row-unlisted'
-              },
+              rowClassName: getExampleSmelterRowClassName,
             },
           }}
         >
-          <SeedSmelterList rows={seedRows} />
+          <SeedSmelterList rows={SMELTER_ROW_CLASS_NAME_SEED_ROWS} />
         </CMReportingApp>
       </CMReportingProvider>
     </Flex>

@@ -3,7 +3,6 @@
  * @description Example 应用容器：用于验证能力边界与集成模式。
  */
 
-import { SMELTER_LOOKUP_DATA } from '@core/data/lookups'
 import { initI18n, type Locale } from '@core/i18n'
 import { getDefaultVersion } from '@core/registry'
 import type { PageKey, TemplateType } from '@core/registry/types'
@@ -25,6 +24,7 @@ import { ImportJsonModal } from './ImportJsonModal'
 import { CMReportingRefScenario } from './scenarios/CMReportingRefScenario'
 import { LegacyTransformScenario } from './scenarios/LegacyTransformScenario'
 import { SmelterRowClassNameScenario } from './scenarios/SmelterRowClassNameScenario'
+import { getExampleSmelterRowClassName } from './smelterRowClassName'
 
 const DEFAULT_TEMPLATE: TemplateType = 'cmrt'
 const DEFAULT_PAGE: PageKey = 'declaration'
@@ -233,13 +233,7 @@ export function ExamplesApp({ locale, onLocaleChange }: ExamplesAppProps) {
               smelterList: {
                 lookupMode: 'external',
                 showLoadingIndicator: false,
-                rowClassName: (record) => {
-                  const lookup = record.smelterLookup?.trim() ?? ''
-                  if (!lookup) return ''
-                  if (lookup.toLowerCase() === 'smelter not listed') return 'smelter-row-unlisted'
-                  if (lookup.toLowerCase() === 'smelter not yet identified') return ''
-                  return SMELTER_LOOKUP_DATA[lookup] ? '' : 'smelter-row-unlisted'
-                },
+                rowClassName: getExampleSmelterRowClassName,
                 onLookupSmelterByNumber,
                 onPickSmelterForNumberLookup,
                 onPickSmelterForRow,

@@ -36,6 +36,7 @@ const TOKEN_VARIABLE_MAPPINGS = [
   ['--app-warning-bg', 'colorWarningBg'],
   ['--app-warning-border', 'colorWarningBorder'],
   ['--app-error', 'colorError'],
+  ['--app-error-text', 'colorErrorText'],
   ['--app-error-bg', 'colorErrorBg'],
   ['--app-error-border', 'colorErrorBorder'],
   ['--app-fill-secondary', 'colorFillSecondary'],
@@ -48,7 +49,7 @@ const TOKEN_VARIABLE_MAPPINGS = [
 function resolveCssVariableValue(tokenKey: TokenKey, token: TokenLike, cssVar?: CssVarLike): string {
   const cssVariableName = cssVar?.[tokenKey]
   if (typeof cssVariableName === 'string' && cssVariableName.length > 0) {
-    return `var(${cssVariableName})`
+    return cssVariableName.startsWith('var(') ? cssVariableName : `var(${cssVariableName})`
   }
 
   const tokenValue = token[tokenKey]
