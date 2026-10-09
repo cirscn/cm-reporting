@@ -141,6 +141,7 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 
 - `Smelter List` 相关的 checker 校验与进度统计共用同一门控：仅当矿种处于“需要填写冶炼厂”状态时生效。
 - 当用户后续将 `Q1/Q2` 改为否定或其它不满足当前模板门控的选项，导致某金属不再要求冶炼厂时，该金属在 `smelterList` 中的行会自动删除。
+- AMRT 全版本的冶炼厂与矿场金属下拉仅包含 Declaration 已申报且 `Q1=Yes` 的矿种；`Q2` 调查比例不限制这些金属选项。
 - 该规则用于确保 checker 错误数与完成度一致，避免“错误为 0 但完成度下降”的状态偏差。
 - 对所有带 `smelterLookup` 下拉的模板版本，只要某一行已经选择 `metal`，该行的 `smelterLookup` 就属于 checker 必填；未选择时会直接判定为未完成。
 - 导入或 `setFormData()` 写入的 `Smelter List` 数据也会检查重复冶炼厂；判重口径与行内外部选择一致：同一个 `metal` 下按行 `id` 判重，`smelter-new-*` 临时 ID 不参与判重。
@@ -153,6 +154,11 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 - 在只读模式下，输入框、下拉框、日期选择等控件仍保留 `disabled` 表单语义；已有内容正常显示，空值控件不展示 placeholder，背景统一为 `#eeeeee`，边框透明，内容文字与 label 使用同一文本色。
 - 在 `dynamic-dropdown` 模式（EMRT 2.x / AMRT 1.3+）下，取消某矿种会自动清空该矿种在按矿种题目与备注中的值，并删除该矿种在 `Smelter List` / `Mine List` 的历史行，避免残留不可见脏数据。
 - 当 `other` 保持勾选但某个自定义矿种槽位被清空时，会同步清理对应 `other-*` 的题目/备注与 `Smelter List` / `Mine List` 行数据。
+
+**AMRT 矿产申报范围联动：**
+
+- `AMRT 1.1 / 1.2 / 1.3 / 1.31 / 1.31.1` 的 `Minerals Scope` 金属下拉均来自 Declaration 当前已申报矿种，包含有名称的 Other 和 1.1/1.2 手填矿种，不按 `Q1` 答案过滤。
+- 取消申报金属、撤选 Other、清空某个 Other 名称或清空 1.1/1.2 手填矿种后，删除该矿种对应的 `Minerals Scope` 整行（含纳入原因），并清理该矿种的问题答案、备注及 `Smelter List` / `Mine List` 整行。
 
 ---
 
@@ -269,7 +275,11 @@ import type {
 `AMRT` 全版本与 `EMRT` 2.x 共用以下交互清理规则：
 
 - 用户修改答案，使某金属不再满足本版本冶炼厂门控时，清空对应矿场行的 `metal`、`smelterName` 和 `smelterId`，保留行 `id`、矿场名称、所在地等详情。EMRT 由 `Q1/Q2` 共同控制；AMRT 由 `Q1` 控制，`Q2` 调查比例本身不关闭冶炼厂门控。
-- 用户删除或替换冶炼厂后，若原 `SmelterRow.id` 已不存在于同一金属下，仅清空关联矿场行的 `smelterName` 和 `smelterId`，保留 `metal` 和矿场详情。按 ID 精确关联，同名不同 ID 不会误清；仅自由输入名称、没有关联 ID 的行不会按名称猜测清理。
+- 用户删除或替换冶炼厂、清空其有效名称或修改其金属后，若原 `SmelterRow.id` 在同一金属下已无有效名称，仅清空关联矿场行的 `smelterName` 和 `smelterId`，保留 `metal` 和矿场详情。按 ID 精确关联，同名不同 ID 不会误清；同一 ID 改名时同步关联矿场的显示名称。
+- 使用冶炼厂名称下拉的版本中，没有关联 ID 的旧选择只在该名称原为本次编辑前同金属的有效候选、且编辑后同名候选全部消失时清空；同名其他厂仍在时保留，不按名称补猜关联 ID。允许手填名称的版本保留没有关联 ID 的自由输入。
+- 清空 `smelterLookup` 时，同步清空该行自动回填的名称、识别号码、地址等基础数据，避免旧厂名继续作为矿场候选。
+- `AMRT 1.1 / 1.2` 从旧版数据导入的冶炼厂可能保留隐藏 `smelterLookup`；用户清空可见 `smelterName` 时会同步清空该隐藏值，保留其他手填详情，避免旧厂名继续作为候选。
+- 上述冶炼厂编辑只清理受本次变更影响的矿场关联，不清洗无关的历史导入数据。
 - 恢复答案或重新添加冶炼厂，不会自动恢复已清空的值。取消申报矿种仍按范围规则删除对应列表整行；`setFormData()` 和快照载入本身保留原始矿场数据，不触发上述交互清理。
 
 ---
@@ -496,7 +506,7 @@ return null
 - 问题矩阵中被门控禁用的空回答框和空备注框同样不显示 placeholder，避免把“请选择”“备注”误看成已填内容。
 - 如果宿主外部回写只带了 `smelterName`、没带 `smelterLookup`，库会自动用 `smelterName` 回填到 `smelterLookup`，保证“冶炼厂查找”列显示正常，且 checker 不会把该行继续判成未选择冶炼厂。
 - 外部回写里 `smelterNumber` 是冶炼厂 CID 展示号；“冶炼厂识别”列也会使用该 CID。`sourceId` 是来源识别号；如果宿主把 RMI 来源值放在 `smelterIdentification` 且未传 `sourceId`，库会把该值归入 `sourceId`。`sourceId` 不再作为冶炼厂列表的表格列展示，仅作为数据字段保留（参与外部回写归一化与 Excel 导出）。
-- 配置 `onLookupSmelterByNumber` 后，用户在“冶炼厂识别号码输入列”输入 CID 并离开输入框时，库会把 CID 交给宿主查询；宿主返回唯一结果时，库会先确认该结果的 `metal` 仍在当前申报范围内（例如 Q1/Q2 都为 `Yes`），再自动回填金属、名称、国家、CID、RMI 来源和地址等字段；不在范围内时只提示，不写入表格。
+- 配置 `onLookupSmelterByNumber` 后，用户在“冶炼厂识别号码输入列”输入 CID 并离开输入框时，库会把 CID 交给宿主查询；宿主返回唯一结果时，库会先确认该结果的 `metal` 满足当前模板的冶炼厂门控（AMRT 为已申报且 `Q1=Yes`；EMRT 由 `Q1/Q2` 共同控制），再自动回填金属、名称、国家、CID、RMI 来源和地址等字段；不满足时只提示，不写入表格。
 - 若 `onLookupSmelterByNumber` 返回多条，库会优先调用 `onPickSmelterForNumberLookup`，由宿主用选择器让用户确认一条；未配置该回调时只提示多条，不自动猜测。
 - 外部回写 `metal` 可传内部 key（如 `cobalt`），也可传当前下拉显示名（如 `钴`）；库会归一化成下拉使用的 key。归一化失败且该金属不在当前可选范围时，不自动回填。
 - 当全局只读（`readOnly=true`）或父级 `ConfigProvider` 处于禁用态时，上述字段仍遵循 `parentDisabled || readOnly` 禁用规则，不会被局部锁定条件覆盖。

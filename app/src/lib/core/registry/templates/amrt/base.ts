@@ -230,7 +230,7 @@ export function buildAmrtVersionDef(override: AmrtVersionOverride): TemplateVers
       smelterListGating: { type: 'q1-yes' },
     },
     smelterList: {
-      metalDropdownSource: { type: 'dynamic-active' },
+      metalDropdownSource: { type: 'dynamic-q1-yes' },
       hasIdColumn: override.smelterList.hasIdColumn,
       hasLookup: override.smelterList.hasLookup,
       hasCombinedColumn: override.smelterList.hasCombinedColumn,
@@ -240,7 +240,7 @@ export function buildAmrtVersionDef(override: AmrtVersionOverride): TemplateVers
     },
     mineList: {
       available: true,
-      metalDropdownSource: { type: 'dynamic-active' },
+      metalDropdownSource: { type: 'dynamic-q1-yes' },
       smelterNameMode: override.mineList.smelterNameMode,
     },
     productList: {

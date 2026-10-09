@@ -52,11 +52,15 @@ Apply these rules in every solution:
 - `Mine List` 表头也必须对齐对应 RMI Excel 模板；当前 UI 不展示模板中的辅助列 `Country Code`、`State / Province Code`。
 - 矿厂表头文案变化不能改变数据契约，仍应回写到既有字段：例如矿厂识别走 `mineId`，矿厂识别来源走 `mineIdSource`。
 - `EMRT / AMRT` 的 `Mine List` 行只要选择了 `metal`，`smelterName`、`mineName`、`mineCountry` 就必须参与 checker、进度和 schema 校验；`mineCountry` 是自由文本输入，不是国家/地区下拉。
+- `AMRT` 全版本的 `Smelter List` / `Mine List` 金属下拉只包含 Declaration 已申报且 `Q1=Yes` 的矿种；`Q2` 调查比例不限制这些金属选项。
 - `AMRT` 全版本与 `EMRT` 2.x 的 `MineRow.smelterId?: string` 表示所选 `SmelterRow.id`（外部选择时为宿主后台主键），不能用 CID、`smelterNumber` 或 `SmelterRow.smelterId` 替代。选择矿场冶炼厂建议或下拉项时，库同时写入名称和 ID；同名不同 ID 的选项不会合并。
 - 矿场保留各版本原有手工输入能力：自由编辑/清空 `smelterName` 会清除旧关联 ID，切换 `metal` 会清空名称和 ID；库不会只凭名称补猜历史关联。宿主直接写入 `MineRow` 时，必须同步维护名称与关联 ID。
 - `MineRow.id` 是每条矿场行的独立主键，不能用 `smelterId` 代替。矿场列表允许多行选择同一种金属、同一个冶炼厂，`smelterId` 可重复；行编辑、删除与 Legacy 回写仍按独立 `id` 定位。
 - `AMRT` 全版本与 `EMRT` 2.x 共用交互清理：用户修改答案，使某金属不再满足本版本冶炼厂门控时，清空对应矿场行的 `metal`、`smelterName`、`smelterId`，保留行 `id` 和矿场详情。EMRT 由 `Q1/Q2` 共同控制；AMRT 由 `Q1` 控制，`Q2` 调查比例本身不关闭冶炼厂门控。
-- 用户删除或替换冶炼厂后，若原 `SmelterRow.id` 已不存在于同一金属下，按 ID 精确清空关联矿场的 `smelterName`、`smelterId`，保留 `metal` 和矿场详情；同名不同 ID 不误清，没有 ID 的自由输入名称不能按名称猜关联。
+- 用户删除或替换冶炼厂、清空其有效名称或修改其金属后，若原 `SmelterRow.id` 在同一金属下已无有效名称，按 ID 精确清空关联矿场的 `smelterName`、`smelterId`，保留 `metal` 和矿场详情；同名不同 ID 不误清，同 ID 改名会同步矿场显示名称。
+- 冶炼厂名称下拉版本中，没有关联 ID 的旧选择只在该名称原为本次编辑前同金属有效候选、且编辑后同名候选全部消失时清空；同名其他厂仍存在时保留，不按名称补猜关联 ID。手填名称版本保留没有 ID 的自由输入。
+- 清空 `smelterLookup` 会同步清空该行自动回填的名称、识别号码、地址等基础数据；冶炼厂编辑只清理受本次变更影响的矿场关联，不清洗无关历史导入数据。
+- `AMRT 1.1 / 1.2` 旧版导入行可能存有隐藏 `smelterLookup`；本次交互清空可见 `smelterName` 时同步清空该隐藏值，保留其他手填详情，避免旧厂名继续成为候选。
 - 恢复答案或重新添加冶炼厂不自动恢复已清空值；取消申报矿种仍按范围规则删除对应列表整行。`setFormData()` 与快照载入本身保留原始矿场数据，不触发上述交互清理。
 - Snapshot 保存、提交与 JSON 导入/导出保留 `data.mineList[*].smelterId`，继续使用 `schemaVersion: 1`。Legacy `minList[*].smelterId` 导入为矿场关联 ID；未改关联且保留 `ctx` 时，精确回写保留原字段缺失/`null`；新增、改选、清空与 loose 输出同步当前 ID，不能回传旧 ID。
 - Respect package license (`PolyForm-Noncommercial-1.0.0`) in usage recommendations.
@@ -81,6 +85,8 @@ Apply these rules in every solution:
 - Product List integration payload fields are `partNumber / partName / requestPartNumber / requestPartName / remark`.
 - 对 `dynamic-dropdown` 范围模板（`EMRT` 2.x / `AMRT` 1.3+），当取消某个矿种时，应预期库会自动执行级联清理：清空该矿种的按矿种题目/备注答案，并删除关联的 `Smelter List` / `Mine List` 行数据。
 - 当 `other` 保持勾选但某个自定义矿种名称被清空时，库会按槽位清理对应 `other-*` 的按矿种答案与关联列表行。
+- `AMRT 1.1 / 1.2 / 1.3 / 1.31 / 1.31.1` 的 `Minerals Scope` 金属下拉均来自 Declaration 当前已申报矿种（含有名称的 Other 与 1.1/1.2 手填矿种），不按 `Q1` 答案过滤。
+- AMRT 取消矿种、撤选 Other、清空 Other 名称或清空 1.1/1.2 手填矿种后，还会删除该矿种的 `Minerals Scope` 整行（含纳入原因），并清理对应问题答案、备注与冶炼厂/矿场整行；宿主无需重复执行清理。
 
 ## Unbranded Version Notes
 

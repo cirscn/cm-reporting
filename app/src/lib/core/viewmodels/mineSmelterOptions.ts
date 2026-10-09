@@ -8,9 +8,9 @@ export interface MineSmelterOption {
 }
 
 function getSmelterName(row: SmelterRow): string {
-  if (row.smelterName) return row.smelterName
+  if (row.smelterName.trim()) return row.smelterName.trim()
   if (isSmelterNotListed(row.smelterLookup) || isSmelterNotIdentified(row.smelterLookup)) return ''
-  return row.smelterLookup
+  return row.smelterLookup.trim()
 }
 
 export function buildMineSmelterOptions(rows: SmelterRow[]) {

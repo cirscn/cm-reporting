@@ -1,18 +1,23 @@
 import type { SmelterRow } from '@core/types/tableRows'
 
-import { clearRemovedMineSmelters } from './mineCascade'
+import { reconcileMineSmelters } from './mineCascade'
+import { clearChangedSmelterLookups } from './smelterCascade'
 import type { TemplateActionContext, TemplateStoreActions } from './templateStoreTypes'
 
 function setSmelters(context: TemplateActionContext, rows: SmelterRow[]) {
   const { set, get, versionDef, scheduleValidation } = context
   if (get().readOnly) return
   set((state) => {
+    const nextRows = clearChangedSmelterLookups({
+      previousRows: state.smelterList, rows, hasLookup: versionDef.smelterList.hasLookup,
+    })
     if (versionDef.mineList.available) {
-      state.mineList = clearRemovedMineSmelters({
-        rows: state.mineList, previousSmelters: state.smelterList, nextSmelters: rows,
+      state.mineList = reconcileMineSmelters({
+        rows: state.mineList, previousSmelters: state.smelterList, nextSmelters: nextRows,
+        smelterNameMode: versionDef.mineList.smelterNameMode,
       })
     }
-    state.smelterList = rows
+    state.smelterList = nextRows
     state.isDirty = true
   })
   scheduleValidation()
