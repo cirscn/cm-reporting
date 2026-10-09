@@ -55,6 +55,9 @@ Apply these rules in every solution:
 - `AMRT` 全版本与 `EMRT` 2.x 的 `MineRow.smelterId?: string` 表示所选 `SmelterRow.id`（外部选择时为宿主后台主键），不能用 CID、`smelterNumber` 或 `SmelterRow.smelterId` 替代。选择矿场冶炼厂建议或下拉项时，库同时写入名称和 ID；同名不同 ID 的选项不会合并。
 - 矿场保留各版本原有手工输入能力：自由编辑/清空 `smelterName` 会清除旧关联 ID，切换 `metal` 会清空名称和 ID；库不会只凭名称补猜历史关联。宿主直接写入 `MineRow` 时，必须同步维护名称与关联 ID。
 - `MineRow.id` 是每条矿场行的独立主键，不能用 `smelterId` 代替。矿场列表允许多行选择同一种金属、同一个冶炼厂，`smelterId` 可重复；行编辑、删除与 Legacy 回写仍按独立 `id` 定位。
+- `AMRT` 全版本与 `EMRT` 2.x 共用交互清理：用户修改答案，使某金属不再满足本版本冶炼厂门控时，清空对应矿场行的 `metal`、`smelterName`、`smelterId`，保留行 `id` 和矿场详情。EMRT 由 `Q1/Q2` 共同控制；AMRT 由 `Q1` 控制，`Q2` 调查比例本身不关闭冶炼厂门控。
+- 用户删除或替换冶炼厂后，若原 `SmelterRow.id` 已不存在于同一金属下，按 ID 精确清空关联矿场的 `smelterName`、`smelterId`，保留 `metal` 和矿场详情；同名不同 ID 不误清，没有 ID 的自由输入名称不能按名称猜关联。
+- 恢复答案或重新添加冶炼厂不自动恢复已清空值；取消申报矿种仍按范围规则删除对应列表整行。`setFormData()` 与快照载入本身保留原始矿场数据，不触发上述交互清理。
 - Snapshot 保存、提交与 JSON 导入/导出保留 `data.mineList[*].smelterId`，继续使用 `schemaVersion: 1`。Legacy `minList[*].smelterId` 导入为矿场关联 ID；未改关联且保留 `ctx` 时，精确回写保留原字段缺失/`null`；新增、改选、清空与 loose 输出同步当前 ID，不能回传旧 ID。
 - Respect package license (`PolyForm-Noncommercial-1.0.0`) in usage recommendations.
 - For `readOnly` behavior, treat it as **view-only contract** (not just disabled inputs):

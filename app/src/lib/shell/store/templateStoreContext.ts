@@ -11,7 +11,7 @@ import { createContext, useContext } from 'react'
 import type { StoreApi } from 'zustand'
 import { useStore } from 'zustand'
 
-import type { TemplateStoreState } from './templateStore'
+import type { TemplateStoreState } from './templateStoreTypes'
 
 /** zustand store 实例类型。 */
 export type TemplateStore = StoreApi<TemplateStoreState>
