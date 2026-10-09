@@ -67,6 +67,7 @@ const mineRowSchema = z.object({
   id: z.string(),
   metal: z.string(),
   smelterName: z.string(),
+  smelterId: z.string().optional(),
   mineName: z.string(),
   mineCountry: z.string(),
   mineId: z.string().optional(),

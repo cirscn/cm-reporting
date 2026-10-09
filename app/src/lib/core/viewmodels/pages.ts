@@ -5,13 +5,12 @@
 
 // 说明：页面只负责渲染，这里的函数负责“从模板/表单派生展示数据”。
 
-import { compact, uniq } from 'lodash-es'
-
 import { getCountryOptions } from '../data/countries'
 import type { TemplateType, TemplateVersionDef } from '../registry/types'
 import { getCustomMineralLabels, getDisplayMinerals, getMetalsForSource } from '../template/minerals'
-import { isSmelterNotIdentified, isSmelterNotListed } from '../transform'
 import type { SmelterRow } from '../types/tableRows'
+
+import { buildMineSmelterOptions } from './mineSmelterOptions'
 
 /** Declaration 页面派生数据。 */
 export function buildDeclarationViewModel({
@@ -99,48 +98,8 @@ export function buildMineListViewModel({
         { selectedMinerals, customMinerals }
       ).map((mineral) => ({ ...mineral, label: labelOverrides.get(mineral.key) }))
     : []
-  const smelterNames = compact<string>(
-    smelterList.map((row) => {
-      if (row.smelterName) return row.smelterName
-      if (
-        row.smelterLookup &&
-        !isSmelterNotListed(row.smelterLookup) &&
-        !isSmelterNotIdentified(row.smelterLookup)
-      ) {
-        return row.smelterLookup
-      }
-      return null
-    })
-  )
-  const smelterOptions = uniq(smelterNames).map((value) => ({ value, label: value }))
-  const smelterOptionsByMetal = (() => {
-    const map = new Map<string, Set<string>>()
-    smelterList.forEach((row) => {
-      const metalKey = row.metal?.trim()
-      if (!metalKey) return
-      const name = row.smelterName
-        ? row.smelterName
-        : row.smelterLookup &&
-            !isSmelterNotListed(row.smelterLookup) &&
-            !isSmelterNotIdentified(row.smelterLookup)
-          ? row.smelterLookup
-          : ''
-      if (!name) return
-      const bucket = map.get(metalKey) ?? new Set<string>()
-      bucket.add(name)
-      map.set(metalKey, bucket)
-    })
-    return Object.fromEntries(
-      Array.from(map.entries()).map(([metalKey, names]) => [
-        metalKey,
-        Array.from(names).map((value) => ({ value, label: value })),
-      ])
-    )
-  })()
-
   return {
     availableMetals,
-    smelterOptions,
-    smelterOptionsByMetal,
+    ...buildMineSmelterOptions(smelterList),
   }
 }

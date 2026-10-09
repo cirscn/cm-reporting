@@ -31,7 +31,7 @@ Apply these rules in every solution:
 - `companyInfo.authorizationDate` 推荐传 `YYYY-MM-DD`；运行时兼容秒/毫秒时间戳（number/数字字符串），并会按北京时间日历日归一化为 `YYYY-MM-DD`，例如 `1749657600000` 会得到 `2025-06-12`。
 - Legacy `cmtCompany.effectiveDate` 为空字符串、空白字符串、`0` 或 `'0'` 时表示未填写；`toInternal()` 会导入为空的 `companyInfo.authorizationDate`，不要在宿主侧补成 1970。
 - Return integrations callback result in `{ items: [...] } | null | undefined` shape only.
-- 对 `SmelterList` 外部回写结果，`id` 与冶炼厂识别号码语义严格分离：`id` 仅用于行主键与去重判定；识别号码应由 `smelterNumber` 回写并仅用于展示（`smelterId` 仅内部兼容）。
+- 对 `SmelterList` 外部回写结果，`id` 与冶炼厂识别号码语义严格分离：`id` 用于行主键、去重判定和矿场 `MineRow.smelterId` 关联；识别号码应由 `smelterNumber` 回写并仅用于展示（`SmelterRow.smelterId` 仅内部兼容）。
 - `SmelterList` 新增行应先生成临时 ID（`smelter-new-<timestamp>`）；宿主外部选择回写 `id` 后覆盖该临时 ID，未回写 `id` 时本次回写无效并提示错误。
 - `SmelterList` 行内外部选择需保证同一个 `metal` 下冶炼厂唯一，按回写 `id` 判重。
 - 导入或 `setFormData()` 写入的 `SmelterList` 历史数据也会在 checker / `validate()` 中按同一口径判重：同一个 `metal` 下重复的非临时 `id` 会报错，`smelter-new-*` 临时 ID 不参与判重。
@@ -52,6 +52,10 @@ Apply these rules in every solution:
 - `Mine List` 表头也必须对齐对应 RMI Excel 模板；当前 UI 不展示模板中的辅助列 `Country Code`、`State / Province Code`。
 - 矿厂表头文案变化不能改变数据契约，仍应回写到既有字段：例如矿厂识别走 `mineId`，矿厂识别来源走 `mineIdSource`。
 - `EMRT / AMRT` 的 `Mine List` 行只要选择了 `metal`，`smelterName`、`mineName`、`mineCountry` 就必须参与 checker、进度和 schema 校验；`mineCountry` 是自由文本输入，不是国家/地区下拉。
+- `AMRT` 全版本与 `EMRT` 2.x 的 `MineRow.smelterId?: string` 表示所选 `SmelterRow.id`（外部选择时为宿主后台主键），不能用 CID、`smelterNumber` 或 `SmelterRow.smelterId` 替代。选择矿场冶炼厂建议或下拉项时，库同时写入名称和 ID；同名不同 ID 的选项不会合并。
+- 矿场保留各版本原有手工输入能力：自由编辑/清空 `smelterName` 会清除旧关联 ID，切换 `metal` 会清空名称和 ID；库不会只凭名称补猜历史关联。宿主直接写入 `MineRow` 时，必须同步维护名称与关联 ID。
+- `MineRow.id` 是每条矿场行的独立主键，不能用 `smelterId` 代替。矿场列表允许多行选择同一种金属、同一个冶炼厂，`smelterId` 可重复；行编辑、删除与 Legacy 回写仍按独立 `id` 定位。
+- Snapshot 保存、提交与 JSON 导入/导出保留 `data.mineList[*].smelterId`，继续使用 `schemaVersion: 1`。Legacy `minList[*].smelterId` 导入为矿场关联 ID；未改关联且保留 `ctx` 时，精确回写保留原字段缺失/`null`；新增、改选、清空与 loose 输出同步当前 ID，不能回传旧 ID。
 - Respect package license (`PolyForm-Noncommercial-1.0.0`) in usage recommendations.
 - For `readOnly` behavior, treat it as **view-only contract** (not just disabled inputs):
   - hide checker page and checker entry in workflow;

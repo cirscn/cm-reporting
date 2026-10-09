@@ -254,6 +254,18 @@ import type {
 } from '@lib/index'
 ```
 
+### 矿场行关联字段（`MineRow`）
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `id` | `string` | 矿场行独立主键；每行不同，不能使用 `smelterId` 代替 |
+| `smelterName` | `string` | 从该矿场采购的冶炼厂名称 |
+| `smelterId` | `string \| undefined` | 所选 `SmelterRow.id`；外部选择时是宿主后台主键，不能使用 CID 或 `smelterNumber` 替代 |
+
+`MineRow.smelterId` 是矿场到冶炼厂的关联字段，与 `SmelterRow.smelterId` 的内部兼容字段不同。历史快照可以不包含该字段；库不会只凭名称推测或补写关联主键。宿主直接修改 `MineRow` 时，需要同步维护 `smelterName` 和 `smelterId`；仅手工输入名称时应清除旧关联主键。
+
+同一种金属、同一个冶炼厂可以对应多条矿场行：这些行的 `smelterId` 可以相同，但 `id` 必须各自不同。表格编辑、删除和 Legacy 回写均按矿场行 `id` 定位，不按 `smelterId` 去重。
+
 ---
 
 ## Snapshot 导入/导出（JSON）
@@ -283,6 +295,8 @@ interface ReportSnapshotV1 {
 
 > `companyInfo.authorizationDate` 的内部标准格式为 `YYYY-MM-DD`。  
 > 运行时导入（如 `parseSnapshot` / `setSnapshot` 回填）额外兼容时间戳输入（秒级或毫秒级，number/数字字符串），并会按北京时间日历日自动归一化为 `YYYY-MM-DD`；例如 `1749657600000` 会得到 `2025-06-12`。
+
+`data.mineList[*].smelterId` 会随 `getSnapshot()`、`saveDraft()`、`submit()`、`exportJson()` / `stringifySnapshot()` 一起输出，`parseSnapshot()` / `setSnapshot()` 回填时保留。该可选字段仍使用 `schemaVersion: 1`，不改变模板版本覆盖。
 
 ### 导出 JSON
 
@@ -462,9 +476,9 @@ return null
 **外部回写字段规则：**
 
 - 行 `id` 与冶炼厂识别号码（`smelterNumber` 列）语义严格分离：
-  - `id` 仅表示宿主数据主键（用于行 ID 与去重判定）；
+  - `id` 表示宿主数据主键，用于行 ID、去重判定和矿场行的 `MineRow.smelterId` 关联；
   - `smelterNumber` 仅用于展示；
-  - `smelterId` 为内部兼容字段，不参与展示与业务判定。
+  - `SmelterRow.smelterId` 为内部兼容字段，不参与展示与业务判定。
 - 点击“新增一行”时，库会先生成临时行 ID（格式：`smelter-new-<timestamp>`）。
 - 宿主回写了 `id` 后，库会使用该 `id` 覆盖临时行 ID；未回写 `id` 时本次回写无效并提示错误。
 - 同一个 `metal` 下禁止重复选择同一冶炼厂（按回写 `id` 去重）。
@@ -492,7 +506,7 @@ return null
 - 当前覆盖范围是全部调查类型：`CMRT / CRT / EMRT / AMRT`，并保留版本差异。
 - UI 表头只调整“显示名称、显示顺序、显示/隐藏”，不改底层 Snapshot / 后端字段名。
 - 以下 3 个辅助列不再在 UI 冶炼厂列表中显示：`Standard Smelter Name`、`Country Code`、`State / Province Code`。
-- `smelterId` 仍是内部兼容字段，不作为当前冶炼厂列表推荐对外字段；识别号码请使用 `smelterNumber`。
+- `SmelterRow.smelterId` 仍是内部兼容字段，不作为当前冶炼厂列表推荐对外字段；识别号码请使用 `smelterNumber`。
 
 **Mine List 表头与模板对齐规则：**
 
@@ -501,6 +515,14 @@ return null
 - 当前 UI 显示列仍只保留业务可编辑列，不显示模板里的辅助列：`Country Code`、`State / Province Code`。
 - UI 表头文案对齐模板，不代表底层字段名变化；例如“矿厂识别（例如《CID》）”对应的仍是 `mineId` 字段。
 - `EMRT / AMRT` 矿厂行只要选择了 `metal`，`smelterName`、`mineName`、`mineCountry` 就会按必填项参与校验和进度统计；`mineCountry` 在 UI 中是文本输入框，不再使用国家/地区下拉。
+
+**Mine List 冶炼厂关联规则：**
+
+- 覆盖全部已支持 `AMRT` 版本和 `EMRT` 2.x，保留各版本原有的手工输入或下拉交互。
+- 矿场行选择当前金属下的冶炼厂建议或下拉选项时，同时写入 `smelterName` 和所选 `SmelterRow.id` 到 `smelterId`；同名、不同 `id` 的冶炼厂保留为不同选项。
+- 允许手工输入的版本仍可自由填写名称；编辑或清空名称会清除旧 `smelterId`，自由输入不会自动按名称关联后台主键。
+- 修改矿场行的 `metal` 时，同步清空 `smelterName` 和 `smelterId`，避免保留其他金属的关联。
+- `CMRT / CRT / EMRT 1.x` 不新增矿场页。后台关联主键保存在 Snapshot / Legacy JSON 中，Excel 矿场表仍按模板填写名称。
 
 **行内选择上下文 (`SmelterRowPickContext`)：**
 
@@ -615,6 +637,8 @@ const { snapshot, ctx } = cirsGpmLegacyAdapter.toInternal(legacyJson)
 
 > Legacy `cmtCompany.effectiveDate` 有值时按原时间戳转换；为空字符串、空白字符串、`0` 或 `'0'` 时按未填写处理，导入后的 `companyInfo.authorizationDate` 为空，不会显示 1970-01-01。
 
+矿场 `minList[*].smelterId` 导入为 `MineRow.smelterId`，独立于冶炼厂 CID。原字段缺失或为 `null` 的历史数据不会按名称自动补 ID；保留 `ctx` 且未修改关联时，精确回写保留原来的缺失或 `null`。
+
 ### 导出 Snapshot → Legacy JSON
 
 **精确回写（Roundtrip）**：需要导入时保存的 `ctx`
@@ -628,6 +652,8 @@ const legacy = cirsGpmLegacyAdapter.toExternal(snapshot, ctx)
 ```tsx
 const legacy = cirsGpmLegacyAdapter.toExternalLoose(snapshot)
 ```
+
+新增矿场、改选冶炼厂或清空关联后，`toExternal()` 与 `toExternalLoose()` 都会同步输出当前 `MineRow.smelterId` 到 `minList[*].smelterId`；已清除的关联不会继续回传旧 ID。宿主绕过页面直接更新矿场行时，也必须同时更新名称和关联 ID。
 
 ### Roundtrip vs Loose 对比
 

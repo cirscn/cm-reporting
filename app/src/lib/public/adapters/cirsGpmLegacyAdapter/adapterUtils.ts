@@ -2,13 +2,16 @@
  * @file adapters/cirsGpmLegacyAdapter/adapterUtils.ts
  * @description CIRS GPM legacy adapter 共享工具函数。
  *
- * 从 toInternal.ts / toExternal.ts 中提取的重复逻辑：
- * - normalizeLegacyYesNoUnknown：Yes/No/Unknown 格式标准化
- * - writeNullableString：按字段原始状态决定写回值（保留 null / '' / 不存在的区分）
- * - writeLegacyField：对单个 legacy 字段执行 writeNullableString 并处理 delete
+ * 统一处理答案别名、字段映射和 null / 空字符串 / 字段缺失的精确写回。
  */
 
 import type { NullableFieldState } from './types'
+
+const LEGACY_ANSWER_BY_ALIAS = new Map<string, string>([
+  ['1', 'Yes'], ['yes', 'Yes'], ['y', 'Yes'], ['true', 'Yes'],
+  ['0', 'No'], ['no', 'No'], ['n', 'No'], ['false', 'No'],
+  ['unknown', 'Unknown'], ['unk', 'Unknown'],
+])
 
 // ---------------------------------------------------------------------------
 // Yes/No/Unknown 标准化
@@ -25,11 +28,7 @@ export function normalizeLegacyYesNoUnknown(value: unknown): string {
   if (value === null || value === undefined) return ''
   const raw = String(value).trim()
   if (!raw) return ''
-  const lower = raw.toLowerCase()
-  if (lower === '1' || lower === 'yes' || lower === 'y' || lower === 'true') return 'Yes'
-  if (lower === '0' || lower === 'no' || lower === 'n' || lower === 'false') return 'No'
-  if (lower === 'unknown' || lower === 'unk') return 'Unknown'
-  return raw
+  return LEGACY_ANSWER_BY_ALIAS.get(raw.toLowerCase()) ?? raw
 }
 
 // ---------------------------------------------------------------------------
@@ -59,15 +58,17 @@ export function writeNullableString(state: NullableFieldState, next: string): un
 /**
  * 对单个 legacy 字段执行写回操作（合并 state 查询 + writeNullableString + delete）。
  *
- * 该函数消除了 patchSmelters / patchMines / patchProducts / patchAmrtReasons 中
- * 重复 4 次的 `const write = (key, value) => {...}` 闭包。
+ * 使用原始字段状态保留 null、空字符串与字段缺失的区别。
  */
 export function writeLegacyField(
-  item: Record<string, unknown>,
-  states: Map<string, NullableFieldState>,
-  key: string,
-  value: string,
+  options: {
+    item: Record<string, unknown>
+    states: Map<string, NullableFieldState>
+    key: string
+    value: string
+  },
 ) {
+  const { item, states, key, value } = options
   const state = states.get(key) ?? {
     exists: key in item,
     wasNull: item[key] === null,
@@ -80,4 +81,24 @@ export function writeLegacyField(
     return
   }
   item[key] = written
+}
+
+export function writeLegacyFields(options: {
+  item: Record<string, unknown>
+  states: Map<string, NullableFieldState>
+  values: Record<string, string | undefined>
+}) {
+  const { item, states, values } = options
+  for (const [key, value] of Object.entries(values)) {
+    writeLegacyField({ item, states, key, value: value ?? '' })
+  }
+}
+
+export function readMappedRowFields(options: {
+  row: Record<string, string | undefined>
+  mapping: Record<string, string>
+}): Record<string, string | undefined> {
+  return Object.fromEntries(
+    Object.entries(options.mapping).map(([internalKey, legacyKey]) => [legacyKey, options.row[internalKey]]),
+  )
 }

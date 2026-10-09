@@ -8,6 +8,7 @@
  * 导出接口类型：SmelterRow。
  */
 export interface SmelterRow {
+  /** 行主键；外部选择时为宿主主键，也是矿场 smelterId 的关联值。 */
   id: string
   metal: string
   smelterLookup: string
@@ -39,9 +40,12 @@ export interface SmelterRow {
  * 导出接口类型：MineRow。
  */
 export interface MineRow {
+  /** 矿场行的独立主键；多行可关联同一个 smelterId，不能用该关联值代替行主键。 */
   id: string
   metal: string
   smelterName: string
+  /** 所选冶炼厂行的 ID；外部选择时为宿主主键，与 CID 展示号码无关。 */
+  smelterId?: string
   mineName: string
   mineCountry: string
   mineId?: string

@@ -23,7 +23,7 @@
   - `saveDraft()`：不校验必填，直接返回当前 Snapshot；
   - `submit()`：执行内部全量校验（`zod + checker`），失败返回 `null` 且自动跳转到 checker，成功返回 Snapshot。
 - 示例中通过 `showPageActions={false}` 隐藏库内底部翻页，完全由宿主弹窗/按钮接管流程。
-- `id` 与冶炼厂识别号码语义分离：`id` 仅作为行主键与去重依据；识别号码使用 `smelterNumber` 展示（`smelterId` 仅内部兼容）。
+- `id` 与冶炼厂识别号码语义分离：`id` 作为行主键、去重依据和矿场 `MineRow.smelterId` 的关联主键；识别号码使用 `smelterNumber` 展示（`SmelterRow.smelterId` 仅内部兼容）。
 - 冶炼厂新增行会先使用临时 ID（`smelter-new-<timestamp>`），当宿主外部选择回写 `id` 后覆盖临时 ID；若未回写 `id` 则本次回写无效并提示错误。
 - 同一个 `metal` 下不能重复选择同一冶炼厂（按回写 `id` 判重）。
 - 导入或 `setFormData()` 写入的历史数据也会按同一口径进入 checker / `validate()`；同一 `metal` 下重复的非临时 `id` 会报错，`smelter-new-*` 临时 ID 不参与判重。
@@ -83,6 +83,13 @@
 - 表头文案与字段名分开看：例如“矿厂识别（例如《CID》）”对应的仍是 `mineId`，不是新造了一个字段。
 - 在 `EMRT / AMRT` 里，矿厂行选择金属后，“从该矿厂采购的冶炼厂的名称”“矿厂(矿场)名称”“矿厂所在国家或地区”会变成必填；国家/地区是普通输入框，不是下拉框。
 
+### 矿场冶炼厂关联（当前行为）
+
+- `AMRT` 全版本与 `EMRT` 2.x 选择冶炼厂建议或下拉项时，会一起保存 `smelterName` 和所选 `SmelterRow.id` 到 `MineRow.smelterId`；外部选择时，该 ID 是宿主后台主键，不能使用 CID 或 `smelterNumber`。
+- 同名但不同 ID 的冶炼厂保留为不同选项；可手工输入名称的版本仍支持自由填写，编辑/清空名称会清除旧 ID，切换矿场金属会清空名称和 ID。
+- 矿场行 `id` 与关联字段 `smelterId` 分开：同一金属和同一冶炼厂可以对应多条矿场行，这些行的 `smelterId` 相同，但 `id` 必须各自不同，编辑/删除按行 `id` 定位。
+- 宿主直接更新矿场数据时，需要同步维护名称与 ID；历史数据只有名称时，库不会按名称自动补猜后台 ID。`CMRT / CRT / EMRT 1.x` 不新增矿场列表。
+
 ### EMRT 申报范围默认行为
 
 - EMRT 默认会选中当前版本全部矿种（包括 `dynamic-dropdown` 版本）。
@@ -104,6 +111,8 @@
 - 导入支持两类 JSON：
   - **RMI legacy JSON**：通过 `cirsGpmLegacyAdapter.toInternal()` 导入；会生成 `legacyCtx` 以支持后续精确回写（roundtrip）。
   - **ReportSnapshotV1**：通过 `parseSnapshot()` 导入；不包含 legacy 的“历史字段类型/缺失细节”，因此无法做 byte-level roundtrip。
+
+- Snapshot 保存/提交、JSON 导出和回填都会保留 `data.mineList[*].smelterId`，继续使用 `schemaVersion: 1`。Legacy 导入会保留 `minList[*].smelterId`；保留 `legacyCtx` 且未修改关联时，原字段缺失/`null` 保持精确回写；新增、改选或清空矿场关联后，两种 Legacy 导出都会同步当前关联 ID，避免继续回传旧 ID。
 
 - 关于公司信息“完成日期”（`authorizationDate`）：
   - 推荐输入 `YYYY-MM-DD`（如 `2026-02-09`）。
