@@ -1,5 +1,11 @@
 # cm-reporting
 
+## 0.10.6
+
+### Patch Changes
+
+- cbdc449: 将 AMRT 所有已支持版本的企业地址改为选填，地址留空不再触发必填错误，并同步中文说明与集成文档。
+
 ## 0.10.5
 
 ### Patch Changes
