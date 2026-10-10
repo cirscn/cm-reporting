@@ -56,13 +56,17 @@ function patchSmelterNumber(options: ExistingSmelterOptions) {
 }
 
 function patchSmelterIdentity(options: ExistingSmelterOptions) {
-  const { row, item, states } = options
+  const { context, row, item, states } = options
   patchSmelterNumber(options)
   if ((row.sourceId ?? '') !== getAnyString(item.smelterIdentification)) {
     writeLegacyField({ item, states, key: 'smelterIdentification', value: row.sourceId ?? '' })
   }
-  if ((row.recycledScrap ?? '') !== normalizeLegacyYesNoUnknown(item.isRecycle)) {
-    writeLegacyField({ item, states, key: 'isRecycle', value: toLegacyYesNoUnknown(row.recycledScrap ?? '') })
+  const encodeAmrtUnknown = context.ctx.templateType === 'amrt' && row.recycledScrap === 'Unknown'
+  if (encodeAmrtUnknown || (row.recycledScrap ?? '') !== normalizeLegacyYesNoUnknown(item.isRecycle)) {
+    writeLegacyField({
+      item, states, key: 'isRecycle',
+      value: toLegacyYesNoUnknown(row.recycledScrap ?? '', context.ctx.templateType),
+    })
   }
 }
 
@@ -90,7 +94,7 @@ function createSmelter(context: ExportContext, row: SmelterRow) {
     smelterCountry: row.smelterCountry,
     smelterNumber: row.smelterNumber || row.smelterIdentification,
     smelterIdentification: row.sourceId,
-    isRecycle: toLegacyYesNoUnknown(row.recycledScrap ?? ''),
+    isRecycle: toLegacyYesNoUnknown(row.recycledScrap ?? '', context.ctx.templateType),
     remark: row.comments,
   } })
   if (!isEmpty(row.smelterName) && !isEmpty(row.smelterLookup)) item.standardSmelterName = row.smelterName

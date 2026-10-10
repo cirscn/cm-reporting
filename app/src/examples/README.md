@@ -127,6 +127,8 @@
 
 - Snapshot 保存/提交、JSON 导出和回填都会保留 `data.mineList[*].smelterId`，继续使用 `schemaVersion: 1`。Legacy 导入会保留 `minList[*].smelterId`；保留 `legacyCtx` 且未修改关联时，原字段缺失/`null` 保持精确回写；新增、改选或清空矿场关联后，两种 Legacy 导出都会同步当前关联 ID，避免继续回传旧 ID。
 
+- 冶炼厂回收料答案的 `isRecycle: "2"` / `"Unknown"` 导入后均显示“未知”，内部 Snapshot 与 Excel 保持 `Unknown`。AMRT 在精确回写与宽松导出时均提交字符串 `"2"`（是 / 否仍为 `"1"` / `"0"`），历史 `"Unknown"` 也会统一转换，这是精确回写的明确例外；其他模板保持原有规则，标准未知为 `"Unknown"`，未改历史字段保留原编码。AMRT 1.1 / 1.2 可选未知，1.3 / 1.31 / 1.31.1 仍只提供是 / 否。
+
 - 关于公司信息“完成日期”（`authorizationDate`）：
   - 推荐输入 `YYYY-MM-DD`（如 `2026-02-09`）。
   - Snapshot 导入/回填运行时兼容秒级与毫秒级时间戳（number/数字字符串），会按北京时间日历日自动归一化为 `YYYY-MM-DD`；例如 `1749657600000` 会得到 `2025-06-12`。

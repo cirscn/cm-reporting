@@ -22,7 +22,7 @@ export const cirsGpmLegacyAdapter = {
    * 从“纯内部 snapshot”导出 legacy JSON（不依赖导入得到的 ctx）。
    *
    * 语义：
-   * - `toExternal(snapshot, ctx)`：用于 legacy JSON → internal → legacy JSON 的精确回写（尽量保留 missing/null/number/string 等历史细节）。
+   * - `toExternal(snapshot, ctx)`：用于 legacy JSON → internal → legacy JSON 的精确回写（尽量保留 missing/null/number/string 等历史细节；AMRT 的 isRecycle 未知值统一写回 '2'）。
    * - `toExternalLoose(snapshot)`：用于“未导入 legacy JSON，但希望导出 legacy schema”的场景；只保证输出符合 legacy schema，
    *   不承诺 byte-level roundtrip，也不承诺完全复刻某个历史系统的字段缺失/类型细节。
    */

@@ -10,7 +10,7 @@ import type { NullableFieldState } from './types'
 const LEGACY_ANSWER_BY_ALIAS = new Map<string, string>([
   ['1', 'Yes'], ['yes', 'Yes'], ['y', 'Yes'], ['true', 'Yes'],
   ['0', 'No'], ['no', 'No'], ['n', 'No'], ['false', 'No'],
-  ['unknown', 'Unknown'], ['unk', 'Unknown'],
+  ['2', 'Unknown'], ['unknown', 'Unknown'], ['unk', 'Unknown'],
 ])
 
 // ---------------------------------------------------------------------------
@@ -22,7 +22,7 @@ const LEGACY_ANSWER_BY_ALIAS = new Map<string, string>([
  *
  * 输入举例：'1' / 'yes' / 'Yes' / 'y' / 'true' → 'Yes'
  *           '0' / 'no'  / 'No'  / 'n' / 'false' → 'No'
- *           'unknown' / 'unk' → 'Unknown'
+ *           '2' / 'unknown' / 'unk' → 'Unknown'
  */
 export function normalizeLegacyYesNoUnknown(value: unknown): string {
   if (value === null || value === undefined) return ''

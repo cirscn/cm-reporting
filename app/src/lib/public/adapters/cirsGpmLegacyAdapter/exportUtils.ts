@@ -1,7 +1,10 @@
+import type { TemplateType } from '@core/registry/types'
 import { getActiveMineralKeys, parseOtherMineralKey } from '@core/template/minerals'
 
 import type { ExportContext } from './conversionTypes'
 import { normalizeMineralLabel } from './planCache'
+
+const AMRT_UNKNOWN_ANSWER = '2'
 
 export function isEmpty(value: unknown): boolean {
   return value === '' || value === null || value === undefined
@@ -16,13 +19,13 @@ export function getAnyString(value: unknown): string {
   return (typeof value === 'string' ? value : String(value)).trim()
 }
 
-export function toLegacyYesNoUnknown(value: string): string {
+export function toLegacyYesNoUnknown(value: string, templateType: TemplateType): string {
   const raw = getString(value).trim()
   if (!raw) return ''
   const lower = raw.toLowerCase()
   if (lower === 'yes' || lower === 'y' || lower === 'true') return '1'
   if (lower === 'no' || lower === 'n' || lower === 'false') return '0'
-  if (lower === 'unknown') return 'Unknown'
+  if (lower === 'unknown') return templateType === 'amrt' ? AMRT_UNKNOWN_ANSWER : 'Unknown'
   return raw
 }
 

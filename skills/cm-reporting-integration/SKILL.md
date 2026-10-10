@@ -31,6 +31,7 @@ Apply these rules in every solution:
 - Do not silently coerce unrelated wrong types in legacy payloads; keep non-contract violations visible.
 - `companyInfo.authorizationDate` 推荐传 `YYYY-MM-DD`；运行时兼容秒/毫秒时间戳（number/数字字符串），并会按北京时间日历日归一化为 `YYYY-MM-DD`，例如 `1749657600000` 会得到 `2025-06-12`。
 - Legacy `cmtCompany.effectiveDate` 为空字符串、空白字符串、`0` 或 `'0'` 时表示未填写；`toInternal()` 会导入为空的 `companyInfo.authorizationDate`，不要在宿主侧补成 1970。
+- 冶炼厂 `isRecycle` 的 `"2"` / `"Unknown"` 导入为内部 `recycledScrap: 'Unknown'`，Snapshot 与 Excel 保持标准答案。AMRT 的 `toExternal()` / `toExternalLoose()` 均按字符串 `"1"` / `"0"` / `"2"` 提交是 / 否 / 未知，历史 `"Unknown"` 也统一写回 `"2"`；这是精确回写的明确例外。CMRT / EMRT / CRT 保持原有导出规则，标准未知为 `"Unknown"`，未改历史字段保留原编码。AMRT 1.1 / 1.2 提供未知选项，1.3 / 1.31 / 1.31.1 仍只提供是 / 否，历史未知数据不扩大选项范围。
 - Return integrations callback result in `{ items: [...] } | null | undefined` shape only.
 - 对 `SmelterList` 外部回写结果，`id` 与冶炼厂识别号码语义严格分离：`id` 用于行主键、去重判定和矿场 `MineRow.smelterId` 关联；识别号码应由 `smelterNumber` 回写并仅用于展示（`SmelterRow.smelterId` 仅内部兼容）。
 - `SmelterList` 新增行应先生成临时 ID（`smelter-new-<timestamp>`）；宿主外部选择回写 `id` 后覆盖该临时 ID，未回写 `id` 时本次回写无效并提示错误。

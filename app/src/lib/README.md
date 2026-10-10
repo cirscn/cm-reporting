@@ -656,6 +656,8 @@ const { snapshot, ctx } = cirsGpmLegacyAdapter.toInternal(legacyJson)
 
 矿场 `minList[*].smelterId` 导入为 `MineRow.smelterId`，独立于冶炼厂 CID。原字段缺失或为 `null` 的历史数据不会按名称自动补 ID；保留 `ctx` 且未修改关联时，精确回写保留原来的缺失或 `null`。
 
+冶炼厂 `cmtSmelters[*].isRecycle` 的字符串 `"2"` 与 `"Unknown"` 均导入为内部 `recycledScrap: 'Unknown'`，页面显示“未知”。内部 Snapshot 和 Excel 继续使用 `Yes / No / Unknown`，后台编码只在 Legacy JSON 转换时处理。
+
 ### 导出 Snapshot → Legacy JSON
 
 **精确回写（Roundtrip）**：需要导入时保存的 `ctx`
@@ -671,6 +673,8 @@ const legacy = cirsGpmLegacyAdapter.toExternalLoose(snapshot)
 ```
 
 新增矿场、改选冶炼厂或清空关联后，`toExternal()` 与 `toExternalLoose()` 都会同步输出当前 `MineRow.smelterId` 到 `minList[*].smelterId`；已清除的关联不会继续回传旧 ID。宿主绕过页面直接更新矿场行时，也必须同时更新名称和关联 ID。
+
+AMRT 的 `isRecycle` 按字符串编码提交：是为 `"1"`、否为 `"0"`、未知为 `"2"`。两种导出均适用，历史 `"Unknown"` 也统一写回 `"2"`，这是精确回写的明确例外。CMRT / EMRT / CRT 保持原有导出规则，标准未知答案为 `"Unknown"`，未改历史字段保留原编码。各版本选项范围保持不变：AMRT 1.1 / 1.2 可选未知，1.3 / 1.31 / 1.31.1 仍只提供是、否；后者导入的历史未知答案按同一编码回写。
 
 ### Roundtrip vs Loose 对比
 
