@@ -139,7 +139,7 @@ const AMRT_COMPANY_FIELDS: FieldDef[] = [
   },
   { key: 'companyId', labelKey: 'fields.companyId', type: 'text', required: false },
   { key: 'companyAuthId', labelKey: 'fields.companyAuthId', type: 'text', required: false },
-  { key: 'address', labelKey: 'fields.address', type: 'text', required: true },
+  { key: 'address', labelKey: 'fields.address', type: 'text', required: false },
   { key: 'contactName', labelKey: 'fields.contactName', type: 'text', required: true },
   { key: 'contactEmail', labelKey: 'fields.contactEmail', type: 'email', required: true },
   { key: 'contactPhone', labelKey: 'fields.contactPhone', type: 'text', required: true },

@@ -26,6 +26,7 @@ Apply these rules in every solution:
 - Do not add host-side theme patches for normal integration: `CMReporting` inherits the host Ant Design `ConfigProvider` theme by default. Pass `theme={defaultAntdTheme}` or `mergeThemeConfig(...)` only when the host explicitly wants the library theme instead of the system theme.
 - Provide official template `.xlsx` as `ArrayBuffer` when calling Excel export APIs.
 - Treat Snapshot as full-state contract (`schemaVersion/templateType/versionId/data`).
+- `CMRT / EMRT / AMRT` 的企业地址均为选填；`AMRT` 全部已支持版本的地址留空不触发必填错误，表单不显示必填标记，宿主无需额外添加地址必填校验。
 - Before calling `cirsGpmLegacyAdapter.toInternal(...)`, normalize only the known legacy nullable-array fields from `null` to `[]`: `cmtRangeQuestions`, `cmtCompanyQuestions`, `cmtSmelters`, `cmtParts`, `minList`, `amrtReasonList`.
 - Do not silently coerce unrelated wrong types in legacy payloads; keep non-contract violations visible.
 - `companyInfo.authorizationDate` 推荐传 `YYYY-MM-DD`；运行时兼容秒/毫秒时间戳（number/数字字符串），并会按北京时间日历日归一化为 `YYYY-MM-DD`，例如 `1749657600000` 会得到 `2025-06-12`。

@@ -136,6 +136,7 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 
 - `submit()` 与 `validate()` 使用同一套全量校验门控（`zod + checker`）。
 - 当 checker 仍有“必填未完成”项时，`submit()` 一定返回 `null`，不会出现“checker 提示未完成但仍提交成功”的状态分叉。
+- `CMRT / EMRT / AMRT` 的企业地址均为选填；`AMRT` 全部已支持版本的地址留空不触发必填错误，表单不显示必填标记。
 
 **Checker 一致性说明（Smelter List）：**
 

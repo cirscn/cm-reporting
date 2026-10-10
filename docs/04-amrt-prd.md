@@ -48,7 +48,8 @@ AMRT 相比其他模板有以下独特特性：
 3. **最多 10 种矿种**：模板文字要求限制
 4. **仅 Q1-Q2**：问题数量最少（其他模板 Q1-Q6/Q7/Q8）
 5. **无公司层面问题**：A-H/A-I 在 AMRT 中不存在
-6. **地址必填**：按 Instructions 要求必填（模板内部标记不一致）
+
+企业地址在 AMRT 全部已支持版本中均为选填，表单不显示必填标记，留空不触发必填错误。
 
 ## 2. 信息架构
 
@@ -109,7 +110,7 @@ graph LR
 ```mermaid
 flowchart TD
     Start([开始]) --> SelectLang[选择语言]
-    SelectLang --> FillCompany[填写公司信息<br/>含地址必填]
+    SelectLang --> FillCompany[填写公司信息<br/>地址选填]
     FillCompany --> SelectScope[选择申报范围 A/B/C]
     
     SelectScope --> |B. Product| FillProduct[填写 Product List]
@@ -203,7 +204,7 @@ erDiagram
         string other_minerals "其他矿产(1.3)"
         string unique_id "公司唯一识别信息"
         string auth_id "公司唯一授权识别信息"
-        string address "地址(Instructions必填)"
+        string address "地址(选填)"
         string contact_name "联系人姓名(*)"
         string contact_email "电子邮件-联系人(*)"
         string contact_phone "电话-联系人(*)"
@@ -267,7 +268,7 @@ erDiagram
 | 其他矿产（Other） | 条件 | 文本 | 仅1.3，选择Other时必填 |
 | 公司唯一识别信息 | 否 | 文本 | |
 | 公司唯一授权识别信息 | 否 | 文本 | |
-| **地址** | **是(Instructions)** | 文本 | **模板内部不一致：Instructions必填，但Declaration未标星、Checker未列** |
+| **地址** | **否** | 文本 | 全部已支持版本选填；最新 Excel 英文 Instructions 为 optional，Declaration 未标星、Checker 未列；中文 Instructions 仍写必填，存在语言文案差异 |
 | 联系人姓名 (*) | 是 | 文本 | |
 | 电子邮件 - 联系人 (*) | 是 | 文本 | 无邮箱可填 `not available` |
 | 电话 - 联系人 (*) | 是 | 文本 | |
@@ -433,7 +434,7 @@ AMRT 仅有 **Q1-Q2** 两道题，是所有模板中问题最少的。
 
 > 备注：Instructions 中的补充要求仅作提示，强制校验以 Checker 为准
 
-> 公司信息区域另含可选字段：公司唯一识别信息、公司唯一授权识别信息、授权人职务、授权人电话（地址在 Instructions 中标记必填但 Checker 未列）。
+> 公司信息区域另含可选字段：公司唯一识别信息、公司唯一授权识别信息、地址、授权人职务、授权人电话。地址在全部已支持版本中留空不触发必填错误。
 
 ### 5.2 条件必填规则
 
@@ -442,10 +443,6 @@ flowchart TD
     subgraph 申报范围联动
         ScopeB[申报范围=B] --> ProductReq[Product List 必填]
         ScopeC[申报范围=C] --> DescReq[范围描述必填]
-    end
-    
-    subgraph 地址必填
-        Addr[地址] --> AddrReq[Instructions要求必填<br/>模板标记不一致]
     end
     
     subgraph 矿种输入联动-1.3
@@ -497,7 +494,7 @@ flowchart TD
 
 | 字段/规则 | Instructions | Declaration/Checker | 产品执行 |
 |----------|--------------|---------------------|---------|
-| 地址 | **必填** | 未标星、未列入 Checker | 按 Checker 不强制 |
+| 地址 | 最新 Excel 英文为 **optional**；中文仍写必填 | 未标星、未列入 Checker | 全部已支持版本选填，不显示必填标记、不检查空值 |
 | Q1/Q2 | 需填写 | **Q1 必填、Q2 可选（Checker 不强制）** | 按 Checker 处理 |
 | Smelter List | 需填写 | **Q1=Yes 时 Checker 要求覆盖对应矿种** | 按 Checker 处理（Mine List 无 Checker） |
 | 1.1/1.2 国家/地区 | 必填列 | 条件格式未单独提示 | 按必填处理 |
@@ -605,7 +602,7 @@ flowchart TD
 
 ## 8. 实现注意事项
 
-1. **地址必填**：按 Instructions 要求必填，提示用户（模板内部不一致）
+1. **地址选填**：全部已支持版本不显示必填标记，地址留空不触发必填错误；最新 Excel 中文 Instructions 的必填文案与英文及 Checker 不一致，不据此增加必填校验
 2. **矿种限制**：强制最多 10 种（模板文字要求）
 3. **版本判断**：1.1/1.2 与 1.3 差异很大，需分支处理
 4. **Other 逻辑**（1.3）：选择 Other 后必须填写对应 D15:I16，且数量匹配
@@ -630,7 +627,7 @@ flowchart TD
 | Minerals Scope | **有** | 无 | 无 | 无 |
 | Mine List | 有 | 无 | 2.0+ | 无 |
 | Smelter Look-up | 1.3有 | 有 | 有 | 有 |
-| 地址必填 | **是(Instructions)** | 否 | 否 | 否 |
+| 地址必填 | 否 | 否 | 否 | 否 |
 
 ## 10. 参考文档
 

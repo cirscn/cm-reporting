@@ -23,6 +23,7 @@
   - `saveDraft()`：不校验必填，直接返回当前 Snapshot；
   - `submit()`：执行内部全量校验（`zod + checker`），失败返回 `null` 且自动跳转到 checker，成功返回 Snapshot。
 - 示例中通过 `showPageActions={false}` 隐藏库内底部翻页，完全由宿主弹窗/按钮接管流程。
+- `CMRT / EMRT / AMRT` 的企业地址均为选填；切换任一已支持 `AMRT` 版本时，地址留空不触发必填错误，表单不显示必填标记。
 - `id` 与冶炼厂识别号码语义分离：`id` 作为行主键、去重依据和矿场 `MineRow.smelterId` 的关联主键；识别号码使用 `smelterNumber` 展示（`SmelterRow.smelterId` 仅内部兼容）。
 - 冶炼厂新增行会先使用临时 ID（`smelter-new-<timestamp>`），当宿主外部选择回写 `id` 后覆盖临时 ID；若未回写 `id` 则本次回写无效并提示错误。
 - 同一个 `metal` 下不能重复选择同一冶炼厂（按回写 `id` 判重）。
