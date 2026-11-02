@@ -1,5 +1,6 @@
 const UNBRANDED_TEMPLATE_VERSIONS = new Set([
   'AMRT@1.31.1',
+  'AMRT@1.32.1',
   'CMRT@6.6.1',
   'EMRT@2.11.1',
 ])

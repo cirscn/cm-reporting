@@ -31,7 +31,7 @@ Apply these rules in every solution:
 - Do not silently coerce unrelated wrong types in legacy payloads; keep non-contract violations visible.
 - `companyInfo.authorizationDate` 推荐传 `YYYY-MM-DD`；运行时兼容秒/毫秒时间戳（number/数字字符串），并会按北京时间日历日归一化为 `YYYY-MM-DD`，例如 `1749657600000` 会得到 `2025-06-12`。
 - Legacy `cmtCompany.effectiveDate` 为空字符串、空白字符串、`0` 或 `'0'` 时表示未填写；`toInternal()` 会导入为空的 `companyInfo.authorizationDate`，不要在宿主侧补成 1970。
-- 冶炼厂 `isRecycle` 的 `"2"` / `"Unknown"` 导入为内部 `recycledScrap: 'Unknown'`，Snapshot 与 Excel 保持标准答案。AMRT 的 `toExternal()` / `toExternalLoose()` 均按字符串 `"1"` / `"0"` / `"2"` 提交是 / 否 / 未知，历史 `"Unknown"` 也统一写回 `"2"`；这是精确回写的明确例外。CMRT / EMRT / CRT 保持原有导出规则，标准未知为 `"Unknown"`，未改历史字段保留原编码。AMRT 1.1 / 1.2 提供未知选项，1.3 / 1.31 / 1.31.1 仍只提供是 / 否，历史未知数据不扩大选项范围。
+- 冶炼厂 `isRecycle` 的 `"2"` / `"Unknown"` 导入为内部 `recycledScrap: 'Unknown'`，Snapshot 与 Excel 保持标准答案。AMRT 的 `toExternal()` / `toExternalLoose()` 均按字符串 `"1"` / `"0"` / `"2"` 提交是 / 否 / 未知，历史 `"Unknown"` 也统一写回 `"2"`；这是精确回写的明确例外。CMRT / EMRT / CRT 保持原有导出规则，标准未知为 `"Unknown"`，未改历史字段保留原编码。AMRT 1.1 / 1.2 提供未知选项，1.3 / 1.31 / 1.31.1 / 1.32.1 仍只提供是 / 否，历史未知数据不扩大选项范围。
 - Return integrations callback result in `{ items: [...] } | null | undefined` shape only.
 - 对 `SmelterList` 外部回写结果，`id` 与冶炼厂识别号码语义严格分离：`id` 用于行主键、去重判定和矿场 `MineRow.smelterId` 关联；识别号码应由 `smelterNumber` 回写并仅用于展示（`SmelterRow.smelterId` 仅内部兼容）。
 - `SmelterList` 新增行应先生成临时 ID（`smelter-new-<timestamp>`）；宿主外部选择回写 `id` 后覆盖该临时 ID，未回写 `id` 时本次回写无效并提示错误。
@@ -83,20 +83,21 @@ Apply these rules in every solution:
 - For all templates, keep `Smelter List` rows under the same Q1/Q2 gating as the current template: when a metal no longer requires smelter disclosure, rows for that metal are automatically removed from `smelterList`.
 - For any template version with `smelterLookup` dropdown support, once a `Smelter List` row has a selected `metal`, treat `smelterLookup` as checker-required; missing lookup must stay visible as an unfinished item instead of silently passing.
 - For `EMRT`, default selection should include all declared minerals on empty initialization; when `readOnly=false`, users can still edit the declaration scope selections.
-- For `Product List`, when `Declaration Scope = Product` (`scopeType === 'B'`), the list itself is required and `partNumber` is always required; versions with `hasRequesterColumns=true` (for example `CMRT 6.6 / 6.6.1`, `EMRT 2.11 / 2.11.1`, and `AMRT 1.3 / 1.31 / 1.31.1`) still show `requestPartNumber`, but it is not required.
+- For `Product List`, when `Declaration Scope = Product` (`scopeType === 'B'`), the list itself is required and `partNumber` is always required; versions with `hasRequesterColumns=true` (for example `CMRT 6.6 / 6.6.1`, `EMRT 2.11 / 2.11.1`, and `AMRT 1.3 / 1.31 / 1.31.1 / 1.32.1`) still show `requestPartNumber`, but it is not required.
 - Product List integration payload fields are `partNumber / partName / requestPartNumber / requestPartName / remark`.
 - 对 `dynamic-dropdown` 范围模板（`EMRT` 2.x / `AMRT` 1.3+），当取消某个矿种时，应预期库会自动执行级联清理：清空该矿种的按矿种题目/备注答案，并删除关联的 `Smelter List` / `Mine List` 行数据。
 - 当 `other` 保持勾选但某个自定义矿种名称被清空时，库会按槽位清理对应 `other-*` 的按矿种答案与关联列表行。
-- `AMRT 1.1 / 1.2 / 1.3 / 1.31 / 1.31.1` 的 `Minerals Scope` 金属下拉均来自 Declaration 当前已申报矿种（含有名称的 Other 与 1.1/1.2 手填矿种），不按 `Q1` 答案过滤。
+- `AMRT 1.1 / 1.2 / 1.3 / 1.31 / 1.31.1 / 1.32.1` 的 `Minerals Scope` 金属下拉均来自 Declaration 当前已申报矿种（含有名称的 Other 与 1.1/1.2 手填矿种），不按 `Q1` 答案过滤。
 - AMRT 取消矿种、撤选 Other、清空 Other 名称或清空 1.1/1.2 手填矿种后，还会删除该矿种的 `Minerals Scope` 整行（含纳入原因），并清理对应问题答案、备注与冶炼厂/矿场整行；宿主无需重复执行清理。
 
-## Unbranded Version Notes
+## 正式模板版本说明
 
 - Treat `CMRT 6.6.1`, `EMRT 2.11.1`, and `AMRT 1.31.1` as independent official versions for snapshot and export traceability.
 - These versions only remove the template Logo; their structures and rules match `CMRT 6.6`, `EMRT 2.11`, and `AMRT 1.31` respectively.
 - Their official filenames do not use the `RMI_` prefix: `CMRT_6.6.1.xlsx`, `EMRT_2.11.1.xlsx`, and `AMRT_1.31.1.xlsx`.
-- Use `templateType="amrt"` with `versionId="1.31.1"` for the latest AMRT template file `AMRT_1.31.1.xlsx`.
-- `AMRT 1.31 / 1.31.1` adds `Cadmium`, `Lead`, `Molybdenum`, `Rhenium`, `Selenium`, and `Tellurium` compared with `AMRT 1.3`.
+- 最新 AMRT 使用 `templateType="amrt"`、`versionId="1.32.1"` 和模板文件 `AMRT_1.32.1.xlsx`；这也是默认版本。本次只更新模板，字段、选项及校验规则延续 `1.31.1`，Snapshot 与 Excel 导出保留独立版本号，全部历史版本继续支持。
+- `1.32.1` 默认中文，移除 `Revision` 工作表，更新 `Smelter Look-up` 数据；国家/地区列表验证的新增仅发生在原始 Excel，宿主仍沿用现有填写界面，矿厂国家/地区保持自由文本。
+- `AMRT 1.31 / 1.31.1 / 1.32.1` 相比 `AMRT 1.3` 多出 `Cadmium`、`Lead`、`Molybdenum`、`Rhenium`、`Selenium`、`Tellurium`。
 - Treat those six entries as first-class minerals in Snapshot data, not as `Other` custom minerals.
 - Excel export writes these minerals through Declaration, `Smelter List`, `Mine List`, and `Minerals Scope` using the original template patch flow.
 

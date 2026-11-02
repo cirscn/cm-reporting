@@ -158,7 +158,7 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 
 **AMRT 矿产申报范围联动：**
 
-- `AMRT 1.1 / 1.2 / 1.3 / 1.31 / 1.31.1` 的 `Minerals Scope` 金属下拉均来自 Declaration 当前已申报矿种，包含有名称的 Other 和 1.1/1.2 手填矿种，不按 `Q1` 答案过滤。
+- `AMRT 1.1 / 1.2 / 1.3 / 1.31 / 1.31.1 / 1.32.1` 的 `Minerals Scope` 金属下拉均来自 Declaration 当前已申报矿种，包含有名称的 Other 和 1.1/1.2 手填矿种，不按 `Q1` 答案过滤。
 - 取消申报金属、撤选 Other、清空某个 Other 名称或清空 1.1/1.2 手填矿种后，删除该矿种对应的 `Minerals Scope` 整行（含纳入原因），并清理该矿种的问题答案、备注及 `Smelter List` / `Mine List` 整行。
 
 ---
@@ -397,12 +397,14 @@ URL.revokeObjectURL(url)
 
 > Excel 导出采用"最小 patch"策略——严格保留模板的 DV、格式、公式、隐藏 sheet 等，仅填入用户数据。
 
-### 无 Logo 正式升版与 AMRT 矿产范围
+### 正式模板升版与 AMRT 矿产范围
 
 - `CMRT 6.6.1`、`EMRT 2.11.1`、`AMRT 1.31.1` 作为独立正式版本接入，分别是 `6.6`、`2.11`、`1.31` 的无 Logo 版本。
 - 三个升版与对应旧版本结构、字段和规则一致，但 Snapshot 与 Excel 导出会保留独立 `versionId`，便于后续溯源。
 - 官方无 Logo 文件名不带 `RMI_` 前缀：`CMRT_6.6.1.xlsx`、`EMRT_2.11.1.xlsx`、`AMRT_1.31.1.xlsx`。
-- `AMRT 1.31.1` 是默认版本；相比 `AMRT 1.3`，它延续 `1.31` 新增的 `Cadmium`、`Lead`、`Molybdenum`、`Rhenium`、`Selenium`、`Tellurium`。
+- `AMRT 1.32.1` 是最新默认版本，使用原始文件名 `AMRT_1.32.1.xlsx`；本次只更新模板，字段、选项和校验规则延续 `1.31.1`，Snapshot 与 Excel 导出保留独立 `versionId="1.32.1"`。
+- 新模板默认中文，移除 `Revision` 工作表，更新 `Smelter Look-up` 数据；原始 Excel 新增冶炼厂与矿厂国家/地区列表验证。填写界面沿用现有交互，矿厂国家/地区仍为自由文本。
+- `AMRT 1.31 / 1.31.1 / 1.32.1` 相比 `AMRT 1.3` 多出 `Cadmium`、`Lead`、`Molybdenum`、`Rhenium`、`Selenium`、`Tellurium`。全部历史版本继续可选、可保存和导出。
 - 这些矿产会进入 Declaration 矿产选择、按矿产题目、`Smelter List`、`Mine List`、`Minerals Scope` 和 Excel 导出。
 
 ---
@@ -474,7 +476,7 @@ return null
 - 当 `Declaration Scope = Product`（内部值 `scopeType === 'B'`）时，`Product List` 必须至少有 1 行数据。
 - `回复方的产品编号`（字段 `partNumber`）始终按必填处理。
 - `回复方的产品名称` 对应字段 `partName`，注释对应字段 `remark`。
-- 当模板配置 `hasRequesterColumns=true`（如 `CMRT 6.6 / 6.6.1`、`EMRT 2.11 / 2.11.1`、`AMRT 1.3 / 1.31 / 1.31.1`）时，会展示请求方列，但 `请求方的产品编号`（字段 `requestPartNumber`）不参与必填校验。
+- 当模板配置 `hasRequesterColumns=true`（如 `CMRT 6.6 / 6.6.1`、`EMRT 2.11 / 2.11.1`、`AMRT 1.3 / 1.31 / 1.31.1 / 1.32.1`）时，会展示请求方列，但 `请求方的产品编号`（字段 `requestPartNumber`）不参与必填校验。
 - `请求方的产品名称` 对应字段 `requestPartName`。
 
 ### SmelterList 外部选择
@@ -527,7 +529,7 @@ return null
 
 **Mine List 表头与模板对齐规则：**
 
-- `Mine List` 只在支持该工作表的模板中显示：当前是 `AMRT 1.1 / 1.2 / 1.3 / 1.31 / 1.31.1` 与 `EMRT 2.0 / 2.1 / 2.11 / 2.11.1`。
+- `Mine List` 只在支持该工作表的模板中显示：当前是 `AMRT 1.1 / 1.2 / 1.3 / 1.31 / 1.31.1 / 1.32.1` 与 `EMRT 2.0 / 2.1 / 2.11 / 2.11.1`。
 - 这些版本的矿厂列表 UI 表头已按对应 RMI Excel 模板对齐。
 - 当前 UI 显示列仍只保留业务可编辑列，不显示模板里的辅助列：`Country Code`、`State / Province Code`。
 - UI 表头文案对齐模板，不代表底层字段名变化；例如“矿厂识别（例如《CID》）”对应的仍是 `mineId` 字段。
@@ -674,7 +676,7 @@ const legacy = cirsGpmLegacyAdapter.toExternalLoose(snapshot)
 
 新增矿场、改选冶炼厂或清空关联后，`toExternal()` 与 `toExternalLoose()` 都会同步输出当前 `MineRow.smelterId` 到 `minList[*].smelterId`；已清除的关联不会继续回传旧 ID。宿主绕过页面直接更新矿场行时，也必须同时更新名称和关联 ID。
 
-AMRT 的 `isRecycle` 按字符串编码提交：是为 `"1"`、否为 `"0"`、未知为 `"2"`。两种导出均适用，历史 `"Unknown"` 也统一写回 `"2"`，这是精确回写的明确例外。CMRT / EMRT / CRT 保持原有导出规则，标准未知答案为 `"Unknown"`，未改历史字段保留原编码。各版本选项范围保持不变：AMRT 1.1 / 1.2 可选未知，1.3 / 1.31 / 1.31.1 仍只提供是、否；后者导入的历史未知答案按同一编码回写。
+AMRT 的 `isRecycle` 按字符串编码提交：是为 `"1"`、否为 `"0"`、未知为 `"2"`。两种导出均适用，历史 `"Unknown"` 也统一写回 `"2"`，这是精确回写的明确例外。CMRT / EMRT / CRT 保持原有导出规则，标准未知答案为 `"Unknown"`，未改历史字段保留原编码。各版本选项范围保持不变：AMRT 1.1 / 1.2 可选未知，1.3 / 1.31 / 1.31.1 / 1.32.1 仍只提供是、否；后者导入的历史未知答案按同一编码回写。
 
 ### Roundtrip vs Loose 对比
 

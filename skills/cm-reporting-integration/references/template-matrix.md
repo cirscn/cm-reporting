@@ -21,6 +21,7 @@ The official unbranded versions keep their original filenames without the `RMI_`
 - `CMRT_6.6.1.xlsx`
 - `EMRT_2.11.1.xlsx`
 - `AMRT_1.31.1.xlsx`
+- `AMRT_1.32.1.xlsx`
 
 Package export path base:
 
@@ -53,6 +54,9 @@ Package export path base:
 | `amrt` | `1.3` | `AMRT` | `RMI_AMRT_1.3.xlsx` |
 | `amrt` | `1.31` | `AMRT` | `RMI_AMRT_1.31.xlsx` |
 | `amrt` | `1.31.1` | `AMRT` | `AMRT_1.31.1.xlsx` |
+| `amrt` | `1.32.1` | `AMRT` | `AMRT_1.32.1.xlsx` |
+
+AMRT 当前默认版本是 `1.32.1`；本次只更新模板，字段、选项及校验规则延续 `1.31.1`，历史版本仍保留独立文件映射。
 
 ## 3) Recommended path resolution
 

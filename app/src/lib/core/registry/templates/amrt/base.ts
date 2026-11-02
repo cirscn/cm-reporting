@@ -13,7 +13,7 @@ import type {
 
 import type { AmrtVersionId } from './manifest'
 
-const AMRT_OPEN_DATE_VERSION_IDS = new Set<AmrtVersionId>(['1.31', '1.31.1'])
+const AMRT_OPEN_DATE_VERSION_IDS = new Set<AmrtVersionId>(['1.31', '1.31.1', '1.32.1'])
 
 // ---------------------------------------------------------------------------
 // AMRT Minerals

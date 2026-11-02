@@ -28,6 +28,11 @@ const CASES: ReadonlyArray<{
     versionId: '1.31.1',
     relativePath: 'templates/AMRT/AMRT_1.31.1.xlsx',
   },
+  {
+    templateType: 'amrt',
+    versionId: '1.32.1',
+    relativePath: 'templates/AMRT/AMRT_1.32.1.xlsx',
+  },
 ]
 
 function createEmptySnapshot(

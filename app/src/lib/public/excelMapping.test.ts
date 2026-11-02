@@ -35,6 +35,11 @@ describe('excel mapping coverage', () => {
       branded: EXCEL_TEMPLATE_ANCHORS.amrt['1.31'],
       unbranded: EXCEL_TEMPLATE_ANCHORS.amrt['1.31.1'],
     },
+    {
+      name: 'AMRT 1.31.1 / 1.32.1',
+      branded: EXCEL_TEMPLATE_ANCHORS.amrt['1.31.1'],
+      unbranded: EXCEL_TEMPLATE_ANCHORS.amrt['1.32.1'],
+    },
   ])(
     'keeps $name declaration anchors structurally identical',
     ({ branded, unbranded }) => {

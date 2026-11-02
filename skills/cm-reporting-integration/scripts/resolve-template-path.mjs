@@ -34,9 +34,9 @@ const matrix = {
   },
   amrt: {
     dir: 'AMRT',
-    versions: ['1.1', '1.2', '1.3', '1.31', '1.31.1'],
+    versions: ['1.1', '1.2', '1.3', '1.31', '1.31.1', '1.32.1'],
     prefix: 'RMI_AMRT_',
-    filenames: { '1.31.1': 'AMRT_1.31.1.xlsx' },
+    filenames: { '1.31.1': 'AMRT_1.31.1.xlsx', '1.32.1': 'AMRT_1.32.1.xlsx' },
   },
 }
 

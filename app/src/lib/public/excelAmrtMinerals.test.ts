@@ -63,14 +63,19 @@ describe('excel export - AMRT mineral selection', () => {
     expect(readCellText(declXml, 'E15', ctx.sharedStrings)).toBe('Second Metal')
   })
 
-  test('exports AMRT 1.31 added minerals to declaration and list sheets', async () => {
-    const templatePath = path.resolve(process.cwd(), 'templates/AMRT/RMI_AMRT_1.31.xlsx')
+  test.each([
+    { versionId: '1.31', filename: 'RMI_AMRT_1.31.xlsx' },
+    { versionId: '1.31.1', filename: 'AMRT_1.31.1.xlsx' },
+    { versionId: '1.32.1', filename: 'AMRT_1.32.1.xlsx' },
+  ])('exports AMRT $versionId added minerals to declaration and list sheets', async ({ versionId, filename }) => {
+    const templatePath = path.resolve(process.cwd(), 'templates/AMRT', filename)
     const buf = fs.readFileSync(templatePath)
+    const templateCtx = await loadXlsxContext(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength))
 
     const snapshot: ReportSnapshotV1 = {
       schemaVersion: 1,
       templateType: 'amrt',
-      versionId: '1.31',
+      versionId,
       locale: 'en-US',
       data: {
         companyInfo: {},
@@ -140,6 +145,13 @@ describe('excel export - AMRT mineral selection', () => {
     expect(readCellText(smelterXml, 'B5', ctx.sharedStrings)).toBe('Molybdenum')
     expect(readCellText(mineXml, 'A5', ctx.sharedStrings)).toBe('Tellurium')
     expect(readCellText(mineralsScopeXml, 'B8', ctx.sharedStrings)).toBe('Cadmium')
+    expect(getSheetXml(ctx, 'Smelter Look-up')).toBe(getSheetXml(templateCtx, 'Smelter Look-up'))
+    for (const sheetName of ['Declaration', 'Smelter List', 'Mine List']) {
+      const validationPattern = /<dataValidations\b[^>]*>[\s\S]*?<\/dataValidations>/
+      const originalValidations = getSheetXml(templateCtx, sheetName).match(validationPattern)?.[0]
+      expect(originalValidations).toBeTruthy()
+      expect(getSheetXml(ctx, sheetName).match(validationPattern)?.[0]).toBe(originalValidations)
+    }
   })
 })
 

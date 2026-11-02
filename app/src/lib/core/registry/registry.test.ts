@@ -45,6 +45,7 @@ const DATE_CONFIG_CASES: Array<{
   { type: 'amrt', versionId: '1.3', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
   { type: 'amrt', versionId: '1.31', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
   { type: 'amrt', versionId: '1.31.1', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
+  { type: 'amrt', versionId: '1.32.1', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
 ]
 
 describe('registry versions', () => {
@@ -63,20 +64,22 @@ describe('registry versions', () => {
     })
   })
 
-  it('uses the unbranded releases as traceable default versions', () => {
+  it('uses the latest releases as traceable default versions', () => {
     expect(getTemplateDefinition('cmrt').defaultVersion).toBe('6.6.1')
     expect(getTemplateDefinition('emrt').defaultVersion).toBe('2.11.1')
-    expect(getTemplateDefinition('amrt').defaultVersion).toBe('1.31.1')
+    expect(getTemplateDefinition('amrt').defaultVersion).toBe('1.32.1')
 
     expect(getVersionDef('cmrt', '6.6.1').version.id).toBe('6.6.1')
     expect(getVersionDef('emrt', '2.11.1').version.id).toBe('2.11.1')
     expect(getVersionDef('amrt', '1.31.1').version.id).toBe('1.31.1')
+    expect(getVersionDef('amrt', '1.32.1').version.id).toBe('1.32.1')
   })
 
   it.each([
     ['cmrt', '6.6', '6.6.1'],
     ['emrt', '2.11', '2.11.1'],
     ['amrt', '1.31', '1.31.1'],
+    ['amrt', '1.31.1', '1.32.1'],
   ] as const)(
     'keeps %s %s and %s rules identical except version metadata',
     (type, brandedVersion, unbrandedVersion) => {

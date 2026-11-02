@@ -31,6 +31,7 @@ describe('cirsGpmLegacyAdapter', () => {
     const cases = [
       { fixture: 'cmrt.json', identifier: 'CMRT_6.5', versionId: '6.5' },
       { fixture: 'emrt.json', identifier: 'emrt_2.1', versionId: '2.1' },
+      { fixture: 'amrt.json', identifier: 'AMRT_1.32.1', versionId: '1.32.1' },
     ] as const
     for (const { fixture, identifier, versionId } of cases) {
       const legacy = asRecord(loadFixture(fixture))
