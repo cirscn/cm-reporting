@@ -19,9 +19,19 @@ const CASES: ReadonlyArray<{
     relativePath: 'templates/CMRT/CMRT_6.6.1.xlsx',
   },
   {
+    templateType: 'cmrt',
+    versionId: '6.6.2',
+    relativePath: 'templates/CMRT/CMRT_6.6.2.xlsx',
+  },
+  {
     templateType: 'emrt',
     versionId: '2.11.1',
     relativePath: 'templates/EMRT/EMRT_2.11.1.xlsx',
+  },
+  {
+    templateType: 'emrt',
+    versionId: '2.11.2',
+    relativePath: 'templates/EMRT/EMRT_2.11.2.xlsx',
   },
   {
     templateType: 'amrt',

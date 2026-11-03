@@ -7,10 +7,11 @@ export const CMRT_VERSION_IDS = [
   '6.5',
   '6.6',
   '6.6.1',
+  '6.6.2',
 ] as const
 
 export type CmrtVersionId = typeof CMRT_VERSION_IDS[number]
 
-export const CMRT_DEFAULT_VERSION: CmrtVersionId = '6.6.1'
+export const CMRT_DEFAULT_VERSION: CmrtVersionId = '6.6.2'
 
 export const CMRT_VERSION_ENTRIES = CMRT_VERSION_IDS.map((id) => ({ id, label: id }))

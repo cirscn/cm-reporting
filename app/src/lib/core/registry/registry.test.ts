@@ -30,6 +30,7 @@ const DATE_CONFIG_CASES: Array<{
   { type: 'cmrt', versionId: '6.5', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
   { type: 'cmrt', versionId: '6.6', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
   { type: 'cmrt', versionId: '6.6.1', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
+  { type: 'cmrt', versionId: '6.6.2', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
   { type: 'emrt', versionId: '1.1', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
   { type: 'emrt', versionId: '1.11', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
   { type: 'emrt', versionId: '1.2', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
@@ -38,6 +39,7 @@ const DATE_CONFIG_CASES: Array<{
   { type: 'emrt', versionId: '2.1', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
   { type: 'emrt', versionId: '2.11', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
   { type: 'emrt', versionId: '2.11.1', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
+  { type: 'emrt', versionId: '2.11.2', dateConfig: { minDate: '2006-12-31', minBoundary: 'exclusive' } },
   { type: 'crt', versionId: '2.2', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
   { type: 'crt', versionId: '2.21', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
   { type: 'amrt', versionId: '1.1', dateConfig: { minDate: '2006-12-31', maxDate: '2026-03-31' } },
@@ -65,19 +67,23 @@ describe('registry versions', () => {
   })
 
   it('uses the latest releases as traceable default versions', () => {
-    expect(getTemplateDefinition('cmrt').defaultVersion).toBe('6.6.1')
-    expect(getTemplateDefinition('emrt').defaultVersion).toBe('2.11.1')
+    expect(getTemplateDefinition('cmrt').defaultVersion).toBe('6.6.2')
+    expect(getTemplateDefinition('emrt').defaultVersion).toBe('2.11.2')
     expect(getTemplateDefinition('amrt').defaultVersion).toBe('1.32.1')
 
     expect(getVersionDef('cmrt', '6.6.1').version.id).toBe('6.6.1')
+    expect(getVersionDef('cmrt', '6.6.2').version.id).toBe('6.6.2')
     expect(getVersionDef('emrt', '2.11.1').version.id).toBe('2.11.1')
+    expect(getVersionDef('emrt', '2.11.2').version.id).toBe('2.11.2')
     expect(getVersionDef('amrt', '1.31.1').version.id).toBe('1.31.1')
     expect(getVersionDef('amrt', '1.32.1').version.id).toBe('1.32.1')
   })
 
   it.each([
     ['cmrt', '6.6', '6.6.1'],
+    ['cmrt', '6.6.1', '6.6.2'],
     ['emrt', '2.11', '2.11.1'],
+    ['emrt', '2.11.1', '2.11.2'],
     ['amrt', '1.31', '1.31.1'],
     ['amrt', '1.31.1', '1.32.1'],
   ] as const)(

@@ -7,10 +7,11 @@ export const EMRT_VERSION_IDS = [
   '2.1',
   '2.11',
   '2.11.1',
+  '2.11.2',
 ] as const
 
 export type EmrtVersionId = typeof EMRT_VERSION_IDS[number]
 
-export const EMRT_DEFAULT_VERSION: EmrtVersionId = '2.11.1'
+export const EMRT_DEFAULT_VERSION: EmrtVersionId = '2.11.2'
 
 export const EMRT_VERSION_ENTRIES = EMRT_VERSION_IDS.map((id) => ({ id, label: id }))

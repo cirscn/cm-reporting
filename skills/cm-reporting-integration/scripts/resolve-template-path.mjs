@@ -17,15 +17,15 @@ const versionId = String(positional[1])
 const matrix = {
   cmrt: {
     dir: 'CMRT',
-    versions: ['6.01', '6.1', '6.22', '6.31', '6.4', '6.5', '6.6', '6.6.1'],
+    versions: ['6.01', '6.1', '6.22', '6.31', '6.4', '6.5', '6.6', '6.6.1', '6.6.2'],
     prefix: 'RMI_CMRT_',
-    filenames: { '6.6.1': 'CMRT_6.6.1.xlsx' },
+    filenames: { '6.6.1': 'CMRT_6.6.1.xlsx', '6.6.2': 'CMRT_6.6.2.xlsx' },
   },
   emrt: {
     dir: 'EMRT',
-    versions: ['1.1', '1.11', '1.2', '1.3', '2.0', '2.1', '2.11', '2.11.1'],
+    versions: ['1.1', '1.11', '1.2', '1.3', '2.0', '2.1', '2.11', '2.11.1', '2.11.2'],
     prefix: 'RMI_EMRT_',
-    filenames: { '2.11.1': 'EMRT_2.11.1.xlsx' },
+    filenames: { '2.11.1': 'EMRT_2.11.1.xlsx', '2.11.2': 'EMRT_2.11.2.xlsx' },
   },
   crt: {
     dir: 'CRT',

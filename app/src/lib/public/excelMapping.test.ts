@@ -26,9 +26,19 @@ describe('excel mapping coverage', () => {
       unbranded: EXCEL_TEMPLATE_ANCHORS.cmrt['6.6.1'],
     },
     {
+      name: 'CMRT 6.6.1 / 6.6.2',
+      branded: EXCEL_TEMPLATE_ANCHORS.cmrt['6.6.1'],
+      unbranded: EXCEL_TEMPLATE_ANCHORS.cmrt['6.6.2'],
+    },
+    {
       name: 'EMRT 2.11 / 2.11.1',
       branded: EXCEL_TEMPLATE_ANCHORS.emrt['2.11'],
       unbranded: EXCEL_TEMPLATE_ANCHORS.emrt['2.11.1'],
+    },
+    {
+      name: 'EMRT 2.11.1 / 2.11.2',
+      branded: EXCEL_TEMPLATE_ANCHORS.emrt['2.11.1'],
+      unbranded: EXCEL_TEMPLATE_ANCHORS.emrt['2.11.2'],
     },
     {
       name: 'AMRT 1.31 / 1.31.1',

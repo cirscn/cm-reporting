@@ -71,8 +71,8 @@ describe('CompanyInfoForm declaration scope options', () => {
     ])
   })
 
-  test('shows company info placeholders for CMRT 6.6', () => {
-    const versionDef = getVersionDef('cmrt', '6.6')
+  test.each(['6.6', '6.6.1', '6.6.2'])('shows company info placeholders for CMRT %s', (versionId) => {
+    const versionDef = getVersionDef('cmrt', versionId)
 
     renderToStaticMarkup(
       <CompanyInfoForm

@@ -52,7 +52,7 @@ function App() {
   return (
     <CMReporting
       templateType="cmrt"
-      versionId="6.5"
+      versionId="6.6.2"
       locale="zh-CN"
       onSnapshotChange={(snapshot) => console.log(snapshot)}
     />
@@ -68,10 +68,14 @@ function App() {
 
 | 模板 | 版本 | 说明 |
 |------|------|------|
-| CMRT | 6.01, 6.1, 6.22, 6.31, 6.4, 6.5, 6.6, 6.6.1 | 冲突矿产报告模板 |
-| EMRT | 1.1, 1.11, 1.2, 1.3, 2.0, 2.1, 2.11, 2.11.1 | 扩展矿产报告模板 |
+| CMRT | 6.01, 6.1, 6.22, 6.31, 6.4, 6.5, 6.6, 6.6.1, 6.6.2 | 冲突矿产报告模板 |
+| EMRT | 1.1, 1.11, 1.2, 1.3, 2.0, 2.1, 2.11, 2.11.1, 2.11.2 | 扩展矿产报告模板 |
 | CRT | 2.2, 2.21 | 钴报告模板 |
 | AMRT | 1.1, 1.2, 1.3, 1.31, 1.31.1, 1.32.1 | 附加矿产报告模板 |
+
+CMRT、EMRT 当前默认版本分别为 `6.6.2`、`2.11.2`，填写字段、选项与校验规则延续各自的 `.1` 版本，全部历史版本继续支持。导出使用原始文件 `CMRT_6.6.2.xlsx`、`EMRT_2.11.2.xlsx`，保存和导出均保留准确版本号。
+
+两个新版原始 Excel 移除了 `Revision` 工作表，并将部分发布方说明改为 `Issuer`；CMRT 的“冶炼厂未列出”来源公式还移除了自动填入的 `RMI`。插件按新版模板保留这些差异，并同步对应的中英文说明文案。
 
 ## 开发
 
@@ -121,8 +125,8 @@ $ pnpm validate:templates
 
 Validating templates...
 
-✓ CMRT: 8 versions, all templates found
-✓ EMRT: 8 versions, all templates found
+✓ CMRT: 9 versions, all templates found
+✓ EMRT: 9 versions, all templates found
 ✓ CRT: 2 versions, all templates found
 ✓ AMRT: 6 versions, all templates found
 

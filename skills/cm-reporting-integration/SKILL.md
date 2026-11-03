@@ -83,7 +83,7 @@ Apply these rules in every solution:
 - For all templates, keep `Smelter List` rows under the same Q1/Q2 gating as the current template: when a metal no longer requires smelter disclosure, rows for that metal are automatically removed from `smelterList`.
 - For any template version with `smelterLookup` dropdown support, once a `Smelter List` row has a selected `metal`, treat `smelterLookup` as checker-required; missing lookup must stay visible as an unfinished item instead of silently passing.
 - For `EMRT`, default selection should include all declared minerals on empty initialization; when `readOnly=false`, users can still edit the declaration scope selections.
-- For `Product List`, when `Declaration Scope = Product` (`scopeType === 'B'`), the list itself is required and `partNumber` is always required; versions with `hasRequesterColumns=true` (for example `CMRT 6.6 / 6.6.1`, `EMRT 2.11 / 2.11.1`, and `AMRT 1.3 / 1.31 / 1.31.1 / 1.32.1`) still show `requestPartNumber`, but it is not required.
+- `Product List` 在 `Declaration Scope = Product`（`scopeType === 'B'`）时不能为空，`partNumber` 始终必填；带请求方列的版本（例如 `CMRT 6.6 / 6.6.1 / 6.6.2`、`EMRT 2.11 / 2.11.1 / 2.11.2`、`AMRT 1.3 / 1.31 / 1.31.1 / 1.32.1`）仍显示 `requestPartNumber`，但该字段不参与必填校验。
 - Product List integration payload fields are `partNumber / partName / requestPartNumber / requestPartName / remark`.
 - 对 `dynamic-dropdown` 范围模板（`EMRT` 2.x / `AMRT` 1.3+），当取消某个矿种时，应预期库会自动执行级联清理：清空该矿种的按矿种题目/备注答案，并删除关联的 `Smelter List` / `Mine List` 行数据。
 - 当 `other` 保持勾选但某个自定义矿种名称被清空时，库会按槽位清理对应 `other-*` 的按矿种答案与关联列表行。
@@ -95,6 +95,9 @@ Apply these rules in every solution:
 - Treat `CMRT 6.6.1`, `EMRT 2.11.1`, and `AMRT 1.31.1` as independent official versions for snapshot and export traceability.
 - These versions only remove the template Logo; their structures and rules match `CMRT 6.6`, `EMRT 2.11`, and `AMRT 1.31` respectively.
 - Their official filenames do not use the `RMI_` prefix: `CMRT_6.6.1.xlsx`, `EMRT_2.11.1.xlsx`, and `AMRT_1.31.1.xlsx`.
+- 最新 CMRT 使用 `templateType="cmrt"`、`versionId="6.6.2"`、`CMRT_6.6.2.xlsx`；最新 EMRT 使用 `templateType="emrt"`、`versionId="2.11.2"`、`EMRT_2.11.2.xlsx`。两者是各自默认版本，文件名不带 `RMI_`，填写字段、选项和校验规则延续各自的 `.1` 版本，Snapshot 与 Excel 导出保留独立版本号，全部历史版本继续支持。
+- 两个新版原始 Excel 移除了 `Revision` 工作表，部分发布方说明改为 `Issuer`；界面中的新版中英文说明与模板对齐。插件内的版本信息页继续展示版本清单，不依赖原始 Excel 的 `Revision` 工作表。
+- `CMRT 6.6.2` 的 `Smelter List!G5:G2504` 在 `Smelter Not Listed` 分支不再自动填入 `RMI`；导出保留对应版本的原始公式，宿主显式提供的 `sourceId` 仍按现有数据契约保留。EMRT 2.11.2 延续原有冶炼厂来源公式，不要把此项 CMRT 差异套用到 EMRT。
 - 最新 AMRT 使用 `templateType="amrt"`、`versionId="1.32.1"` 和模板文件 `AMRT_1.32.1.xlsx`；这也是默认版本。本次只更新模板，字段、选项及校验规则延续 `1.31.1`，Snapshot 与 Excel 导出保留独立版本号，全部历史版本继续支持。
 - `1.32.1` 默认中文，移除 `Revision` 工作表，更新 `Smelter Look-up` 数据；国家/地区列表验证的新增仅发生在原始 Excel，宿主仍沿用现有填写界面，矿厂国家/地区保持自由文本。
 - `AMRT 1.31 / 1.31.1 / 1.32.1` 相比 `AMRT 1.3` 多出 `Cadmium`、`Lead`、`Molybdenum`、`Rhenium`、`Selenium`、`Tellurium`。

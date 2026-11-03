@@ -16,6 +16,7 @@ import { emrt_2_0 } from './versions/2.0'
 import { emrt_2_1 } from './versions/2.1'
 import { emrt_2_11 } from './versions/2.11'
 import { emrt_2_11_1 } from './versions/2.11.1'
+import { emrt_2_11_2 } from './versions/2.11.2'
 
 const EMRT_VERSION_OVERRIDES = {
   '1.1': emrt_1_1,
@@ -26,6 +27,7 @@ const EMRT_VERSION_OVERRIDES = {
   '2.1': emrt_2_1,
   '2.11': emrt_2_11,
   '2.11.1': emrt_2_11_1,
+  '2.11.2': emrt_2_11_2,
 } satisfies Record<(typeof EMRT_VERSION_IDS)[number], EmrtVersionOverride>
 
 const EMRT_VERSION_MAP = createVersionMap(Object.values(EMRT_VERSION_OVERRIDES))

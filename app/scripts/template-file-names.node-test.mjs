@@ -11,7 +11,9 @@ test('保留旧版本的 RMI_ 文件名前缀', () => {
 
 test('解析无 Logo 升版的官方原始文件名', () => {
   assert.equal(getTemplateFilename('CMRT', '6.6.1'), 'CMRT_6.6.1.xlsx')
+  assert.equal(getTemplateFilename('CMRT', '6.6.2'), 'CMRT_6.6.2.xlsx')
   assert.equal(getTemplateFilename('EMRT', '2.11.1'), 'EMRT_2.11.1.xlsx')
+  assert.equal(getTemplateFilename('EMRT', '2.11.2'), 'EMRT_2.11.2.xlsx')
   assert.equal(getTemplateFilename('AMRT', '1.31.1'), 'AMRT_1.31.1.xlsx')
   assert.equal(getTemplateFilename('AMRT', '1.32.1'), 'AMRT_1.32.1.xlsx')
 })

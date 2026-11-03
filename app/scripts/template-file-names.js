@@ -2,7 +2,9 @@ const UNBRANDED_TEMPLATE_VERSIONS = new Set([
   'AMRT@1.31.1',
   'AMRT@1.32.1',
   'CMRT@6.6.1',
+  'CMRT@6.6.2',
   'EMRT@2.11.1',
+  'EMRT@2.11.2',
 ])
 
 /** 返回官方模板原始文件名；无 Logo 版本不带 RMI_ 前缀。 */
