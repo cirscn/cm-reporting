@@ -7,6 +7,7 @@ import { getVersionDef } from '@core/registry'
 import { runChecker } from '@core/rules/checker'
 import { buildFormSchema, type FormData } from '@core/schema'
 import { createEmptyFormData } from '@core/template/formDefaults'
+import { ERROR_KEYS } from '@core/validation/errorKeys'
 import { useContext } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, test } from 'vitest'
@@ -114,6 +115,34 @@ function buildFilledEmrtFormData(options: { includeRequiredSmelter: boolean }): 
 }
 
 describe('TemplateStore validateForm', () => {
+  test.each([
+    ['contactEmail', 'first. last@example.com'],
+    ['authorizerEmail', 'first. last@example.com'],
+    ['contactEmail', '@example.com'],
+    ['contactEmail', 'contact@'],
+    ['contactEmail', 'contact@@example.com'],
+    ['contactEmail', 'contact@example'],
+    ['contactEmail', 'first..last@example.com'],
+    ['contactEmail', 'contact@example-.com'],
+    ['contactEmail', 'contact@example.com '],
+  ])('rejects an invalid %s value (%s) in both form validation and checker', async (field, email) => {
+    const versionDef = getVersionDef('emrt', EMRT_VERSION_ID)
+    const formData = buildFilledEmrtFormData({ includeRequiredSmelter: true })
+    formData.companyInfo[field] = email
+
+    const store = createStoreForEmrtValidation()
+    store.getState().setFormData(formData)
+
+    expect(await store.getState().validateForm()).toBe(false)
+    expect(store.getState().errors.companyInfo[field]).toBe(ERROR_KEYS.emailInvalid)
+    expect(runChecker(versionDef, buildRuleInput(formData), buildDataInput(formData))).toEqual([
+      expect.objectContaining({
+        fieldPath: `companyInfo.${field}`,
+        messageKey: ERROR_KEYS.checker.invalidEmail,
+      }),
+    ])
+  })
+
   test('returns false when zod passes but checker fails', async () => {
     const versionDef = getVersionDef('emrt', EMRT_VERSION_ID)
     const formData = buildFilledEmrtFormData({ includeRequiredSmelter: false })
@@ -136,9 +165,18 @@ describe('TemplateStore validateForm', () => {
     expect(valid).toBe(false)
   })
 
-  test('returns true when zod and checker both pass', async () => {
+  test.each([
+    'first.last+tag@sub.example.com',
+    'not available',
+    ' N/A ',
+    '无',
+    '不适用',
+    '不可用',
+  ])('accepts %s in both email fields', async (email) => {
     const versionDef = getVersionDef('emrt', EMRT_VERSION_ID)
     const formData = buildFilledEmrtFormData({ includeRequiredSmelter: true })
+    formData.companyInfo.contactEmail = email
+    formData.companyInfo.authorizerEmail = email
     const schema = buildFormSchema(versionDef)
 
     expect(schema.safeParse(formData).success).toBe(true)

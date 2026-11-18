@@ -22,6 +22,8 @@
 - `CMReportingRefScenario` 已演示外置保存/提交按钮：
   - `saveDraft()`：不校验必填，直接返回当前 Snapshot；
   - `submit()`：执行内部全量校验（`zod + checker`），失败返回 `null` 且自动跳转到 checker，成功返回 Snapshot。
+- 申报页联系人和授权人邮箱在所有版本中均为必填。表单、应用 Checker、`validate()` 和 `submit()` 使用同一规则。每栏可填一个无空白的邮箱地址，格式为 `用户名@域名`，域名须含点号且各段格式正确。无邮箱时可填 `not available`、`n/a`、`无`、`不适用` 或 `不可用`。匹配占位词时忽略英文大小写和两端空白。
+- `first. last@example.com` 会触发邮箱错误，`validate()` 返回 `false`，`submit()` 返回 `null`。填写 ` N/A ` 可通过该邮箱项。官方 Excel 的 Checker 公式只检查邮箱是否包含 `@`。
 - 示例中通过 `showPageActions={false}` 隐藏库内底部翻页，完全由宿主弹窗/按钮接管流程。
 - `CMRT / EMRT / AMRT` 的企业地址均为选填；切换任一已支持 `AMRT` 版本时，地址留空不触发必填错误，表单不显示必填标记。
 - `id` 与冶炼厂识别号码语义分离：`id` 作为行主键、去重依据和矿场 `MineRow.smelterId` 的关联主键；识别号码使用 `smelterNumber` 展示（`SmelterRow.smelterId` 仅内部兼容）。

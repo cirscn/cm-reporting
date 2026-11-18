@@ -8,24 +8,25 @@ import { z } from 'zod/v4'
 
 import { ERROR_KEYS } from './errorKeys'
 
-const NOT_AVAILABLE_EMAIL = 'not available'
-const EMAIL_FORMAT_SCHEMA = z.string().refine(
-  (value) => value.includes('@'),
-  ERROR_KEYS.emailInvalid
-)
+const EMAIL_PLACEHOLDERS = new Set(['not available', 'n/a', '无', '不适用', '不可用'])
+const EMAIL_FORMAT_SCHEMA = z.email({ pattern: z.regexes.html5Email })
 
-/**
- * 判断是否为“无邮箱”占位值（PRD 允许）。
- */
-function isNotAvailableEmail(value: string) {
-  return value.trim().toLowerCase() === NOT_AVAILABLE_EMAIL
+/** 在浏览器邮箱规则的基础上，检查域名和用户名的点号。 */
+function hasValidEmailFormat(value: string) {
+  if (!EMAIL_FORMAT_SCHEMA.safeParse(value).success) return false
+
+  const [localPart, domain] = value.split('@')
+  return domain.includes('.') &&
+    !localPart.startsWith('.') &&
+    !localPart.endsWith('.') &&
+    !localPart.includes('..')
 }
 
 /**
  * 导出常量：emailSchema。
  */
 export const emailSchema = z.string().refine(
-  (value) => isNotAvailableEmail(value) || EMAIL_FORMAT_SCHEMA.safeParse(value).success,
+  (value) => EMAIL_PLACEHOLDERS.has(value.trim().toLowerCase()) || hasValidEmailFormat(value),
   ERROR_KEYS.emailInvalid
 )
 

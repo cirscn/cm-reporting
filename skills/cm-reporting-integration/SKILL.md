@@ -159,4 +159,6 @@ Load only what the request needs:
   - 失败返回 `null`，并自动跳转 checker 页面；
   - 成功返回 `ReportSnapshotV1`，由宿主决定后续 API 提交。
 - `CMReportingRef.validate()` 与 `submit()` 共享同一套全量门控（`zod + checker`），不应再将其视为“仅结构校验”。
+- 申报页联系人和授权人邮箱在所有版本中均为必填。表单、应用 Checker、`validate()` 和 `submit()` 使用同一规则。每栏可填一个无空白的邮箱地址，格式为 `用户名@域名`，域名须含点号且各段格式正确。无邮箱时可填 `not available`、`n/a`、`无`、`不适用` 或 `不可用`。匹配占位词时忽略英文大小写和两端空白。
+- 宿主使用库内校验判断邮箱能否提交。官方 Excel 的 Checker 公式只检查邮箱是否包含 `@`，应用按上述规则校验。
 - `useCMReporting()` 提供同等能力（`saveDraft/submit`），适合函数式集成场景。

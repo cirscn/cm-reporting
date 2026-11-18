@@ -135,6 +135,8 @@ import type { CMReportingRef, CMReportingProps } from '@lib/index'
 **提交/校验一致性说明：**
 
 - `submit()` 与 `validate()` 使用同一套全量校验门控（`zod + checker`）。
+- 申报页联系人和授权人邮箱在所有版本中均为必填。表单、应用 Checker、`validate()` 和 `submit()` 使用同一规则。每栏可填一个无空白的邮箱地址，格式为 `用户名@域名`，域名须含点号且各段格式正确。
+- 无邮箱时可填 `not available`、`n/a`、`无`、`不适用` 或 `不可用`。匹配占位词时忽略英文大小写和两端空白。导出使用官方 Excel 的原有 Checker 公式，该公式只检查邮箱是否包含 `@`。
 - 当 checker 仍有“必填未完成”项时，`submit()` 一定返回 `null`，不会出现“checker 提示未完成但仍提交成功”的状态分叉。
 - `CMRT / EMRT / AMRT` 的企业地址均为选填；`AMRT` 全部已支持版本的地址留空不触发必填错误，表单不显示必填标记。
 
